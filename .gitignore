@@ -110,7 +110,7 @@ env.bak/
 venv.bak/
 
 # Frontend environment files
-# front/.env
+front/.env
 
 # Spyder project settings
 .spyderproject
