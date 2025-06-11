@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  # Бэкенд сервис
+  backend:
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+    container_name: nareshka-backend
+    ports:
+      - "4000:4000"
+    environment:
+      - PORT=4000
+    networks:
+      - nareshka-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Фронтенд сервис
+  frontend:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    container_name: nareshka-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - nareshka-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+# Общая сеть для контейнеров
+networks:
+  nareshka-network:
+    driver: bridge
+    name: nareshka-network
