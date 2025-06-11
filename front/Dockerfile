@@ -1,42 +1,59 @@
-# Стадия сборки
-FROM node:20-alpine AS builder
+# Этап сборки
+FROM node:20-alpine as build
 
-# Устанавливаем рабочую директорию
 WORKDIR /app
 
-# Копируем файлы зависимостей
-COPY package.json package-lock.json ./
+# Копируем package.json и package-lock.json
+COPY package*.json ./
 
 # Устанавливаем зависимости
-RUN npm ci --silent
+RUN npm ci --only=production
 
 # Копируем исходный код
 COPY . .
 
-# Используем продакшен конфигурацию если нет .env
-RUN if [ ! -f .env ]; then cp .env.prod .env; fi
-
-# Показываем содержимое .env для отладки
-RUN echo "=== Content of .env ===" && cat .env
-
-# Собираем приложение
+# Создаем продакшн сборку с продакшн переменными окружения
+COPY .env.prod .env
 RUN npm run build
 
-# Показываем что собралось
-RUN echo "=== Built files ===" && ls -la dist/
-
-# Стадия производства с nginx
+# Продакшн этап с nginx
 FROM nginx:alpine
 
 # Копируем собранное приложение
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=build /app/dist /usr/share/nginx/html
 
-# Удаляем дефолтную конфигурацию и создаем нашу
-RUN rm /etc/nginx/conf.d/default.conf
-COPY site.conf /etc/nginx/conf.d/default.conf
+# Копируем кастомную конфигурацию nginx
+COPY <<EOF /etc/nginx/conf.d/default.conf
+server {
+    listen 80;
+    location / {
+        root /usr/share/nginx/html;
+        index index.html index.htm;
+        try_files \$uri \$uri/ /index.html;
+    }
+    
+    # Проксирование API запросов на бэкенд
+    location /api {
+        proxy_pass http://backend:4000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_cache_bypass \$http_upgrade;
+    }
+    
+    # Gzip сжатие
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_proxied expired no-cache no-store private must-revalidate auth;
+    gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/javascript application/xml+rss;
+}
+EOF
 
-# Открываем порт
 EXPOSE 80
 
-# Запускаем nginx
 CMD ["nginx", "-g", "daemon off;"] 
