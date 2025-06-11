@@ -16,8 +16,14 @@ COPY . .
 # Используем продакшен конфигурацию если нет .env
 RUN if [ ! -f .env ]; then cp .env.prod .env; fi
 
+# Показываем содержимое .env для отладки
+RUN echo "=== Content of .env ===" && cat .env
+
 # Собираем приложение
 RUN npm run build
+
+# Показываем что собралось
+RUN echo "=== Built files ===" && ls -la dist/
 
 # Стадия производства с nginx
 FROM nginx:alpine
@@ -25,7 +31,8 @@ FROM nginx:alpine
 # Копируем собранное приложение
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Копируем конфигурацию nginx
+# Удаляем дефолтную конфигурацию и копируем нашу
+RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # Открываем порт
