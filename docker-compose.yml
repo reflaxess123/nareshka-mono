@@ -7,13 +7,22 @@ services:
       context: ./back
       dockerfile: Dockerfile
     container_name: nareshka-backend
-    ports:
-      - "4000:4000"
+    expose:
+      - "4000"
     environment:
       - PORT=4000
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - SECRET_KEY=${SECRET_KEY}
+      - ALLOWED_ORIGINS=${SERVICE_FQDN_FRONTEND}
     networks:
       - nareshka-network
     restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.backend.rule=Host(`${SERVICE_FQDN_BACKEND}`) && PathPrefix(`/api`)
+      - traefik.http.routers.backend.entryPoints=http
+      - traefik.http.services.backend.loadbalancer.server.port=4000
     healthcheck:
       test:
         [
@@ -33,13 +42,18 @@ services:
       context: ./front
       dockerfile: Dockerfile
     container_name: nareshka-frontend
-    ports:
-      - "80:80"
+    expose:
+      - "80"
     depends_on:
       - backend
     networks:
       - nareshka-network
     restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.frontend.rule=Host(`${SERVICE_FQDN_FRONTEND}`)
+      - traefik.http.routers.frontend.entryPoints=http
+      - traefik.http.services.frontend.loadbalancer.server.port=80
     healthcheck:
       test:
         [
