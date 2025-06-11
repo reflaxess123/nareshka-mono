@@ -1,0 +1,42 @@
+@use '@/app/styles/helpers' as *;
+
+.registerForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+
+  .title {
+    user-select: none;
+  }
+
+  .buttons {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+
+.error {
+  color: var(--color-error);
+  font-size: var(--font-size-sm);
+  margin-top: var(--space-1);
+  display: block;
+}
+
+.field {
+  margin-bottom: var(--space-4);
+}
+
+.input {
+  width: 100%;
+  padding: var(--space-2);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+
+  &.invalid {
+    border-color: var(--color-error);
+    box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.25);
+  }
+}

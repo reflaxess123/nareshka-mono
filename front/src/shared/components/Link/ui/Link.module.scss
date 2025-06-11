@@ -1,0 +1,55 @@
+@use '@/app/styles/helpers' as *;
+
+.link {
+  color: var(--text-inverse);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  user-select: none;
+  cursor: pointer;
+  transition: color var(--transition-normal) var(--ease-in-out);
+
+  &.sidebar {
+    color: var(--sidebar-text);
+
+    &:hover {
+      color: var(--sidebar-text);
+    }
+  }
+
+  .text {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-normal);
+    white-space: nowrap;
+    opacity: var(--opacity-0);
+    width: 0;
+    margin-left: 0;
+    overflow: hidden;
+    transition: all var(--transition-slow) var(--ease-in-out);
+    visibility: hidden;
+
+    &.small {
+      font-size: var(--font-size-base);
+    }
+
+    &.medium {
+      font-size: var(--font-size-2xl);
+    }
+
+    &.large {
+      font-size: var(--font-size-4xl);
+    }
+  }
+
+  &:hover .text {
+    transform: translateX(10px) scale(1.1);
+  }
+}
+
+.link .parentHoveredText {
+  visibility: visible;
+  opacity: var(--opacity-100);
+  width: auto;
+  margin-left: var(--space-1);
+}

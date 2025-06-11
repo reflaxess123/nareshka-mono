@@ -1,0 +1,145 @@
+@use '@/app/styles/helpers' as *;
+
+.contentBlocksList {
+  width: 100%;
+}
+
+.loading,
+.error,
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 40px 20px;
+}
+
+.loadingContainer,
+.errorContainer,
+.emptyContainer {
+  text-align: center;
+  max-width: 400px;
+}
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  color: var(--text-secondary);
+}
+
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+
+  h3 {
+    color: var(--danger-color);
+    margin: 0;
+    font-size: 18px;
+  }
+
+  p {
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.5;
+  }
+}
+
+.emptyContainer {
+  color: var(--text-secondary);
+
+  h3 {
+    color: var(--text-primary);
+    margin: 0 0 8px 0;
+    font-size: 18px;
+  }
+
+  p {
+    margin: 0;
+    line-height: 1.5;
+  }
+}
+
+.errorIcon {
+  color: var(--danger-color);
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.resultsInfo {
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--border-primary);
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-secondary);
+
+    span {
+      color: var(--text-tertiary);
+    }
+  }
+}
+
+.blocksList {
+  display: grid;
+  gap: 20px;
+  margin-bottom: 32px;
+
+  &.compact {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.blockCard {
+  // Дополнительные стили для карточек в списке
+}
+
+.loadMoreTrigger {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+  min-height: 80px;
+}
+
+.loadingMore {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.additionalLoading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}

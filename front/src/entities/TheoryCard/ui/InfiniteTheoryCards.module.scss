@@ -1,0 +1,176 @@
+@use '@/app/styles/helpers' as *;
+
+.container {
+  width: 100%;
+
+  .statsBar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: fluid-to-tablet(24, 16);
+    padding: fluid-to-tablet(20, 16) fluid-to-tablet(20, 16);
+    background: var(--filter-bg);
+    backdrop-filter: var(--backdrop-blur-md);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--filter-border);
+    flex-wrap: wrap;
+    box-shadow: var(--shadow-card);
+
+    @include mobile {
+      padding: var(--space-3) var(--space-4);
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .statsText {
+      font-size: var(--font-size-sm);
+      color: var(--filter-text);
+      font-weight: var(--font-weight-medium);
+    }
+
+    .filterBadge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      padding: var(--space-1) var(--space-2);
+      background: rgba(255, 255, 255, var(--opacity-15));
+      border-radius: var(--radius-xl);
+      font-size: var(--font-size-xs);
+      color: var(--filter-text);
+      font-weight: var(--font-weight-medium);
+      border: 1px solid rgba(255, 255, 255, var(--opacity-20));
+
+      @include mobile {
+        font-size: 11px;
+      }
+    }
+  }
+
+  .cardsGrid {
+    display: flex;
+    flex-direction: column;
+    gap: fluid-to-tablet(24, 16);
+  }
+
+  .loadingState {
+    @include flex-center;
+    flex-direction: column;
+    min-height: 300px;
+    gap: var(--space-4);
+    color: var(--text-primary);
+    @include fluid-text(18, 16);
+  }
+
+  .errorState {
+    @include flex-center;
+    flex-direction: column;
+    min-height: 200px;
+    gap: var(--space-3);
+    color: var(--color-error);
+    @include fluid-text(18, 16);
+    background: rgba(239, 68, 68, var(--opacity-10));
+    border-radius: var(--radius-xl);
+    padding: fluid-to-tablet(32, 24);
+    backdrop-filter: var(--backdrop-blur-md);
+    border: 1px solid rgba(239, 68, 68, var(--opacity-20));
+
+    .errorIcon {
+      font-size: var(--font-size-4xl);
+    }
+  }
+
+  .emptyState {
+    @include flex-center;
+    flex-direction: column;
+    min-height: 300px;
+    gap: var(--space-4);
+    text-align: center;
+    color: var(--text-secondary);
+    background: var(--surface-elevated);
+    border-radius: var(--radius-2xl);
+    padding: fluid-to-tablet(48, 32) fluid-to-tablet(32, 20);
+    backdrop-filter: var(--backdrop-blur-md);
+    border: 1px solid var(--border-secondary);
+    box-shadow: var(--shadow-card);
+
+    .emptyIcon {
+      font-size: var(--font-size-6xl);
+      opacity: var(--opacity-60);
+    }
+
+    h3 {
+      margin: 0;
+      @include fluid-text(24, 20);
+      color: var(--text-primary);
+
+      @include mobile {
+        font-size: var(--font-size-xl);
+      }
+    }
+
+    p {
+      margin: 0;
+      font-size: var(--font-size-base);
+      opacity: var(--opacity-70);
+
+      @include mobile {
+        font-size: var(--font-size-sm);
+      }
+    }
+  }
+
+  .loadMore {
+    margin-top: fluid-to-tablet(32, 24);
+    @include flex-center;
+    min-height: 80px;
+
+    .loadingMore {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      color: var(--text-secondary);
+      font-size: var(--font-size-base);
+    }
+
+    .loadMoreTrigger {
+      color: var(--text-tertiary);
+      font-size: var(--font-size-sm);
+      text-align: center;
+      padding: var(--space-4);
+    }
+  }
+
+  .endMessage {
+    @include flex-center;
+    margin-top: fluid-to-tablet(32, 24);
+    padding: fluid-to-tablet(24, 16);
+    background: rgba(16, 185, 129, var(--opacity-10));
+    border-radius: var(--radius-xl);
+    border: 1px solid rgba(16, 185, 129, var(--opacity-20));
+    backdrop-filter: var(--backdrop-blur-md);
+
+    span {
+      color: var(--color-success);
+      @include fluid-text(18, 16);
+      font-weight: var(--font-weight-semibold);
+    }
+  }
+
+  .spinner {
+    @include square(24px);
+    border: 3px solid var(--border-muted);
+    border-top: 3px solid var(--text-accent);
+    border-radius: var(--radius-full);
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

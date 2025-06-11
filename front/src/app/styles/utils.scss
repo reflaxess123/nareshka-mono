@@ -1,0 +1,24 @@
+@use 'helpers';
+
+.container {
+  width: 100%;
+  max-width: calc(var(--container-width) + var(--container-padding-x) * 2);
+  margin-inline: auto;
+  padding-inline: var(--container-padding-x);
+  box-sizing: border-box;
+}
+
+.visually-hidden {
+  @include helpers.visually-hidden;
+}
+
+.visible-mobile {
+  @include helpers.mobile-above {
+    display: none !important;
+  }
+}
+.hidden-mobile {
+  @include helpers.mobile {
+    display: none !important;
+  }
+}

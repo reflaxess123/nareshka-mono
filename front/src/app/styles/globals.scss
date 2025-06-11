@@ -1,0 +1,50 @@
+@use 'reset' as *;
+@use 'variables';
+@use 'fonts';
+@use 'utils';
+@use './helpers' as *;
+
+// * {
+//   outline: 1px dashed rgba(255, 0, 255, 0.5);
+// }
+
+html {
+  &.is-lock {
+    overflow: hidden;
+  }
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family-base);
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
+  transition:
+    color var(--transition-normal),
+    background-color var(--transition-normal);
+}
+
+main {
+  flex-grow: 1;
+}
+
+a,
+button,
+label,
+input,
+textarea,
+select,
+svg * {
+  transition-duration: var(--transition-duration);
+}
+
+// :focus-visible { // Закомментировано, если миксин не определен или не используется
+//   @include focus-visible;
+// }
+
+// .header,
+// .content > *:not(:nth-last-child(2)),
+// .footer {
+//   display: none !important;
+// }

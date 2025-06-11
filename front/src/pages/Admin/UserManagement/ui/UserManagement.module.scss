@@ -1,0 +1,194 @@
+@use '@/app/styles/helpers' as *;
+
+.userManagement {
+  width: 100%;
+  min-height: 100vh;
+  padding: var(--space-6);
+  background: var(--bg-primary);
+
+  @include mobile {
+    padding: var(--space-4);
+  }
+}
+
+.loading,
+.error,
+.empty {
+  @include flex-center;
+  flex-direction: column;
+  min-height: 400px;
+  gap: var(--space-4);
+}
+
+.error {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  border: 1px solid var(--border-error);
+}
+
+.header {
+  margin-bottom: var(--space-6);
+  text-align: center;
+
+  .subtitle {
+    margin-top: var(--space-2);
+    color: var(--text-secondary);
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--space-6);
+  gap: var(--space-3);
+
+  @include mobile {
+    justify-content: center;
+  }
+}
+
+.usersList {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  border: 1px solid var(--border-primary);
+}
+
+.usersGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: var(--space-4);
+
+  @include tablet {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+}
+
+.userCard {
+  background: var(--color-gray-50);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  border: 1px solid var(--border-secondary);
+  transition: all var(--transition-normal);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--border-accent);
+  }
+}
+
+.userInfo {
+  margin-bottom: var(--space-4);
+}
+
+.userHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-3);
+}
+
+.roleContainer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-secondary);
+}
+
+.roleText {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+}
+
+.adminIcon {
+  color: var(--color-warning);
+}
+
+.userIcon {
+  color: var(--color-success);
+}
+
+.guestIcon {
+  color: var(--text-tertiary);
+}
+
+.userId {
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  font-weight: var(--font-weight-medium);
+}
+
+.userEmail {
+  margin-bottom: var(--space-3);
+  padding: var(--space-2);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-secondary);
+}
+
+.userDates {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.dateItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--font-size-sm);
+}
+
+.dateLabel {
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+.dateValue {
+  color: var(--text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.userActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  border-top: 1px solid var(--border-secondary);
+  padding-top: var(--space-3);
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-sm);
+  padding: var(--space-2) var(--space-3);
+  min-height: 36px;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  @include mobile {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+.empty {
+  text-align: center;
+  padding: var(--space-8);
+  color: var(--text-secondary);
+}

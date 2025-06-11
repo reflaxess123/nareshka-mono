@@ -1,0 +1,94 @@
+// === СВЕТЛАЯ ТЕМА ===
+
+@mixin light-theme {
+  // === СЕМАНТИЧЕСКИЕ ЦВЕТА ДЛЯ СВЕТЛОЙ ТЕМЫ ===
+  --bg-primary: var(--color-white);
+  --bg-secondary: var(--color-gray-50);
+  --bg-tertiary: var(--color-gray-100);
+  --bg-accent: var(--color-primary);
+  --bg-overlay: rgba(0, 0, 0, 0.5);
+  --bg-muted: var(--color-gray-200);
+  --bg-hover: var(--color-gray-100); // Цвет при наведении
+  --bg-disabled: var(
+    --color-gray-300
+  ); // Более контрастный серый для отключенных элементов
+
+  --text-primary: var(--color-gray-900);
+  --text-secondary: var(--color-gray-700);
+  --text-tertiary: var(--color-gray-500);
+  --text-accent: var(--color-primary);
+  --text-inverse: var(--color-white);
+  --text-muted: var(--color-gray-400);
+  --text-disabled: var(
+    --color-gray-500
+  ); // Более темный серый для отключенного текста
+
+  --border-primary: var(--color-gray-300);
+  --border-secondary: var(--color-gray-200);
+  --border-accent: var(--color-primary);
+  --border-muted: var(--color-gray-100);
+
+  --surface-primary: var(--color-white);
+  --surface-secondary: var(--color-gray-50);
+  --surface-elevated: var(--color-white);
+  --surface-overlay: var(--color-white);
+
+  // === ACCENT ПЕРЕМЕННЫЕ ===
+  --accent-primary: var(--color-primary); // Основной акцентный цвет
+  --accent-hover: var(--color-primary-dark); // Темнее при наведении
+  --accent-light: rgba(118, 75, 162, 0.1); // Светлый вариант с прозрачностью
+  --accent-dark: var(--color-primary-dark); // Темнее для контраста
+
+  // === СТАТУСНЫЕ ЦВЕТА ===
+  --success-color: var(--color-success);
+  --success-hover: var(--color-success-light);
+  --warning-color: var(--color-warning);
+  --warning-hover: var(--color-warning-light);
+  --danger-color: var(--color-error);
+  --danger-hover: var(--color-error-light);
+  --info-color: var(--color-info);
+  --info-hover: var(--color-info-light);
+
+  // === СПЕЦИАЛЬНЫЕ ЦВЕТА ДЛЯ КОМПОНЕНТОВ ===
+  // Сайдбар
+  --sidebar-bg: var(--color-primary);
+  --sidebar-bg-hover: var(--color-primary-dark);
+  --sidebar-text: var(--text-inverse);
+
+  // Карточки
+  --card-bg: var(--color-primary);
+  --card-bg-expanded: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-secondary) 100%
+  );
+  --card-text: var(--text-inverse);
+  --card-overlay: rgba(255, 255, 255, 0.1);
+
+  // Фильтры
+  --filter-bg: var(--color-primary);
+  --filter-bg-hover: var(--color-primary-dark);
+  --filter-text: var(--text-inverse);
+  --filter-border: var(--color-primary-light);
+
+  // Тени для светлой темы
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-sm:
+    0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-md:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --shadow-xl:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+
+  // Специальные тени для компонентов
+  --shadow-sidebar:
+    0 8px 32px rgba(102, 126, 234, 0.2), 0 4px 16px rgba(118, 75, 162, 0.1);
+  --shadow-card:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-card-hover:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}

@@ -1,0 +1,184 @@
+@use '@/app/styles/helpers' as *;
+
+.filters {
+  background: var(--filter-bg);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius-2xl);
+  padding: fluid-to-tablet(24, 16);
+  margin-bottom: fluid-to-tablet(32, 24);
+  border: 1px solid var(--filter-border);
+  user-select: none;
+  box-shadow: var(--shadow-card);
+  transition: all var(--transition-normal) var(--ease-in-out);
+
+  &:hover {
+    background: var(--filter-bg-hover);
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  .filtersRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    align-items: end;
+    justify-content: space-between;
+
+    @include mobile {
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-4);
+    }
+  }
+
+  .searchGroup {
+    position: relative;
+    flex: 2;
+    // min-width: 250px;
+
+    @include mobile {
+      max-width: 100%;
+      width: 100%;
+    }
+
+    .searchInput {
+      width: 100%;
+      padding: var(--space-3) var(--space-4) var(--space-3) 44px;
+      border: 2px solid var(--filter-border);
+      border-radius: var(--radius-xl);
+      background: rgba(255, 255, 255, var(--opacity-10));
+      color: var(--filter-text);
+      font-size: var(--font-size-sm);
+      transition: all var(--transition-normal) var(--ease-in-out);
+      backdrop-filter: var(--backdrop-blur-sm);
+
+      &::placeholder {
+        color: rgba(255, 255, 255, var(--opacity-60));
+      }
+
+      &:focus {
+        outline: none;
+        border-color: var(--text-accent);
+        background: rgba(255, 255, 255, var(--opacity-15));
+        box-shadow: 0 0 0 3px rgba(187, 134, 252, var(--opacity-20));
+      }
+    }
+
+    .searchIcon {
+      position: absolute;
+      left: var(--space-4);
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: var(--font-size-base);
+      color: rgba(255, 255, 255, var(--opacity-60));
+    }
+  }
+
+  .filterGroup {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    flex: 1;
+    min-width: 160px;
+    color: var(--filter-text);
+
+    @include mobile {
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .filterLabel {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      color: rgba(255, 255, 255, var(--opacity-80));
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .filterSelect {
+      padding: var(--space-3) var(--space-4);
+      border: 2px solid var(--filter-border);
+      border-radius: var(--radius-xl);
+      background: rgba(255, 255, 255, var(--opacity-10));
+      color: var(--filter-text);
+      font-size: var(--font-size-sm);
+      cursor: pointer;
+      transition: all var(--transition-normal) var(--ease-in-out);
+      backdrop-filter: var(--backdrop-blur-sm);
+
+      &:focus {
+        outline: none;
+        border-color: var(--text-accent);
+        background: rgba(255, 255, 255, var(--opacity-15));
+        box-shadow: 0 0 0 3px rgba(187, 134, 252, var(--opacity-20));
+      }
+
+      &:disabled {
+        @include disabled;
+      }
+
+      option {
+        background: var(--filter-bg);
+        color: var(--filter-text);
+      }
+    }
+  }
+
+  .checkboxGroup {
+    @include flex-center;
+    margin-top: 0;
+    align-self: end;
+    height: 44px;
+    flex: 0 0 auto;
+    min-width: 180px;
+
+    @include mobile {
+      margin-top: 0;
+      justify-content: center;
+      height: auto;
+    }
+
+    .checkboxLabel {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--font-size-sm);
+      color: rgba(255, 255, 255, var(--opacity-90));
+      cursor: pointer;
+      user-select: none;
+      transition: color var(--transition-normal) var(--ease-in-out);
+
+      &:hover {
+        color: var(--filter-text);
+      }
+    }
+
+    .checkbox {
+      @include square(18px);
+      border: 2px solid var(--filter-border);
+      border-radius: var(--radius-sm);
+      background: transparent;
+      cursor: pointer;
+      position: relative;
+      transition: all var(--transition-normal) var(--ease-in-out);
+
+      &:checked {
+        background: var(--text-accent);
+        border-color: var(--text-accent);
+        box-shadow: 0 0 0 2px rgba(187, 134, 252, var(--opacity-30));
+
+        &::after {
+          content: '✓';
+          @include abs-center;
+          color: var(--text-inverse);
+          font-size: var(--font-size-xs);
+          font-weight: var(--font-weight-bold);
+        }
+      }
+
+      &:hover {
+        border-color: var(--text-accent);
+        background: rgba(187, 134, 252, var(--opacity-10));
+      }
+    }
+  }
+}

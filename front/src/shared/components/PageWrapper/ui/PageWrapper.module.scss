@@ -1,0 +1,48 @@
+@use '@/app/styles/helpers' as *;
+
+$padding: 40px fluid-to-mobile-small(150, 10);
+
+.sidebarOverlay {
+  position: fixed;
+  opacity: 0;
+  transition:
+    opacity var(--transition-slow) var(--ease-in-out),
+    backdrop-filter var(--transition-slow) var(--ease-in-out);
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-black);
+  z-index: var(--z-sticky);
+  pointer-events: none;
+
+  &.visible {
+    opacity: var(--opacity-50);
+  }
+}
+
+.pageWrapper {
+  padding: $padding;
+  width: calc(100vw - var(--sidebar-width));
+  box-sizing: border-box;
+  height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  position: relative;
+
+  @include mobile {
+    width: 100%;
+  }
+}
+
+// Стили для липкого позиционирования BurgerButton в верхнем левом углу
+.burgerButton {
+  display: none;
+
+  @include mobile {
+    display: block;
+    position: sticky;
+    top: 20px; // Обязательно для работы sticky
+    z-index: var(--z-toast);
+    margin-bottom: 20px; // Отступ от следующего контента
+    align-self: flex-start; // Позиционирование в начале
+  }
+}

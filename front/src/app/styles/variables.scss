@@ -1,0 +1,181 @@
+@use 'helpers';
+@use 'themes/base';
+@use 'themes/light';
+@use 'themes/dark';
+
+:root {
+  // === ИМПОРТ БАЗОВЫХ ЦВЕТОВ ===
+  @include base.base-colors;
+
+  // === ПРИМЕНЕНИЕ СВЕТЛОЙ ТЕМЫ ПО УМОЛЧАНИЮ ===
+  @include light.light-theme;
+
+  // === BORDER RADIUS ===
+  --radius-none: 0;
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-3xl: 24px;
+  --radius-full: 9999px;
+
+  // Обратная совместимость
+  --border-radius-xxxs: var(--radius-sm);
+  --border-radius-xxs: var(--radius-md);
+  --border-radius-xs: var(--radius-md);
+  --border-radius-s: var(--radius-lg);
+  --border-radius-m: var(--radius-xl);
+  --border-radius-l: var(--radius-xl);
+  --border-radius-xl: var(--radius-2xl);
+
+  // === BORDER WIDTHS ===
+  --border-width-xs: 1px;
+  --border-width-sm: 2px;
+  --border-width-md: 3px;
+  --border-width-lg: 4px;
+
+  // Обратная совместимость
+  --border-width-s: var(--border-width-xs);
+  --border-width-m: var(--border-width-md);
+  --border-width-l: var(--border-width-lg);
+
+  // === SPACING ===
+  --space-0: 0;
+  --space-1: 0.25rem; // 4px
+  --space-2: 0.5rem; // 8px
+  --space-3: 0.75rem; // 12px
+  --space-4: 1rem; // 16px
+  --space-5: 1.25rem; // 20px
+  --space-6: 1.5rem; // 24px
+  --space-8: 2rem; // 32px
+  --space-10: 2.5rem; // 40px
+  --space-12: 3rem; // 48px
+  --space-16: 4rem; // 64px
+  --space-20: 5rem; // 80px
+  --space-24: 6rem; // 96px
+  --space-32: 8rem; // 128px
+
+  // === FONTS ===
+  --font-family-base:
+    'FiraSans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    sans-serif;
+  --font-family-mono:
+    'Fira Code', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas,
+    'Courier New', monospace;
+
+  // Font sizes
+  --font-size-xs: 0.75rem; // 12px
+  --font-size-sm: 0.875rem; // 14px
+  --font-size-base: 1rem; // 16px
+  --font-size-lg: 1.125rem; // 18px
+  --font-size-xl: 1.25rem; // 20px
+  --font-size-2xl: 1.5rem; // 24px
+  --font-size-3xl: 1.875rem; // 30px
+  --font-size-4xl: 2.25rem; // 36px
+  --font-size-5xl: 3rem; // 48px
+  --font-size-6xl: 3.75rem; // 60px
+
+  // Font weights
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  // Line heights
+  --line-height-tight: 1.25;
+  --line-height-snug: 1.375;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+  --line-height-loose: 2;
+
+  // === TRANSITIONS ===
+  --transition-fast: 0.15s;
+  --transition-normal: 0.2s;
+  --transition-slow: 0.3s;
+  --transition-slower: 0.4s;
+
+  // Обратная совместимость
+  --transition-duration: var(--transition-normal);
+  --transition-duration-longer: var(--transition-slower);
+
+  // Easing functions
+  --ease-linear: linear;
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  // === Z-INDEX ===
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+  --z-toast: 1080;
+
+  // === LAYOUT ===
+  --container-padding-x: #{helpers.fluid(80, 16)};
+  --sidebar-width: 75px;
+  --sidebar-width-hover: 300px;
+
+  // === GRADIENTS ===
+  --gradient-primary: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-secondary) 100%
+  );
+  --gradient-primary-reverse: linear-gradient(
+    135deg,
+    var(--color-secondary) 0%,
+    var(--color-primary) 100%
+  );
+  --gradient-overlay: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+
+  // === BACKDROP FILTERS ===
+  --backdrop-blur-sm: blur(4px);
+  --backdrop-blur-md: blur(8px);
+  --backdrop-blur-lg: blur(16px);
+
+  // === OPACITY ===
+  --opacity-0: 0;
+  --opacity-5: 0.05;
+  --opacity-10: 0.1;
+  --opacity-20: 0.2;
+  --opacity-25: 0.25;
+  --opacity-30: 0.3;
+  --opacity-40: 0.4;
+  --opacity-50: 0.5;
+  --opacity-60: 0.6;
+  --opacity-70: 0.7;
+  --opacity-75: 0.75;
+  --opacity-80: 0.8;
+  --opacity-90: 0.9;
+  --opacity-95: 0.95;
+  --opacity-100: 1;
+}
+
+// === ТЕМНАЯ ТЕМА (АВТОМАТИЧЕСКАЯ) ===
+@media (prefers-color-scheme: dark) {
+  :root {
+    @include dark.dark-theme;
+  }
+}
+
+// === ПРИНУДИТЕЛЬНАЯ ТЕМНАЯ ТЕМА ===
+[data-theme='dark'] {
+  @include dark.dark-theme;
+}
+
+// === ПРИНУДИТЕЛЬНАЯ СВЕТЛАЯ ТЕМА ===
+[data-theme='light'] {
+  @include light.light-theme;
+}

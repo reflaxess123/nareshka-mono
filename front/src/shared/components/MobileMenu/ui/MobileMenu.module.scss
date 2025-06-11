@@ -1,0 +1,67 @@
+@use '@/app/styles/helpers' as *;
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--bg-overlay);
+  z-index: var(--z-modal-backdrop);
+  backdrop-filter: var(--backdrop-blur-sm);
+}
+
+.mobileMenu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: var(--sidebar-bg);
+  z-index: var(--z-modal);
+  box-shadow: var(--shadow-2xl);
+  transition: background-color var(--transition-normal) var(--ease-in-out);
+}
+
+.menuContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  padding-top: 150px;
+  padding-left: 20px;
+  padding-bottom: 20px;
+}
+
+.linksTop {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.linksBottom {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.link {
+  padding: 20px 15px;
+  border-radius: var(--radius-xl);
+  transition: all var(--transition-slow) var(--ease-in-out);
+
+  &:hover {
+    background-color: rgba(255, 255, 255, var(--opacity-10));
+    transform: translateX(5px);
+  }
+
+  :global(.text) {
+    font-size: 50px !important;
+    font-weight: var(--font-weight-medium) !important;
+    color: var(--sidebar-text) !important;
+  }
+
+  :global(.icon) {
+    color: var(--sidebar-text) !important;
+  }
+}

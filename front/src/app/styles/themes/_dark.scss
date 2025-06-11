@@ -1,0 +1,100 @@
+// === ТЕМНАЯ ТЕМА ===
+// Material Design Dark Theme
+
+@mixin dark-theme {
+  // === СЕМАНТИЧЕСКИЕ ЦВЕТА ДЛЯ ТЕМНОЙ ТЕМЫ ===
+  --bg-primary: #1a0033; // Темнее чем сайдбар для фона
+  --bg-secondary: #2d1b4d; // Немного светлее для разнообразия
+  --bg-tertiary: #3700b3; // Тот же цвет что сайдбар для карточек
+  --bg-accent: #bb86fc; // Primary
+  --bg-overlay: rgba(26, 0, 51, 0.8);
+  --bg-muted: #2d1b4d;
+  --bg-hover: rgba(187, 134, 252, 0.1); // Цвет при наведении
+  --bg-disabled: #6b7280; // Более светлый серый для отключенных элементов
+
+  --text-primary: #ffffff; // On Background
+  --text-secondary: #b3b3b3; // Приглушенный белый
+  --text-tertiary: #8a8a8a; // Еще более приглушенный
+  --text-accent: #bb86fc; // Primary
+  --text-inverse: #000000; // On Primary
+  --text-muted: #666666;
+  --text-disabled: #9ca3af; // Более светлый серый для отключенного текста
+
+  --border-primary: #4527a0;
+  --border-secondary: #3700b3;
+  --border-accent: #bb86fc; // Primary
+  --border-muted: #2d1b4d;
+
+  --surface-primary: #1a0033; // Surface - темный фиолетовый
+  --surface-secondary: #2d1b4d;
+  --surface-elevated: #3700b3; // Тот же цвет что сайдбар
+  --surface-overlay: #2d1b4d;
+
+  // === ACCENT ПЕРЕМЕННЫЕ ===
+  --accent-primary: #bb86fc; // Основной акцентный цвет
+  --accent-hover: #cf9fff; // Светлее при наведении
+  --accent-light: rgba(187, 134, 252, 0.2); // Светлый вариант с прозрачностью
+  --accent-dark: #9966cc; // Темнее для контраста
+
+  // === СТАТУСНЫЕ ЦВЕТА ===
+  --success-color: #10b981;
+  --success-hover: #34d399;
+  --warning-color: #f59e0b;
+  --warning-hover: #fbbf24;
+  --danger-color: #ef4444;
+  --danger-hover: #f87171;
+  --info-color: #3b82f6;
+  --info-hover: #60a5fa;
+
+  // === СПЕЦИАЛЬНЫЕ ЦВЕТА ДЛЯ КОМПОНЕНТОВ В ТЕМНОЙ ТЕМЕ ===
+  // Сайдбар - используем Primary Variant чтобы выделить его от фона
+  --sidebar-bg: #3700b3; // Primary Variant
+  --sidebar-bg-hover: #4527a0; // Немного светлее Primary Variant
+  --sidebar-text: #ffffff;
+
+  // Карточки - тот же цвет что и сайдбар
+  --card-bg: #3700b3; // Тот же цвет что сайдбар
+  --card-bg-expanded: linear-gradient(135deg, #4527a0 0%, #5e35b1 100%);
+  --card-text: #ffffff;
+  --card-overlay: rgba(187, 134, 252, 0.1); // Легкий Primary overlay
+
+  // Фильтры - тот же цвет что карточки
+  --filter-bg: #3700b3;
+  --filter-bg-hover: #4527a0;
+  --filter-text: #ffffff;
+  --filter-border: #4527a0;
+
+  // Тени для темной темы с фиолетовым оттенком
+  --shadow-xs: 0 1px 2px 0 rgba(55, 0, 179, 0.4);
+  --shadow-sm:
+    0 1px 3px 0 rgba(55, 0, 179, 0.5), 0 1px 2px -1px rgba(55, 0, 179, 0.5);
+  --shadow-md:
+    0 4px 6px -1px rgba(55, 0, 179, 0.5), 0 2px 4px -2px rgba(55, 0, 179, 0.5);
+  --shadow-lg:
+    0 10px 15px -3px rgba(55, 0, 179, 0.5), 0 4px 6px -4px rgba(55, 0, 179, 0.5);
+  --shadow-xl:
+    0 20px 25px -5px rgba(55, 0, 179, 0.5),
+    0 8px 10px -6px rgba(55, 0, 179, 0.5);
+  --shadow-2xl: 0 25px 50px -12px rgba(55, 0, 179, 0.7);
+  --shadow-inner: inset 0 2px 4px 0 rgba(55, 0, 179, 0.3);
+
+  // Специальные тени для компонентов
+  --shadow-sidebar:
+    0 8px 32px rgba(55, 0, 179, 0.3), 0 4px 16px rgba(55, 0, 179, 0.2);
+  --shadow-card:
+    0 4px 6px -1px rgba(55, 0, 179, 0.5), 0 2px 4px -2px rgba(55, 0, 179, 0.5);
+  --shadow-card-hover:
+    0 20px 25px -5px rgba(55, 0, 179, 0.5),
+    0 8px 10px -6px rgba(55, 0, 179, 0.5);
+
+  // === ДОПОЛНИТЕЛЬНЫЕ MATERIAL DESIGN ЦВЕТА ===
+  --color-primary-material: #bb86fc; // Primary
+  --color-primary-variant: #3700b3; // Primary Variant
+  --color-secondary-material: #03dac5; // Secondary
+  --color-error-material: #cf6679; // Error
+  --color-on-primary: #000000; // On Primary
+  --color-on-secondary: #000000; // On Secondary
+  --color-on-background: #ffffff; // On Background
+  --color-on-surface: #ffffff; // On Surface
+  --color-on-error: #000000; // On Error
+}

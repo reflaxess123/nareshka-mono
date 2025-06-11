@@ -1,0 +1,81 @@
+@use 'constants' as *;
+@use 'sass:math';
+
+@function fluid-range(
+  $maxSize,
+  $minSize,
+  $maxViewportWidth,
+  $minViewportWidth
+) {
+  $maxSizeRem: math.div($maxSize, 16);
+  $minSizeRem: math.div($minSize, 16);
+  $maxWidthRem: math.div($maxViewportWidth, 16);
+  $minWidthRem: math.div($minViewportWidth, 16);
+
+  @if ($maxWidthRem == $minWidthRem) {
+    @return #{$minSizeRem}rem;
+  }
+
+  $slope: math.div(($maxSizeRem - $minSizeRem), ($maxWidthRem - $minWidthRem));
+  $yAxisIntersections: -$minWidthRem * $slope + $minSizeRem;
+
+  @return clamp(
+    #{$minSizeRem}rem,
+    #{$yAxisIntersections}rem + #{$slope * 100vw},
+    #{$maxSizeRem}rem
+  );
+}
+
+@function fluid($max: 100, $min: 10, $endPoint: null) {
+  $maxViewportWidth: $container-desktop-width;
+  $minViewportWidth: 390;
+
+  @if ($endPoint == 'laptop') {
+    $minViewportWidth: $container-laptop-width;
+  } @else if ($endPoint == 'tablet') {
+    $minViewportWidth: $container-tablet-width;
+  }
+
+  @return fluid-range($max, $min, $maxViewportWidth, $minViewportWidth);
+}
+
+@function fluid-px($max: 100, $min: 10, $endPoint: null) {
+  $maxViewportWidth: $container-desktop-width;
+  $minViewportWidth: 390;
+
+  @if ($endPoint == 'laptop') {
+    $minViewportWidth: $container-laptop-width;
+  } @else if ($endPoint == 'tablet') {
+    $minViewportWidth: $container-tablet-width;
+  }
+
+  $maxSize: $max;
+  $minSize: $min;
+  $maxWidth: $maxViewportWidth;
+  $minWidth: $minViewportWidth;
+
+  $slope: math.div(($maxSize - $minSize), ($maxWidth - $minWidth));
+  $yAxisIntersections: -$minWidth * $slope + $minSize;
+
+  @return clamp(
+    #{$minSize}px,
+    #{$yAxisIntersections}px + #{$slope * 100vw},
+    #{$maxSize}px
+  );
+}
+
+@function fluid-to-laptop($max: 100, $min: 10) {
+  @return fluid($max, $min, 'laptop');
+}
+
+@function fluid-to-tablet($max: 100, $min: 10) {
+  @return fluid($max, $min, 'tablet');
+}
+
+@function fluid-to-mobile-s($max: 100, $min: 10) {
+  @return fluid-range($max, $min, $container-tablet-width, 390);
+}
+
+@function fluid-to-mobile-small($max: 100, $min: 10) {
+  @return fluid-range($max, $min, $container-desktop-width, 500);
+}

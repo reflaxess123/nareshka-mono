@@ -1,0 +1,67 @@
+// === БАЗОВАЯ ЦВЕТОВАЯ ПАЛИТРА ===
+// Эти цвета остаются неизменными для всех тем
+
+@mixin base-colors {
+  // Основные цвета
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  // Градиентные цвета (основная палитра)
+  --color-primary: #764ba2;
+  --color-primary-light: #8b67c4;
+  --color-primary-dark: #563775;
+  --color-secondary: #667eea;
+  --color-secondary-light: #7d92ff;
+  --color-secondary-dark: #4f63d2;
+
+  // Material Design цвета
+  --color-material-primary: #bb86fc;
+  --color-material-primary-variant: #3700b3;
+  --color-material-secondary: #03dac5;
+  --color-material-background: #121212;
+  --color-material-surface: #121212;
+  --color-material-error: #cf6679;
+  --color-material-on-primary: #000000;
+  --color-material-on-secondary: #000000;
+  --color-material-on-background: #ffffff;
+  --color-material-on-surface: #ffffff;
+  --color-material-on-error: #000000;
+
+  // Серые тона для светлой темы
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+
+  // Zinc тона (альтернативные серые)
+  --color-zinc-50: #fafafa;
+  --color-zinc-100: #f4f4f5;
+  --color-zinc-200: #e4e4e7;
+  --color-zinc-300: #d4d4d8;
+  --color-zinc-400: #a1a1aa;
+  --color-zinc-500: #71717a;
+  --color-zinc-600: #52525b;
+  --color-zinc-700: #3f3f46;
+  --color-zinc-800: #27272a;
+  --color-zinc-900: #18181b;
+
+  // Статусные цвета
+  --color-success: #10b981;
+  --color-success-light: #34d399;
+  --color-success-dark: #059669;
+  --color-warning: #f59e0b;
+  --color-warning-light: #fbbf24;
+  --color-warning-dark: #d97706;
+  --color-error: #ef4444;
+  --color-error-light: #f87171;
+  --color-error-dark: #dc2626;
+  --color-info: #3b82f6;
+  --color-info-light: #60a5fa;
+  --color-info-dark: #2563eb;
+}
