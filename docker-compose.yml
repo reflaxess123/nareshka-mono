@@ -44,8 +44,10 @@ services:
     networks:
       - nareshka-network
     restart: unless-stopped
+    environment:
+      - SERVICE_FQDN_FRONTEND
     labels:
-      - traefik.http.services.http-0-wowk488c8k4ooo8ow0s0sg4k-frontend.loadbalancer.server.port=80
+      - traefik.enable=true
     healthcheck:
       test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1"]
       interval: 30s
