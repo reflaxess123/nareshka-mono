@@ -31,9 +31,9 @@ FROM nginx:alpine
 # Копируем собранное приложение
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Удаляем дефолтную конфигурацию и копируем нашу
+# Удаляем дефолтную конфигурацию и создаем нашу
 RUN rm /etc/nginx/conf.d/default.conf
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY site.conf /etc/nginx/conf.d/default.conf
 
 # Открываем порт
 EXPOSE 80
