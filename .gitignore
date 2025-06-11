@@ -109,6 +109,9 @@ ENV/
 env.bak/
 venv.bak/
 
+# Frontend environment files
+# front/.env
+
 # Spyder project settings
 .spyderproject
 .spyproject
