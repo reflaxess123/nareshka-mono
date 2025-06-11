@@ -23,8 +23,8 @@ services:
       - WEBDAV_URL=${WEBDAV_URL}
       - WEBDAV_USERNAME=${WEBDAV_USERNAME}
       - WEBDAV_PASSWORD=${WEBDAV_PASSWORD}
-      # CORS - разрешаем фронтенд
-      - ALLOWED_ORIGINS=http://frontend,https://${DOKPLOY_DOMAIN:-localhost}
+      # CORS - разрешаем фронтенд и Dokploy домены
+      - ALLOWED_ORIGINS=http://frontend,https://${DOKPLOY_DOMAIN:-localhost},https://nareshkamono-nxm1sb-d43bd4-185-21-13-91.traefik.me
     ports:
       - "4000:4000"
     volumes:
