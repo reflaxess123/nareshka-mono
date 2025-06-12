@@ -1,0 +1,101 @@
+services:
+  # PostgreSQL для разработки
+  postgres:
+    image: postgres:15-alpine
+    container_name: nareshka-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: nareshka_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - nareshka-network
+
+  # Redis для разработки
+  redis:
+    image: redis:7-alpine
+    container_name: nareshka-redis-dev
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - nareshka-network
+
+  # Бэкенд в dev режиме
+  backend:
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+    container_name: nareshka-backend-dev
+    restart: unless-stopped
+    environment:
+      # Переопределяем базы данных на локальные
+      - DATABASE_URL=postgresql://postgres:dev_password@postgres:5432/nareshka_dev
+      - REDIS_URL=redis://redis:6379/0
+      # Остальные настройки берем из .env
+      - SECRET_KEY=${SECRET_KEY}
+      - ALGORITHM=${ALGORITHM}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
+      - PORT=4000
+      - HOST=0.0.0.0
+      - DEBUG=true
+      - WEBDAV_URL=${WEBDAV_URL}
+      - WEBDAV_USERNAME=${WEBDAV_USERNAME}
+      - WEBDAV_PASSWORD=${WEBDAV_PASSWORD}
+      - ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3001,http://frontend
+    ports:
+      - "4000:4000"
+    volumes:
+      # Монтируем код для hot reload
+      - "./back:/app"
+      - "../files/backend-logs:/app/logs"
+      - "../files/backend-uploads:/app/uploads"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - nareshka-network
+    user: root
+    command: sh -c "poetry install && python main.py"
+
+    # Фронтенд в dev режиме
+  frontend:
+    image: node:20-alpine
+    container_name: nareshka-frontend-dev
+    restart: unless-stopped
+    working_dir: /app
+    ports:
+      - "3001:5173"
+    volumes:
+      # Монтируем код для hot reload
+      - "./front:/app"
+      - "/app/node_modules"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:4000
+    depends_on:
+      - backend
+      - postgres
+      - redis
+    networks:
+      - nareshka-network
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 5173"
+
+networks:
+  nareshka-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  backend-logs:
+    driver: local
+  backend-uploads:
+    driver: local
