@@ -64,7 +64,7 @@ class ContentAPI {
     });
 
     const response = await apiInstance.get<ServerContentBlocksResponse>(
-      `/api/content/blocks?${params.toString()}`
+      `/content/blocks?${params.toString()}`
     );
 
     // Преобразуем данные сервера в нужный формат
@@ -86,7 +86,7 @@ class ContentAPI {
   // Получение конкретного блока по ID
   async getBlock(blockId: string): Promise<ContentBlock> {
     const response = await apiInstance.get<ServerContentBlock>(
-      `/api/content/blocks/${blockId}`
+      `/content/blocks/${blockId}`
     );
 
     // Преобразуем данные блока
@@ -108,7 +108,7 @@ class ContentAPI {
     data: ContentProgressUpdate
   ): Promise<ContentProgressResponse> {
     const response = await apiInstance.patch(
-      `/api/content/blocks/${blockId}/progress`,
+      `/content/blocks/${blockId}/progress`,
       data
     );
     return response.data;
@@ -116,7 +116,7 @@ class ContentAPI {
 
   // Получение иерархии категорий
   async getCategories(): Promise<ContentCategory[]> {
-    const response = await apiInstance.get('/api/content/categories');
+    const response = await apiInstance.get('/content/categories');
     return response.data;
   }
 

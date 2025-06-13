@@ -28,13 +28,13 @@ export const authApi = {
   },
 
   async getProfile() {
-    const response = await apiInstance.get<User>('/api/profile');
+    const response = await apiInstance.get<User>('/profile');
     return response.data;
   },
 
   admin: {
     async getStats(): Promise<AdminStats> {
-      const response = await apiInstance.get<AdminStats>('/api/admin/stats');
+      const response = await apiInstance.get<AdminStats>('/admin/stats');
       return response.data;
     },
 
@@ -48,15 +48,12 @@ export const authApi = {
         users: AdminUser[];
         total: number;
         pages: number;
-      }>('/api/admin/users', { params });
+      }>('/admin/users', { params });
       return response.data;
     },
 
     async createUser(data: CreateUserRequest): Promise<AdminUser> {
-      const response = await apiInstance.post<AdminUser>(
-        '/api/admin/users',
-        data
-      );
+      const response = await apiInstance.post<AdminUser>('/admin/users', data);
       return response.data;
     },
 
@@ -65,29 +62,27 @@ export const authApi = {
       data: UpdateUserRequest
     ): Promise<AdminUser> {
       const response = await apiInstance.put<AdminUser>(
-        `/api/admin/users/${userId}`,
+        `/admin/users/${userId}`,
         data
       );
       return response.data;
     },
 
     async deleteUser(userId: number): Promise<void> {
-      const response = await apiInstance.delete<void>(
-        `/api/admin/users/${userId}`
-      );
+      const response = await apiInstance.delete<void>(`/admin/users/${userId}`);
       return response.data;
     },
 
     async getContentStats(): Promise<Record<string, unknown>> {
       const response = await apiInstance.get<Record<string, unknown>>(
-        '/api/admin/content/stats'
+        '/admin/content/stats'
       );
       return response.data;
     },
 
     async deleteContentFile(fileId: string): Promise<void> {
       const response = await apiInstance.delete<void>(
-        `/api/admin/content/files/${fileId}`
+        `/admin/content/files/${fileId}`
       );
       return response.data;
     },

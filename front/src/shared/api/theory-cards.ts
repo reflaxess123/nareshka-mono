@@ -49,7 +49,7 @@ export const theoryCardsApi = {
     params: TheoryCardsQueryParams
   ): Promise<TheoryCardsResponse> {
     const response = await apiInstance.get<ServerTheoryCardsResponse>(
-      '/api/theory/cards',
+      '/theory/cards',
       {
         params,
       }
@@ -79,15 +79,13 @@ export const theoryCardsApi = {
   },
 
   async getCategories() {
-    const response = await apiInstance.get<Category[]>(
-      '/api/theory/categories'
-    );
+    const response = await apiInstance.get<Category[]>('/theory/categories');
     return response.data;
   },
 
   async updateProgress(cardId: string, data: UpdateProgressRequest) {
     const response = await apiInstance.patch<UpdateProgressResponse>(
-      `/api/theory/cards/${cardId}/progress`,
+      `/theory/cards/${cardId}/progress`,
       data
     );
     return response.data;
