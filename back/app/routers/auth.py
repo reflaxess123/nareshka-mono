@@ -58,10 +58,10 @@ async def register(user: UserCreate, request: Request, response: Response, db: S
             value=session_id,
             httponly=True,
             max_age=24 * 60 * 60,  # 1 день
-            samesite="none",
-            secure=True,
+            samesite="lax" if settings.debug else "none",
+            secure=not settings.debug,
             path="/",
-            domain=settings.session_cookie_domain
+            domain=None if settings.debug else settings.session_cookie_domain
         )
         
         return {
@@ -119,10 +119,10 @@ async def login(user_data: UserLogin, response: Response, db: Session = Depends(
             value=session_id,
             httponly=True,
             max_age=24 * 60 * 60,  # 1 день
-            samesite="none",
-            secure=True,
+            samesite="lax" if settings.debug else "none",
+            secure=not settings.debug,
             path="/",
-            domain=settings.session_cookie_domain
+            domain=None if settings.debug else settings.session_cookie_domain
         )
         
         return {
@@ -151,10 +151,10 @@ async def logout(request: Request, response: Response):
         # Удаляем cookie
         response.delete_cookie(
             key="session_id",
-            samesite="none",
-            secure=True,
+            samesite="lax" if settings.debug else "none",
+            secure=not settings.debug,
             path="/",
-            domain=settings.session_cookie_domain
+            domain=None if settings.debug else settings.session_cookie_domain
         )
         
         return {"message": "Logout successful"}
