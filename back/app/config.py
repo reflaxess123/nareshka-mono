@@ -39,6 +39,7 @@ class Settings(BaseSettings):
     secret_key: str
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 1440
+    session_cookie_domain: str = Field(default="localhost", alias="SESSION_COOKIE_DOMAIN")
     
     # Сервер
     port: int = 4000
