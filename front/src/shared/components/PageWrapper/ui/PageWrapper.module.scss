@@ -30,19 +30,6 @@ $padding: 40px fluid-to-mobile-small(150, 10);
 
   @include mobile {
     width: 100%;
-  }
-}
-
-// Стили для липкого позиционирования BurgerButton в верхнем левом углу
-.burgerButton {
-  display: none;
-
-  @include mobile {
-    display: block;
-    position: sticky;
-    top: 20px; // Обязательно для работы sticky
-    z-index: var(--z-toast);
-    margin-bottom: 20px; // Отступ от следующего контента
-    align-self: flex-start; // Позиционирование в начале
+    padding-bottom: calc(var(--bottom-nav-height) + var(--space-4));
   }
 }

@@ -6,24 +6,28 @@ type LinkProps = {
   text: string;
   className?: string;
   icon?: React.ReactNode;
+  iconClassName?: string;
   hoverExpand?: boolean;
   isParentHovered?: boolean;
   to?: string;
   onClick?: () => void;
   size?: 'small' | 'medium' | 'large';
-  variant?: 'default' | 'sidebar';
+  variant?: 'default' | 'sidebar' | 'bottomBar';
+  isActive?: boolean;
 };
 
 export const Link = ({
   text,
   className,
   icon,
+  iconClassName,
   hoverExpand,
   isParentHovered,
   to,
   onClick,
   size = 'medium',
   variant = 'default',
+  isActive,
 }: LinkProps) => {
   const navigate = useNavigate();
 
@@ -32,6 +36,8 @@ export const Link = ({
       className={clsx(styles.link, className, {
         [styles.hoverExpand]: hoverExpand,
         [styles.sidebar]: variant === 'sidebar',
+        [styles.bottomBar]: variant === 'bottomBar',
+        [styles.active]: isActive,
       })}
       onClick={() => {
         if (onClick) {
@@ -41,7 +47,7 @@ export const Link = ({
         }
       }}
     >
-      {icon && <div className={styles.icon}>{icon}</div>}
+      {icon && <div className={clsx(styles.icon, iconClassName)}>{icon}</div>}
       {text && (
         <div
           className={clsx(styles.text, {

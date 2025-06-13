@@ -1,0 +1,43 @@
+@use '@/app/styles/helpers' as *;
+
+.bottomNav {
+  display: none;
+
+  @include mobile {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: var(--bottom-nav-height);
+    background: var(--sidebar-bg);
+    border-top: 1px solid var(--border-primary);
+    justify-content: space-around;
+    align-items: stretch;
+    z-index: var(--z-sticky);
+    padding: 0 var(--space-6);
+    gap: var(--space-2);
+
+    .link {
+      color: var(--sidebar-text);
+    }
+  }
+}
+
+.isSelected {
+  color: var(--primary) !important;
+
+  &::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-lg);
+    background-color: rgba(255, 0, 0, 0.15);
+  }
+}

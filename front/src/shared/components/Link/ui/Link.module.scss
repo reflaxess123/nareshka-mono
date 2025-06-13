@@ -1,5 +1,13 @@
 @use '@/app/styles/helpers' as *;
 
+.icon {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .link {
   color: var(--text-inverse);
   text-decoration: none;
@@ -15,6 +23,40 @@
 
     &:hover {
       color: var(--sidebar-text);
+    }
+  }
+
+  &.bottomBar {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2px;
+    padding: var(--space-1) 0;
+    color: var(--text-secondary);
+    flex: 1;
+    font-size: var(--font-size-xs);
+    line-height: 1.2;
+    border-radius: var(--rounded-sm);
+    transition:
+      background-color 150ms ease-in-out,
+      color 150ms ease-in-out;
+
+    .icon > svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .text {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-normal);
+    }
+
+    &:hover .text {
+      transform: none;
+    }
+
+    &:hover:not(.active) {
+      color: yellow;
     }
   }
 
@@ -45,6 +87,19 @@
   &:hover .text {
     transform: translateX(10px) scale(1.1);
   }
+}
+
+.link.bottomBar .text {
+  visibility: visible;
+  opacity: 1;
+  width: auto;
+  margin-left: 0;
+  overflow: visible;
+  transition: none;
+}
+
+.link.active {
+  color: var(--primary);
 }
 
 .link .parentHoveredText {
