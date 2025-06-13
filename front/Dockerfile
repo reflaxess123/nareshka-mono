@@ -1,11 +1,6 @@
 # Этап сборки
 FROM node:20-alpine as build
 
-# Принимаем build-time аргумент из docker-compose
-ARG VITE_API_BASE_URL
-# Устанавливаем его как env var для процесса сборки
-ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
-
 WORKDIR /app
 
 # Копируем package.json и package-lock.json
