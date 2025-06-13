@@ -1,7 +1,25 @@
+import os
+from pathlib import Path
 from typing import List
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
+# Определяем базовую директорию проекта (где находится папка back)
+# Это делает путь к .env файлу независимым от точки запуска
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+ENV_FILE_PATH = BASE_DIR / "back/.env"
+
+
+# Проверяем, существует ли файл, чтобы избежать ошибок
+if not ENV_FILE_PATH.is_file():
+    print(f"DEBUG: .env file NOT found at {ENV_FILE_PATH}")
+    # Можно просто проигнорировать или вывести предупреждение,
+    # если переменные окружения могут быть заданы другим способом
+    # В данном случае мы ожидаем, что они могут быть в среде, поэтому просто продолжаем
+    pass
+else:
+    print(f"DEBUG: .env file found at {ENV_FILE_PATH}")
 
 # Константы для валидации
 MAX_EMAIL_LENGTH = 255
@@ -50,10 +68,13 @@ class Settings(BaseSettings):
     
     # Конфигурация модели для Pydantic V2
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=str(ENV_FILE_PATH) if ENV_FILE_PATH.is_file() else None,
         case_sensitive=False,
-        extra="ignore"  # Игнорируем дополнительные поля от Coolify
+        extra="ignore"
     )
 
 
-settings = Settings() 
+settings = Settings()
+print(f"DEBUG: Database URL loaded: {settings.database_url}")
+print(f"DEBUG: Redis URL loaded: {settings.redis_url}")
+print(f"DEBUG: CORS origins loaded: {settings.allowed_origins}") 
