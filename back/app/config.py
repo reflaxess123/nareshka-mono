@@ -44,6 +44,7 @@ class Settings(BaseSettings):
     port: int = 4000
     host: str = "0.0.0.0"
     debug: bool = True
+    proxy_headers: bool = Field(default=False, alias="PROXY_HEADERS")
     
     # WebDAV
     webdav_url: str = ""
