@@ -61,7 +61,6 @@ async def register(user: UserCreate, request: Request, response: Response, db: S
             samesite="lax" if settings.debug else "none",
             secure=not settings.debug,
             path="/",
-            domain=None if settings.debug else settings.session_cookie_domain
         )
         
         return {
@@ -122,7 +121,6 @@ async def login(user_data: UserLogin, response: Response, db: Session = Depends(
             samesite="lax" if settings.debug else "none",
             secure=not settings.debug,
             path="/",
-            domain=None if settings.debug else settings.session_cookie_domain
         )
         
         return {
