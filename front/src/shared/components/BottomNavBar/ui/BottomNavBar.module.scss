@@ -16,8 +16,8 @@
     justify-content: space-around;
     align-items: stretch;
     z-index: var(--z-sticky);
-    padding: 0 var(--space-6);
-    gap: var(--space-2);
+    padding: 0 0;
+    gap: var(--space-1);
 
     .link {
       color: var(--sidebar-text);
