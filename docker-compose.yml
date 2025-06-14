@@ -6,8 +6,6 @@ services:
       dockerfile: Dockerfile
     container_name: nareshka-backend
     restart: unless-stopped
-    group_add:
-      - "988" # Добавляем пользователя в группу docker хоста по GID
     environment:
       # База данных
       - DATABASE_URL=${DATABASE_URL}
