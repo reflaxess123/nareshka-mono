@@ -26,6 +26,150 @@ psycopg2-binary = "^2.9.10"
 email-validator = "^2.2.0"
 
 [tool.poetry.group.dev.dependencies]
+ruff = "^0.6.0"
+mypy = "^1.11.0"
+
+# Ruff конфигурация
+[tool.ruff]
+# Исключаем папки из проверки
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+    "__pycache__",
+    "alembic/versions",
+]
+
+# Длина строки
+line-length = 88
+
+# Целевая версия Python
+target-version = "py38"
+
+[tool.ruff.lint]
+# Включаем нужные правила
+select = [
+    "E",     # pycodestyle errors
+    "W",     # pycodestyle warnings
+    "F",     # pyflakes
+    "I",     # isort
+    "B",     # flake8-bugbear
+    "C4",    # flake8-comprehensions
+    "UP",    # pyupgrade
+    "ARG001", # unused-function-argument
+    "SIM",   # flake8-simplify
+    "TCH",   # flake8-type-checking
+    "TID",   # flake8-tidy-imports
+    "Q",     # flake8-quotes
+    "PL",    # pylint
+]
+
+# Исключаем некоторые правила
+ignore = [
+    "E501",   # line too long, handled by black
+    "B008",   # do not perform function calls in argument defaults
+    "C901",   # too complex
+    "PLR0913", # too many arguments
+    "PLE0605", # invalid format for __all__
+    "PLR2004", # magic value used in comparison
+]
+
+# Разрешаем автоматические исправления
+fixable = ["ALL"]
+unfixable = []
+
+# Разрешаем неиспользуемые переменные, если они начинаются с _
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.format]
+# Использовать одинарные кавычки
+quote-style = "double"
+
+# Отступы
+indent-style = "space"
+
+# Пропускать магические запятые
+skip-magic-trailing-comma = false
+
+# Стиль окончания строк
+line-ending = "auto"
+
+[tool.ruff.lint.isort]
+# Сортировка импортов
+combine-as-imports = true
+force-wrap-aliases = true
+split-on-trailing-comma = true
+
+[tool.ruff.lint.per-file-ignores]
+# Игнорируем некоторые правила для миграций Alembic
+"alembic/versions/*" = ["ALL"]
+# Игнорируем некоторые правила для __init__.py
+"__init__.py" = ["F401"]
+
+# MyPy конфигурация
+[tool.mypy]
+python_version = "3.8"
+strict = false
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = true
+disallow_untyped_decorators = false
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+show_error_codes = true
+
+# Исключаем папки
+exclude = [
+    "alembic/versions/",
+    "__pycache__/",
+    ".venv/",
+    "build/",
+    "dist/"
+]
+
+# Игнорируем отсутствующие импорты для некоторых библиотек
+[[tool.mypy.overrides]]
+module = [
+    "bcrypt.*",
+    "passlib.*",
+    "jose.*",
+    "redis.*",
+    "psycopg2.*",
+    "uvicorn.*"
+]
+ignore_missing_imports = true
+
+# Скрипты для удобного запуска
+[tool.poetry.scripts]
+lint = "ruff check ."
+lint-fix = "ruff check . --fix"
+format = "ruff format ."
+format-check = "ruff format . --check"
+type-check = "mypy . --config-file .mypy.ini"
+check-all = "python -c \"import subprocess; subprocess.run(['poetry', 'run', 'ruff', 'check', '.']); subprocess.run(['poetry', 'run', 'ruff', 'format', '--check', '.']); subprocess.run(['poetry', 'run', 'mypy', '.', '--config-file', '.mypy.ini'])\""
 
 [build-system]
 requires = ["poetry-core"]

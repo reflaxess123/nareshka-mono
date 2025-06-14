@@ -24,12 +24,18 @@ const DetailedStats = lazy(() =>
     default: module.DetailedStats,
   }))
 );
+const CodeEditor = lazy(() =>
+  import('@/pages/CodeEditor').then((module) => ({
+    default: module.CodeEditorPage,
+  }))
+);
 
 export enum AppRoutes {
   HOME = '/',
   TASKS = '/tasks',
   THEORY = '/theory',
   PROFILE = '/profile',
+  CODE_EDITOR = '/code-editor',
   ADMIN_PANEL = '/admin-panel',
   ADMIN_USERS = '/admin/users',
   ADMIN_STATS = '/admin/stats',
@@ -40,6 +46,7 @@ export const routeConfig: AppRoute[] = [
   { path: AppRoutes.TASKS, element: <Tasks /> },
   { path: AppRoutes.THEORY, element: <Theory /> },
   { path: AppRoutes.PROFILE, element: <Profile /> },
+  { path: AppRoutes.CODE_EDITOR, element: <CodeEditor /> },
   { path: AppRoutes.ADMIN_PANEL, element: <Adminka /> },
   { path: AppRoutes.ADMIN_USERS, element: <UserManagement /> },
   { path: AppRoutes.ADMIN_STATS, element: <DetailedStats /> },

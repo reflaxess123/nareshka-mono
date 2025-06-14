@@ -1,0 +1,115 @@
+.code-editor-page {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .page-header {
+    margin-bottom: 48px;
+    text-align: center;
+    width: 100%;
+
+    .header-content {
+      .header-text {
+        h1 {
+          font-size: 2.5rem;
+          font-weight: 700;
+          color: var(--text-primary);
+          margin-bottom: 16px;
+          background: linear-gradient(
+            135deg,
+            var(--accent-primary),
+            var(--accent-secondary)
+          );
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        p {
+          font-size: 1.1rem;
+          color: var(--text-secondary);
+          line-height: 1.6;
+          max-width: 600px;
+          margin: 0 auto;
+        }
+      }
+
+      .header-stats {
+        margin-top: 24px;
+        display: flex;
+        justify-content: center;
+
+        .stat-card {
+          padding: 16px;
+          background: var(--bg-secondary);
+          border: 1px solid var(--border-primary);
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.3s ease;
+
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px var(--shadow-primary);
+          }
+        }
+      }
+    }
+  }
+
+  .editor-section {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .editor-container {
+      width: 100%;
+      max-width: 1200px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px var(--shadow-primary);
+      transition: all 0.3s ease;
+
+      &:hover {
+        box-shadow: 0 12px 48px var(--shadow-primary);
+        border-color: var(--accent-primary);
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .code-editor-page {
+    padding: 16px;
+
+    .page-header .header-content .header-text h1 {
+      font-size: 2rem;
+    }
+
+    .editor-section .editor-container {
+      border-radius: 12px;
+    }
+  }
+}
+
+// Dark mode enhancements
+@media (prefers-color-scheme: dark) {
+  .code-editor-page {
+    .page-header .header-content .header-text h1 {
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  }
+}

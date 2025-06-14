@@ -1,8 +1,10 @@
-from pydantic import BaseModel, EmailStr
-from typing import Optional, List, Any
 from datetime import datetime
 from decimal import Decimal
-from .models import UserRole, CardState
+from typing import List, Optional
+
+from pydantic import BaseModel, EmailStr
+
+from .models import CardState, CodeLanguage, ExecutionStatus, UserRole
 
 
 # Схемы для пользователей
@@ -23,7 +25,7 @@ class UserResponse(UserBase):
     id: int
     role: UserRole
     createdAt: datetime
-    
+
     class Config:
         from_attributes = True
 
@@ -54,7 +56,7 @@ class ContentFileResponse(ContentFileBase):
     id: str
     createdAt: datetime
     updatedAt: datetime
-    
+
     class Config:
         from_attributes = True
 
@@ -82,7 +84,7 @@ class ContentBlockResponse(ContentBlockBase):
     fileId: str
     createdAt: datetime
     updatedAt: datetime
-    
+
     class Config:
         from_attributes = True
 
@@ -103,7 +105,7 @@ class UserContentProgressResponse(UserContentProgressBase):
     blockId: str
     createdAt: datetime
     updatedAt: datetime
-    
+
     class Config:
         from_attributes = True
 
@@ -129,7 +131,7 @@ class TheoryCardResponse(TheoryCardBase):
     id: str
     createdAt: datetime
     updatedAt: datetime
-    
+
     class Config:
         from_attributes = True
 
@@ -158,7 +160,7 @@ class UserTheoryProgressResponse(UserTheoryProgressBase):
     cardId: str
     createdAt: datetime
     updatedAt: datetime
-    
+
     class Config:
         from_attributes = True
 
@@ -179,6 +181,92 @@ class UserStatsResponse(BaseModel):
     totalCards: int
     completedCards: int
     categories: List[str]
-    
+
     class Config:
-        from_attributes = True 
+        from_attributes = True
+
+
+# Схемы для редактора кода
+class SupportedLanguagePublic(BaseModel):
+    id: str
+    name: str
+    language: CodeLanguage
+    version: str
+    fileExtension: str
+    timeoutSeconds: int
+    memoryLimitMB: int
+    isEnabled: bool
+
+    class Config:
+        from_attributes = True
+
+
+class CodeExecutionRequest(BaseModel):
+    sourceCode: str
+    language: CodeLanguage
+    stdin: Optional[str] = None
+    blockId: Optional[str] = None
+
+
+class CodeExecutionResponse(BaseModel):
+    id: str
+    userId: int
+    blockId: Optional[str] = None
+    languageId: str
+    sourceCode: str
+    stdin: Optional[str] = None
+    status: ExecutionStatus
+    stdout: Optional[str] = None
+    stderr: Optional[str] = None
+    exitCode: Optional[int] = None
+    executionTimeMs: Optional[int] = None
+    memoryUsedMB: Optional[int] = None
+    containerLogs: Optional[str] = None
+    errorMessage: Optional[str] = None
+    createdAt: datetime
+    completedAt: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+class UserCodeSolutionCreate(BaseModel):
+    blockId: str
+    language: CodeLanguage
+    sourceCode: str
+    isCompleted: bool = False
+
+
+class UserCodeSolutionUpdate(BaseModel):
+    sourceCode: Optional[str] = None
+    isCompleted: Optional[bool] = None
+
+
+class UserCodeSolutionResponse(BaseModel):
+    id: str
+    userId: int
+    blockId: str
+    languageId: str
+    sourceCode: str
+    isCompleted: bool
+    executionCount: int
+    successfulExecutions: int
+    lastExecutionId: Optional[str] = None
+    createdAt: datetime
+    updatedAt: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class LanguageStat(BaseModel):
+    language: CodeLanguage
+    name: str
+    executions: int
+
+
+class ExecutionStats(BaseModel):
+    totalExecutions: int
+    successfulExecutions: int
+    averageExecutionTime: float
+    languageStats: List[LanguageStat]

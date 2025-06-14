@@ -1,14 +1,13 @@
-from fastapi import FastAPI, Request, Depends
+import uvicorn
+from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
-import uvicorn
 
+from app.auth import get_current_user_from_session
 from app.config import settings
 from app.database import get_db
-from app.models import User
-from app.auth import get_current_user_from_session
-from app.routers import auth, theory, content, stats, admin
+from app.routers import admin, auth, code_editor, content, stats, theory
 
 # Создание приложения FastAPI ////
 app = FastAPI(
@@ -34,6 +33,7 @@ app.include_router(theory.router)
 app.include_router(content.router)
 app.include_router(stats.router)
 app.include_router(admin.router)
+app.include_router(code_editor.router)
 
 @app.get("/")
 async def root():
@@ -50,7 +50,7 @@ async def get_profile(request: Request, db: Session = Depends(get_db)):
             status_code=401,
             content={"message": "Not authenticated"}
         )
-    
+
     return {
         "id": user.id,
         "email": user.email,
@@ -72,4 +72,4 @@ if __name__ == "__main__":
         port=settings.port,
         reload=settings.debug,
         proxy_headers=settings.proxy_headers
-    ) 
+    )

@@ -1,21 +1,22 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
-from sqlalchemy.orm import Session
-import uuid
 import logging
+import uuid
 
-from ..database import get_db
-from ..models import User
-from ..schemas import UserCreate, UserLogin, UserResponse, MessageResponse
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from sqlalchemy.orm import Session
+
 from ..auth import (
-    get_password_hash,
-    get_user_by_email,
-    verify_password,
     create_session,
     delete_session,
     get_current_user_from_session,
-    get_current_user_from_session_required
+    get_current_user_from_session_required,
+    get_password_hash,
+    get_user_by_email,
+    verify_password,
 )
 from ..config import settings
+from ..database import get_db
+from ..models import User
+from ..schemas import UserCreate, UserLogin, UserResponse
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
@@ -27,7 +28,7 @@ router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 @router.post("/register")
 async def register(user: UserCreate, request: Request, response: Response, db: Session = Depends(get_db)):
     """Регистрация нового пользователя (точно как в Node.js версии)"""
-    
+
     # Проверяем, существует ли пользователь
     existing_user = get_user_by_email(db, user.email)
     if existing_user:
@@ -35,7 +36,7 @@ async def register(user: UserCreate, request: Request, response: Response, db: S
             status_code=400,
             detail="User already exists"
         )
-    
+
     try:
         # Создаем нового пользователя
         hashed_password = get_password_hash(user.password)
@@ -43,15 +44,15 @@ async def register(user: UserCreate, request: Request, response: Response, db: S
             email=user.email,
             password=hashed_password
         )
-        
+
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
-        
+
         # Создаем сессию для нового пользователя
         session_id = str(uuid.uuid4())
         create_session(db_user.id, session_id)
-        
+
         # Устанавливаем cookie сессии
         response.set_cookie(
             key="session_id",
@@ -62,12 +63,12 @@ async def register(user: UserCreate, request: Request, response: Response, db: S
             secure=not settings.debug,
             path="/",
         )
-        
+
         return {
             "message": "User registered successfully",
             "userId": db_user.id
         }
-        
+
     except Exception as e:
         logger.error(f"Registration error: {e}")
         db.rollback()  # Откатываем транзакцию при ошибке
@@ -80,10 +81,10 @@ async def register(user: UserCreate, request: Request, response: Response, db: S
 @router.post("/login")
 async def login(user_data: UserLogin, response: Response, db: Session = Depends(get_db)):
     """Вход пользователя (точно как в Node.js версии)"""
-    
+
     try:
         logger.info(f"Attempting login for email: {user_data.email}")
-        
+
         # Поиск пользователя
         user = get_user_by_email(db, user_data.email)
         if not user:
@@ -92,26 +93,26 @@ async def login(user_data: UserLogin, response: Response, db: Session = Depends(
                 status_code=401,
                 detail="Invalid credentials"
             )
-        
+
         logger.info(f"User found: {user.id}, checking password...")
-        
+
         # Проверка пароля
         password_valid = verify_password(user_data.password, user.password)
         logger.info(f"Password verification result: {password_valid}")
-        
+
         if not password_valid:
             logger.warning(f"Invalid password for user: {user_data.email}")
             raise HTTPException(
                 status_code=401,
                 detail="Invalid credentials"
             )
-        
+
         logger.info(f"Login successful for user: {user.id}")
-        
+
         # Создаем сессию
         session_id = str(uuid.uuid4())
         create_session(user.id, session_id)
-        
+
         # Устанавливаем cookie сессии
         response.set_cookie(
             key="session_id",
@@ -122,12 +123,12 @@ async def login(user_data: UserLogin, response: Response, db: Session = Depends(
             secure=not settings.debug,
             path="/",
         )
-        
+
         return {
             "message": "Login successful",
             "userId": user.id
         }
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -145,7 +146,7 @@ async def logout(request: Request, response: Response):
         session_id = request.cookies.get("session_id")
         if session_id:
             delete_session(session_id)
-        
+
         # Удаляем cookie
         response.delete_cookie(
             key="session_id",
@@ -154,10 +155,10 @@ async def logout(request: Request, response: Response):
             path="/",
             domain=None if settings.debug else settings.session_cookie_domain
         )
-        
+
         return {"message": "Logout successful"}
-        
-    except Exception as e:
+
+    except Exception:
         raise HTTPException(
             status_code=500,
             detail="Could not log out, please try again"
@@ -176,7 +177,7 @@ async def get_current_user_info(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Not authenticated"
         )
-    
+
     return user
 
 
@@ -201,9 +202,9 @@ async def debug_users(request: Request, db: Session = Depends(get_db)):
             status_code=403,
             detail="Admin access required"
         )
-    
+
     users = db.query(User).all()
     return {
         "total_users": len(users),
         "users": [{"id": u.id, "email": u.email} for u in users]
-    } 
+    }

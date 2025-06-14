@@ -9,6 +9,7 @@ import { useLogout } from '@/shared/hooks/useAuth';
 import {
   Bird,
   Brain,
+  Code,
   LogIn,
   LogOut,
   Moon,
@@ -87,6 +88,16 @@ export const Sidebar = ({ children }: { children: React.ReactNode }) => {
             icon={<Brain size={24} />}
             isParentHovered={isOpen}
             to={AppRoutes.THEORY}
+            variant="sidebar"
+          />
+
+          {/* Редактор кода - доступен всем */}
+          <Link
+            text="Редактор кода"
+            className={styles.link}
+            icon={<Code size={24} />}
+            isParentHovered={isOpen}
+            to={AppRoutes.CODE_EDITOR}
             variant="sidebar"
           />
 

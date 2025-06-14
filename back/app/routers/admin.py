@@ -1,14 +1,21 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
-from sqlalchemy.orm import Session
-from sqlalchemy import func, desc, asc, or_
-from typing import Optional, List
 import logging
-from pydantic import BaseModel, EmailStr
-from datetime import datetime
+from typing import List, Optional
 
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from pydantic import BaseModel, EmailStr
+from sqlalchemy import desc, func, or_
+from sqlalchemy.orm import Session
+
+from ..auth import get_password_hash, require_admin
 from ..database import get_db
-from ..models import User, ContentFile, ContentBlock, TheoryCard, UserContentProgress, UserTheoryProgress
-from ..auth import require_admin, get_password_hash
+from ..models import (
+    ContentBlock,
+    ContentFile,
+    TheoryCard,
+    User,
+    UserContentProgress,
+    UserTheoryProgress,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -94,25 +101,25 @@ async def get_admin_stats(
     admin_user: User = Depends(require_admin)
 ):
     """Получение общей статистики системы"""
-    
+
     try:
         # Статистика пользователей
         users_stats = db.query(User.role, func.count(User.id)).group_by(User.role).all()
         total_users = db.query(User).count()
-        
+
         users_by_role = {"admin": 0, "user": 0, "guest": 0}
         for role, count in users_stats:
             users_by_role[role.lower()] = count
-        
+
         # Статистика контента
         total_files = db.query(ContentFile).count()
         total_blocks = db.query(ContentBlock).count()
         total_theory_cards = db.query(TheoryCard).count()
-        
+
         # Статистика прогресса
         total_content_progress = db.query(UserContentProgress).count()
         total_theory_progress = db.query(UserTheoryProgress).count()
-        
+
         return {
             "users": {
                 "total": total_users,
@@ -130,7 +137,7 @@ async def get_admin_stats(
                 "totalTheoryProgress": total_theory_progress
             }
         }
-        
+
     except Exception as e:
         logger.error(f"Admin stats error: {e}")
         raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера")
@@ -147,36 +154,36 @@ async def get_admin_users(
     search: Optional[str] = Query(None, description="Поиск по email")
 ):
     """Получение списка всех пользователей"""
-    
+
     try:
         skip = (page - 1) * limit
-        
+
         # Строим запрос
         query = db.query(User)
-        
+
         if role:
             query = query.filter(User.role == role)
-        
+
         if search:
             query = query.filter(User.email.ilike(f"%{search}%"))
-        
+
         # Получаем общее количество
         total = query.count()
-        
+
         # Получаем пользователей с подсчетом прогресса
         users = query.order_by(desc(User.createdAt)).offset(skip).limit(limit).all()
-        
+
         # Добавляем подсчет прогресса для каждого пользователя
         users_with_progress = []
         for user in users:
             content_progress_count = db.query(UserContentProgress).filter(
                 UserContentProgress.userId == user.id
             ).count()
-            
+
             theory_progress_count = db.query(UserTheoryProgress).filter(
                 UserTheoryProgress.userId == user.id
             ).count()
-            
+
             users_with_progress.append({
                 "id": user.id,
                 "email": user.email,
@@ -188,7 +195,7 @@ async def get_admin_users(
                     "theoryProgress": theory_progress_count
                 }
             })
-        
+
         return {
             "users": users_with_progress,
             "pagination": {
@@ -198,7 +205,7 @@ async def get_admin_users(
                 "totalPages": (total + limit - 1) // limit
             }
         }
-        
+
     except Exception as e:
         logger.error(f"Admin users list error: {e}")
         raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера")
@@ -212,14 +219,14 @@ async def create_admin_user(
     admin_user: User = Depends(require_admin)
 ):
     """Создание нового пользователя"""
-    
+
     try:
         if len(user_data.password) < 6:
             raise HTTPException(
                 status_code=400,
                 detail="Пароль должен содержать минимум 6 символов"
             )
-        
+
         # Проверяем, не существует ли уже пользователь с таким email
         existing_user = db.query(User).filter(User.email == user_data.email).first()
         if existing_user:
@@ -227,28 +234,28 @@ async def create_admin_user(
                 status_code=409,
                 detail="Пользователь с таким email уже существует"
             )
-        
+
         # Хешируем пароль
         hashed_password = get_password_hash(user_data.password)
-        
+
         # Создаем пользователя
         new_user = User(
             email=user_data.email,
             password=hashed_password,
             role=user_data.role
         )
-        
+
         db.add(new_user)
         db.commit()
         db.refresh(new_user)
-        
+
         return {
             "id": new_user.id,
             "email": new_user.email,
             "role": new_user.role,
             "createdAt": new_user.createdAt
         }
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -266,13 +273,13 @@ async def update_admin_user(
     admin_user: User = Depends(require_admin)
 ):
     """Обновление пользователя"""
-    
+
     try:
         # Находим пользователя
         user = db.query(User).filter(User.id == user_id).first()
         if not user:
             raise HTTPException(status_code=404, detail="Пользователь не найден")
-        
+
         # Проверяем email если он изменяется
         if user_data.email and user_data.email != user.email:
             existing_user = db.query(User).filter(User.email == user_data.email).first()
@@ -282,11 +289,11 @@ async def update_admin_user(
                     detail="Email уже используется другим пользователем"
                 )
             user.email = user_data.email
-        
+
         # Обновляем роль
         if user_data.role:
             user.role = user_data.role
-        
+
         # Обновляем пароль
         if user_data.password:
             if len(user_data.password) < 6:
@@ -295,17 +302,17 @@ async def update_admin_user(
                     detail="Пароль должен содержать минимум 6 символов"
                 )
             user.password = get_password_hash(user_data.password)
-        
+
         db.commit()
         db.refresh(user)
-        
+
         return {
             "id": user.id,
             "email": user.email,
             "role": user.role,
             "updatedAt": user.updatedAt
         }
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -322,7 +329,7 @@ async def delete_admin_user(
     admin_user: User = Depends(require_admin)
 ):
     """Удаление пользователя"""
-    
+
     try:
         # Запрещаем удалять самого себя
         if user_id == admin_user.id:
@@ -330,17 +337,17 @@ async def delete_admin_user(
                 status_code=400,
                 detail="Нельзя удалить самого себя"
             )
-        
+
         # Находим и удаляем пользователя
         user = db.query(User).filter(User.id == user_id).first()
         if not user:
             raise HTTPException(status_code=404, detail="Пользователь не найден")
-        
+
         db.delete(user)
         db.commit()
-        
+
         return {"message": "Пользователь успешно удален"}
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -356,32 +363,32 @@ async def get_admin_content_stats(
     admin_user: User = Depends(require_admin)
 ):
     """Получение детальной статистики по контенту"""
-    
+
     try:
         # Статистика по категориям контента
         content_by_category = db.query(
             ContentFile.mainCategory,
-            func.count(ContentFile.id).label('files_count')
+            func.count(ContentFile.id).label("files_count")
         ).group_by(ContentFile.mainCategory).all()
-        
+
         # Статистика по блокам в категориях
         blocks_by_category = db.query(
             ContentFile.mainCategory,
-            func.count(ContentBlock.id).label('blocks_count')
+            func.count(ContentBlock.id).label("blocks_count")
         ).join(ContentBlock, ContentFile.id == ContentBlock.fileId).group_by(
             ContentFile.mainCategory
         ).all()
-        
+
         # Статистика прогресса по категориям
         progress_by_category = db.query(
             ContentFile.mainCategory,
-            func.count(UserContentProgress.id).label('progress_count')
+            func.count(UserContentProgress.id).label("progress_count")
         ).join(
             ContentBlock, ContentFile.id == ContentBlock.fileId
         ).join(
             UserContentProgress, ContentBlock.id == UserContentProgress.blockId
         ).group_by(ContentFile.mainCategory).all()
-        
+
         return {
             "categoriesStats": {
                 "filesByCategory": [{"category": cat, "count": count} for cat, count in content_by_category],
@@ -389,7 +396,7 @@ async def get_admin_content_stats(
                 "progressByCategory": [{"category": cat, "count": count} for cat, count in progress_by_category]
             }
         }
-        
+
     except Exception as e:
         logger.error(f"Admin content stats error: {e}")
         raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера")
@@ -406,21 +413,21 @@ async def get_admin_content_files(
     search: Optional[str] = Query(None)
 ):
     """Получение списка файлов контента для админки"""
-    
+
     try:
         skip = (page - 1) * limit
-        
+
         query = db.query(ContentFile)
-        
+
         if category:
             query = query.filter(ContentFile.mainCategory.ilike(f"%{category}%"))
-        
+
         if search:
             query = query.filter(ContentFile.webdavPath.ilike(f"%{search}%"))
-        
+
         total = query.count()
         files = query.order_by(desc(ContentFile.createdAt)).offset(skip).limit(limit).all()
-        
+
         # Добавляем подсчет блоков для каждого файла
         files_with_blocks = []
         for file in files:
@@ -434,7 +441,7 @@ async def get_admin_content_files(
                 "updatedAt": file.updatedAt,
                 "blocksCount": blocks_count
             })
-        
+
         return {
             "files": files_with_blocks,
             "pagination": {
@@ -444,7 +451,7 @@ async def get_admin_content_files(
                 "totalPages": (total + limit - 1) // limit
             }
         }
-        
+
     except Exception as e:
         logger.error(f"Admin content files error: {e}")
         raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера")
@@ -461,21 +468,21 @@ async def get_admin_content_blocks(
     search: Optional[str] = Query(None)
 ):
     """Получение списка блоков контента для админки"""
-    
+
     try:
         skip = (page - 1) * limit
-        
+
         query = db.query(ContentBlock).join(ContentFile)
-        
+
         if fileId:
             query = query.filter(ContentBlock.fileId == fileId)
-        
+
         if search:
             query = query.filter(ContentBlock.blockTitle.ilike(f"%{search}%"))
-        
+
         total = query.count()
         blocks = query.order_by(desc(ContentBlock.createdAt)).offset(skip).limit(limit).all()
-        
+
         return {
             "blocks": [
                 {
@@ -501,7 +508,7 @@ async def get_admin_content_blocks(
                 "totalPages": (total + limit - 1) // limit
             }
         }
-        
+
     except Exception as e:
         logger.error(f"Admin content blocks error: {e}")
         raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера")
@@ -518,15 +525,15 @@ async def get_admin_theory_cards(
     search: Optional[str] = Query(None)
 ):
     """Получение списка карточек теории для админки"""
-    
+
     try:
         skip = (page - 1) * limit
-        
+
         query = db.query(TheoryCard)
-        
+
         if category:
             query = query.filter(TheoryCard.category.ilike(f"%{category}%"))
-        
+
         if search:
             query = query.filter(
                 or_(
@@ -534,10 +541,10 @@ async def get_admin_theory_cards(
                     TheoryCard.answerBlock.ilike(f"%{search}%")
                 )
             )
-        
+
         total = query.count()
         cards = query.order_by(desc(TheoryCard.createdAt)).offset(skip).limit(limit).all()
-        
+
         return {
             "cards": [
                 {
@@ -562,7 +569,7 @@ async def get_admin_theory_cards(
                 "totalPages": (total + limit - 1) // limit
             }
         }
-        
+
     except Exception as e:
         logger.error(f"Admin theory cards error: {e}")
         raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера")
@@ -576,17 +583,17 @@ async def delete_admin_content_file(
     admin_user: User = Depends(require_admin)
 ):
     """Удаление файла контента"""
-    
+
     try:
         file = db.query(ContentFile).filter(ContentFile.id == file_id).first()
         if not file:
             raise HTTPException(status_code=404, detail="Файл не найден")
-        
+
         db.delete(file)
         db.commit()
-        
+
         return {"message": "Файл успешно удален"}
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -603,7 +610,7 @@ async def create_admin_content_file(
     admin_user: User = Depends(require_admin)
 ):
     """Создание нового файла контента"""
-    
+
     try:
         # Проверяем, не существует ли уже файл с таким путем
         existing_file = db.query(ContentFile).filter(ContentFile.webdavPath == file_data.webdavPath).first()
@@ -612,7 +619,7 @@ async def create_admin_content_file(
                 status_code=409,
                 detail="Файл с таким webdavPath уже существует"
             )
-        
+
         from uuid import uuid4
         new_file = ContentFile(
             id=str(uuid4()),
@@ -620,14 +627,14 @@ async def create_admin_content_file(
             mainCategory=file_data.mainCategory,
             subCategory=file_data.subCategory
         )
-        
+
         db.add(new_file)
         db.commit()
         db.refresh(new_file)
-        
+
         # Добавляем подсчет блоков
         blocks_count = db.query(ContentBlock).filter(ContentBlock.fileId == new_file.id).count()
-        
+
         return {
             "id": new_file.id,
             "webdavPath": new_file.webdavPath,
@@ -637,7 +644,7 @@ async def create_admin_content_file(
             "updatedAt": new_file.updatedAt,
             "blocksCount": blocks_count
         }
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -655,12 +662,12 @@ async def update_admin_content_file(
     admin_user: User = Depends(require_admin)
 ):
     """Обновление файла контента"""
-    
+
     try:
         file = db.query(ContentFile).filter(ContentFile.id == file_id).first()
         if not file:
             raise HTTPException(status_code=404, detail="Файл не найден")
-        
+
         # Проверяем webdavPath если он изменяется
         if file_data.webdavPath and file_data.webdavPath != file.webdavPath:
             existing_file = db.query(ContentFile).filter(ContentFile.webdavPath == file_data.webdavPath).first()
@@ -670,19 +677,19 @@ async def update_admin_content_file(
                     detail="webdavPath уже используется другим файлом"
                 )
             file.webdavPath = file_data.webdavPath
-        
+
         if file_data.mainCategory:
             file.mainCategory = file_data.mainCategory
-        
+
         if file_data.subCategory:
             file.subCategory = file_data.subCategory
-        
+
         db.commit()
         db.refresh(file)
-        
+
         # Добавляем подсчет блоков
         blocks_count = db.query(ContentBlock).filter(ContentBlock.fileId == file.id).count()
-        
+
         return {
             "id": file.id,
             "webdavPath": file.webdavPath,
@@ -692,7 +699,7 @@ async def update_admin_content_file(
             "updatedAt": file.updatedAt,
             "blocksCount": blocks_count
         }
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -709,13 +716,13 @@ async def create_admin_content_block(
     admin_user: User = Depends(require_admin)
 ):
     """Создание нового блока контента"""
-    
+
     try:
         # Проверяем, существует ли файл
         file = db.query(ContentFile).filter(ContentFile.id == block_data.fileId).first()
         if not file:
             raise HTTPException(status_code=404, detail="Файл не найден")
-        
+
         from uuid import uuid4
         new_block = ContentBlock(
             id=str(uuid4()),
@@ -731,11 +738,11 @@ async def create_admin_content_block(
             codeFoldTitle=block_data.codeFoldTitle,
             extractedUrls=block_data.extractedUrls
         )
-        
+
         db.add(new_block)
         db.commit()
         db.refresh(new_block)
-        
+
         return {
             "id": new_block.id,
             "fileId": new_block.fileId,
@@ -752,7 +759,7 @@ async def create_admin_content_block(
             "createdAt": new_block.createdAt,
             "updatedAt": new_block.updatedAt
         }
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -770,19 +777,19 @@ async def update_admin_content_block(
     admin_user: User = Depends(require_admin)
 ):
     """Обновление блока контента"""
-    
+
     try:
         block = db.query(ContentBlock).filter(ContentBlock.id == block_id).first()
         if not block:
             raise HTTPException(status_code=404, detail="Блок не найден")
-        
+
         # Проверяем, существует ли файл если fileId изменился
         if block_data.fileId and block_data.fileId != block.fileId:
             file = db.query(ContentFile).filter(ContentFile.id == block_data.fileId).first()
             if not file:
                 raise HTTPException(status_code=404, detail="Файл не найден")
             block.fileId = block_data.fileId
-        
+
         if block_data.pathTitles is not None:
             block.pathTitles = block_data.pathTitles
         if block_data.blockTitle:
@@ -803,10 +810,10 @@ async def update_admin_content_block(
             block.codeFoldTitle = block_data.codeFoldTitle
         if block_data.extractedUrls is not None:
             block.extractedUrls = block_data.extractedUrls
-        
+
         db.commit()
         db.refresh(block)
-        
+
         return {
             "id": block.id,
             "fileId": block.fileId,
@@ -823,7 +830,7 @@ async def update_admin_content_block(
             "createdAt": block.createdAt,
             "updatedAt": block.updatedAt
         }
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -840,17 +847,17 @@ async def delete_admin_content_block(
     admin_user: User = Depends(require_admin)
 ):
     """Удаление блока контента"""
-    
+
     try:
         block = db.query(ContentBlock).filter(ContentBlock.id == block_id).first()
         if not block:
             raise HTTPException(status_code=404, detail="Блок не найден")
-        
+
         db.delete(block)
         db.commit()
-        
+
         return {"message": "Блок успешно удален"}
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -867,13 +874,13 @@ async def create_admin_theory_card(
     admin_user: User = Depends(require_admin)
 ):
     """Создание новой карточки теории"""
-    
+
     try:
         from uuid import uuid4
-        
+
         # Генерируем ankiGuid если не передан
         anki_guid = card_data.ankiGuid or f"card_{uuid4().hex[:16]}"
-        
+
         new_card = TheoryCard(
             id=str(uuid4()),
             ankiGuid=anki_guid,
@@ -886,11 +893,11 @@ async def create_admin_theory_card(
             tags=card_data.tags,
             orderIndex=card_data.orderIndex
         )
-        
+
         db.add(new_card)
         db.commit()
         db.refresh(new_card)
-        
+
         return {
             "id": new_card.id,
             "ankiGuid": new_card.ankiGuid,
@@ -905,7 +912,7 @@ async def create_admin_theory_card(
             "createdAt": new_card.createdAt,
             "updatedAt": new_card.updatedAt
         }
-        
+
     except Exception as e:
         logger.error(f"Admin create theory card error: {e}")
         db.rollback()
@@ -921,12 +928,12 @@ async def update_admin_theory_card(
     admin_user: User = Depends(require_admin)
 ):
     """Обновление карточки теории"""
-    
+
     try:
         card = db.query(TheoryCard).filter(TheoryCard.id == card_id).first()
         if not card:
             raise HTTPException(status_code=404, detail="Карточка не найдена")
-        
+
         if card_data.ankiGuid:
             card.ankiGuid = card_data.ankiGuid
         if card_data.cardType:
@@ -945,10 +952,10 @@ async def update_admin_theory_card(
             card.tags = card_data.tags
         if card_data.orderIndex is not None:
             card.orderIndex = card_data.orderIndex
-        
+
         db.commit()
         db.refresh(card)
-        
+
         return {
             "id": card.id,
             "ankiGuid": card.ankiGuid,
@@ -963,7 +970,7 @@ async def update_admin_theory_card(
             "createdAt": card.createdAt,
             "updatedAt": card.updatedAt
         }
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -980,17 +987,17 @@ async def delete_admin_theory_card(
     admin_user: User = Depends(require_admin)
 ):
     """Удаление карточки теории"""
-    
+
     try:
         card = db.query(TheoryCard).filter(TheoryCard.id == card_id).first()
         if not card:
             raise HTTPException(status_code=404, detail="Карточка не найдена")
-        
+
         db.delete(card)
         db.commit()
-        
+
         return {"message": "Карточка успешно удалена"}
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -1007,10 +1014,10 @@ async def bulk_delete_content(
     admin_user: User = Depends(require_admin)
 ):
     """Массовое удаление контента"""
-    
+
     try:
         deleted_count = 0
-        
+
         for item_id in delete_data.ids:
             # Пытаемся удалить как файл
             file = db.query(ContentFile).filter(ContentFile.id == item_id).first()
@@ -1018,20 +1025,20 @@ async def bulk_delete_content(
                 db.delete(file)
                 deleted_count += 1
                 continue
-            
+
             # Пытаемся удалить как блок
             block = db.query(ContentBlock).filter(ContentBlock.id == item_id).first()
             if block:
                 db.delete(block)
                 deleted_count += 1
-        
+
         db.commit()
-        
+
         return {
             "message": f"Успешно удалено {deleted_count} элементов",
             "deletedCount": deleted_count
         }
-        
+
     except Exception as e:
         logger.error(f"Admin bulk delete content error: {e}")
         db.rollback()
@@ -1046,18 +1053,18 @@ async def bulk_delete_theory(
     admin_user: User = Depends(require_admin)
 ):
     """Массовое удаление карточек теории"""
-    
+
     try:
         deleted_count = db.query(TheoryCard).filter(TheoryCard.id.in_(delete_data.ids)).count()
         db.query(TheoryCard).filter(TheoryCard.id.in_(delete_data.ids)).delete(synchronize_session=False)
         db.commit()
-        
+
         return {
             "message": f"Успешно удалено {deleted_count} карточек",
             "deletedCount": deleted_count
         }
-        
+
     except Exception as e:
         logger.error(f"Admin bulk delete theory error: {e}")
         db.rollback()
-        raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера") 
+        raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера")
