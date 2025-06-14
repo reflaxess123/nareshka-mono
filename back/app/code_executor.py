@@ -72,10 +72,13 @@ class CodeExecutor:
                 }
             # Создаем временную директорию для файлов
             with tempfile.TemporaryDirectory() as temp_dir:
+                os.chmod(temp_dir, 0o755)
+
                 # Записываем исходный код в файл
                 source_file = os.path.join(temp_dir, f"main{language.fileExtension}")
                 with open(source_file, "w", encoding="utf-8") as f:
                     f.write(source_code)
+                os.chmod(source_file, 0o644)
 
                 # Записываем входные данные если есть
                 stdin_file = None
@@ -83,6 +86,7 @@ class CodeExecutor:
                     stdin_file = os.path.join(temp_dir, "input.txt")
                     with open(stdin_file, "w", encoding="utf-8") as f:
                         f.write(stdin)
+                    os.chmod(stdin_file, 0o644)
 
                 # Выполняем код в контейнере
                 result = await self._run_in_container(
@@ -161,7 +165,7 @@ class CodeExecutor:
         except ContainerError as e:
             # Контейнер завершился с ошибкой
             stderr = e.stderr.decode("utf-8") if e.stderr else ""
-            stdout = e.stdout.decode("utf-8") if e.stdout else ""
+            stdout = ""
 
             return {
                 "status": ExecutionStatus.ERROR,
@@ -198,9 +202,9 @@ class CodeExecutor:
 
         if language.language == CodeLanguage.PYTHON:
             if stdin_file:
-                return "sh -c 'python main.py < input.txt'"
+                return "sh -c 'python -B main.py < input.txt'"
             else:
-                return "python main.py"
+                return "python -B main.py"
 
         elif language.language == CodeLanguage.JAVASCRIPT:
             if stdin_file:
