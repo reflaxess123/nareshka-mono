@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
     libpq-dev \
+    procps \
     && rm -rf /var/lib/apt/lists/*
 
 # Устанавливаем Poetry
@@ -23,13 +24,20 @@ RUN poetry config virtualenvs.create false \
 # Копируем исходный код приложения
 COPY . .
 
+# Копируем и настраиваем entrypoint
+COPY entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 # Создаем непривилегированного пользователя
 RUN useradd --create-home --shell /bin/bash app \
     && chown -R app:app /app
-USER app
+
+# Устанавливаем entrypoint. Он будет запущен от root.
+ENTRYPOINT ["entrypoint.sh"]
 
 # Открываем порт
 EXPOSE 4000
 
-# Команда запуска
+# Команда запуска, которая будет передана в entrypoint
+# Она будет выполнена от пользователя app, как указано в entrypoint.sh
 CMD ["python", "main.py"] 
