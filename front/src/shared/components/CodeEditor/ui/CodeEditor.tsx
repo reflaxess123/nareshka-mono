@@ -197,7 +197,7 @@ export const CodeEditor = ({
   const [isExecuting, setIsExecuting] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
-  const editorRef = useRef<editor.IStandaloneCodeEditor>();
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const queryClient = useQueryClient();
 
   // Load saved solution if blockId is provided
