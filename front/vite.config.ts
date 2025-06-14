@@ -17,23 +17,9 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
-      output: {
-        manualChunks: {
-          // Только большие библиотеки выносим отдельно
-          vendor: ['axios', 'date-fns', 'konva', 'socket.io-client'],
-        },
-      },
+      output: {},
     },
-    // Увеличиваем лимит предупреждения о размере чанков
     chunkSizeWarningLimit: 1500,
-    // Включаем минификацию
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true, // Убираем console.log в продакшене
-        drop_debugger: true,
-      },
-    },
   },
   server: {
     proxy: {
