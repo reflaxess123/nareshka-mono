@@ -6,7 +6,6 @@
   align-items: center;
   gap: 32px;
   padding: 32px 0;
-  min-height: calc(100vh - 80px);
 }
 
 .accessDenied {
@@ -69,21 +68,21 @@
 }
 
 // Адаптивность
-@media (max-width: 768px) {
-  .home {
-    padding: 20px 16px;
-  }
-
-  .accessDenied {
-    margin: 0 16px;
-    padding: 32px 16px;
-  }
-
-  .debugInfo {
-    position: relative;
-    bottom: auto;
-    right: auto;
-    margin: 20px auto 0;
-    max-width: none;
-  }
-}
+// @media (max-width: 768px) {
+//   .home {
+//     padding: 20px 16px;
+//   }
+//
+//   .accessDenied {
+//     margin: 0 16px;
+//     padding: 32px 16px;
+//   }
+//
+//   .debugInfo {
+//     position: relative;
+//     bottom: auto;
+//     right: auto;
+//     margin: 20px auto 0;
+//     max-width: none;
+//   }
+// }

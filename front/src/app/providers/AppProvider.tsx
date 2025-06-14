@@ -17,12 +17,12 @@ export const AppProvider = ({ children }: AppProviderProps) => {
     <ThemeProvider>
       <Provider store={store}>
         <QueryProvider>
-          <AuthProvider>
-            <ModalProvider>
+          <ModalProvider>
+            <AuthProvider>
               {children || <AppRouter />}
               <ModalRenderer />
-            </ModalProvider>
-          </AuthProvider>
+            </AuthProvider>
+          </ModalProvider>
         </QueryProvider>
       </Provider>
     </ThemeProvider>
