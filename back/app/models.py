@@ -227,7 +227,7 @@ class CodeExecution(Base):
     __tablename__ = "CodeExecution"
 
     id = Column(String, primary_key=True)
-    userId = Column(Integer, ForeignKey("User.id", ondelete="CASCADE"), nullable=False)
+    userId = Column(Integer, ForeignKey("User.id", ondelete="CASCADE"), nullable=True)
     blockId = Column(String, ForeignKey("ContentBlock.id", ondelete="CASCADE"), nullable=True)
     languageId = Column(String, ForeignKey("SupportedLanguage.id", ondelete="CASCADE"), nullable=False)
     sourceCode = Column(Text, nullable=False)

@@ -210,7 +210,7 @@ class CodeExecutionRequest(BaseModel):
 
 class CodeExecutionResponse(BaseModel):
     id: str
-    userId: int
+    userId: Optional[int] = None
     blockId: Optional[str] = None
     languageId: str
     sourceCode: str
