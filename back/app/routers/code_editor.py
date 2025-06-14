@@ -7,7 +7,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 from sqlalchemy import desc, func
 from sqlalchemy.orm import Session
 
-from ..auth import get_current_user_from_session_required
+from ..auth import get_current_user_from_session, get_current_user_from_session_required
 from ..code_executor import code_executor
 from ..database import engine, get_db
 from ..models import (
@@ -77,7 +77,7 @@ async def execute_code(
 ):
     """Выполнение кода в изолированной среде"""
 
-    user = get_current_user_from_session_required(user_request, db)
+    user = get_current_user_from_session(user_request, db)
 
     # Проверяем безопасность кода
     if not code_executor.validate_code_safety(request.sourceCode, request.language):
@@ -102,7 +102,7 @@ async def execute_code(
     execution_id = str(uuid.uuid4())
     execution = CodeExecution(
         id=execution_id,
-        userId=user.id,
+        userId=user.id if user else None,
         blockId=request.blockId,
         languageId=language.id,
         sourceCode=request.sourceCode,
@@ -131,12 +131,17 @@ async def get_execution_result(
 ):
     """Получение результата выполнения кода"""
 
-    user = get_current_user_from_session_required(user_request, db)
+    user = get_current_user_from_session(user_request, db)
 
-    execution = db.query(CodeExecution).filter(
-        CodeExecution.id == execution_id,
-        CodeExecution.userId == user.id
-    ).first()
+    query = db.query(CodeExecution).filter(CodeExecution.id == execution_id)
+    
+    if user:
+        query = query.filter(CodeExecution.userId == user.id)
+    else:
+        # Для анонимных пользователей, проверяем, что у записи нет userId
+        query = query.filter(CodeExecution.userId.is_(None))
+
+    execution = query.first()
 
     if not execution:
         raise HTTPException(status_code=404, detail="Execution not found")
