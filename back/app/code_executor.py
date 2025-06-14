@@ -13,6 +13,11 @@ from .models import CodeLanguage, ExecutionStatus, SupportedLanguage
 
 logger = logging.getLogger(__name__)
 
+# Путь к общей директории для выполнения кода.
+# Эта директория монтируется из хоста в docker-compose.yml
+SHARED_EXEC_DIR = "/tmp/nareshka-executions"
+os.makedirs(SHARED_EXEC_DIR, exist_ok=True)
+
 
 class CodeExecutionError(Exception):
     """Кастомное исключение для ошибок выполнения кода"""
@@ -70,15 +75,18 @@ class CodeExecutor:
                     "errorMessage": str(e),
                     "executionTimeMs": int((time.time() - start_time) * 1000)
                 }
-            # Создаем временную директорию для файлов
-            with tempfile.TemporaryDirectory() as temp_dir:
-                os.chmod(temp_dir, 0o755)
+            # Создаем временную директорию для файлов в общем месте
+            with tempfile.TemporaryDirectory(dir=SHARED_EXEC_DIR) as temp_dir:
+                # Даем права на чтение и выполнение для всех, чтобы
+                # пользователь 'nobody' в дочернем контейнере мог получить доступ
+                os.chmod(temp_dir, 0o777)
 
                 # Записываем исходный код в файл
                 source_file = os.path.join(temp_dir, f"main{language.fileExtension}")
                 with open(source_file, "w", encoding="utf-8") as f:
                     f.write(source_code)
-                os.chmod(source_file, 0o644)
+                # Даем права на чтение и запись всем
+                os.chmod(source_file, 0o666)
 
                 # Записываем входные данные если есть
                 stdin_file = None
@@ -86,7 +94,8 @@ class CodeExecutor:
                     stdin_file = os.path.join(temp_dir, "input.txt")
                     with open(stdin_file, "w", encoding="utf-8") as f:
                         f.write(stdin)
-                    os.chmod(stdin_file, 0o644)
+                    # Даем права на чтение и запись всем
+                    os.chmod(stdin_file, 0o666)
 
                 # Выполняем код в контейнере
                 result = await self._run_in_container(

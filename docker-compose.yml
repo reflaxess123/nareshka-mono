@@ -32,6 +32,9 @@ services:
     volumes:
       # Пробрасываем Docker сокет для выполнения кода
       - /var/run/docker.sock:/var/run/docker.sock
+      # Общая директория для временных файлов с кодом.
+      # Путь должен быть одинаковым на хосте и в контейнере.
+      - /tmp/nareshka-executions:/tmp/nareshka-executions
       # Используем ../files для персистентности данных как рекомендует Dokploy
       - "../files/backend-logs:/app/logs"
       - "../files/backend-uploads:/app/uploads"
