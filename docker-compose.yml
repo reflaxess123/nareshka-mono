@@ -28,6 +28,8 @@ services:
     ports:
       - "4000:4000"
     volumes:
+      # Пробрасываем Docker сокет для выполнения кода
+      - /var/run/docker.sock:/var/run/docker.sock
       # Используем ../files для персистентности данных как рекомендует Dokploy
       - "../files/backend-logs:/app/logs"
       - "../files/backend-uploads:/app/uploads"
