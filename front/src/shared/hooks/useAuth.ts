@@ -83,8 +83,8 @@ export const useLogout = () => {
   return useMutation({
     mutationFn: () => authApi.logout(),
     onSuccess: () => {
-      // Очищаем весь кэш после выхода
-      queryClient.clear();
+      // Очищаем кэш профиля после выхода
+      queryClient.removeQueries({ queryKey: authKeys.profile });
       window.location.href = '/';
     },
   });

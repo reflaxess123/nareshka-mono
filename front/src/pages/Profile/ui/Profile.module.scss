@@ -2,6 +2,8 @@
 
 .profile {
   display: flex;
+  flex-direction: column;
+  gap: 25px;
   align-items: center;
   justify-content: center;
   width: 100%;
@@ -9,4 +11,19 @@
   background: var(--bg-secondary);
   color: var(--text-primary);
   user-select: none;
+
+  .link {
+    color: black;
+    display: none;
+  }
+
+  @include mobile {
+    width: calc(100vw - 82px);
+    overflow: hidden;
+
+    .link {
+      display: block;
+    }
+  }
+
 }

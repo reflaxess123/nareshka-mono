@@ -100,31 +100,6 @@
   border-top: 1px solid var(--border-primary);
 }
 
-// Адаптивность
-@media (max-width: 768px) {
-  .dashboard {
-    padding: 16px;
-  }
-
-  .statsGrid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-
-  .statsCard {
-    padding: 16px;
-  }
-
-  .actions {
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .actionButton {
-    width: 100%;
-  }
-}
-
 // Темы
 [data-theme='dark'] {
   .statsCard {
