@@ -2,7 +2,7 @@ import { AppRoutes } from '@/app/providers/router';
 import { Link } from '@/shared/components/Link';
 import { useAuth } from '@/shared/hooks';
 import clsx from 'clsx';
-import { Bird, Brain, Home, LogIn, User } from 'lucide-react';
+import { Bird, Brain, Code, Home, LogIn, User } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import styles from './BottomNavBar.module.scss';
 
@@ -15,9 +15,10 @@ export const BottomNavBar = ({ onOpenLogin }: BottomNavBarProps) => {
   const { pathname } = useLocation();
 
   const links = [
-    { href: AppRoutes.HOME, icon: <Home />, text: 'Главная' },
+    { href: AppRoutes.HOME, icon: <Home />, text: 'Админка' },
     { href: AppRoutes.THEORY, icon: <Brain />, text: 'Теория' },
     { href: AppRoutes.TASKS, icon: <Bird />, text: 'Нарешка' },
+    { href: AppRoutes.CODE_EDITOR, icon: <Code />, text: 'Кодер' },
   ];
 
   const handleOpenLogin = () => {

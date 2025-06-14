@@ -17,6 +17,7 @@ import type {
   CodeExecutionResponse,
 } from '@/shared/api/code-editor';
 import { codeEditorApi, codeEditorKeys } from '@/shared/api/code-editor';
+import { useTheme } from '@/shared/context';
 
 // Types
 export interface CodeEditorProps {
@@ -189,6 +190,7 @@ export const CodeEditor = ({
   readOnly = false,
   className = '',
 }: CodeEditorProps) => {
+  const { theme } = useTheme();
   const [code, setCode] = useState(initialCode);
   const [language, setLanguage] = useState(initialLanguage);
   const [stdin, setStdin] = useState('');
@@ -319,7 +321,7 @@ export const CodeEditor = ({
     scrollBeyondLastLine: false,
     readOnly,
     automaticLayout: true,
-    theme: 'vs-dark',
+    theme: theme === 'dark' ? 'vs-dark' : 'vs-light',
     wordWrap: 'on',
     tabSize: 2,
     insertSpaces: true,
