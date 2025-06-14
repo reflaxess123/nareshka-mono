@@ -1,8 +1,9 @@
 import { AppRoutes } from '@/app/providers/router';
 import { Link } from '@/shared/components/Link';
+import { useTheme } from '@/shared/context/ThemeContext';
 import { useAuth } from '@/shared/hooks';
 import clsx from 'clsx';
-import { Bird, Brain, Code, Home, LogIn, User } from 'lucide-react';
+import { Bird, Brain, Code, Home, LogIn, Moon, Sun, User } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import styles from './BottomNavBar.module.scss';
 
@@ -13,6 +14,18 @@ interface BottomNavBarProps {
 export const BottomNavBar = ({ onOpenLogin }: BottomNavBarProps) => {
   const { isAuthenticated } = useAuth();
   const { pathname } = useLocation();
+  const { theme, setTheme } = useTheme();
+  const handleThemeToggle = () => {
+    setTheme(theme === 'light' ? 'dark' : 'light');
+  };
+
+  const getThemeIcon = () => {
+    return theme === 'light' ? <Sun size={24} /> : <Moon size={24} />;
+  };
+
+  const getThemeText = () => {
+    return theme === 'light' ? 'Светлая' : 'Темная';
+  };
 
   const links = [
     { href: AppRoutes.HOME, icon: <Home />, text: 'Админка' },
@@ -63,6 +76,14 @@ export const BottomNavBar = ({ onOpenLogin }: BottomNavBarProps) => {
           size="small"
         />
       )}
+      <Link
+        text={getThemeText()}
+        className={styles.link}
+        icon={getThemeIcon()}
+        onClick={handleThemeToggle}
+        variant="bottomBar"
+        size="small"
+      />
     </nav>
   );
 };
