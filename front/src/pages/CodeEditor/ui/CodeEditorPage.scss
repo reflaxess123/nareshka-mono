@@ -6,39 +6,194 @@
   padding: 48px 24px;
   background-image: radial-gradient(var(--bg-secondary) 1px, transparent 0);
   background-size: 40px 40px;
+  min-height: calc(100vh - var(--sidebar-width));
+  background: var(--bg-primary);
+
+  // Состояние загрузки
+  &.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .loading-spinner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-4);
+      color: var(--text-secondary);
+
+      svg {
+        color: var(--accent-primary);
+      }
+    }
+  }
+
+  // Состояние ошибки
+  &.error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .error-container {
+      text-align: center;
+      max-width: 500px;
+      padding: var(--space-8);
+
+      h1 {
+        margin-bottom: var(--space-4);
+        color: var(--text-primary);
+      }
+
+      p {
+        margin-bottom: var(--space-6);
+        color: var(--text-secondary);
+      }
+    }
+  }
 
   .page-header {
     margin-bottom: 48px;
     text-align: center;
     // width: 100%;
     transition: all 0.3s ease;
+    background: var(--surface-elevated);
+    border-bottom: 1px solid var(--border-primary);
+    padding: var(--space-6);
+    margin-bottom: var(--space-6);
 
     .header-content {
-      .header-text {
-        h1 {
-          font-size: 3rem;
-          font-weight: 700;
-          color: var(--text-primary);
-          margin-bottom: 16px;
-          background: linear-gradient(
-            135deg,
-            var(--accent-primary),
-            var(--accent-secondary, var(--accent-primary))
-          );
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1400px;
+      margin: 0 auto;
+      gap: var(--space-4);
+
+      .header-left {
+        flex-shrink: 0;
+
+        .back-button {
+          display: flex;
+          align-items: center;
+          gap: var(--space-2);
         }
 
-        p {
-          font-size: 1.1rem;
-          color: var(--text-secondary);
-          line-height: 1.6;
-          max-width: 600px;
-          margin: 0 auto;
+        .header-text {
+          h1 {
+            margin: 0;
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--text-primary);
+          }
         }
       }
+
+      .header-center {
+        flex: 1;
+        text-align: center;
+
+        .task-title {
+          margin: 0;
+          font-size: var(--font-size-2xl);
+          font-weight: var(--font-weight-bold);
+          color: var(--text-primary);
+          margin-bottom: var(--space-2);
+        }
+
+        .task-meta {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: var(--space-3);
+          flex-wrap: wrap;
+
+          .category {
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+          }
+
+          .level {
+            background: var(--surface-secondary);
+            color: var(--text-primary);
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+          }
+
+          .js-badge {
+            background: var(--success-color);
+            color: var(--text-inverse);
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-bold);
+          }
+        }
+      }
+
+      .header-right {
+        flex-shrink: 0;
+
+        .template-controls {
+          display: flex;
+          gap: var(--space-2);
+        }
+      }
+    }
+
+    // Статус заготовки
+    .template-status {
+      margin-top: var(--space-4);
+      padding: var(--space-3);
+      border-radius: var(--radius-lg);
+      border: 1px solid;
+
+      &.template {
+        background: rgba(34, 197, 94, 0.1);
+        border-color: var(--success-color);
+        color: var(--success-color);
+      }
+
+      &.original {
+        background: rgba(59, 130, 246, 0.1);
+        border-color: var(--info-color);
+        color: var(--info-color);
+      }
+
+      .status-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-2);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-medium);
+
+        .status-icon {
+          flex-shrink: 0;
+        }
+      }
+    }
+  }
+
+  // Описание задачи
+  .task-description {
+    max-width: 1200px;
+    margin: 0 auto var(--space-6);
+    padding: 0 var(--space-6);
+
+    h3 {
+      margin: 0 0 var(--space-3);
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      color: var(--text-primary);
+    }
+
+    p {
+      margin: 0;
+      color: var(--text-secondary);
+      line-height: var(--line-height-relaxed);
+      font-size: var(--font-size-base);
     }
   }
 
@@ -47,6 +202,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 var(--space-6);
 
     .editor-container {
       width: 100%;
@@ -63,6 +221,45 @@
         border-color: var(--accent-hover);
         transform: translateY(-4px);
       }
+    }
+  }
+}
+
+// Адаптивность для мобильных устройств
+@media (max-width: 768px) {
+  .code-editor-page {
+    .page-header {
+      padding: var(--space-4);
+
+      .header-content {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space-3);
+
+        .header-left,
+        .header-right {
+          align-self: flex-start;
+        }
+
+        .header-center {
+          .task-title {
+            font-size: var(--font-size-xl);
+          }
+
+          .task-meta {
+            justify-content: flex-start;
+          }
+        }
+
+        .template-controls {
+          flex-wrap: wrap;
+        }
+      }
+    }
+
+    .task-description,
+    .editor-section {
+      padding: 0 var(--space-4);
     }
   }
 }

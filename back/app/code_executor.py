@@ -5,6 +5,7 @@ import tempfile
 import time
 import uuid
 from typing import Any, Dict, List, Optional
+import platform
 
 import docker
 from docker.errors import APIError, ContainerError, ImageNotFound
@@ -13,10 +14,20 @@ from .models import CodeLanguage, ExecutionStatus, SupportedLanguage
 
 logger = logging.getLogger(__name__)
 
-# Путь к общей директории для выполнения кода.
-# Эта директория монтируется из хоста в docker-compose.yml
-SHARED_EXEC_DIR = "/tmp/nareshka-executions"
-os.makedirs(SHARED_EXEC_DIR, exist_ok=True)
+# Кроссплатформенный путь к общей директории для выполнения кода
+def get_shared_exec_dir():
+    """Получает путь к общей директории для выполнения кода в зависимости от ОС"""
+    if platform.system() == "Windows":
+        # В Windows используем C:\temp\nareshka-executions
+        base_dir = "C:\\temp\\nareshka-executions"
+    else:
+        # В Unix-подобных системах используем /tmp/nareshka-executions
+        base_dir = "/tmp/nareshka-executions"
+    
+    os.makedirs(base_dir, exist_ok=True)
+    return base_dir
+
+SHARED_EXEC_DIR = get_shared_exec_dir()
 
 
 class CodeExecutionError(Exception):

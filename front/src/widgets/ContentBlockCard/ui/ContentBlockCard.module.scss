@@ -452,3 +452,65 @@
     background: var(--color-primary-hover);
   }
 }
+
+// Контейнер для кнопки редактора
+.editorButtonContainer {
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border-muted);
+  display: flex;
+}
+
+// Кнопка перехода в редактор
+.tryEditorButton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-normal) ease;
+  box-shadow: var(--shadow-sm);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  // Лейбл JS для JavaScript задач
+  .jsLabel {
+    background: var(--success-color);
+    color: var(--text-inverse);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    margin-left: var(--space-2);
+  }
+}
+
+// Кнопка развернуть/свернуть
+.expandButton {
+  position: absolute;
+  bottom: var(--space-2);
+  right: var(--space-2);
+  background: var(--surface-secondary);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-full);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-normal) ease;
+  opacity: 0.7;
+
+  &:hover {
+    opacity: 1;
+    background: var(--surface-elevated);
+    border-color: var(--border-accent);
+    transform: scale(1.1);
+  }
+}

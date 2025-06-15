@@ -28,11 +28,12 @@ services:
     ports:
       - "4000:4000"
     volumes:
-      # Пробрасываем Docker сокет для выполнения кода
+      # Пробрасываем Docker сокет для выполнения кода (в Windows используется named pipe)
       - /var/run/docker.sock:/var/run/docker.sock
       # Общая директория для временных файлов с кодом.
-      # Путь должен быть одинаковым на хосте и в контейнере.
-      - /tmp/nareshka-executions:/tmp/nareshka-executions
+      # В Windows: C:\temp\nareshka-executions:/tmp/nareshka-executions
+      # В Linux: /tmp/nareshka-executions:/tmp/nareshka-executions
+      - ${NARESHKA_EXEC_DIR:-/tmp/nareshka-executions}:/tmp/nareshka-executions
       # Используем ../files для персистентности данных как рекомендует Dokploy
       - "../files/backend-logs:/app/logs"
       - "../files/backend-uploads:/app/uploads"

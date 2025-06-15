@@ -203,7 +203,7 @@ class SupportedLanguagePublic(BaseModel):
 
 class CodeExecutionRequest(BaseModel):
     sourceCode: str
-    language: CodeLanguage
+    language: str
     stdin: Optional[str] = None
     blockId: Optional[str] = None
 

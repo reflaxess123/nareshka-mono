@@ -183,7 +183,7 @@ export const CodeExecutionPanel = ({
 export const CodeEditor = ({
   blockId,
   initialCode = '',
-  initialLanguage = 'PYTHON',
+  initialLanguage = 'JAVASCRIPT',
   onCodeChange,
   onExecutionComplete,
   height = '400px',
@@ -242,6 +242,17 @@ export const CodeEditor = ({
       setIsExecuting(false);
     },
   });
+
+  // Update language when initialLanguage prop changes
+  useEffect(() => {
+    setLanguage(initialLanguage);
+  }, [initialLanguage]);
+
+  // Update code when initialCode prop changes
+  useEffect(() => {
+    setCode(initialCode);
+  }, [initialCode]);
+  
 
   // Load saved solution when data is available
   useEffect(() => {

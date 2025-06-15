@@ -79,8 +79,17 @@ async def execute_code(
 
     user = get_current_user_from_session(user_request, db)
 
+    # Проверяем, что язык из валидного списка enum
+    try:
+        language_enum = CodeLanguage(request.language)
+    except ValueError:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Language {request.language} is not supported. Valid languages: {', '.join([lang.value for lang in CodeLanguage])}"
+        )
+
     # Проверяем безопасность кода
-    if not code_executor.validate_code_safety(request.sourceCode, request.language):
+    if not code_executor.validate_code_safety(request.sourceCode, language_enum):
         raise HTTPException(
             status_code=400,
             detail="Code contains potentially unsafe patterns"
@@ -88,14 +97,14 @@ async def execute_code(
 
     # Получаем настройки языка
     language = db.query(SupportedLanguage).filter(
-        SupportedLanguage.language == request.language,
+        SupportedLanguage.language == language_enum,
         SupportedLanguage.isEnabled == True
     ).first()
 
     if not language:
         raise HTTPException(
             status_code=400,
-            detail=f"Language {request.language} is not supported"
+            detail=f"Language {request.language} is not supported or disabled"
         )
 
     # Создаем запись о выполнении
