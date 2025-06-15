@@ -97,4 +97,9 @@
   --color-on-background: #ffffff; // On Background
   --color-on-surface: #ffffff; // On Surface
   --color-on-error: #000000; // On Error
+
+  // === СКРОЛЛБАР ===
+  --scrollbar-track-bg: var(--surface-secondary);
+  --scrollbar-thumb-bg: var(--accent-dark);
+  --scrollbar-thumb-hover-bg: var(--accent-hover);
 }

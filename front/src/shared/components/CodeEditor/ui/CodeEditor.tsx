@@ -1,8 +1,8 @@
 import { Editor } from '@monaco-editor/react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { AnimatePresence, motion } from 'framer-motion';
 import {
   CheckCircle,
+  Copy,
   Loader2,
   Play,
   Save,
@@ -18,6 +18,7 @@ import type {
 } from '@/shared/api/code-editor';
 import { codeEditorApi, codeEditorKeys } from '@/shared/api/code-editor';
 import { useTheme } from '@/shared/context';
+import styles from './CodeEditor.module.scss';
 
 // Types
 export interface CodeEditorProps {
@@ -56,7 +57,7 @@ export const LanguageSelector = ({
 
   if (isLoading) {
     return (
-      <div className={`language-selector ${className}`}>
+      <div className={`${styles.languageSelector} ${className}`}>
         <Loader2 className="w-4 h-4 animate-spin" />
         <span>Loading languages...</span>
       </div>
@@ -67,7 +68,7 @@ export const LanguageSelector = ({
     <select
       value={selectedLanguage}
       onChange={(e) => onLanguageChange(e.target.value)}
-      className={`language-selector ${className}`}
+      className={`${styles.languageSelector} ${className}`}
     >
       {languages.map((lang) => (
         <option key={lang.id} value={lang.language}>
@@ -84,9 +85,15 @@ export const CodeExecutionPanel = ({
   isLoading = false,
   onClear,
 }: CodeExecutionPanelProps) => {
-  if (!execution && !isLoading) {
-    return null;
-  }
+  const [copied, setCopied] = useState<'stdout' | 'stderr' | ''>('');
+
+  const handleCopy = (text: string | undefined, type: 'stdout' | 'stderr') => {
+    if (!text) return;
+    navigator.clipboard.writeText(text);
+    setCopied(type);
+    const timer = setTimeout(() => setCopied(''), 2000);
+    return () => clearTimeout(timer);
+  };
 
   const getStatusIcon = () => {
     if (
@@ -125,57 +132,77 @@ export const CodeExecutionPanel = ({
   };
 
   return (
-    <AnimatePresence>
-      <motion.div
-        className="code-execution-panel"
-        initial={{ opacity: 0, height: 0 }}
-        animate={{ opacity: 1, height: 'auto' }}
-        exit={{ opacity: 0, height: 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        <div className="execution-header">
-          <div className="execution-status">
-            {getStatusIcon()}
-            <span>{getStatusText()}</span>
-          </div>
-          {onClear && (
-            <button onClick={onClear} className="clear-button">
-              Clear
+    <div className={styles.codeExecutionPanel}>
+      <div className={styles.executionHeader}>
+        <div className={styles.executionStatus}>
+          {getStatusIcon()}
+          <span>{getStatusText()}</span>
+        </div>
+        {onClear && (
+          <button onClick={onClear} className={styles.clearButton}>
+            Clear
+          </button>
+        )}
+      </div>
+
+      {execution?.stdout && (
+        <div className={styles.executionOutput}>
+          <div className={styles.outputHeader}>
+            <h4>Output</h4>
+            <button
+              onClick={() => handleCopy(execution.stdout, 'stdout')}
+              className={styles.copyButton}
+            >
+              {copied === 'stdout' ? (
+                <CheckCircle size={14} />
+              ) : (
+                <Copy size={14} />
+              )}
+              <span>{copied === 'stdout' ? 'Copied!' : 'Copy'}</span>
             </button>
+          </div>
+          <pre className={styles.outputContent}>{execution.stdout}</pre>
+        </div>
+      )}
+
+      {execution?.stderr && (
+        <div className={styles.executionError}>
+          <div className={styles.outputHeader}>
+            <h4>Error</h4>
+            <button
+              onClick={() => handleCopy(execution.stderr, 'stderr')}
+              className={styles.copyButton}
+            >
+              {copied === 'stderr' ? (
+                <CheckCircle size={14} />
+              ) : (
+                <Copy size={14} />
+              )}
+              <span>{copied === 'stderr' ? 'Copied!' : 'Copy'}</span>
+            </button>
+          </div>
+          <pre className={styles.errorContent}>{execution.stderr}</pre>
+        </div>
+      )}
+
+      {execution?.errorMessage && (
+        <div className={styles.executionError}>
+          <div className={styles.outputHeader}>
+            <h4>Error Message</h4>
+          </div>
+          <p className={styles.errorMessage}>{execution.errorMessage}</p>
+        </div>
+      )}
+
+      {execution?.status === 'SUCCESS' && execution.executionTimeMs && (
+        <div className={styles.executionStats}>
+          <span>Time: {execution.executionTimeMs}ms</span>
+          {execution.memoryUsedMB && (
+            <span>Memory: {execution.memoryUsedMB}MB</span>
           )}
         </div>
-
-        {execution?.stdout && (
-          <div className="execution-output">
-            <h4>Output:</h4>
-            <pre className="output-content">{execution.stdout}</pre>
-          </div>
-        )}
-
-        {execution?.stderr && (
-          <div className="execution-error">
-            <h4>Error:</h4>
-            <pre className="error-content">{execution.stderr}</pre>
-          </div>
-        )}
-
-        {execution?.errorMessage && (
-          <div className="execution-error">
-            <h4>Error Message:</h4>
-            <p className="error-message">{execution.errorMessage}</p>
-          </div>
-        )}
-
-        {execution?.status === 'SUCCESS' && execution.executionTimeMs && (
-          <div className="execution-stats">
-            <span>Time: {execution.executionTimeMs}ms</span>
-            {execution.memoryUsedMB && (
-              <span>Memory: {execution.memoryUsedMB}MB</span>
-            )}
-          </div>
-        )}
-      </motion.div>
-    </AnimatePresence>
+      )}
+    </div>
   );
 };
 
@@ -183,7 +210,7 @@ export const CodeExecutionPanel = ({
 export const CodeEditor = ({
   blockId,
   initialCode = '',
-  initialLanguage = 'JAVASCRIPT',
+  initialLanguage = 'PYTHON',
   onCodeChange,
   onExecutionComplete,
   height = '400px',
@@ -252,7 +279,6 @@ export const CodeEditor = ({
   useEffect(() => {
     setCode(initialCode);
   }, [initialCode]);
-  
 
   // Load saved solution when data is available
   useEffect(() => {
@@ -336,30 +362,33 @@ export const CodeEditor = ({
     wordWrap: 'on',
     tabSize: 2,
     insertSpaces: true,
+    scrollbar: {
+      verticalScrollbarSize: 8,
+      horizontalScrollbarSize: 8,
+    },
   };
 
   return (
-    <div className={`code-editor-container ${className}`}>
+    <div className={`${styles.codeEditorContainer} ${className}`}>
       {/* Editor Toolbar */}
-      <div className="editor-toolbar">
-        <div className="toolbar-left">
+      <div className={styles.editorToolbar}>
+        <div className={styles.toolbarLeft}>
           <LanguageSelector
             selectedLanguage={language}
             onLanguageChange={handleLanguageChange}
-            className="toolbar-language"
+            className={styles.toolbarLanguage}
           />
         </div>
 
-        <div className="toolbar-right">
+        <div className={styles.toolbarRight}>
           {blockId && (
             <button
               onClick={handleSaveSolution}
               disabled={saveSolutionMutation.isPending || !code.trim()}
-              className="toolbar-button save-button"
+              className={`${styles.toolbarButton} ${styles.saveButton}`}
               title="Save Solution"
             >
               <Save className="w-4 h-4" />
-              {saveSolutionMutation.isPending ? 'Saving...' : 'Save'}
             </button>
           )}
 
@@ -368,7 +397,7 @@ export const CodeEditor = ({
             disabled={
               isExecuting || executeCodeMutation.isPending || !code.trim()
             }
-            className="toolbar-button execute-button"
+            className={`${styles.toolbarButton} ${styles.executeButton}`}
             title="Run Code"
           >
             {isExecuting || executeCodeMutation.isPending ? (
@@ -376,12 +405,11 @@ export const CodeEditor = ({
             ) : (
               <Play className="w-4 h-4" />
             )}
-            Run
           </button>
 
           <button
             onClick={() => setShowSettings(!showSettings)}
-            className="toolbar-button settings-button"
+            className={`${styles.toolbarButton} ${styles.settingsButton}`}
             title="Settings"
           >
             <Settings className="w-4 h-4" />
@@ -390,31 +418,24 @@ export const CodeEditor = ({
       </div>
 
       {/* Settings Panel */}
-      <AnimatePresence>
-        {showSettings && (
-          <motion.div
-            className="settings-panel"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-          >
-            <div className="setting-group">
-              <label htmlFor="stdin-input">Input (stdin):</label>
-              <textarea
-                id="stdin-input"
-                value={stdin}
-                onChange={(e) => setStdin(e.target.value)}
-                placeholder="Enter input for your program..."
-                className="stdin-input"
-                rows={3}
-              />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {showSettings && (
+        <div className={styles.settingsPanel}>
+          <div className={styles.settingGroup}>
+            <label htmlFor="stdin-input">Input (stdin):</label>
+            <textarea
+              id="stdin-input"
+              value={stdin}
+              onChange={(e) => setStdin(e.target.value)}
+              placeholder="Enter input for your program..."
+              className={styles.stdinInput}
+              rows={3}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Monaco Editor */}
-      <div className="editor-wrapper" style={{ height }}>
+      <div className={styles.editorWrapper} style={{ height }}>
         <Editor
           height="100%"
           language={getMonacoLanguage(language)}
@@ -428,11 +449,13 @@ export const CodeEditor = ({
       </div>
 
       {/* Execution Results */}
-      <CodeExecutionPanel
-        execution={currentExecution}
-        isLoading={isExecuting || executeCodeMutation.isPending}
-        onClear={() => setCurrentExecution(undefined)}
-      />
+      {(isExecuting || executeCodeMutation.isPending || currentExecution) && (
+        <CodeExecutionPanel
+          execution={currentExecution}
+          isLoading={isExecuting || executeCodeMutation.isPending}
+          onClear={() => setCurrentExecution(undefined)}
+        />
+      )}
     </div>
   );
 };
