@@ -133,7 +133,7 @@ export interface MindMapEdge extends Edge {
   source: string;
   target: string;
   animated?: boolean;
-  style?: Record<string, any>;
+  style?: Record<string, unknown>;
 }
 
 export interface MindMapData {
