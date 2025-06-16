@@ -9,13 +9,10 @@ interface CenterNodeProps {
 }
 
 const CenterNode: React.FC<CenterNodeProps> = ({ data, selected }) => {
-  // Поддерживаем и новый и старый формат данных
-  const title =
-    (data as any).title || (data as any).label || 'JavaScript Skills';
+  const dataRecord = data as Record<string, unknown>;
+  const title = (dataRecord.title as string) || 'JavaScript Skills';
   const description =
-    (data as any).description || 'Интерактивная карта изучения JavaScript';
-  const totalTasks = (data as any).total_tasks || (data as any).task_count || 0;
-  const coverage = (data as any).coverage || 100;
+    (dataRecord.description as string) || 'Изучение JavaScript';
 
   return (
     <div className={`center-node ${selected ? 'selected' : ''}`}>
@@ -69,23 +66,7 @@ const CenterNode: React.FC<CenterNodeProps> = ({ data, selected }) => {
           </div>
           <h2 className="center-title">{title}</h2>
         </div>
-
         <p className="center-description">{description}</p>
-
-        <div className="center-stats">
-          <div className="stat">
-            <div className="stat-value">{totalTasks}</div>
-            <div className="stat-label">Задач</div>
-          </div>
-
-          <div className="stat-divider" />
-
-          <div className="stat">
-            <div className="stat-value">{coverage}%</div>
-            <div className="stat-label">Покрытие</div>
-          </div>
-        </div>
-
         <div className="center-badge">
           <span>Карта навыков JavaScript</span>
         </div>

@@ -12,8 +12,8 @@ import {
 import '@xyflow/react/dist/style.css';
 import React, { useCallback, useEffect, useState } from 'react';
 import CenterNode from '../components/MindMapNodes/CenterNode';
-import TaskNode from '../components/MindMapNodes/TaskNode';
 import TopicNode from '../components/MindMapNodes/TopicNode';
+import TopicTaskModal from '../components/MindMapNodes/TopicTaskModal';
 import styles from './MindMapPage.module.scss';
 
 interface MindMapData {
@@ -36,7 +36,6 @@ const nodeTypes: NodeTypes = {
   topic: TopicNode,
   topicNode: TopicNode,
   conceptNode: TopicNode,
-  task: TaskNode,
 };
 
 const NewMindMapPage: React.FC = () => {
@@ -44,27 +43,33 @@ const NewMindMapPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
+  const [isTopicModalOpen, setIsTopicModalOpen] = useState(false);
 
   const fetchMindMap = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch('/api/mindmap/generate');
       const result = await response.json();
-      console.log('Received mind map data:', result);
 
       if (result.success && result.data) {
         setMindMapData(result.data);
         setNodes(result.data.nodes);
         setEdges(result.data.edges);
-      } else {
-        console.error('API returned error:', result.error);
       }
-    } catch (error) {
-      console.error('Error fetching mind map:', error);
+    } catch {
+      // Игнорируем ошибки
     } finally {
       setLoading(false);
     }
   }, [setNodes, setEdges]);
+
+  const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
+    if (node.type === 'topic' && node.data.topic_key) {
+      setSelectedTopic(node.data.topic_key as string);
+      setIsTopicModalOpen(true);
+    }
+  }, []);
 
   useEffect(() => {
     fetchMindMap();
@@ -80,9 +85,10 @@ const NewMindMapPage: React.FC = () => {
           justifyContent: 'center',
           alignItems: 'center',
           fontSize: '18px',
+          color: '#666',
         }}
       >
-        Генерируем mind map...
+        🔄 Загрузка MindMap...
       </div>
     );
   }
@@ -97,44 +103,28 @@ const NewMindMapPage: React.FC = () => {
           justifyContent: 'center',
           alignItems: 'center',
           fontSize: '18px',
+          color: '#666',
         }}
       >
-        Не удалось загрузить mind map
+        ❌ Ошибка загрузки данных
       </div>
     );
   }
 
   return (
-    <div className={styles.mindmapContainer}>
-      <div className={styles.header}>
-        <div className={styles.headerContent}>
-          <div className={styles.headerFlex}>
-            <div className={styles.headerLeft}>
-              <div className={styles.headerInfo}>
-                <div className={styles.logo}>JS</div>
-                <div className={styles.titleContainer}>
-                  <h1 className={styles.title}>JavaScript Skills Map</h1>
-                  <p className={styles.subtitle}>
-                    {mindMapData?.total_nodes || 0} узлов •{' '}
-                    {mindMapData?.active_topics || 0} активных тем
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className={styles.flowCanvas}>
+    <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+      <div style={{ width: '100%', height: '100%' }}>
         <ReactFlow
           nodes={nodes}
           edges={edges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
+          onNodeClick={onNodeClick}
           nodeTypes={nodeTypes}
           fitView
-          defaultViewport={{ x: 0, y: 0, zoom: 0.5 }}
-          minZoom={0.2}
+          fitViewOptions={{ padding: 0.1, includeHiddenNodes: false }}
+          defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
+          minZoom={0.3}
           maxZoom={2}
           deleteKeyCode={null}
           multiSelectionKeyCode={null}
@@ -162,22 +152,14 @@ const NewMindMapPage: React.FC = () => {
         </ReactFlow>
       </div>
 
-      <div className={styles.legend}>
-        <div className={styles.legendItems}>
-          <div className={styles.legendItem}>
-            <div className={`${styles.legendDot} ${styles.purple}`}></div>
-            <span className={styles.legendText}>Центр</span>
-          </div>
-          <div className={styles.legendItem}>
-            <div className={`${styles.legendDot} ${styles.green}`}></div>
-            <span className={styles.legendText}>Темы</span>
-          </div>
-          <div className={styles.legendItem}>
-            <div className={`${styles.legendDot} ${styles.yellow}`}></div>
-            <span className={styles.legendText}>Задачи</span>
-          </div>
-        </div>
-      </div>
+      <TopicTaskModal
+        isOpen={isTopicModalOpen}
+        onClose={() => {
+          setIsTopicModalOpen(false);
+          setSelectedTopic(null);
+        }}
+        topicKey={selectedTopic}
+      />
     </div>
   );
 };
