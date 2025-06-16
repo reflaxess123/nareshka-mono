@@ -29,6 +29,11 @@ const CodeEditor = lazy(() =>
     default: module.CodeEditorPage,
   }))
 );
+const MindMap = lazy(() =>
+  import('@/pages/NewMindMapPage').then((module) => ({
+    default: module.default,
+  }))
+);
 
 export enum AppRoutes {
   HOME = '/',
@@ -36,6 +41,7 @@ export enum AppRoutes {
   THEORY = '/theory',
   PROFILE = '/profile',
   CODE_EDITOR = '/code-editor',
+  MINDMAP = '/mindmap',
   ADMIN_PANEL = '/admin-panel',
   ADMIN_USERS = '/admin/users',
   ADMIN_STATS = '/admin/stats',
@@ -47,6 +53,7 @@ export const routeConfig: AppRoute[] = [
   { path: AppRoutes.THEORY, element: <Theory /> },
   { path: AppRoutes.PROFILE, element: <Profile /> },
   { path: AppRoutes.CODE_EDITOR, element: <CodeEditor /> },
+  { path: AppRoutes.MINDMAP, element: <MindMap /> },
   { path: AppRoutes.ADMIN_PANEL, element: <Adminka /> },
   { path: AppRoutes.ADMIN_USERS, element: <UserManagement /> },
   { path: AppRoutes.ADMIN_STATS, element: <DetailedStats /> },

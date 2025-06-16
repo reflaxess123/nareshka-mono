@@ -3,7 +3,17 @@ import { Link } from '@/shared/components/Link';
 import { useTheme } from '@/shared/context/ThemeContext';
 import { useAuth } from '@/shared/hooks';
 import clsx from 'clsx';
-import { Bird, Brain, Code, Home, LogIn, Moon, Sun, User } from 'lucide-react';
+import {
+  Bird,
+  Brain,
+  Code,
+  Home,
+  LogIn,
+  Map,
+  Moon,
+  Sun,
+  User,
+} from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import styles from './BottomNavBar.module.scss';
 
@@ -32,6 +42,7 @@ export const BottomNavBar = ({ onOpenLogin }: BottomNavBarProps) => {
     { href: AppRoutes.THEORY, icon: <Brain />, text: 'Теория' },
     { href: AppRoutes.TASKS, icon: <Bird />, text: 'Нарешка' },
     { href: AppRoutes.CODE_EDITOR, icon: <Code />, text: 'Кодер' },
+    { href: AppRoutes.MINDMAP, icon: <Map />, text: 'Карта' },
   ];
 
   const handleOpenLogin = () => {
