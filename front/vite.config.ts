@@ -6,7 +6,13 @@ export default defineConfig({
   plugins: [
     react(),
     checker({
-      typescript: true,
+      typescript: {
+        tsconfigPath: './tsconfig.app.json',
+        buildMode: false,
+      },
+      overlay: {
+        initialIsOpen: false,
+      },
     }),
   ],
   resolve: {

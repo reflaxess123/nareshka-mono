@@ -64,7 +64,7 @@ const NewMindMapPage: React.FC = () => {
     }
   }, [setNodes, setEdges]);
 
-  const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
+  const onNodeClick = useCallback((_event: React.MouseEvent, node: Node) => {
     if (node.type === 'topic' && node.data.topic_key) {
       setSelectedTopic(node.data.topic_key as string);
       setIsTopicModalOpen(true);
