@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import Dict, Any, Optional
-import json
 from datetime import datetime
 
 from ..database import get_db
+from ..mindmap_config import get_all_topics, get_topic_config
 
 router = APIRouter(prefix="/api/mindmap", tags=["mindmap"])
 
@@ -42,68 +42,8 @@ def generate_topic_based_mindmap(
     topic_filter: Optional[str] = None
 ) -> Dict[str, Any]:
     
-    md_topics = {
-        'closures': {
-            'title': 'Замыкания',
-            'icon': '🔒',
-            'color': '#8B5CF6',
-            'description': 'Функции и области видимости'
-        },
-        'throttle_debounce': {
-            'title': 'Тротлы и дебаунсы',
-            'icon': '⏱️',
-            'color': '#F97316',
-            'description': 'Оптимизация производительности'
-        },
-        'custom_functions': {
-            'title': 'Кастомные методы и функции',
-            'icon': '⚡',
-            'color': '#3B82F6',
-            'description': 'Создание собственных функций и методов'
-        },
-        'time': {
-            'title': 'Часовая',
-            'icon': '🕐',
-            'color': '#06B6D4',
-            'description': 'Работа с временем и датами'
-        },
-        'arrays': {
-            'title': 'Массивы',
-            'icon': '📝',
-            'color': '#F59E0B',
-            'description': 'Работа с массивами и их методами'
-        },
-        'promises': {
-            'title': 'Промисы',
-            'icon': '🔄',
-            'color': '#06B6D4',
-            'description': 'Асинхронная работа и промисы'
-        },
-        'strings': {
-            'title': 'Строки',
-            'icon': '🔤',
-            'color': '#8B5CF6',
-            'description': 'Обработка строк и регулярные выражения'
-        },
-        'objects': {
-            'title': 'Объекты',
-            'icon': '📦',
-            'color': '#84CC16',
-            'description': 'Работа с объектами и их свойствами'
-        },
-        'classes': {
-            'title': 'Классы',
-            'icon': '🏗️',
-            'color': '#10B981',
-            'description': 'ООП и классы в JavaScript'
-        },
-        'matrices': {
-            'title': 'Матрицы',
-            'icon': '🔢',
-            'color': '#EF4444',
-            'description': 'Двумерные массивы и матрицы'
-        }
-    }
+    # Используем конфигурацию из отдельного файла
+    md_topics = get_all_topics()
     
     nodes = []
     edges = []
@@ -180,96 +120,32 @@ async def get_topic_tasks(
     difficulty_filter: Optional[str] = None
 ) -> Dict[str, Any]:
     try:
-        md_topics = {
-            'closures': {
-                'title': 'Замыкания',
-                'icon': '🔒',
-                'color': '#8B5CF6',
-                'description': 'Функции и области видимости'
-            },
-            'throttle_debounce': {
-                'title': 'Тротлы и дебаунсы',
-                'icon': '⏱️',
-                'color': '#F97316',
-                'description': 'Оптимизация производительности'
-            },
-            'custom_functions': {
-                'title': 'Кастомные методы и функции',
-                'icon': '⚡',
-                'color': '#3B82F6',
-                'description': 'Создание собственных функций и методов'
-            },
-            'time': {
-                'title': 'Часовая',
-                'icon': '🕐',
-                'color': '#06B6D4',
-                'description': 'Работа с временем и датами'
-            },
-            'arrays': {
-                'title': 'Массивы',
-                'icon': '📝',
-                'color': '#F59E0B',
-                'description': 'Работа с массивами и их методами'
-            },
-            'promises': {
-                'title': 'Промисы',
-                'icon': '🔄',
-                'color': '#06B6D4',
-                'description': 'Асинхронная работа и промисы'
-            },
-            'strings': {
-                'title': 'Строки',
-                'icon': '🔤',
-                'color': '#8B5CF6',
-                'description': 'Обработка строк и регулярные выражения'
-            },
-            'objects': {
-                'title': 'Объекты',
-                'icon': '📦',
-                'color': '#84CC16',
-                'description': 'Работа с объектами и их свойствами'
-            },
-            'classes': {
-                'title': 'Классы',
-                'icon': '🏗️',
-                'color': '#10B981',
-                'description': 'ООП и классы в JavaScript'
-            },
-            'matrices': {
-                'title': 'Матрицы',
-                'icon': '🔢',
-                'color': '#EF4444',
-                'description': 'Двумерные массивы и матрицы'
+        topic_config = get_topic_config(topic_key)
+        if not topic_config:
+            raise HTTPException(status_code=404, detail=f"Topic '{topic_key}' not found")
+        
+        from ..models import ContentBlock, ContentFile
+        from sqlalchemy import asc, func
+        
+        query = db.query(ContentBlock).join(ContentFile)
+        
+        query = query.filter(
+            func.lower(ContentFile.mainCategory) == func.lower(topic_config['mainCategory']),
+            func.lower(ContentFile.subCategory) == func.lower(topic_config['subCategory'])
+        )
+        
+        query = query.order_by(asc(ContentBlock.orderInFile))
+        
+        content_blocks = query.all()
+        
+        tasks = []
+        for block in content_blocks:
+            task = {
+                "id": block.id,
+                "title": block.blockTitle or "Задача без названия",
+                "description": block.textContent or ""
             }
-        }
-        
-        if topic_key not in md_topics:
-            raise HTTPException(status_code=404, detail=f"Группа '{topic_key}' не найдена")
-        
-        topic_config = md_topics[topic_key]
-        
-        mock_tasks = [
-            {
-                'id': f'task_{topic_key}_1',
-                'title': f'Пример задачи 1 - {topic_config["title"]}',
-                'description': f'Это пример задачи для группы {topic_config["title"]}',
-                'complexity_score': 3.5,
-                'target_skill_level': 'intermediate',
-                'estimated_time_minutes': 30,
-                'programming_concepts': [topic_key],
-                'js_features_used': ['functions', 'variables']
-            },
-            {
-                'id': f'task_{topic_key}_2',
-                'title': f'Пример задачи 2 - {topic_config["title"]}',
-                'description': f'Еще одна пример задачи для группы {topic_config["title"]}',
-                'complexity_score': 5.0,
-                'target_skill_level': 'advanced',
-                'estimated_time_minutes': 45,
-                'programming_concepts': [topic_key],
-                'js_features_used': ['functions', 'objects']
-            }
-        ]
+            tasks.append(task)
         
         return {
             "success": True,
@@ -280,14 +156,10 @@ async def get_topic_tasks(
                 "color": topic_config['color'],
                 "description": topic_config['description']
             },
-            "tasks": mock_tasks,
-            "total_tasks": len(mock_tasks),
-            "applied_filters": {
-                "difficulty": difficulty_filter
-            }
+            "tasks": tasks
         }
-        
+    
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Ошибка получения задач: {str(e)}") 
+        raise HTTPException(status_code=500, detail=f"Ошибка загрузки задач: {str(e)}") 
