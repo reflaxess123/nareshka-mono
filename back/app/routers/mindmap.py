@@ -140,7 +140,7 @@ async def get_topic_tasks(
         
         tasks = []
         for block in content_blocks:
-                description = block.textContent or ""
+            description = block.textContent or ""
             if description:
                 description = description.replace("\\n", "\n").replace("\\t", "\t")
             
