@@ -172,7 +172,7 @@ export const ContentProgress = ({
         disabled={updateProgressMutation.isPending}
         size={ButtonSize.SM}
         variant={
-          currentCount > 0 ? ButtonVariant.SECONDARY : ButtonVariant.PRIMARY
+          currentCount > 0 ? ButtonVariant.SECONDARY : ButtonVariant.OUTLINED
         }
         leftIcon={<Check size={16} />}
       >

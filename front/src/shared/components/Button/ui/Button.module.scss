@@ -21,7 +21,7 @@
 
   // Варианты
   &.primary {
-    background: var(--surface-secondary);
+    background: var(--surface-primary);
     color: var(--text-inverse);
     &:hover:not(.disabled) {
       background: var(--surface-elevated);
@@ -53,6 +53,16 @@
 
     &:hover:not(.disabled) {
       background: var(--bg-tertiary);
+    }
+  }
+
+  &.outlined {
+    background: transparent;
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+
+    &:hover:not(.disabled) {
+      background: var(--color-primary-01);
     }
   }
 
