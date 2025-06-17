@@ -64,6 +64,16 @@
   --color-info: #3b82f6;
   --color-info-light: #60a5fa;
   --color-info-dark: #2563eb;
+
+  --toastify-color-light: #fff;
+  --toastify-color-dark: #121212;
+  --toastify-color-info: #3498db;
+  --toastify-color-success: var(--sidebar-bg);
+  --toastify-color-warning: #f1c40f;
+  --toastify-color-error: hsl(6, 78%, 57%);
+  --toastify-color-transparent: rgba(255, 255, 255, 0.7);
+
+  --toastify-icon-color-info: var(--toastify-color-info);
 }
 
 h1,

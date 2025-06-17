@@ -7,10 +7,12 @@ import {
   TextSize,
   TextWeight,
 } from '@/shared/components/Text';
-import { useAppDispatch, useLogout } from '@/shared/hooks';
+import { useAppDispatch, useAuth, useLogout } from '@/shared/hooks';
 import { toggleSidebar } from '@/widgets/Sidebar/model/slice/sidebarSlice';
 import { LogOut } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import styles from './Profile.module.scss';
 
 const Profile = () => {
@@ -21,6 +23,16 @@ const Profile = () => {
     logoutMutation.mutate();
     dispatch(toggleSidebar());
   };
+
+  const { user } = useAuth();
+  const toastShownRef = useRef(false);
+
+  useEffect(() => {
+    if (user?.email && !toastShownRef.current) {
+      toast.success(`ПРИВЕТ ${user.email.split('@')[0]}!`);
+      toastShownRef.current = true;
+    }
+  }, [user]);
 
   return (
     <PageWrapper>

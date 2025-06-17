@@ -4,9 +4,12 @@ import type { ReactNode } from 'react';
 import { Provider } from 'react-redux';
 import { AuthProvider } from './auth/ui/AuthProvider';
 import { ModalRenderer } from './modal/ui/ModalProvider';
+import { NotificationProvider } from './notification';
 import { QueryProvider } from './query';
 import { store } from './redux';
 import { AppRouter } from './router';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 interface AppProviderProps {
   children?: ReactNode;
@@ -21,6 +24,7 @@ export const AppProvider = ({ children }: AppProviderProps) => {
             <AuthProvider>
               {children || <AppRouter />}
               <ModalRenderer />
+              <NotificationProvider />
             </AuthProvider>
           </ModalProvider>
         </QueryProvider>
