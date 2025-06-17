@@ -7,9 +7,8 @@ from sqlalchemy.orm import Session
 from app.auth import get_current_user_from_session
 from app.config import settings
 from app.database import get_db
-from app.routers import admin, auth, code_editor, content, mindmap, stats, theory
+from app.routers import admin, auth, code_editor, content, mindmap, stats, theory, tasks
 
-# Создание приложения FastAPI ////
 app = FastAPI(
     title="Nareshka Learning Platform API",
     description="API для платформы изучения программирования",
@@ -18,7 +17,6 @@ app = FastAPI(
     redoc_url="/api-redoc"
 )
 
-# Настройка CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.allowed_origins,
@@ -27,10 +25,10 @@ app.add_middleware(
     allow_headers=["Content-Type", "Authorization"],
 )
 
-# Подключение роутеров
 app.include_router(auth.router)
 app.include_router(theory.router)
 app.include_router(content.router)
+app.include_router(tasks.router)
 app.include_router(stats.router)
 app.include_router(admin.router)
 app.include_router(code_editor.router)

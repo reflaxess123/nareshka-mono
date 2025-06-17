@@ -22,7 +22,12 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import styles from './ContentBlockCard.module.scss';
 
-// Определяем размеры модального окна (копируем из Modal.tsx)
+interface ExtendedContentBlock extends ContentBlock {
+  type?: 'content_block' | 'theory_quiz';
+  questionBlock?: string;
+  answerBlock?: string;
+}
+
 enum ModalSize {
   SM = 'sm',
   MD = 'md',
@@ -30,7 +35,7 @@ enum ModalSize {
 }
 
 interface ContentBlockCardProps {
-  block: ContentBlock;
+  block: ExtendedContentBlock;
   className?: string;
   variant?: 'default' | 'compact' | 'detailed';
 }
@@ -38,13 +43,13 @@ interface ContentBlockCardProps {
 export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
   ({ block, variant = 'default', className = '' }, ref) => {
     const [isCodeExpanded, setIsCodeExpanded] = useState(!block.isCodeFoldable);
+    const [isAnswerExpanded, setIsAnswerExpanded] = useState(false);
     const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
     const [showEditModal, setShowEditModal] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false);
     const { isAdmin } = useRole();
     const navigate = useNavigate();
 
-    // Состояние формы редактирования
     const [editData, setEditData] = useState({
       blockTitle: block.blockTitle,
       textContent: block.textContent || '',
@@ -87,7 +92,6 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
           throw new Error('Не удалось обновить блок');
         }
 
-        // Обновляем данные блока локально
         Object.assign(block, editData);
         setShowEditModal(false);
       } catch (error) {
@@ -188,14 +192,9 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
       );
     };
 
-    /**
-     * Обработчик перехода в редактор с заготовкой
-     */
     const handleTryInEditor = () => {
-      // Генерируем заготовку кода
       const templateResult = codeTemplateGenerator.generateTemplate(block);
 
-      // Переходим в основной редактор с параметрами задачи
       const params = new URLSearchParams({
         blockId: block.id,
         template: templateResult.template,
@@ -206,9 +205,6 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
       navigate(`/code-editor?${params.toString()}`);
     };
 
-    /**
-     * Проверяет, показывать ли кнопку редактора
-     */
     const shouldShowEditorButton = (): boolean => {
       return !!(block.codeContent && block.codeContent.trim());
     };
@@ -299,14 +295,42 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
           <div className={styles.content}>
             {block.textContent && (
               <div className={styles.textContent}>
-                <p>{block.textContent}</p>
+                {block.type === 'theory_quiz' ? (
+                  <div
+                    dangerouslySetInnerHTML={{ __html: block.textContent }}
+                  />
+                ) : (
+                  <p>{block.textContent}</p>
+                )}
+              </div>
+            )}
+
+            {block.type === 'theory_quiz' && block.answerBlock && (
+              <div className={styles.quizAnswer}>
+                <button
+                  className={styles.answerToggle}
+                  onClick={() => setIsAnswerExpanded(!isAnswerExpanded)}
+                >
+                  <span className={styles.answerTitle}>💡 Ответ</span>
+                  {isAnswerExpanded ? (
+                    <ChevronUp size={16} />
+                  ) : (
+                    <ChevronDown size={16} />
+                  )}
+                </button>
+
+                {isAnswerExpanded && (
+                  <div
+                    className={styles.answerContent}
+                    dangerouslySetInnerHTML={{ __html: block.answerBlock }}
+                  />
+                )}
               </div>
             )}
 
             {renderCodeBlock()}
             {renderUrls()}
 
-            {/* Кнопка для перехода в редактор */}
             {shouldShowEditorButton() && (
               <div className={styles.editorButtonContainer}>
                 <Button
@@ -329,7 +353,6 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
             )}
           </div>
 
-          {/* Кнопка развернуть/свернуть */}
           {(block.textContent ||
             block.codeContent ||
             block.extractedUrls.length > 0) && (
@@ -365,7 +388,6 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
           </footer>
         </article>
 
-        {/* Модальное окно редактирования - рендерится через Portal */}
         {showEditModal &&
           createPortal(
             <Modal

@@ -17,11 +17,9 @@ const Tasks = () => {
   const { user } = useAuth();
   const { isGuest } = useRole();
 
-  // Загружаем категории при монтировании
   useContentCategories();
 
   useEffect(() => {
-    // Проверяем авторизацию пользователя
     if (!user) {
       console.warn('Пользователь не авторизован');
     }
@@ -38,7 +36,6 @@ const Tasks = () => {
             align={TextAlign.CENTER}
           />
 
-          {/* Уведомление для гостей */}
           {isGuest && (
             <div className={styles.guestNotice}>
               <LogIn size={20} />
@@ -52,12 +49,10 @@ const Tasks = () => {
         </header>
 
         <div className={styles.content}>
-          {/* Фильтры */}
           <div className={styles.filtersSection}>
             <ContentFilters className={styles.filters} />
           </div>
 
-          {/* Список контент-блоков */}
           <div className={styles.blocksSection}>
             <ContentBlocksList
               variant="default"

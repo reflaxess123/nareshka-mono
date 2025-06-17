@@ -15,12 +15,11 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/theory", tags=["Theory"])
 
-# Pydantic models для запросов
 class ProgressAction(BaseModel):
-    action: str  # "increment" или "decrement"
+    action: str     
 
 class ReviewRating(BaseModel):
-    rating: str  # "again", "hard", "good", "easy"
+    rating: str  
 
 
 @router.get("/cards")
@@ -39,18 +38,17 @@ async def get_theory_cards(
 ):
     """Получение списка теоретических карточек с пагинацией и фильтрацией"""
 
-    # Проверяем аутентификацию
     user = get_current_user_from_session(request, db)
     is_authenticated = user is not None
     user_id = user.id if user else None
 
-    # Рассчитываем offset
     offset = (page - 1) * limit
 
-    # Строим базовый запрос
-    query = db.query(TheoryCard)
+    query = db.query(TheoryCard).filter(
+        ~TheoryCard.category.ilike('%QUIZ%'),
+        ~TheoryCard.category.ilike('%ПРАКТИКА%')
+    )
 
-    # Применяем фильтры
     if category:
         query = query.filter(func.lower(TheoryCard.category) == func.lower(category))
 
@@ -60,7 +58,6 @@ async def get_theory_cards(
     if deck:
         query = query.filter(TheoryCard.deck.ilike(f"%{deck}%"))
 
-    # Полнотекстовый поиск
     if q and q.strip():
         search_term = f"%{q.strip()}%"
         query = query.filter(
@@ -72,9 +69,7 @@ async def get_theory_cards(
             )
         )
 
-    # Фильтрация только неизученных карточек
     if onlyUnstudied and is_authenticated and user_id:
-        # Исключаем карточки, которые уже изучались
         studied_card_ids = db.query(UserTheoryProgress.cardId).filter(
             UserTheoryProgress.userId == user_id,
             UserTheoryProgress.solvedCount > 0
@@ -82,7 +77,6 @@ async def get_theory_cards(
 
         query = query.filter(~TheoryCard.id.in_(studied_card_ids))
 
-    # Применяем сортировку
     if sortBy == "createdAt":
         order_field = TheoryCard.createdAt
     elif sortBy == "updatedAt":
@@ -97,13 +91,10 @@ async def get_theory_cards(
     else:
         query = query.order_by(asc(order_field))
 
-    # Получаем общее количество для пагинации
     total_count = query.count()
 
-    # Применяем пагинацию
     cards = query.offset(offset).limit(limit).all()
 
-    # Если пользователь авторизован, получаем прогресс
     cards_with_progress = []
     for card in cards:
         card_data = {
@@ -144,7 +135,6 @@ async def get_theory_cards(
 
         cards_with_progress.append(card_data)
 
-    # Подсчитываем страницы
     total_pages = (total_count + limit - 1) // limit
 
     return {
@@ -165,14 +155,15 @@ async def get_theory_categories(db: Session = Depends(get_db)):
     """Получение списка всех категорий теории"""
 
     try:
-        # Получаем группированные данные как в Node.js
         categories_data = db.query(
             TheoryCard.category,
             TheoryCard.subCategory,
             func.count(TheoryCard.id).label("count")
+        ).filter(
+            ~TheoryCard.category.ilike('%QUIZ%'),
+            ~TheoryCard.category.ilike('%ПРАКТИКА%')
         ).group_by(TheoryCard.category, TheoryCard.subCategory).all()
 
-        # Группируем по основным категориям
         grouped_categories = {}
 
         for category, sub_category, count in categories_data:
@@ -191,14 +182,13 @@ async def get_theory_categories(db: Session = Depends(get_db)):
 
             grouped_categories[category]["totalCards"] += count
 
-        # Сортируем результат
         result = []
         for cat_name in sorted(grouped_categories.keys()):
             cat_data = grouped_categories[cat_name]
             cat_data["subCategories"].sort(key=lambda x: x["name"])
             result.append(cat_data)
 
-        # Возвращаем массив напрямую как в Node.js
+
         return result
 
     except Exception as e:
@@ -208,8 +198,6 @@ async def get_theory_categories(db: Session = Depends(get_db)):
 
 @router.get("/categories/{category}/subcategories")
 async def get_theory_subcategories(category: str, db: Session = Depends(get_db)):
-    """Получение подкатегорий для указанной категории"""
-
     try:
         subcategories = db.query(
             TheoryCard.subCategory,
@@ -246,7 +234,6 @@ async def get_theory_card(
     if not card:
         raise HTTPException(status_code=404, detail="Card not found")
 
-    # Проверяем аутентификацию для прогресса
     user = get_current_user_from_session(request, db)
 
     card_data = {
@@ -297,7 +284,6 @@ async def update_theory_card_progress(
 ):
     """Обновление прогресса пользователя по карточке"""
 
-    # Получаем пользователя (обязательно авторизованного)
     user = get_current_user_from_session_required(request, db)
     user_id = user.id
 
@@ -309,12 +295,10 @@ async def update_theory_card_progress(
         )
 
     try:
-        # Проверяем, существует ли карточка
         card = db.query(TheoryCard).filter(TheoryCard.id == card_id).first()
         if not card:
             raise HTTPException(status_code=404, detail="Theory card not found")
 
-        # Ищем или создаем прогресс
         progress = db.query(UserTheoryProgress).filter(
             UserTheoryProgress.userId == user_id,
             UserTheoryProgress.cardId == card_id
@@ -368,7 +352,6 @@ async def review_theory_card(
 ):
     """Повторение карточки с интервальным алгоритмом"""
 
-    # Получаем пользователя (обязательно авторизованного)
     user = get_current_user_from_session_required(request, db)
     user_id = user.id
 
@@ -381,13 +364,10 @@ async def review_theory_card(
         )
 
     try:
-        # Проверяем, существует ли карточка
         card = db.query(TheoryCard).filter(TheoryCard.id == card_id).first()
         if not card:
             raise HTTPException(status_code=404, detail="Theory card not found")
 
-        # Простая реализация интервального повторения
-        # В реальном проекте здесь был бы более сложный алгоритм
         progress = db.query(UserTheoryProgress).filter(
             UserTheoryProgress.userId == user_id,
             UserTheoryProgress.cardId == card_id
@@ -404,7 +384,6 @@ async def review_theory_card(
             )
             db.add(progress)
 
-        # Обновляем прогресс на основе рейтинга
         progress.reviewCount += 1
         progress.lastReviewDate = datetime.utcnow()
 
@@ -424,7 +403,6 @@ async def review_theory_card(
             progress.interval = max(1, int(progress.interval * progress.easeFactor * 1.3))
             progress.cardState = "REVIEW"
 
-        # Устанавливаем дату следующего повторения
         from datetime import timedelta
         progress.dueDate = datetime.utcnow() + timedelta(days=progress.interval)
 
@@ -453,12 +431,10 @@ async def get_theory_card_stats(
 ):
     """Получение статистики карточки"""
 
-    # Получаем пользователя (обязательно авторизованного)
     user = get_current_user_from_session_required(request, db)
     user_id = user.id
 
     try:
-        # Проверяем, существует ли карточка
         card = db.query(TheoryCard).filter(TheoryCard.id == card_id).first()
         if not card:
             raise HTTPException(status_code=404, detail="Theory card not found")
@@ -504,17 +480,14 @@ async def reset_theory_card_progress(
 ):
     """Сброс прогресса карточки"""
 
-    # Получаем пользователя (обязательно авторизованного)
     user = get_current_user_from_session_required(request, db)
     user_id = user.id
 
     try:
-        # Проверяем, существует ли карточка
         card = db.query(TheoryCard).filter(TheoryCard.id == card_id).first()
         if not card:
             raise HTTPException(status_code=404, detail="Theory card not found")
 
-        # Удаляем прогресс
         db.query(UserTheoryProgress).filter(
             UserTheoryProgress.userId == user_id,
             UserTheoryProgress.cardId == card_id
@@ -538,12 +511,10 @@ async def get_theory_card_intervals(
 ):
     """Получение вариантов интервалов повторения"""
 
-    # Получаем пользователя (обязательно авторизованного)
     user = get_current_user_from_session_required(request, db)
     user_id = user.id
 
     try:
-        # Проверяем, существует ли карточка
         card = db.query(TheoryCard).filter(TheoryCard.id == card_id).first()
         if not card:
             raise HTTPException(status_code=404, detail="Theory card not found")
@@ -553,12 +524,11 @@ async def get_theory_card_intervals(
             UserTheoryProgress.cardId == card_id
         ).first()
 
-        # Рассчитываем интервалы для разных оценок
         current_interval = progress.interval if progress else 1
         current_ease = float(progress.easeFactor) if progress else 2.5
 
         intervals = {
-            "again": 1,  # Сбросить
+            "again": 1,  
             "hard": max(1, int(current_interval * 1.2)),
             "good": max(1, int(current_interval * current_ease)),
             "easy": max(1, int(current_interval * current_ease * 1.3))
@@ -579,12 +549,10 @@ async def get_due_theory_cards(
 ):
     """Получение карточек к повторению"""
 
-    # Получаем пользователя (обязательно авторизованного)
     user = get_current_user_from_session_required(request, db)
     user_id = user.id
 
     try:
-        # Получаем карточки к повторению
         current_time = datetime.utcnow()
 
         due_progress = db.query(UserTheoryProgress).filter(
@@ -592,11 +560,9 @@ async def get_due_theory_cards(
             UserTheoryProgress.dueDate <= current_time
         ).limit(limit).all()
 
-        # Получаем карточки
         card_ids = [p.cardId for p in due_progress]
         cards = db.query(TheoryCard).filter(TheoryCard.id.in_(card_ids)).all() if card_ids else []
 
-        # Также добавляем новые карточки если нужно
         if len(cards) < limit:
             new_card_limit = limit - len(cards)
             studied_card_ids = db.query(UserTheoryProgress.cardId).filter(
@@ -609,7 +575,6 @@ async def get_due_theory_cards(
 
             cards.extend(new_cards)
 
-        # Формируем ответ
         cards_with_progress = []
         for card in cards:
             progress = next((p for p in due_progress if p.cardId == card.id), None)
@@ -663,12 +628,10 @@ async def get_theory_stats_overview(
 ):
     """Получение общей статистики по карточкам"""
 
-    # Получаем пользователя (обязательно авторизованного)
     user = get_current_user_from_session_required(request, db)
     user_id = user.id
 
     try:
-        # Подсчитываем карточки по состояниям
         total_cards = db.query(TheoryCard).count()
 
         progress_stats = db.query(UserTheoryProgress).filter(

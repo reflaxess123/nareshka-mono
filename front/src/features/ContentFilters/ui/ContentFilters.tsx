@@ -12,6 +12,11 @@ import { Search, X } from 'lucide-react';
 import { useCallback } from 'react';
 import styles from './ContentFilters.module.scss';
 
+interface Category {
+  name: string;
+  subCategories: string[];
+}
+
 interface ContentFiltersProps {
   onFiltersChange?: (filters: ContentBlocksFilters) => void;
   className?: string;
@@ -72,7 +77,8 @@ export const ContentFilters = ({
 
   const getSubCategories = (mainCategory: string) => {
     return (
-      categories?.find((cat) => cat.name === mainCategory)?.subCategories || []
+      categories?.find((cat: Category) => cat.name === mainCategory)
+        ?.subCategories || []
     );
   };
 
@@ -121,7 +127,7 @@ export const ContentFilters = ({
             className={styles.filterSelect}
           >
             <option value="">Все категории</option>
-            {categories?.map((category) => (
+            {categories?.map((category: Category) => (
               <option key={category.name} value={category.name}>
                 {category.name}
               </option>
@@ -140,11 +146,13 @@ export const ContentFilters = ({
               className={styles.filterSelect}
             >
               <option value="">Все подкатегории</option>
-              {getSubCategories(filters.mainCategory).map((subCategory) => (
-                <option key={subCategory} value={subCategory}>
-                  {subCategory}
-                </option>
-              ))}
+              {getSubCategories(filters.mainCategory).map(
+                (subCategory: string) => (
+                  <option key={subCategory} value={subCategory}>
+                    {subCategory}
+                  </option>
+                )
+              )}
             </select>
           </div>
         )}

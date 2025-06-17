@@ -19,7 +19,6 @@ import {
 import { useEffect } from 'react';
 import { useAppDispatch } from './redux';
 
-// Ключи для кэширования
 export const contentQueryKeys = {
   all: ['content'] as const,
   blocks: () => [...contentQueryKeys.all, 'blocks'] as const,
@@ -29,14 +28,24 @@ export const contentQueryKeys = {
     [...contentQueryKeys.blocks(), 'filtered', filters] as const,
 };
 
-// Хук для получения списка блоков с фильтрацией
 export const useContentBlocks = (filters: ContentBlocksFilters = {}) => {
   const dispatch = useAppDispatch();
 
   const query = useQuery({
     queryKey: contentQueryKeys.filteredBlocks(filters),
-    queryFn: () => contentApi.getBlocks(filters),
-    staleTime: 5 * 60 * 1000, // 5 минут
+    queryFn: () => {
+      const params = new URLSearchParams();
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          params.append(key, value.toString());
+        }
+      });
+
+      return fetch(`/api/tasks/items?${params.toString()}`, {
+        credentials: 'include',
+      }).then((res) => res.json());
+    },
+    staleTime: 5 * 60 * 1000,
   });
 
   useEffect(() => {
@@ -60,7 +69,6 @@ export const useContentBlocks = (filters: ContentBlocksFilters = {}) => {
   return query;
 };
 
-// Хук для бесконечного скролла блоков
 export const useInfiniteContentBlocks = (
   filters: ContentBlocksFilters = {}
 ) => {
@@ -68,8 +76,20 @@ export const useInfiniteContentBlocks = (
 
   const query = useInfiniteQuery({
     queryKey: contentQueryKeys.filteredBlocks(filters),
-    queryFn: ({ pageParam = 1 }) =>
-      contentApi.getBlocks({ ...filters, page: pageParam as number }),
+    queryFn: ({ pageParam = 1 }) => {
+      const params = new URLSearchParams();
+      Object.entries({ ...filters, page: pageParam }).forEach(
+        ([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            params.append(key, value.toString());
+          }
+        }
+      );
+
+      return fetch(`/api/tasks/items?${params.toString()}`, {
+        credentials: 'include',
+      }).then((res) => res.json());
+    },
     getNextPageParam: (lastPage: ContentBlocksResponse) => {
       const { page, totalPages } = lastPage.pagination;
       return page < totalPages ? page + 1 : undefined;
@@ -80,7 +100,6 @@ export const useInfiniteContentBlocks = (
 
   useEffect(() => {
     if (query.data) {
-      // Объединяем все страницы в один массив
       const allBlocks = query.data.pages.flatMap((page) => page.data);
       const lastPage = query.data.pages[query.data.pages.length - 1];
 
@@ -108,7 +127,6 @@ export const useInfiniteContentBlocks = (
   return query;
 };
 
-// Хук для получения конкретного блока
 export const useContentBlock = (blockId: string) => {
   const dispatch = useAppDispatch();
 
@@ -116,7 +134,7 @@ export const useContentBlock = (blockId: string) => {
     queryKey: contentQueryKeys.block(blockId),
     queryFn: () => contentApi.getBlock(blockId),
     enabled: !!blockId,
-    staleTime: 10 * 60 * 1000, // 10 минут
+    staleTime: 10 * 60 * 1000,
   });
 
   useEffect(() => {
@@ -140,14 +158,17 @@ export const useContentBlock = (blockId: string) => {
   return query;
 };
 
-// Хук для получения категорий
 export const useContentCategories = () => {
   const dispatch = useAppDispatch();
 
   const query = useQuery({
     queryKey: contentQueryKeys.categories(),
-    queryFn: () => contentApi.getCategories(),
-    staleTime: 30 * 60 * 1000, // 30 минут (категории редко меняются)
+    queryFn: () => {
+      return fetch('/api/tasks/categories', {
+        credentials: 'include',
+      }).then((res) => res.json());
+    },
+    staleTime: 30 * 60 * 1000,
   });
 
   useEffect(() => {
@@ -171,7 +192,6 @@ export const useContentCategories = () => {
   return query;
 };
 
-// Хук для обновления прогресса
 export const useUpdateProgress = () => {
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
@@ -185,7 +205,6 @@ export const useUpdateProgress = () => {
       action: ContentProgressUpdate['action'];
     }) => contentApi.updateProgress(blockId, { action }),
     onSuccess: (data, variables) => {
-      // Обновляем Redux состояние
       dispatch(
         updateBlockProgress({
           blockId: variables.blockId,
@@ -193,7 +212,6 @@ export const useUpdateProgress = () => {
         })
       );
 
-      // Обновляем конкретный блок в кеше
       queryClient.setQueryData<ContentBlock>(
         contentQueryKeys.block(variables.blockId),
         (oldBlock) => {
@@ -202,7 +220,6 @@ export const useUpdateProgress = () => {
         }
       );
 
-      // Инвалидируем кэш для обновления UI
       queryClient.invalidateQueries({ queryKey: contentQueryKeys.blocks() });
       queryClient.invalidateQueries({
         queryKey: contentQueryKeys.block(variables.blockId),
@@ -218,7 +235,6 @@ export const useUpdateProgress = () => {
   });
 };
 
-// Хук для поиска блоков
 export const useSearchContentBlocks = (
   query: string,
   filters: ContentBlocksFilters = {}
@@ -228,7 +244,7 @@ export const useSearchContentBlocks = (
   const queryResult = useQuery({
     queryKey: [...contentQueryKeys.blocks(), 'search', query, filters],
     queryFn: () => contentApi.searchBlocks(query, filters),
-    enabled: query.length >= 2, // Поиск только при длине запроса >= 2 символов
+    enabled: query.length >= 2,
     staleTime: 2 * 60 * 1000, // 2 минуты
   });
 
@@ -253,7 +269,6 @@ export const useSearchContentBlocks = (
   return queryResult;
 };
 
-// Хук для получения блоков по категории
 export const useContentBlocksByCategory = (
   mainCategory: string,
   subCategory?: string,
@@ -300,7 +315,6 @@ export const useContentBlocksByCategory = (
   return query;
 };
 
-// Хук для предзагрузки блока
 export const usePrefetchContentBlock = () => {
   const queryClient = useQueryClient();
 
