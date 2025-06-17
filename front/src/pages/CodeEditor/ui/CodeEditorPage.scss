@@ -2,11 +2,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  padding: 48px 24px;
-  background-image: radial-gradient(var(--bg-secondary) 1px, transparent 0);
+  padding: 32px 0 0 0;
   background-size: 40px 40px;
-  background: var(--bg-primary);
   border-radius: 16px;
 
   // Состояние загрузки
@@ -52,14 +49,9 @@
   }
 
   .page-header {
-    margin-bottom: 48px;
     text-align: center;
-    // width: 100%;
     transition: all 0.3s ease;
-    background: var(--surface-elevated);
-    border-bottom: 1px solid var(--border-primary);
     padding: var(--space-6);
-    margin-bottom: var(--space-6);
 
     .header-content {
       display: flex;
@@ -228,26 +220,18 @@
 // Адаптивность для мобильных устройств
 @media (max-width: 768px) {
   .code-editor-page {
-    .page-header {
-      padding: var(--space-4);
+    min-width: calc(100vw - 15px);
+    padding: 15px 0 0 0;
 
+    .page-header {
       .header-content {
         flex-direction: column;
-        align-items: stretch;
+        align-items: center;
         gap: var(--space-3);
-
-        .header-left,
-        .header-right {
-          align-self: flex-start;
-        }
 
         .header-center {
           .task-title {
             font-size: var(--font-size-xl);
-          }
-
-          .task-meta {
-            justify-content: flex-start;
           }
         }
 
@@ -255,11 +239,6 @@
           flex-wrap: wrap;
         }
       }
-    }
-
-    .task-description,
-    .editor-section {
-      padding: 0 var(--space-4);
     }
   }
 }

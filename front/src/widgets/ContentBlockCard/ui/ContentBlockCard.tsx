@@ -2,6 +2,7 @@ import type { ContentBlock } from '@/entities/ContentBlock';
 import { ContentProgress } from '@/features/ContentProgress';
 import { Button, ButtonVariant } from '@/shared/components/Button';
 import { Modal } from '@/shared/components/Modal';
+import { Text } from '@/shared/components/Text';
 import { useRole } from '@/shared/hooks';
 import { codeTemplateGenerator } from '@/shared/utils/codeTemplateGenerator';
 import {
@@ -318,8 +319,8 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
                       : 'Открыть в редакторе (код будет скопирован как есть)'
                   }
                 >
-                  <Terminal size={16} />
-                  Попробовать решить в редакторе
+                  <Terminal size={16} color="var(--text-primary)" />
+                  <Text text="Попробовать решить в редакторе" />
                   {codeTemplateGenerator.isJavaScriptTask(block) && (
                     <span className={styles.jsLabel}>JS</span>
                   )}

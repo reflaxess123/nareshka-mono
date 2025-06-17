@@ -10,7 +10,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import type { editor } from 'monaco-editor';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type {
   CodeExecutionRequest,
@@ -27,7 +27,7 @@ export interface CodeEditorProps {
   initialLanguage?: string;
   onCodeChange?: (code: string) => void;
   onExecutionComplete?: (result: CodeExecutionResponse) => void;
-  height?: string;
+  // height?: string;
   readOnly?: boolean;
   className?: string;
 }
@@ -213,7 +213,7 @@ export const CodeEditor = ({
   initialLanguage = 'PYTHON',
   onCodeChange,
   onExecutionComplete,
-  height = '400px',
+  // height = 'auto',
   readOnly = false,
   className = '',
 }: CodeEditorProps) => {
@@ -368,6 +368,14 @@ export const CodeEditor = ({
     },
   };
 
+  // Вычисляем высоту редактора по количеству строк
+  const lineHeight = 22; // px, зависит от fontSize
+  const minLines = 5;
+  const maxLines = 30;
+  const codeLines = useMemo(() => code.split('\n').length, [code]);
+  const editorHeight =
+    Math.min(Math.max(codeLines, minLines), maxLines) * lineHeight; // +8px на паддинги/toolbar
+
   return (
     <div className={`${styles.codeEditorContainer} ${className}`}>
       {/* Editor Toolbar */}
@@ -435,9 +443,9 @@ export const CodeEditor = ({
       )}
 
       {/* Monaco Editor */}
-      <div className={styles.editorWrapper} style={{ height }}>
+      <div className={styles.editorWrapper}>
         <Editor
-          height="100%"
+          height={editorHeight}
           language={getMonacoLanguage(language)}
           value={code}
           options={editorOptions}

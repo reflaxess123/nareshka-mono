@@ -45,7 +45,7 @@ export const Button = ({
       {!isLoading && leftIcon && (
         <span className={styles.leftIcon}>{leftIcon}</span>
       )}
-      <span className={styles.content}>{children}</span>
+      {children}
       {!isLoading && rightIcon && (
         <span className={styles.rightIcon}>{rightIcon}</span>
       )}

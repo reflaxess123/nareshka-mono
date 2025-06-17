@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query';
-import { AnimatePresence, motion } from 'framer-motion';
 import { BarChart3, ChevronDown, ChevronUp, Code, History } from 'lucide-react';
 import { useCallback, useState } from 'react';
 
@@ -93,189 +92,159 @@ export const CodeEditorWidget = ({
       </div>
 
       {/* Widget Content */}
-      <AnimatePresence>
-        {isExpanded && (
-          <motion.div
-            className="widget-content"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
-          >
-            {/* Action Bar */}
-            <div className="action-bar">
-              <div className="action-left">
-                {latestSolution && (
-                  <div className="solution-info">
-                    <span className="solution-language">
-                      {latestSolution.supportedLanguage.name}
-                    </span>
-                    <span className="solution-stats">
-                      {latestSolution.executionCount} запусков,
-                      {latestSolution.successfulExecutions} успешных
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              <div className="action-right">
-                <button
-                  onClick={() => setShowHistory(!showHistory)}
-                  className={`action-button ${showHistory ? 'active' : ''}`}
-                  title="История выполнений"
-                >
-                  <History className="w-4 h-4" />
-                  История
-                </button>
-
-                <button
-                  onClick={() => setShowStats(!showStats)}
-                  className={`action-button ${showStats ? 'active' : ''}`}
-                  title="Статистика"
-                >
-                  <BarChart3 className="w-4 h-4" />
-                  Статистика
-                </button>
-              </div>
+      {isExpanded && (
+        <div className="widget-content">
+          {/* Action Bar */}
+          <div className="action-bar">
+            <div className="action-left">
+              {latestSolution && (
+                <div className="solution-info">
+                  <span className="solution-language">
+                    {latestSolution.supportedLanguage.name}
+                  </span>
+                  <span className="solution-stats">
+                    {latestSolution.executionCount} запусков,
+                    {latestSolution.successfulExecutions} успешных
+                  </span>
+                </div>
+              )}
             </div>
 
-            {/* Code Editor */}
-            <div className="editor-container">
-              <CodeEditor
-                blockId={blockId}
-                initialCode={codeContent || latestSolution?.sourceCode}
-                initialLanguage={codeLanguage}
-                onExecutionComplete={handleExecutionComplete}
-                height="500px"
-              />
+            <div className="action-right">
+              <button
+                onClick={() => setShowHistory(!showHistory)}
+                className={`action-button ${showHistory ? 'active' : ''}`}
+                title="История выполнений"
+              >
+                <History className="w-4 h-4" />
+                История
+              </button>
+
+              <button
+                onClick={() => setShowStats(!showStats)}
+                className={`action-button ${showStats ? 'active' : ''}`}
+                title="Статистика"
+              >
+                <BarChart3 className="w-4 h-4" />
+                Статистика
+              </button>
             </div>
+          </div>
 
-            {/* History Panel */}
-            <AnimatePresence>
-              {showHistory && (
-                <motion.div
-                  className="history-panel"
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <h4 className="panel-title">История выполнений</h4>
+          {/* Code Editor */}
+          <div className="editor-container">
+            <CodeEditor
+              blockId={blockId}
+              initialCode={codeContent || latestSolution?.sourceCode}
+              initialLanguage={codeLanguage}
+              onExecutionComplete={handleExecutionComplete}
+            />
+          </div>
 
-                  {executions.length === 0 ? (
-                    <div className="empty-state">
-                      <p>Пока нет истории выполнений для этого блока</p>
-                    </div>
-                  ) : (
-                    <div className="execution-list">
-                      {executions.slice(0, 5).map((execution) => (
-                        <div key={execution.id} className="execution-item">
-                          <div className="execution-header">
-                            <span
-                              className={`status-badge ${execution.status.toLowerCase()}`}
-                            >
-                              {execution.status}
-                            </span>
-                            <span className="execution-time">
-                              {new Date(execution.createdAt).toLocaleString()}
-                            </span>
-                          </div>
+          {/* History Panel */}
+          {showHistory && (
+            <div className="history-panel">
+              <h4 className="panel-title">История выполнений</h4>
 
-                          {execution.executionTimeMs && (
-                            <div className="execution-details">
-                              <span>Время: {execution.executionTimeMs}ms</span>
-                              {execution.memoryUsedMB && (
-                                <span>Память: {execution.memoryUsedMB}MB</span>
-                              )}
-                            </div>
-                          )}
+              {executions.length === 0 ? (
+                <div className="empty-state">
+                  <p>Пока нет истории выполнений для этого блока</p>
+                </div>
+              ) : (
+                <div className="execution-list">
+                  {executions.slice(0, 5).map((execution) => (
+                    <div key={execution.id} className="execution-item">
+                      <div className="execution-header">
+                        <span
+                          className={`status-badge ${execution.status.toLowerCase()}`}
+                        >
+                          {execution.status}
+                        </span>
+                        <span className="execution-time">
+                          {new Date(execution.createdAt).toLocaleString()}
+                        </span>
+                      </div>
 
-                          {execution.errorMessage && (
-                            <div className="execution-error">
-                              {execution.errorMessage}
-                            </div>
+                      {execution.executionTimeMs && (
+                        <div className="execution-details">
+                          <span>Время: {execution.executionTimeMs}ms</span>
+                          {execution.memoryUsedMB && (
+                            <span>Память: {execution.memoryUsedMB}MB</span>
                           )}
                         </div>
-                      ))}
+                      )}
+
+                      {execution.errorMessage && (
+                        <div className="execution-error">
+                          {execution.errorMessage}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </motion.div>
+                  ))}
+                </div>
               )}
-            </AnimatePresence>
+            </div>
+          )}
 
-            {/* Stats Panel */}
-            <AnimatePresence>
-              {showStats && stats && (
-                <motion.div
-                  className="stats-panel"
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <h4 className="panel-title">Статистика выполнения кода</h4>
+          {/* Stats Panel */}
+          {showStats && stats && (
+            <div className="stats-panel">
+              <h4 className="panel-title">Статистика выполнения кода</h4>
 
-                  <div className="stats-grid">
-                    <div className="stat-item">
-                      <div className="stat-value">{stats.totalExecutions}</div>
-                      <div className="stat-label">Всего запусков</div>
-                    </div>
+              <div className="stats-grid">
+                <div className="stat-item">
+                  <div className="stat-value">{stats.totalExecutions}</div>
+                  <div className="stat-label">Всего запусков</div>
+                </div>
 
-                    <div className="stat-item">
-                      <div className="stat-value">
-                        {stats.successfulExecutions}
-                      </div>
-                      <div className="stat-label">Успешных</div>
-                    </div>
+                <div className="stat-item">
+                  <div className="stat-value">{stats.successfulExecutions}</div>
+                  <div className="stat-label">Успешных</div>
+                </div>
 
-                    <div className="stat-item">
-                      <div className="stat-value">
-                        {Math.round(stats.averageExecutionTime)}ms
-                      </div>
-                      <div className="stat-label">Среднее время</div>
-                    </div>
-
-                    <div className="stat-item">
-                      <div className="stat-value">
-                        {stats.totalExecutions > 0
-                          ? Math.round(
-                              (stats.successfulExecutions /
-                                stats.totalExecutions) *
-                                100
-                            )
-                          : 0}
-                        %
-                      </div>
-                      <div className="stat-label">Успешность</div>
-                    </div>
+                <div className="stat-item">
+                  <div className="stat-value">
+                    {Math.round(stats.averageExecutionTime)}ms
                   </div>
+                  <div className="stat-label">Среднее время</div>
+                </div>
 
-                  {stats.languageStats.length > 0 && (
-                    <div className="language-stats">
-                      <h5>Статистика по языкам:</h5>
-                      <div className="language-list">
-                        {stats.languageStats.map((langStat) => (
-                          <div
-                            key={langStat.language}
-                            className="language-stat-item"
-                          >
-                            <span className="language-name">
-                              {langStat.name}
-                            </span>
-                            <span className="language-count">
-                              {langStat.executions} запусков
-                            </span>
-                          </div>
-                        ))}
+                <div className="stat-item">
+                  <div className="stat-value">
+                    {stats.totalExecutions > 0
+                      ? Math.round(
+                          (stats.successfulExecutions / stats.totalExecutions) *
+                            100
+                        )
+                      : 0}
+                    %
+                  </div>
+                  <div className="stat-label">Успешность</div>
+                </div>
+              </div>
+
+              {stats.languageStats.length > 0 && (
+                <div className="language-stats">
+                  <h5>Статистика по языкам:</h5>
+                  <div className="language-list">
+                    {stats.languageStats.map((langStat) => (
+                      <div
+                        key={langStat.language}
+                        className="language-stat-item"
+                      >
+                        <span className="language-name">{langStat.name}</span>
+                        <span className="language-count">
+                          {langStat.executions} запусков
+                        </span>
                       </div>
-                    </div>
-                  )}
-                </motion.div>
+                    ))}
+                  </div>
+                </div>
               )}
-            </AnimatePresence>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

@@ -11,6 +11,7 @@
   background: var(--bg-secondary);
   color: var(--text-primary);
   user-select: none;
+  padding: var(--navbar-height) 0 0 0;
 
   .link {
     color: black;
@@ -25,5 +26,4 @@
       display: block;
     }
   }
-
 }

@@ -1,3 +1,5 @@
+@use '@/app/styles/helpers' as *;
+
 .mindmapContainer {
   position: fixed;
   inset: 0;
@@ -198,4 +200,60 @@
 
 :global(.react-flow__pane.draggable) {
   padding-top: 80px !important;
+}
+/* .mobileNav {
+  display: none;
+} */
+
+.overlayTools {
+  bottom: 0;
+  right: 150px;
+  position: absolute;
+  z-index: 100;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-end;
+  pointer-events: none;
+  > * {
+    pointer-events: auto;
+  }
+}
+
+@include mobile {
+  .mobileNav {
+    display: block;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+    width: 100vw;
+    background: white; // или var(--surface-primary)
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+  }
+  .hideOnMobile {
+    display: none !important;
+  }
+}
+
+.controlsBottomLeft {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  z-index: 100;
+  pointer-events: none;
+  > * {
+    pointer-events: auto;
+  }
+}
+
+.miniMapBottomRight {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  z-index: 100;
+  pointer-events: none;
+  > * {
+    pointer-events: auto;
+  }
 }

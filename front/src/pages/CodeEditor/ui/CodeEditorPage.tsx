@@ -353,7 +353,7 @@ for (let i = 0; i < 10; i++) {
               initialLanguage={
                 normalizedLanguage as 'JAVASCRIPT' | 'TYPESCRIPT' | 'PYTHON'
               }
-              height="600px"
+              // height="600px"
             />
           </div>
         </motion.div>

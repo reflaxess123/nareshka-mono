@@ -3,7 +3,7 @@
 .userManagement {
   width: 100%;
   min-height: 100vh;
-  padding: var(--space-6);
+  padding: var(--navbar-height) 0 0 0;
   background: var(--bg-primary);
 
   @include mobile {

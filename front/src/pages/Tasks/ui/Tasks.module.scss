@@ -3,11 +3,7 @@
 .tasks {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
-
-  @media (max-width: 768px) {
-    padding: 16px;
-  }
+  padding: var(--navbar-height) 0 0 0;
 }
 
 .header {

@@ -1,3 +1,4 @@
+import { BottomNavBar } from '@/shared/components/BottomNavBar';
 import {
   Background,
   Controls,
@@ -11,9 +12,9 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import React, { useCallback, useEffect, useState } from 'react';
-import CenterNode from '../components/MindMapNodes/CenterNode';
-import TopicNode from '../components/MindMapNodes/TopicNode';
-import TopicTaskModal from '../components/MindMapNodes/TopicTaskModal';
+import CenterNode from '../../../components/MindMapNodes/CenterNode';
+import TopicNode from '../../../components/MindMapNodes/TopicNode';
+import TopicTaskModal from '../../../components/MindMapNodes/TopicTaskModal';
 import styles from './MindMapPage.module.scss';
 
 interface MindMapData {
@@ -112,7 +113,7 @@ const NewMindMapPage: React.FC = () => {
   }
 
   return (
-    <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+    <div className={styles.mindmapContainer}>
       <div style={{ width: '100%', height: '100%' }}>
         <ReactFlow
           nodes={nodes}
@@ -139,16 +140,24 @@ const NewMindMapPage: React.FC = () => {
           className={styles.reactFlow}
         >
           <Background color="#f1f5f9" gap={20} />
-          <Controls showInteractive={false} />
-          <MiniMap
-            nodeColor={(node) => {
-              const data = node.data as Record<string, unknown>;
-              return (data.color as string) || '#e2e8f0';
-            }}
-            maskColor="rgba(0, 0, 0, 0.05)"
-            pannable
-            zoomable
-          />
+          <div
+            className={styles.controlsBottomLeft + ' ' + styles.hideOnMobile}
+          >
+            <Controls showInteractive={false} />
+          </div>
+          <div
+            className={styles.miniMapBottomRight + ' ' + styles.hideOnMobile}
+          >
+            <MiniMap
+              nodeColor={(node) => {
+                const data = node.data as Record<string, unknown>;
+                return (data.color as string) || '#e2e8f0';
+              }}
+              maskColor="rgba(0, 0, 0, 0.05)"
+              pannable
+              zoomable
+            />
+          </div>
         </ReactFlow>
       </div>
 
@@ -160,6 +169,9 @@ const NewMindMapPage: React.FC = () => {
         }}
         topicKey={selectedTopic}
       />
+      <div className={styles.mobileNav}>
+        <BottomNavBar />
+      </div>
     </div>
   );
 };

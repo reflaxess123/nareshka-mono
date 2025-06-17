@@ -33,7 +33,7 @@ const CodeEditor = lazy(() =>
   }))
 );
 const MindMap = lazy(() =>
-  import('@/pages/NewMindMapPage').then((module) => ({
+  import('@/pages/MindMap/ui/MindMapPage').then((module) => ({
     default: module.default,
   }))
 );

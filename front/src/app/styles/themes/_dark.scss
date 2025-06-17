@@ -102,4 +102,7 @@
   --scrollbar-track-bg: var(--surface-secondary);
   --scrollbar-thumb-bg: var(--accent-dark);
   --scrollbar-thumb-hover-bg: var(--accent-hover);
+
+  // Тень для навбара (светлая для тёмной темы)
+  --shadow-navbar: 0 2px 8px 0 rgba(255, 255, 255, 0.1);
 }

@@ -2,6 +2,7 @@
 
 .bottomNav {
   display: none;
+  border-radius: 25px;
 
   @include mobile {
     display: flex;
@@ -12,11 +13,10 @@
     width: 100%;
     height: var(--bottom-nav-height);
     background: var(--sidebar-bg);
-    border-top: 1px solid var(--border-primary);
     justify-content: space-around;
     align-items: stretch;
     z-index: var(--z-sticky);
-    padding: 0 0;
+    padding: 0 12px;
     gap: var(--space-1);
 
     .link {

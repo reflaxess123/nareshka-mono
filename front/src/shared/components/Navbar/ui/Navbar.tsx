@@ -110,7 +110,7 @@ export const Navbar = () => {
               <div className={styles.userName}>Пользователь</div>
               <div className={styles.userEmail}>{user?.email}</div>
             </div>
-            <ChevronDown size={16} />
+            <ChevronDown size={16} color="var(--text-primary)" />
           </button>
 
           <div
