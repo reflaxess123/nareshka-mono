@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { MarkdownContent } from '../../shared/components/MarkdownContent';
 import { codeTemplateGenerator } from '../../shared/utils/codeTemplateGenerator';
 import './TopicTaskModal.scss';
 
@@ -149,7 +150,10 @@ const TopicTaskModal: React.FC<TopicTaskModalProps> = ({
                     <div className="task-main">
                       <h4 className="task-title">{task.title}</h4>
                       {task.description && (
-                        <p className="task-description">{task.description}</p>
+                        <MarkdownContent
+                          content={task.description}
+                          className="task-description"
+                        />
                       )}
                     </div>
                   </div>

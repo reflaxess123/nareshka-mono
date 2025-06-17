@@ -1,6 +1,7 @@
 import { contentApi } from '@/shared/api/content';
 import { Button, ButtonVariant } from '@/shared/components/Button';
 import { CodeEditor } from '@/shared/components/CodeEditor';
+import { MarkdownContent } from '@/shared/components/MarkdownContent';
 import { PageWrapper } from '@/shared/components/PageWrapper/ui/PageWrapper';
 import { codeTemplateGenerator } from '@/shared/utils/codeTemplateGenerator';
 import { useQuery } from '@tanstack/react-query';
@@ -335,7 +336,7 @@ for (let i = 0; i < 10; i++) {
             transition={{ duration: 0.5, delay: 0.1 }}
           >
             <h3>📋 Описание задачи</h3>
-            <p>{block.textContent}</p>
+            <MarkdownContent content={block.textContent} />
           </motion.div>
         )}
 

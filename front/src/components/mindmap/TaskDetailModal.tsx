@@ -1,4 +1,5 @@
 import React from 'react';
+import { MarkdownContent } from '../../shared/components/MarkdownContent';
 import type { TaskDetail } from '../../types/mindmap';
 
 interface TaskDetailModalProps {
@@ -64,8 +65,11 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                     <h3 className="font-semibold text-gray-900 mb-2">
                       📝 Описание
                     </h3>
-                    <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-700">
-                      {task.text_content}
+                    <div
+                      className="bg-gray-50 rounded-lg p-4 text-sm text-gray-700"
+                      style={{ whiteSpace: 'pre-line' }}
+                    >
+                      <MarkdownContent content={task.text_content} />
                     </div>
                   </div>
                 )}

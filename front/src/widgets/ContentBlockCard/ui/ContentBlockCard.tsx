@@ -1,6 +1,7 @@
 import type { ContentBlock } from '@/entities/ContentBlock';
 import { ContentProgress } from '@/features/ContentProgress';
 import { Button, ButtonVariant } from '@/shared/components/Button';
+import { MarkdownContent } from '@/shared/components/MarkdownContent';
 import { Modal } from '@/shared/components/Modal';
 import { Text } from '@/shared/components/Text';
 import { useRole } from '@/shared/hooks';
@@ -163,6 +164,10 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
     const renderUrls = () => {
       if (block.extractedUrls.length === 0) return null;
 
+      const hasMarkdownTable =
+        block.textContent?.includes('|') && block.textContent?.includes('---');
+      if (hasMarkdownTable) return null;
+
       return (
         <div className={styles.urls}>
           <h4 className={styles.urlsTitle}>Полезные ссылки:</h4>
@@ -300,7 +305,10 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
                     dangerouslySetInnerHTML={{ __html: block.textContent }}
                   />
                 ) : (
-                  <p>{block.textContent}</p>
+                  <MarkdownContent
+                    content={block.textContent}
+                    extractedUrls={block.extractedUrls}
+                  />
                 )}
               </div>
             )}

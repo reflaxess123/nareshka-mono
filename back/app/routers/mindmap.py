@@ -140,10 +140,14 @@ async def get_topic_tasks(
         
         tasks = []
         for block in content_blocks:
+                description = block.textContent or ""
+            if description:
+                description = description.replace("\\n", "\n").replace("\\t", "\t")
+            
             task = {
                 "id": block.id,
                 "title": block.blockTitle or "Задача без названия",
-                "description": block.textContent or ""
+                "description": description
             }
             tasks.append(task)
         

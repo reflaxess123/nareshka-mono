@@ -36,10 +36,12 @@
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.56.4",
     "react-konva": "^19.0.4",
+    "react-markdown": "^10.1.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.6.1",
     "react-syntax-highlighter": "^15.6.1",
     "redux": "^5.0.1",
+    "remark-gfm": "^4.0.1",
     "socket.io-client": "^4.8.1",
     "zod": "^3.25.32"
   },

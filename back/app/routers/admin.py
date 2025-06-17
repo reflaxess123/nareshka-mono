@@ -21,6 +21,12 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/admin", tags=["Admin"])
 
+def unescape_text_content(text: Optional[str]) -> Optional[str]:
+    """Заменяет экранированные символы на настоящие переносы строк"""
+    if not text:
+        return text
+    return text.replace("\\n", "\n").replace("\\t", "\t")
+
 # Pydantic models для запросов
 class CreateUserRequest(BaseModel):
     email: EmailStr
@@ -750,7 +756,7 @@ async def create_admin_content_block(
             "blockTitle": new_block.blockTitle,
             "blockLevel": new_block.blockLevel,
             "orderInFile": new_block.orderInFile,
-            "textContent": new_block.textContent,
+            "textContent": unescape_text_content(new_block.textContent),
             "codeContent": new_block.codeContent,
             "codeLanguage": new_block.codeLanguage,
             "isCodeFoldable": new_block.isCodeFoldable,
@@ -821,7 +827,7 @@ async def update_admin_content_block(
             "blockTitle": block.blockTitle,
             "blockLevel": block.blockLevel,
             "orderInFile": block.orderInFile,
-            "textContent": block.textContent,
+            "textContent": unescape_text_content(block.textContent),
             "codeContent": block.codeContent,
             "codeLanguage": block.codeLanguage,
             "isCodeFoldable": block.isCodeFoldable,

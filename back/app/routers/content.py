@@ -14,6 +14,12 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/content", tags=["Content"])
 
+def unescape_text_content(text: Optional[str]) -> Optional[str]:
+    """Заменяет экранированные символы на настоящие переносы строк"""
+    if not text:
+        return text
+    return text.replace("\\n", "\n").replace("\\t", "\t")
+
 
 @router.get("/blocks")
 async def get_content_blocks(
@@ -107,7 +113,7 @@ async def get_content_blocks(
             "blockTitle": block.blockTitle,
             "blockLevel": block.blockLevel,
             "orderInFile": block.orderInFile,
-            "textContent": block.textContent,
+            "textContent": unescape_text_content(block.textContent),
             "codeContent": block.codeContent,
             "codeLanguage": block.codeLanguage,
             "isCodeFoldable": block.isCodeFoldable,
@@ -311,7 +317,7 @@ async def get_content_block(
         "blockTitle": block.blockTitle,
         "blockLevel": block.blockLevel,
         "orderInFile": block.orderInFile,
-        "textContent": block.textContent,
+        "textContent": unescape_text_content(block.textContent),
         "codeContent": block.codeContent,
         "codeLanguage": block.codeLanguage,
         "isCodeFoldable": block.isCodeFoldable,

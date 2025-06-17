@@ -14,6 +14,12 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/tasks", tags=["Tasks"])
 
+def unescape_text_content(text: Optional[str]) -> Optional[str]:
+    """Заменяет экранированные символы на настоящие переносы строк"""
+    if not text:
+        return text
+    return text.replace("\\n", "\n").replace("\\t", "\t")
+
 class TaskItem(BaseModel):
     id: str
     type: str
@@ -159,7 +165,7 @@ async def _get_content_blocks(
             "blockTitle": block.blockTitle,
             "blockLevel": block.blockLevel,
             "orderInFile": block.orderInFile,
-            "textContent": block.textContent,
+            "textContent": unescape_text_content(block.textContent),
             "codeContent": block.codeContent,
             "codeLanguage": block.codeLanguage,
             "isCodeFoldable": block.isCodeFoldable,
@@ -256,7 +262,7 @@ async def _get_quiz_cards(
             "blockTitle": f"Quiz: {card.subCategory or 'Общие вопросы'}",
             "blockLevel": 1,
             "orderInFile": card.orderIndex,
-            "textContent": card.questionBlock,
+            "textContent": unescape_text_content(card.questionBlock),
             "codeContent": None,
             "codeLanguage": None,
             "isCodeFoldable": False,
@@ -264,8 +270,8 @@ async def _get_quiz_cards(
             "extractedUrls": [],
             "rawBlockContentHash": None,
             
-            "questionBlock": card.questionBlock,
-            "answerBlock": card.answerBlock,
+            "questionBlock": unescape_text_content(card.questionBlock),
+            "answerBlock": unescape_text_content(card.answerBlock),
             "tags": card.tags,
             
             "progressEntries": [
