@@ -8,6 +8,9 @@ const Home = lazy(() =>
 const Profile = lazy(() =>
   import('@/pages/Profile').then((module) => ({ default: module.Profile }))
 );
+const Settings = lazy(() =>
+  import('@/pages/Settings').then((module) => ({ default: module.Settings }))
+);
 const Tasks = lazy(() =>
   import('@/pages/Tasks').then((module) => ({ default: module.Tasks }))
 );
@@ -40,6 +43,7 @@ export enum AppRoutes {
   TASKS = '/tasks',
   THEORY = '/theory',
   PROFILE = '/profile',
+  SETTINGS = '/settings',
   CODE_EDITOR = '/code-editor',
   MINDMAP = '/mindmap',
   ADMIN_PANEL = '/admin-panel',
@@ -52,6 +56,7 @@ export const routeConfig: AppRoute[] = [
   { path: AppRoutes.TASKS, element: <Tasks /> },
   { path: AppRoutes.THEORY, element: <Theory /> },
   { path: AppRoutes.PROFILE, element: <Profile /> },
+  { path: AppRoutes.SETTINGS, element: <Settings /> },
   { path: AppRoutes.CODE_EDITOR, element: <CodeEditor /> },
   { path: AppRoutes.MINDMAP, element: <MindMap /> },
   { path: AppRoutes.ADMIN_PANEL, element: <Adminka /> },

@@ -1,5 +1,6 @@
 import { routeConfig } from '@/app/providers/router/model/routeConfig';
 import { Loading } from '@/shared/components/Loading';
+import { Navbar } from '@/shared/components/Navbar';
 import { PageTransition } from '@/shared/components/PageTransition';
 import { Sidebar } from '@/widgets/Sidebar';
 import { Suspense } from 'react';
@@ -7,6 +8,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 export const AppRouter = () => (
   <BrowserRouter>
+    <Navbar />
     <Sidebar>
       <PageTransition>
         <Routes>

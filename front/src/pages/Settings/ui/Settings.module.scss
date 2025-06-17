@@ -1,0 +1,69 @@
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.section {
+  background: var(--background-secondary);
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid var(--border-primary);
+}
+
+.sectionTitle {
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.settingItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border-primary);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.settingLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.settingName {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.settingDescription {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.themeButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    filter: brightness(1.1);
+  }
+}
