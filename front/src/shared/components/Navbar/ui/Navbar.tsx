@@ -92,7 +92,7 @@ export const Navbar = () => {
   return (
     <nav className={styles.navbar}>
       <Link
-        to={AppRoutes.THEORY}
+        to={AppRoutes.HOME}
         className={styles.logo}
         text="Nareshka"
         icon={<Brain size={28} />}

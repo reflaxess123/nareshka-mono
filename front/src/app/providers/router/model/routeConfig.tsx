@@ -1,8 +1,14 @@
 import Adminka from '@/pages/Adminka/ui/Adminka';
+import Home from '@/pages/Home/ui/Home';
 import { lazy } from 'react';
 import type { AppRoute } from './types';
 
-const Home = lazy(() =>
+const GetStarted = lazy(() =>
+  import('@/pages/GetStarted').then((module) => ({
+    default: module.GetStarted,
+  }))
+);
+const Dashboard = lazy(() =>
   import('@/pages/Adminka').then((module) => ({ default: module.Adminka }))
 );
 const Profile = lazy(() =>
@@ -40,6 +46,8 @@ const MindMap = lazy(() =>
 
 export enum AppRoutes {
   HOME = '/',
+  GET_STARTED = '/get-started',
+  DASHBOARD = '/dashboard',
   TASKS = '/tasks',
   THEORY = '/theory',
   PROFILE = '/profile',
@@ -53,6 +61,8 @@ export enum AppRoutes {
 
 export const routeConfig: AppRoute[] = [
   { path: AppRoutes.HOME, element: <Home /> },
+  { path: AppRoutes.GET_STARTED, element: <GetStarted /> },
+  { path: AppRoutes.DASHBOARD, element: <Dashboard /> },
   { path: AppRoutes.TASKS, element: <Tasks /> },
   { path: AppRoutes.THEORY, element: <Theory /> },
   { path: AppRoutes.PROFILE, element: <Profile /> },

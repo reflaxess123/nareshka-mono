@@ -3,7 +3,7 @@ import { AppRoutes } from '@/app/providers/router';
 import { isAdmin } from '@/entities/User/model/types';
 import { Link } from '@/shared/components/Link';
 import { useAppDispatch, useAuth } from '@/shared/hooks';
-import { Bird, Brain, Code, Map, Shield } from 'lucide-react';
+import { Bird, Brain, Code, Home, Map, Shield } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { toggleSidebar } from '../model/slice/sidebarSlice';
 import styles from './Sidebar.module.scss';
@@ -23,6 +23,15 @@ export const Sidebar = ({ children }: { children: React.ReactNode }) => {
         onMouseLeave={() => dispatch(toggleSidebar())}
       >
         <div className={styles.linksTop}>
+          <Link
+            text="Дашборд"
+            className={styles.link}
+            icon={<Home size={24} />}
+            isParentHovered={isOpen}
+            to={AppRoutes.DASHBOARD}
+            variant="sidebar"
+          />
+
           {userIsAdmin && (
             <Link
               text="Админка"
