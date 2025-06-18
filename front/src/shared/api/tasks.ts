@@ -49,6 +49,12 @@ export interface TaskItemsFilters {
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
   itemType?: 'content_block' | 'theory_quiz' | 'all';
+  companies?: string;
+}
+
+export interface CompaniesResponse {
+  companies: string[];
+  total: number;
 }
 
 export interface TaskItemsResponse {
@@ -123,6 +129,12 @@ class TasksAPI {
     filters: TaskItemsFilters = {}
   ): Promise<TaskItemsResponse> {
     return this.getTaskItems({ ...filters, page: currentPage + 1 });
+  }
+
+  async getCompanies(): Promise<CompaniesResponse> {
+    const response =
+      await apiInstance.get<CompaniesResponse>('/tasks/companies');
+    return response.data;
   }
 }
 

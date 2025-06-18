@@ -46,3 +46,5 @@ export const Z_INDEX = {
   TOOLTIP: 1070,
   TOAST: 1080,
 } as const;
+
+export * from './categoryTranslations';

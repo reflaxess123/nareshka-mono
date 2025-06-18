@@ -24,6 +24,7 @@ export const contentQueryKeys = {
   blocks: () => [...contentQueryKeys.all, 'blocks'] as const,
   block: (id: string) => [...contentQueryKeys.all, 'block', id] as const,
   categories: () => [...contentQueryKeys.all, 'categories'] as const,
+  companies: () => [...contentQueryKeys.all, 'companies'] as const,
   filteredBlocks: (filters: ContentBlocksFilters) =>
     [...contentQueryKeys.blocks(), 'filtered', filters] as const,
 };
@@ -325,4 +326,29 @@ export const usePrefetchContentBlock = () => {
       staleTime: 10 * 60 * 1000,
     });
   };
+};
+
+export const useCompanies = (filters?: {
+  mainCategory?: string;
+  subCategory?: string;
+}) => {
+  const query = useQuery({
+    queryKey: [...contentQueryKeys.companies(), filters],
+    queryFn: () => {
+      const params = new URLSearchParams();
+      if (filters?.mainCategory) {
+        params.append('mainCategory', filters.mainCategory);
+      }
+      if (filters?.subCategory) {
+        params.append('subCategory', filters.subCategory);
+      }
+
+      return fetch(`/api/tasks/companies?${params.toString()}`, {
+        credentials: 'include',
+      }).then((res) => res.json());
+    },
+    staleTime: 30 * 60 * 1000, // 30 минут
+  });
+
+  return query;
 };

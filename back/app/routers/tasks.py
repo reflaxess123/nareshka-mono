@@ -65,7 +65,8 @@ async def get_task_items(
     sortBy: str = Query("orderInFile", description="Поле для сортировки"),
     sortOrder: str = Query("asc", description="Порядок сортировки"),
     itemType: Optional[str] = Query(None, description="Тип: content_block, theory_quiz или all"),
-    onlyUnsolved: Optional[bool] = Query(None, description="Только нерешенные")
+    onlyUnsolved: Optional[bool] = Query(None, description="Только нерешенные"),
+    companies: Optional[str] = Query(None, description="Фильтр по компаниям (через запятую)")
 ):
     """Получение объединенного списка задач (content blocks + quiz карточки)"""
     
@@ -77,15 +78,18 @@ async def get_task_items(
     
     if not itemType or itemType in ["content_block", "all"]:
         content_blocks = await _get_content_blocks(
-            db, user_id, is_authenticated, mainCategory, subCategory, q, onlyUnsolved
+            db, user_id, is_authenticated, mainCategory, subCategory, q, onlyUnsolved, companies
         )
         all_items.extend(content_blocks)
     
     if not itemType or itemType in ["theory_quiz", "all"]:
-        quiz_cards = await _get_quiz_cards(
-            db, user_id, is_authenticated, mainCategory, subCategory, q, onlyUnsolved
-        )
-        all_items.extend(quiz_cards)
+        # Исключаем quiz карточки если выбран фильтр по компаниям, 
+        # так как у quiz карточек нет поля companies
+        if not companies:
+            quiz_cards = await _get_quiz_cards(
+                db, user_id, is_authenticated, mainCategory, subCategory, q, onlyUnsolved
+            )
+            all_items.extend(quiz_cards)
     
     all_items = _sort_items(all_items, sortBy, sortOrder)
     
@@ -114,7 +118,8 @@ async def _get_content_blocks(
     main_category: Optional[str] = None,
     sub_category: Optional[str] = None,
     q: Optional[str] = None,
-    only_unsolved: Optional[bool] = None
+    only_unsolved: Optional[bool] = None,
+    companies: Optional[str] = None
 ) -> List[Dict[str, Any]]:
     query = db.query(ContentBlock).join(ContentFile)
     
@@ -131,6 +136,18 @@ async def _get_content_blocks(
                 ContentBlock.codeFoldTitle.ilike(search_term)
             )
         )
+    
+    if companies and companies.strip():
+        # Парсим список компаний через запятую
+        company_list = [c.strip().lower() for c in companies.split(',') if c.strip()]
+        if company_list:
+            # Фильтруем по пересечению с массивом companies
+            query = query.filter(
+                or_(
+                    *[func.lower(func.array_to_string(ContentBlock.companies, ',', '')).contains(company) 
+                      for company in company_list]
+                )
+            )
     
     blocks = query.order_by(asc(ContentBlock.orderInFile)).all()
     
@@ -171,6 +188,7 @@ async def _get_content_blocks(
             "isCodeFoldable": block.isCodeFoldable,
             "codeFoldTitle": block.codeFoldTitle,
             "extractedUrls": block.extractedUrls,
+            "companies": block.companies or [],
             "rawBlockContentHash": block.rawBlockContentHash,
             
             "progressEntries": [
@@ -329,6 +347,9 @@ async def get_task_categories(db: Session = Depends(get_db)):
         hierarchy_map = {}
         
         for main_cat, sub_cat in content_categories:
+            # Пропускаем тестовые категории и подкатегории
+            if main_cat == 'Test' or sub_cat == 'Test':
+                continue
             if main_cat not in hierarchy_map:
                 hierarchy_map[main_cat] = set()
             if sub_cat:
@@ -336,6 +357,10 @@ async def get_task_categories(db: Session = Depends(get_db)):
         
         for quiz_cat, sub_cat in quiz_categories:
             main_cat = quiz_cat.replace(" QUIZ", "")  
+            
+            # Пропускаем тестовые категории и подкатегории
+            if main_cat == 'Test' or sub_cat == 'Test':
+                continue
             
             if main_cat not in hierarchy_map:
                 hierarchy_map[main_cat] = set()
@@ -354,4 +379,49 @@ async def get_task_categories(db: Session = Depends(get_db)):
         
     except Exception as e:
         logger.error(f"Error getting task categories: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@router.get("/companies")
+async def get_companies(
+    db: Session = Depends(get_db),
+    mainCategory: Optional[str] = Query(None, description="Фильтр по основной категории"),
+    subCategory: Optional[str] = Query(None, description="Подкатегория")
+):
+    """Получение списка компаний из задач с учетом фильтров"""
+    try:
+        # Базовый запрос для получения компаний
+        query = db.query(ContentBlock.companies).filter(
+            ContentBlock.companies.isnot(None),
+            ContentBlock.companies != []
+        )
+        
+        # Добавляем фильтр по категории, если указан
+        if mainCategory or subCategory:
+            query = query.join(ContentFile)
+            
+            if mainCategory:
+                query = query.filter(func.lower(ContentFile.mainCategory) == func.lower(mainCategory))
+            if subCategory:
+                query = query.filter(func.lower(ContentFile.subCategory) == func.lower(subCategory))
+        
+        results = query.distinct().all()
+        
+        # Собираем все компании в один список
+        all_companies = set()
+        for result in results:
+            if result[0]:  # result[0] это массив companies
+                for company in result[0]:
+                    if company and company.strip():
+                        all_companies.add(company.strip())
+        
+        # Сортируем по алфавиту
+        companies_list = sorted(list(all_companies))
+        
+        return {
+            "companies": companies_list,
+            "total": len(companies_list)
+        }
+    
+    except Exception as e:
+        logger.error(f"Error getting companies: {e}")
         raise HTTPException(status_code=500, detail="Internal server error") 

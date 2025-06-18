@@ -6,8 +6,16 @@ import {
 import { ButtonVariant } from '@/shared/components/Button/model/types';
 import { Button } from '@/shared/components/Button/ui/Button';
 import { Input } from '@/shared/components/Input';
+import {
+  findOriginalCategory,
+  translateMainCategory,
+  translateSubCategory,
+} from '@/shared/constants/categoryTranslations';
 import { useAppDispatch, useAppSelector } from '@/shared/hooks/redux';
-import { useContentCategories } from '@/shared/hooks/useContentBlocks';
+import {
+  useCompanies,
+  useContentCategories,
+} from '@/shared/hooks/useContentBlocks';
 import { Search, X } from 'lucide-react';
 import { useCallback } from 'react';
 import styles from './ContentFilters.module.scss';
@@ -30,6 +38,12 @@ export const ContentFilters = ({
   const filters = useAppSelector(selectContentBlocksFilters);
   const { data: categories } = useContentCategories();
 
+  // Получаем компании с учетом текущих фильтров по категориям
+  const { data: companies } = useCompanies({
+    mainCategory: filters.mainCategory,
+    subCategory: filters.subCategory,
+  });
+
   const handleFilterChange = useCallback(
     (
       key: keyof ContentBlocksFilters,
@@ -44,10 +58,34 @@ export const ContentFilters = ({
 
   const handleMainCategoryChange = useCallback(
     (mainCategory: string) => {
+      // Если выбрана переведенная категория, конвертируем обратно в оригинальное название для API
+      const originalMainCategory = mainCategory
+        ? findOriginalCategory(mainCategory, true)
+        : undefined;
+
       const newFilters = {
         ...filters,
-        mainCategory: mainCategory || undefined,
+        mainCategory: originalMainCategory,
         subCategory: undefined, // Сбрасываем подкатегорию при изменении основной категории
+        companies: undefined, // Сбрасываем компанию при изменении основной категории
+      };
+      dispatch(setFilters(newFilters));
+      onFiltersChange?.(newFilters);
+    },
+    [dispatch, filters, onFiltersChange]
+  );
+
+  const handleSubCategoryChange = useCallback(
+    (subCategory: string) => {
+      // Если выбрана переведенная подкатегория, конвертируем обратно в оригинальное название для API
+      const originalSubCategory = subCategory
+        ? findOriginalCategory(subCategory, false)
+        : undefined;
+
+      const newFilters = {
+        ...filters,
+        subCategory: originalSubCategory,
+        companies: undefined, // Сбрасываем компанию при изменении подкатегории
       };
       dispatch(setFilters(newFilters));
       onFiltersChange?.(newFilters);
@@ -65,6 +103,7 @@ export const ContentFilters = ({
       mainCategory: undefined,
       subCategory: undefined,
       onlyUnsolved: undefined,
+      companies: undefined,
     };
     dispatch(setFilters(resetFilters));
     onFiltersChange?.(resetFilters);
@@ -76,8 +115,10 @@ export const ContentFilters = ({
   };
 
   const getSubCategories = (mainCategory: string) => {
+    // Находим оригинальное название категории для поиска
+    const originalCategory = findOriginalCategory(mainCategory, true);
     return (
-      categories?.find((cat: Category) => cat.name === mainCategory)
+      categories?.find((cat: Category) => cat.name === originalCategory)
         ?.subCategories || []
     );
   };
@@ -87,9 +128,19 @@ export const ContentFilters = ({
       filters.q ||
       filters.onlyUnsolved ||
       filters.mainCategory ||
-      filters.subCategory
+      filters.subCategory ||
+      filters.companies
     );
   };
+
+  // Получаем переведенное название выбранной категории для отображения
+  const displayMainCategory = filters.mainCategory
+    ? translateMainCategory(filters.mainCategory)
+    : '';
+
+  const displaySubCategory = filters.subCategory
+    ? translateSubCategory(filters.subCategory)
+    : '';
 
   return (
     <div className={`${styles.contentFilters} ${className || ''}`}>
@@ -122,40 +173,62 @@ export const ContentFilters = ({
         {/* Основная категория */}
         <div className={styles.filterGroup}>
           <select
-            value={filters.mainCategory || ''}
+            value={displayMainCategory}
             onChange={(e) => handleMainCategoryChange(e.target.value || '')}
             className={styles.filterSelect}
           >
             <option value="">Все категории</option>
             {categories?.map((category: Category) => (
-              <option key={category.name} value={category.name}>
-                {category.name}
+              <option
+                key={category.name}
+                value={translateMainCategory(category.name)}
+              >
+                {translateMainCategory(category.name)}
               </option>
             ))}
           </select>
         </div>
 
         {/* Подкатегория */}
-        {filters.mainCategory && (
+        {displayMainCategory && (
           <div className={styles.filterGroup}>
             <select
-              value={filters.subCategory || ''}
-              onChange={(e) =>
-                handleFilterChange('subCategory', e.target.value || undefined)
-              }
+              value={displaySubCategory}
+              onChange={(e) => handleSubCategoryChange(e.target.value || '')}
               className={styles.filterSelect}
             >
               <option value="">Все подкатегории</option>
-              {getSubCategories(filters.mainCategory).map(
+              {getSubCategories(displayMainCategory).map(
                 (subCategory: string) => (
-                  <option key={subCategory} value={subCategory}>
-                    {subCategory}
+                  <option
+                    key={subCategory}
+                    value={translateSubCategory(subCategory)}
+                  >
+                    {translateSubCategory(subCategory)}
                   </option>
                 )
               )}
             </select>
           </div>
         )}
+
+        {/* Фильтр по компаниям */}
+        <div className={styles.filterGroup}>
+          <select
+            value={filters.companies || ''}
+            onChange={(e) =>
+              handleFilterChange('companies', e.target.value || undefined)
+            }
+            className={styles.filterSelect}
+          >
+            <option value="">Все компании</option>
+            {companies?.companies?.map((company: string) => (
+              <option key={company} value={company}>
+                {company}
+              </option>
+            ))}
+          </select>
+        </div>
 
         {/* Фильтр "Только нерешенные" */}
         <label className={styles.checkboxFilter}>

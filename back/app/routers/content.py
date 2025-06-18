@@ -237,6 +237,9 @@ async def get_content_categories(db: Session = Depends(get_db)):
         hierarchy_map = {}
 
         for main_category, sub_category in files:
+            # Пропускаем тестовые категории и подкатегории
+            if main_category == 'Test' or sub_category == 'Test':
+                continue
             if main_category not in hierarchy_map:
                 hierarchy_map[main_category] = set()
             if sub_category:

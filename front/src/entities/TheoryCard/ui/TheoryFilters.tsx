@@ -1,3 +1,8 @@
+import {
+  findOriginalCategory,
+  translateMainCategory,
+  translateSubCategory,
+} from '@/shared/constants/categoryTranslations';
 import { useEffect, useState } from 'react';
 import { useCategories } from '../model/queries';
 import type { TheoryFilters } from '../model/types';
@@ -25,17 +30,27 @@ export const TheoryFiltersComponent = ({
   }, [searchInput, filters, onFiltersChange]);
 
   const handleCategoryChange = (category: string) => {
+    // Если выбрана переведенная категория, конвертируем обратно в оригинальное название для API
+    const originalCategory =
+      category === 'all' ? undefined : findOriginalCategory(category, true);
+
     onFiltersChange({
       ...filters,
-      category: category === 'all' ? undefined : category,
+      category: originalCategory,
       subCategory: undefined, // Сбрасываем подкатегорию при смене категории
     });
   };
 
   const handleSubCategoryChange = (subCategory: string) => {
+    // Если выбрана переведенная подкатегория, конвертируем обратно в оригинальное название для API
+    const originalSubCategory =
+      subCategory === 'all'
+        ? undefined
+        : findOriginalCategory(subCategory, false);
+
     onFiltersChange({
       ...filters,
-      subCategory: subCategory === 'all' ? undefined : subCategory,
+      subCategory: originalSubCategory,
     });
   };
 
@@ -46,6 +61,15 @@ export const TheoryFiltersComponent = ({
   const selectedCategory = categories?.find(
     (cat) => cat.name === filters.category
   );
+
+  // Получаем переведенные названия для отображения
+  const displayCategory = filters.category
+    ? translateMainCategory(filters.category)
+    : 'all';
+
+  const displaySubCategory = filters.subCategory
+    ? translateSubCategory(filters.subCategory)
+    : 'all';
 
   return (
     <div className={styles.filters}>
@@ -65,15 +89,18 @@ export const TheoryFiltersComponent = ({
         {/* Категории */}
         <div className={styles.filterGroup}>
           <select
-            value={filters.category || 'all'}
+            value={displayCategory}
             onChange={(e) => handleCategoryChange(e.target.value)}
             className={styles.filterSelect}
             disabled={categoriesLoading}
           >
             <option value="all">Все категории</option>
             {categories?.map((category) => (
-              <option key={category.name} value={category.name}>
-                {category.name} ({category.totalCards})
+              <option
+                key={category.name}
+                value={translateMainCategory(category.name)}
+              >
+                {translateMainCategory(category.name)} ({category.totalCards})
               </option>
             ))}
           </select>
@@ -83,14 +110,18 @@ export const TheoryFiltersComponent = ({
         {selectedCategory && selectedCategory.subCategories.length > 0 && (
           <div className={styles.filterGroup}>
             <select
-              value={filters.subCategory || 'all'}
+              value={displaySubCategory}
               onChange={(e) => handleSubCategoryChange(e.target.value)}
               className={styles.filterSelect}
             >
               <option value="all">Все подкатегории</option>
               {selectedCategory.subCategories.map((subCategory) => (
-                <option key={subCategory.name} value={subCategory.name}>
-                  {subCategory.name} ({subCategory.cardCount})
+                <option
+                  key={subCategory.name}
+                  value={translateSubCategory(subCategory.name)}
+                >
+                  {translateSubCategory(subCategory.name)} (
+                  {subCategory.cardCount})
                 </option>
               ))}
             </select>

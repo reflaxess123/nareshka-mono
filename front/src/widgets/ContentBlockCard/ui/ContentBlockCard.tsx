@@ -294,6 +294,18 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
               </span>
               <span className={styles.level}>Уровень {block.blockLevel}</span>
               <span className={styles.order}>#{block.orderInFile}</span>
+              {block.companies && block.companies.length > 0 && (
+                <div className={styles.companies}>
+                  <span className={styles.companiesLabel}>Компании:</span>
+                  <div className={styles.companiesTags}>
+                    {block.companies.map((company, index) => (
+                      <span key={index} className={styles.companyTag}>
+                        {company}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </header>
 

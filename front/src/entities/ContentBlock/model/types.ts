@@ -21,6 +21,7 @@ export interface ContentBlock {
   isCodeFoldable: boolean;
   codeFoldTitle?: string;
   extractedUrls: string[];
+  companies?: string[]; // Список компаний где встречалась задача
   rawBlockContentHash?: string;
   createdAt: string;
   updatedAt: string;
@@ -69,6 +70,7 @@ export interface ContentBlocksFilters {
     | 'file.webdavPath';
   sortOrder?: 'asc' | 'desc';
   onlyUnsolved?: boolean; // Показывать только нерешенные блоки
+  companies?: string; // Фильтр по компаниям (через запятую)
 }
 
 export interface ContentBlockState {

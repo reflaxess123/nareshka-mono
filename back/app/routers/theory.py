@@ -167,6 +167,10 @@ async def get_theory_categories(db: Session = Depends(get_db)):
         grouped_categories = {}
 
         for category, sub_category, count in categories_data:
+            # Пропускаем тестовые категории и подкатегории
+            if category == 'Test' or sub_category == 'Test':
+                continue
+                
             if category not in grouped_categories:
                 grouped_categories[category] = {
                     "name": category,

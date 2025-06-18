@@ -82,6 +82,7 @@ class ContentBlock(Base):
     codeFoldTitle = Column(String)
 
     extractedUrls: List[str] = Column(ARRAY(String), default=[], nullable=False)
+    companies: List[str] = Column(ARRAY(String), default=[], nullable=False)
     rawBlockContentHash = Column(String)
 
     createdAt = Column(DateTime, default=func.now(), nullable=False)
