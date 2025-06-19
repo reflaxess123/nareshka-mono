@@ -126,6 +126,15 @@ const Tasks = () => {
           </div>
         </div>
 
+        <div className={styles.secondRow}>
+          <div className={styles.tabsContainer}>
+            <button className={`${styles.tabButton} ${styles.active}`}>
+              Практика задач
+            </button>
+            <button className={styles.tabButton}>Теория</button>
+          </div>
+        </div>
+
         <div className={styles.mainContent}>
           <div className={styles.questionsSection}>
             <ContentBlocksList
