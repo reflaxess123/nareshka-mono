@@ -79,7 +79,6 @@ export const InfiniteTheoryCards = ({ filters }: InfiniteTheoryCardsProps) => {
   }
 
   const allCards = data?.pages.flatMap((page) => page.cards) || [];
-  const totalItems = data?.pages[0]?.pagination.totalItems || 0;
 
   if (allCards.length === 0) {
     return (
@@ -94,9 +93,6 @@ export const InfiniteTheoryCards = ({ filters }: InfiniteTheoryCardsProps) => {
   return (
     <div className={styles.container}>
       <div className={styles.statsBar}>
-        <span className={styles.statsText}>
-          Показано {allCards.length} из {totalItems} карточек
-        </span>
         {filters.onlyUnstudied && (
           <span className={styles.filterBadge}>🔴 Только неизученные</span>
         )}

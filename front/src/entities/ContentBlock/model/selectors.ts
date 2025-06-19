@@ -23,21 +23,28 @@ export const selectContentBlocksLoading = (state: RootState) =>
 export const selectContentBlocksError = (state: RootState) =>
   state.contentBlock.error;
 
-// Производные селекторы
 export const selectContentBlockById = (blockId: string) => (state: RootState) =>
   state.contentBlock.blocks.find((block) => block.id === blockId);
 
-export const selectContentBlocksByCategory =
-  (mainCategory: string) => (state: RootState) =>
-    state.contentBlock.blocks.filter(
-      (block) => block.file.mainCategory === mainCategory
-    );
+export const selectContentBlocksByCategories =
+  (mainCategories?: string[], subCategories?: string[]) =>
+  (state: RootState) => {
+    let filteredBlocks = state.contentBlock.blocks;
 
-export const selectContentBlocksBySubCategory =
-  (subCategory: string) => (state: RootState) =>
-    state.contentBlock.blocks.filter(
-      (block) => block.file.subCategory === subCategory
-    );
+    if (mainCategories && mainCategories.length > 0) {
+      filteredBlocks = filteredBlocks.filter((block) =>
+        mainCategories.includes(block.file.mainCategory)
+      );
+    }
+
+    if (subCategories && subCategories.length > 0) {
+      filteredBlocks = filteredBlocks.filter((block) =>
+        subCategories.includes(block.file.subCategory)
+      );
+    }
+
+    return filteredBlocks;
+  };
 
 export const selectSolvedContentBlocks = (state: RootState) =>
   state.contentBlock.blocks.filter((block) => block.currentUserSolvedCount > 0);

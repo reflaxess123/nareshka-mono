@@ -80,24 +80,6 @@
   }
 }
 
-.resultsInfo {
-  margin-bottom: 20px;
-  padding: 12px 16px;
-  background: var(--bg-secondary);
-  border-radius: 8px;
-  border: 1px solid var(--border-primary);
-
-  p {
-    margin: 0;
-    font-size: 14px;
-    color: var(--text-secondary);
-
-    span {
-      color: var(--text-tertiary);
-    }
-  }
-}
-
 .blocksList {
   display: grid;
   gap: 20px;

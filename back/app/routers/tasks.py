@@ -59,14 +59,15 @@ async def get_task_items(
     db: Session = Depends(get_db),
     page: int = Query(1, ge=1, description="Номер страницы"),
     limit: int = Query(10, ge=1, le=100, description="Количество элементов на странице"),
-    mainCategory: Optional[str] = Query(None, description="Фильтр по основной категории"),
-    subCategory: Optional[str] = Query(None, description="Подкатегория"),
+    mainCategories: List[str] = Query([], description="Фильтр по основным категориям (множественный)"),
+    subCategories: List[str] = Query([], description="Подкатегории (множественный)"),
     q: Optional[str] = Query(None, description="Полнотекстовый поиск"),
     sortBy: str = Query("orderInFile", description="Поле для сортировки"),
     sortOrder: str = Query("asc", description="Порядок сортировки"),
     itemType: Optional[str] = Query(None, description="Тип: content_block, theory_quiz или all"),
     onlyUnsolved: Optional[bool] = Query(None, description="Только нерешенные"),
-    companies: Optional[str] = Query(None, description="Фильтр по компаниям (через запятую)")
+    companies: Optional[str] = Query(None, description="Фильтр по компаниям (через запятую, deprecated)"),
+    companiesList: List[str] = Query([], description="Фильтр по компаниям (множественный)")
 ):
     """Получение объединенного списка задач (content blocks + quiz карточки)"""
     
@@ -74,20 +75,25 @@ async def get_task_items(
     is_authenticated = user is not None
     user_id = user.id if user else None
     
+    final_companies = list(companiesList) if companiesList else []
+    if companies:
+        company_list = [c.strip() for c in companies.split(',') if c.strip()]
+        for company in company_list:
+            if company not in final_companies:
+                final_companies.append(company)
+    
     all_items = []
     
     if not itemType or itemType in ["content_block", "all"]:
         content_blocks = await _get_content_blocks(
-            db, user_id, is_authenticated, mainCategory, subCategory, q, onlyUnsolved, companies
+            db, user_id, is_authenticated, mainCategories, subCategories, q, onlyUnsolved, final_companies
         )
         all_items.extend(content_blocks)
     
     if not itemType or itemType in ["theory_quiz", "all"]:
-        # Исключаем quiz карточки если выбран фильтр по компаниям, 
-        # так как у quiz карточек нет поля companies
-        if not companies:
+        if not final_companies:
             quiz_cards = await _get_quiz_cards(
-                db, user_id, is_authenticated, mainCategory, subCategory, q, onlyUnsolved
+                db, user_id, is_authenticated, mainCategories, subCategories, q, onlyUnsolved
             )
             all_items.extend(quiz_cards)
     
@@ -115,18 +121,18 @@ async def _get_content_blocks(
     db: Session, 
     user_id: Optional[int], 
     is_authenticated: bool,
-    main_category: Optional[str] = None,
-    sub_category: Optional[str] = None,
+    main_categories: List[str],
+    sub_categories: List[str],
     q: Optional[str] = None,
     only_unsolved: Optional[bool] = None,
-    companies: Optional[str] = None
+    companies: Optional[List[str]] = None
 ) -> List[Dict[str, Any]]:
     query = db.query(ContentBlock).join(ContentFile)
     
-    if main_category:
-        query = query.filter(func.lower(ContentFile.mainCategory) == func.lower(main_category))
-    if sub_category:
-        query = query.filter(func.lower(ContentFile.subCategory) == func.lower(sub_category))
+    if main_categories:
+        query = query.filter(func.lower(ContentFile.mainCategory).in_(map(lambda x: x.lower(), main_categories)))
+    if sub_categories:
+        query = query.filter(func.lower(ContentFile.subCategory).in_(map(lambda x: x.lower(), sub_categories)))
     if q and q.strip():
         search_term = f"%{q.strip()}%"
         query = query.filter(
@@ -137,17 +143,14 @@ async def _get_content_blocks(
             )
         )
     
-    if companies and companies.strip():
-        # Парсим список компаний через запятую
-        company_list = [c.strip().lower() for c in companies.split(',') if c.strip()]
-        if company_list:
-            # Фильтруем по пересечению с массивом companies
-            query = query.filter(
-                or_(
-                    *[func.lower(func.array_to_string(ContentBlock.companies, ',', '')).contains(company) 
-                      for company in company_list]
-                )
+    if companies and companies:
+        # Фильтруем по пересечению с массивом companies
+        query = query.filter(
+            or_(
+                *[func.lower(func.array_to_string(ContentBlock.companies, ',', '')).contains(company) 
+                  for company in companies]
             )
+        )
     
     blocks = query.order_by(asc(ContentBlock.orderInFile)).all()
     
@@ -211,8 +214,8 @@ async def _get_quiz_cards(
     db: Session,
     user_id: Optional[int],
     is_authenticated: bool, 
-    main_category: Optional[str] = None,
-    sub_category: Optional[str] = None,
+    main_categories: List[str],
+    sub_categories: List[str],
     q: Optional[str] = None,
     only_unsolved: Optional[bool] = None
 ) -> List[Dict[str, Any]]:  
@@ -223,20 +226,25 @@ async def _get_quiz_cards(
         )
     )
     
-    if main_category:
-        quiz_category = None
-        if main_category.upper() == "JS":
-            quiz_category = "JS QUIZ"
-        elif main_category.upper() == "REACT":
-            quiz_category = "REACT QUIZ"
+    if main_categories:
+        # Преобразуем основные категории в quiz категории
+        quiz_categories = []
+        for main_cat in main_categories:
+            if main_cat.upper() == "JS":
+                quiz_categories.append("JS QUIZ")
+            elif main_cat.upper() == "REACT":
+                quiz_categories.append("REACT QUIZ")
         
-        if quiz_category:
-            query = query.filter(TheoryCard.category == quiz_category)
+        if quiz_categories:
+            query = query.filter(TheoryCard.category.in_(quiz_categories))
         else:
-            return []  
+            return []  # Нет соответствующих quiz категорий
     
-    if sub_category and sub_category.upper() != "QUIZ":
-        query = query.filter(func.lower(TheoryCard.subCategory) == func.lower(sub_category))
+    if sub_categories:
+        # Фильтруем подкатегории, если не "QUIZ"
+        non_quiz_subcategories = [sub for sub in sub_categories if sub.upper() != "QUIZ"]
+        if non_quiz_subcategories:
+            query = query.filter(func.lower(TheoryCard.subCategory).in_(map(lambda x: x.lower(), non_quiz_subcategories)))
     
     if q and q.strip():
         search_term = f"%{q.strip()}%"
@@ -384,8 +392,8 @@ async def get_task_categories(db: Session = Depends(get_db)):
 @router.get("/companies")
 async def get_companies(
     db: Session = Depends(get_db),
-    mainCategory: Optional[str] = Query(None, description="Фильтр по основной категории"),
-    subCategory: Optional[str] = Query(None, description="Подкатегория")
+    mainCategories: List[str] = Query([], description="Фильтр по основным категориям"),
+    subCategories: List[str] = Query([], description="Фильтр по подкатегориям")
 ):
     """Получение списка компаний из задач с учетом фильтров"""
     try:
@@ -395,14 +403,14 @@ async def get_companies(
             ContentBlock.companies != []
         )
         
-        # Добавляем фильтр по категории, если указан
-        if mainCategory or subCategory:
+        # Добавляем фильтр по категориям, если указаны
+        if mainCategories or subCategories:
             query = query.join(ContentFile)
             
-            if mainCategory:
-                query = query.filter(func.lower(ContentFile.mainCategory) == func.lower(mainCategory))
-            if subCategory:
-                query = query.filter(func.lower(ContentFile.subCategory) == func.lower(subCategory))
+            if mainCategories:
+                query = query.filter(func.lower(ContentFile.mainCategory).in_(map(lambda x: x.lower(), mainCategories)))
+            if subCategories:
+                query = query.filter(func.lower(ContentFile.subCategory).in_(map(lambda x: x.lower(), subCategories)))
         
         results = query.distinct().all()
         

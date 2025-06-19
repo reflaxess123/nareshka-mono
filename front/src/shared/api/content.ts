@@ -128,16 +128,16 @@ class ContentAPI {
     return this.getBlocks({ ...filters, q: query });
   }
 
-  // Получение блоков по категории
-  async getBlocksByCategory(
-    mainCategory: string,
-    subCategory?: string,
-    filters: Omit<ContentBlocksFilters, 'mainCategory' | 'subCategory'> = {}
+  // Получение блоков по категориям
+  async getBlocksByCategories(
+    mainCategories?: string[],
+    subCategories?: string[],
+    filters: ContentBlocksFilters = {}
   ): Promise<ContentBlocksResponse> {
     return this.getBlocks({
       ...filters,
-      mainCategory,
-      ...(subCategory && { subCategory }),
+      ...(mainCategories && mainCategories.length > 0 && { mainCategories }),
+      ...(subCategories && subCategories.length > 0 && { subCategories }),
     });
   }
 

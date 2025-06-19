@@ -58,8 +58,8 @@ export interface ContentBlocksFilters {
   page?: number;
   limit?: number;
   webdavPath?: string;
-  mainCategory?: string;
-  subCategory?: string;
+  mainCategories?: string[]; // Множественный выбор основных категорий
+  subCategories?: string[]; // Множественный выбор подкатегорий
   filePathId?: string;
   q?: string;
   sortBy?:
@@ -70,7 +70,10 @@ export interface ContentBlocksFilters {
     | 'file.webdavPath';
   sortOrder?: 'asc' | 'desc';
   onlyUnsolved?: boolean; // Показывать только нерешенные блоки
-  companies?: string; // Фильтр по компаниям (через запятую)
+  companies?: string[]; // Массив выбранных компаний
+  difficulties?: ('easy' | 'medium' | 'hard')[]; // Фильтр по сложности
+  importance?: ('low' | 'medium' | 'high')[]; // Фильтр по важности
+  progress?: ('completed' | 'not_completed')[]; // Фильтр по прогрессу
 }
 
 export interface ContentBlockState {

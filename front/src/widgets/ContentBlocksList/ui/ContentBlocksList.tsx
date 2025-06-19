@@ -85,10 +85,6 @@ export const ContentBlocksList = ({
     });
   }, [data]);
 
-  // Получаем информацию о пагинации с последней страницы
-  const lastPage = data?.pages[data.pages.length - 1];
-  const pagination = lastPage?.pagination;
-
   const displayError = error || queryError;
 
   if (isLoading) {
@@ -142,16 +138,7 @@ export const ContentBlocksList = ({
   }
 
   return (
-    <div className={`${styles.contentBlocksList} ${className || ''}`}>
-      {/* Информация о результатах */}
-      <div className={styles.resultsInfo}>
-        <p>
-          Показано {allBlocks.length}
-          {pagination && <span> из {pagination.totalItems} блоков</span>}
-        </p>
-      </div>
-
-      {/* Список блоков */}
+    <div className={`${styles.contentBlocksList} ${className || ''}`}>    
       <div
         className={`${styles.blocksList} ${variant === 'compact' ? styles.compact : ''}`}
       >

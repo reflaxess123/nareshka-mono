@@ -38,7 +38,24 @@ export const useContentBlocks = (filters: ContentBlocksFilters = {}) => {
       const params = new URLSearchParams();
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== '') {
-          params.append(key, value.toString());
+          if (Array.isArray(value)) {
+            let paramName = key;
+            if (key === 'mainCategories') {
+              paramName = 'mainCategories';
+            } else if (key === 'subCategories') {
+              paramName = 'subCategories';
+            } else if (key === 'companies') {
+              paramName = 'companiesList';
+            }
+
+            value.forEach((item) => {
+              if (item !== undefined && item !== null && item !== '') {
+                params.append(paramName, item.toString());
+              }
+            });
+          } else {
+            params.append(key, value.toString());
+          }
         }
       });
 
@@ -82,7 +99,24 @@ export const useInfiniteContentBlocks = (
       Object.entries({ ...filters, page: pageParam }).forEach(
         ([key, value]) => {
           if (value !== undefined && value !== null && value !== '') {
-            params.append(key, value.toString());
+            if (Array.isArray(value)) {
+              let paramName = key;
+              if (key === 'mainCategories') {
+                paramName = 'mainCategories';
+              } else if (key === 'subCategories') {
+                paramName = 'subCategories';
+              } else if (key === 'companies') {
+                paramName = 'companiesList';
+              }
+
+              value.forEach((item) => {
+                if (item !== undefined && item !== null && item !== '') {
+                  params.append(paramName, item.toString());
+                }
+              });
+            } else {
+              params.append(key, value.toString());
+            }
           }
         }
       );
@@ -270,9 +304,9 @@ export const useSearchContentBlocks = (
   return queryResult;
 };
 
-export const useContentBlocksByCategory = (
-  mainCategory: string,
-  subCategory?: string,
+export const useContentBlocksByCategories = (
+  mainCategories?: string[],
+  subCategories?: string[],
   additionalFilters: ContentBlocksFilters = {}
 ) => {
   const dispatch = useAppDispatch();
@@ -280,18 +314,18 @@ export const useContentBlocksByCategory = (
   const query = useQuery({
     queryKey: [
       ...contentQueryKeys.blocks(),
-      'category',
-      mainCategory,
-      subCategory,
+      'categories',
+      mainCategories,
+      subCategories,
       additionalFilters,
     ],
     queryFn: () =>
-      contentApi.getBlocksByCategory(
-        mainCategory,
-        subCategory,
+      contentApi.getBlocksByCategories(
+        mainCategories,
+        subCategories,
         additionalFilters
       ),
-    enabled: !!mainCategory,
+    enabled: !!(mainCategories && mainCategories.length > 0),
     staleTime: 5 * 60 * 1000,
   });
 
@@ -307,7 +341,7 @@ export const useContentBlocksByCategory = (
         setError(
           query.error instanceof Error
             ? query.error.message
-            : 'Ошибка загрузки блоков категории'
+            : 'Ошибка загрузки блоков категорий'
         )
       );
     }
@@ -329,18 +363,22 @@ export const usePrefetchContentBlock = () => {
 };
 
 export const useCompanies = (filters?: {
-  mainCategory?: string;
-  subCategory?: string;
+  mainCategories?: string[];
+  subCategories?: string[];
 }) => {
   const query = useQuery({
     queryKey: [...contentQueryKeys.companies(), filters],
     queryFn: () => {
       const params = new URLSearchParams();
-      if (filters?.mainCategory) {
-        params.append('mainCategory', filters.mainCategory);
+      if (filters?.mainCategories && filters.mainCategories.length > 0) {
+        filters.mainCategories.forEach((category) => {
+          params.append('mainCategories', category);
+        });
       }
-      if (filters?.subCategory) {
-        params.append('subCategory', filters.subCategory);
+      if (filters?.subCategories && filters.subCategories.length > 0) {
+        filters.subCategories.forEach((category) => {
+          params.append('subCategories', category);
+        });
       }
 
       return fetch(`/api/tasks/companies?${params.toString()}`, {
