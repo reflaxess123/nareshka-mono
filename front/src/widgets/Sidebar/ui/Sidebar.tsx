@@ -3,7 +3,7 @@ import { AppRoutes } from '@/app/providers/router';
 import { isAdmin } from '@/entities/User/model/types';
 import { Link } from '@/shared/components/Link';
 import { useAppDispatch, useAuth } from '@/shared/hooks';
-import { Bird, Brain, Code, Home, Map, Shield } from 'lucide-react';
+import { Bird, Code, Home, Map, Shield } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { toggleSidebar } from '../model/slice/sidebarSlice';
 import styles from './Sidebar.module.scss';
@@ -42,15 +42,6 @@ export const Sidebar = ({ children }: { children: React.ReactNode }) => {
               variant="sidebar"
             />
           )}
-
-          <Link
-            text="Теория"
-            className={styles.link}
-            icon={<Brain size={24} />}
-            isParentHovered={isOpen}
-            to={AppRoutes.THEORY}
-            variant="sidebar"
-          />
 
           <Link
             text="Карта"

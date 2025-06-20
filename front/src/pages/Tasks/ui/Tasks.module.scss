@@ -198,6 +198,23 @@
   }
 }
 
+.theoryFiltersSection {
+  margin-bottom: 32px;
+  padding: 0;
+
+  @media (max-width: 1024px) {
+    margin-bottom: 28px;
+  }
+
+  @media (max-width: 768px) {
+    margin-bottom: 24px;
+  }
+
+  @media (max-width: 480px) {
+    margin-bottom: 20px;
+  }
+}
+
 .sortContainer {
   display: flex;
   flex-direction: column;
@@ -289,6 +306,12 @@
 
   @media (max-width: 480px) {
     gap: 16px;
+  }
+
+  // Модификатор для полной ширины (теория)
+  &.fullWidth {
+    grid-template-columns: 1fr;
+    gap: 0;
   }
 }
 

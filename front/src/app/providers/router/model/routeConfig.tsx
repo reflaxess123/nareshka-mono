@@ -20,9 +20,7 @@ const Settings = lazy(() =>
 const Tasks = lazy(() =>
   import('@/pages/Tasks').then((module) => ({ default: module.Tasks }))
 );
-const Theory = lazy(() =>
-  import('@/pages/Theory').then((module) => ({ default: module.Theory }))
-);
+
 const UserManagement = lazy(() =>
   import('@/pages/Admin/UserManagement').then((module) => ({
     default: module.UserManagement,
@@ -49,7 +47,6 @@ export enum AppRoutes {
   GET_STARTED = '/get-started',
   DASHBOARD = '/dashboard',
   TASKS = '/tasks',
-  THEORY = '/theory',
   PROFILE = '/profile',
   SETTINGS = '/settings',
   CODE_EDITOR = '/code-editor',
@@ -64,7 +61,7 @@ export const routeConfig: AppRoute[] = [
   { path: AppRoutes.GET_STARTED, element: <GetStarted /> },
   { path: AppRoutes.DASHBOARD, element: <Dashboard /> },
   { path: AppRoutes.TASKS, element: <Tasks /> },
-  { path: AppRoutes.THEORY, element: <Theory /> },
+
   { path: AppRoutes.PROFILE, element: <Profile /> },
   { path: AppRoutes.SETTINGS, element: <Settings /> },
   { path: AppRoutes.CODE_EDITOR, element: <CodeEditor /> },
