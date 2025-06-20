@@ -1,17 +1,22 @@
+import { isAdmin } from '@/entities/User/model/types';
 import { useAuth } from '@/shared/hooks';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Landing from '../../Landing/ui/Landing';
 
 const Home = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/dashboard');
+    if (isAuthenticated && user) {
+      if (isAdmin(user.role)) {
+        navigate('/admin-panel');
+      } else {
+        navigate('/tasks');
+      }
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, user, navigate]);
 
   if (isAuthenticated) {
     return null;

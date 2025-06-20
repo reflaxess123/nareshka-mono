@@ -334,6 +334,10 @@
   bottom: 10px;
   border-radius: 12px;
   padding: 24px;
+  background: rgba(45, 27, 77, 1);
+  border: 2px solid var(--filter-border);
+  box-shadow: var(--shadow-card-hover);
+  backdrop-filter: var(--backdrop-blur-md);
 
   @media (max-width: 1024px) {
     padding: 20px;
@@ -357,11 +361,7 @@
   margin: 0 0 20px 0;
   font-size: 18px;
   font-weight: 600;
-  color: var(--text-primary);
-}
-
-.filters {
-  // Styles will be handled in ContentFilters component
+  color: var(--filter-text);
 }
 
 .guestNotice {
