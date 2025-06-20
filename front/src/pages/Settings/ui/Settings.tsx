@@ -5,7 +5,7 @@ import {
   TextSize,
   TextWeight,
 } from '@/shared/components/Text';
-import { useTheme } from '@/shared/context/ThemeContext';
+import { useTheme } from '@/shared/context';
 import { Moon, Sun } from 'lucide-react';
 import styles from './Settings.module.scss';
 

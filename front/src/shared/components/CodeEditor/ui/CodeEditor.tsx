@@ -350,6 +350,8 @@ export const CodeEditor = ({
   }, [blockId, language, code, saveSolutionMutation]);
 
   // Monaco editor configuration
+  const monacoTheme = theme === 'dark' ? 'vs-dark' : 'vs-light';
+
   const editorOptions: editor.IStandaloneEditorConstructionOptions = {
     minimap: { enabled: false },
     fontSize: 14,
@@ -358,7 +360,7 @@ export const CodeEditor = ({
     scrollBeyondLastLine: false,
     readOnly,
     automaticLayout: true,
-    theme: theme === 'dark' ? 'vs-dark' : 'vs-light',
+    theme: monacoTheme,
     wordWrap: 'on',
     tabSize: 2,
     insertSpaces: true,
@@ -368,8 +370,14 @@ export const CodeEditor = ({
     },
   };
 
-  // Вычисляем высоту редактора по количеству строк
-  const lineHeight = 22; // px, зависит от fontSize
+  useEffect(() => {
+    if (editorRef.current) {
+      const monacoTheme = theme === 'dark' ? 'vs-dark' : 'vs-light';
+      editorRef.current.updateOptions({ theme: monacoTheme });
+    }
+  }, [theme]);
+
+  const lineHeight = 22;
   const minLines = 5;
   const maxLines = 30;
   const codeLines = useMemo(() => code.split('\n').length, [code]);
@@ -452,6 +460,8 @@ export const CodeEditor = ({
           onChange={handleCodeChange}
           onMount={(editor) => {
             editorRef.current = editor;
+            const currentTheme = theme === 'dark' ? 'vs-dark' : 'vs-light';
+            editor.updateOptions({ theme: currentTheme });
           }}
         />
       </div>

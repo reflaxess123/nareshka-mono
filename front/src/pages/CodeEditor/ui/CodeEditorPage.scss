@@ -1,16 +1,24 @@
 .code-editor-page {
+  position: fixed;
+  top: var(--navbar-height); // Учитываем высоту навбара (64px)
+  left: var(--sidebar-width); // Учитываем ширину сайдбара (75px)
+  right: 0;
+  bottom: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 32px 0 0 0;
-  background-size: 40px 40px;
-  border-radius: 16px;
+  background: var(--surface-primary);
+  z-index: 1;
+
+  // На мобильных устройствах убираем отступ для сайдбара и учитываем нижнюю панель
+  @media (max-width: 768px) {
+    left: 0; // На мобильных сайдбар скрыт
+    bottom: var(--bottom-nav-height); // 80px
+  }
 
   // Состояние загрузки
   &.loading {
-    display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
 
     .loading-spinner {
       display: flex;
@@ -27,9 +35,8 @@
 
   // Состояние ошибки
   &.error {
-    display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
 
     .error-container {
       text-align: center;
@@ -48,198 +55,258 @@
     }
   }
 
-  .page-header {
-    text-align: center;
-    transition: all 0.3s ease;
-    padding: var(--space-6);
+  // Компактный header
+  .compact-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--border-primary);
+    background: var(--surface-primary);
+    flex-shrink: 0;
 
-    .header-content {
+    .header-left {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      max-width: 1400px;
-      margin: 0 auto;
-      gap: var(--space-4);
+      gap: var(--space-3);
 
-      .header-left {
-        flex-shrink: 0;
-
-        .back-button {
-          display: flex;
-          align-items: center;
-          gap: var(--space-2);
-        }
-
-        .header-text {
-          h1 {
-            margin: 0;
-            font-size: var(--font-size-2xl);
-            font-weight: var(--font-weight-bold);
-            color: var(--text-primary);
-          }
-        }
+      .back-button {
+        padding: var(--space-2) var(--space-3);
       }
 
-      .header-center {
-        flex: 1;
-        text-align: center;
+      .task-title {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 16px;
+      }
 
-        .task-title {
-          margin: 0;
-          font-size: var(--font-size-2xl);
-          font-weight: var(--font-weight-bold);
-          color: var(--text-primary);
-          margin-bottom: var(--space-2);
+      .task-badges {
+        display: flex;
+        gap: var(--space-2);
+
+        .difficulty-badge,
+        .language-badge {
+          padding: var(--space-1) var(--space-2);
+          border-radius: var(--radius-sm);
+          font-size: 12px;
+          font-weight: 500;
         }
 
-        .task-meta {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: var(--space-3);
-          flex-wrap: wrap;
+        .difficulty-badge {
+          background: var(--accent-secondary);
+          color: var(--accent-primary);
+        }
 
-          .category {
-            color: var(--text-secondary);
-            font-size: var(--font-size-sm);
-          }
+        .language-badge {
+          background: var(--surface-secondary);
+          color: var(--text-secondary);
+        }
+      }
+    }
 
-          .level {
-            background: var(--surface-secondary);
-            color: var(--text-primary);
-            padding: 2px 8px;
-            border-radius: var(--radius-sm);
-            font-size: var(--font-size-xs);
-            font-weight: var(--font-weight-medium);
-          }
+    .header-right {
+      display: flex;
+      gap: var(--space-2);
+    }
 
-          .js-badge {
-            background: var(--success-color);
-            color: var(--text-inverse);
-            padding: 2px 8px;
-            border-radius: var(--radius-sm);
-            font-size: var(--font-size-xs);
-            font-weight: var(--font-weight-bold);
+    // Мобильная адаптация header
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+
+      .header-left {
+        width: 100%;
+        justify-content: space-between;
+
+        .task-title {
+          font-size: 14px;
+          flex: 1;
+          text-align: center;
+        }
+
+        .task-badges {
+          .difficulty-badge,
+          .language-badge {
+            font-size: 11px;
+            padding: 2px var(--space-1);
           }
         }
       }
 
       .header-right {
-        flex-shrink: 0;
-
-        .template-controls {
-          display: flex;
-          gap: var(--space-2);
-        }
-      }
-    }
-
-    // Статус заготовки
-    .template-status {
-      margin-top: var(--space-4);
-      padding: var(--space-3);
-      border-radius: var(--radius-lg);
-      border: 1px solid;
-
-      &.template {
-        background: rgba(34, 197, 94, 0.1);
-        border-color: var(--success-color);
-        color: var(--success-color);
-      }
-
-      &.original {
-        background: rgba(59, 130, 246, 0.1);
-        border-color: var(--info-color);
-        color: var(--info-color);
-      }
-
-      .status-content {
-        display: flex;
-        align-items: center;
+        width: 100%;
         justify-content: center;
-        gap: var(--space-2);
-        font-size: var(--font-size-sm);
-        font-weight: var(--font-weight-medium);
-
-        .status-icon {
-          flex-shrink: 0;
-        }
       }
     }
   }
 
-  // Описание задачи
-  .task-description {
-    max-width: 1200px;
-    margin: 0 auto var(--space-6);
-    padding: 0 var(--space-6);
-
-    h3 {
-      margin: 0 0 var(--space-3);
-      font-size: var(--font-size-lg);
-      font-weight: var(--font-weight-semibold);
-      color: var(--text-primary);
-    }
-
-    p {
-      margin: 0;
-      color: var(--text-secondary);
-      line-height: var(--line-height-relaxed);
-      font-size: var(--font-size-base);
-      white-space: pre-line;
-    }
-  }
-
-  .editor-section {
-    width: 100%;
+  // Split layout
+  .split-layout {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 var(--space-6);
+    flex: 1;
+    overflow: hidden;
 
-    .editor-container {
-      width: 100%;
-      max-width: 1200px;
-      background: var(--surface-secondary);
-      border: 1px solid var(--border-primary);
-      border-radius: 16px;
+    // Левая панель
+    .left-panel {
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--border-primary);
+      background: var(--surface-primary);
       overflow: hidden;
-      box-shadow: var(--shadow-xl);
-      transition: all 0.3s ease;
+
+      .panel-content {
+        flex: 1;
+        padding: var(--space-4);
+        overflow-y: auto;
+
+        h3 {
+          margin: 0 0 var(--space-4) 0;
+          color: var(--text-primary);
+          font-size: 18px;
+          font-weight: 600;
+        }
+
+        .welcome-content {
+          h2 {
+            margin: 0 0 var(--space-4) 0;
+            color: var(--text-primary);
+            font-size: 24px;
+          }
+
+          p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+          }
+        }
+      }
+    }
+
+    // Разделитель
+    .resizer {
+      width: 4px;
+      background: var(--border-primary);
+      cursor: col-resize;
+      flex-shrink: 0;
+      transition: background-color 0.2s ease;
 
       &:hover {
-        box-shadow: var(--shadow-2xl);
-        border-color: var(--accent-hover);
-        transform: translateY(-4px);
+        background: var(--accent-primary);
+      }
+    }
+
+    // Правая панель - редактор
+    .right-panel {
+      display: flex;
+      flex-direction: column;
+      background: var(--surface-primary);
+
+      .editor-wrapper {
+        flex: 1;
+        overflow: hidden;
+
+        // Убираем лишние отступы у редактора
+        > div {
+          height: 100%;
+        }
+      }
+    }
+
+    // Мобильная адаптация split layout
+    @media (max-width: 768px) {
+      flex-direction: column;
+
+      .left-panel {
+        height: 40%;
+        border-right: none;
+        border-bottom: 1px solid var(--border-primary);
+
+        .panel-content {
+          padding: var(--space-3);
+
+          h3 {
+            font-size: 16px;
+          }
+        }
+      }
+
+      .resizer {
+        display: none; // Убираем resizer на мобильных
+      }
+
+      .right-panel {
+        height: 60%;
       }
     }
   }
 }
 
-// Адаптивность для мобильных устройств
-@media (max-width: 768px) {
+// Responsive дизайн для планшетов
+@media (max-width: 1024px) {
   .code-editor-page {
-    min-width: calc(100vw - 15px);
-    padding: 15px 0 0 0;
+    .compact-header {
+      padding: 8px 12px;
 
-    .page-header {
-      .header-content {
-        flex-direction: column;
-        align-items: center;
-        gap: var(--space-3);
+      .header-left {
+        gap: var(--space-2);
 
-        .header-center {
-          .task-title {
-            font-size: var(--font-size-xl);
-          }
-        }
-
-        .template-controls {
-          flex-wrap: wrap;
+        .task-title {
+          font-size: var(--font-size-base);
         }
       }
+
+      .header-right {
+        gap: var(--space-1);
+      }
     }
+
+    .split-layout {
+      .left-panel {
+        min-width: 280px;
+      }
+
+      .right-panel {
+        min-width: 300px;
+      }
+    }
+  }
+}
+
+// Дополнительные стили для улучшения UX
+.code-editor-page {
+  // Стили для скроллбара в левой панели
+  .left-panel .panel-content {
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--surface-secondary);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--border-primary);
+      border-radius: 3px;
+
+      &:hover {
+        background: var(--text-secondary);
+      }
+    }
+  }
+
+  // Анимации при переключении табов
+  .tab-content {
+    animation: fadeIn 0.2s ease-in-out;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

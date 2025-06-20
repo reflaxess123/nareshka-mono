@@ -1,7 +1,7 @@
 import { AppRoutes } from '@/app/providers/router';
 import { LoginForm } from '@/features/LoginForm';
 import { Link } from '@/shared/components/Link';
-import { useTheme } from '@/shared/context/ThemeContext';
+import { useTheme } from '@/shared/context';
 import { useAuth, useModal } from '@/shared/hooks';
 import { useLogout } from '@/shared/hooks/useAuth';
 import clsx from 'clsx';

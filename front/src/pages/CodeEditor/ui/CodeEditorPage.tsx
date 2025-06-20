@@ -1,12 +1,10 @@
 import { contentApi } from '@/shared/api/content';
-import { Button, ButtonVariant } from '@/shared/components/Button';
+import { Button, ButtonSize, ButtonVariant } from '@/shared/components/Button';
 import { CodeEditor } from '@/shared/components/CodeEditor';
 import { MarkdownContent } from '@/shared/components/MarkdownContent';
-import { PageWrapper } from '@/shared/components/PageWrapper/ui/PageWrapper';
 import { codeTemplateGenerator } from '@/shared/utils/codeTemplateGenerator';
 import { useQuery } from '@tanstack/react-query';
-import { motion } from 'framer-motion';
-import { ArrowLeft, CheckCircle, Code2, Info } from 'lucide-react';
+import { ArrowLeft, Code2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import './CodeEditorPage.scss';
@@ -30,7 +28,9 @@ export const CodeEditorPage = () => {
     }
     return 'JAVASCRIPT';
   });
-  const [isTemplateGenerated, setIsTemplateGenerated] = useState(false);
+
+  const [leftPanelWidth, setLeftPanelWidth] = useState(45);
+  const [isResizing, setIsResizing] = useState(false);
 
   const {
     data: block,
@@ -107,7 +107,6 @@ export const CodeEditorPage = () => {
             | 'TYPESCRIPT'
             | 'PYTHON'
         );
-        setIsTemplateGenerated(processedFromUrl);
       }
       return;
     }
@@ -119,7 +118,6 @@ export const CodeEditorPage = () => {
 
         setInitialCode(templateResult.template);
         setLanguage(detectedLanguage as 'JAVASCRIPT' | 'TYPESCRIPT' | 'PYTHON');
-        setIsTemplateGenerated(templateResult.isProcessed);
       }
       return;
     }
@@ -141,7 +139,6 @@ for (let i = 0; i < 10; i++) {
 }
 `);
       setLanguage('JAVASCRIPT');
-      setIsTemplateGenerated(false);
     }
   }, [
     block,
@@ -163,7 +160,6 @@ for (let i = 0; i < 10; i++) {
 
       setInitialCode(block.codeContent);
       setLanguage(detectedLanguage as 'JAVASCRIPT' | 'TYPESCRIPT' | 'PYTHON');
-      setIsTemplateGenerated(false);
 
       const newSearchParams = new URLSearchParams(searchParams);
       newSearchParams.set('template', encodeURIComponent(block.codeContent));
@@ -180,7 +176,6 @@ for (let i = 0; i < 10; i++) {
 
       setInitialCode(templateResult.template);
       setLanguage(detectedLanguage as 'JAVASCRIPT' | 'TYPESCRIPT' | 'PYTHON');
-      setIsTemplateGenerated(templateResult.isProcessed);
 
       const newSearchParams = new URLSearchParams(searchParams);
       newSearchParams.set(
@@ -193,6 +188,35 @@ for (let i = 0; i < 10; i++) {
     }
   };
 
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsResizing(true);
+    e.preventDefault();
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!isResizing) return;
+
+    const newWidth = (e.clientX / window.innerWidth) * 100;
+    if (newWidth >= 25 && newWidth <= 75) {
+      setLeftPanelWidth(newWidth);
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsResizing(false);
+  };
+
+  useEffect(() => {
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isResizing]);
+
   const isTaskMode = !!blockId;
   const isJSTask = block
     ? codeTemplateGenerator.isJavaScriptTask(block)
@@ -200,35 +224,30 @@ for (let i = 0; i < 10; i++) {
 
   if (isTaskMode && isLoading) {
     return (
-      <PageWrapper>
-        <div className="code-editor-page loading">
-          <div className="loading-spinner">
-            <Code2 className="animate-spin" size={32} />
-            <p>Загрузка задачи...</p>
-          </div>
+      <div className="code-editor-page loading">
+        <div className="loading-spinner">
+          <Code2 className="animate-spin" size={32} />
+          <p>Загрузка задачи...</p>
         </div>
-      </PageWrapper>
+      </div>
     );
   }
 
   if (isTaskMode && (error || !block)) {
     return (
-      <PageWrapper>
-        <div className="code-editor-page error">
-          <div className="error-container">
-            <h1>❌ Задача не найдена</h1>
-            <p>Задача с ID {blockId} не существует или была удалена.</p>
-            <Button onClick={handleBackToTasks} variant={ButtonVariant.PRIMARY}>
-              <ArrowLeft size={16} />
-              Вернуться к задачам
-            </Button>
-          </div>
+      <div className="code-editor-page error">
+        <div className="error-container">
+          <h1>❌ Задача не найдена</h1>
+          <p>Задача с ID {blockId} не существует или была удалена.</p>
+          <Button onClick={handleBackToTasks} variant={ButtonVariant.PRIMARY}>
+            <ArrowLeft size={16} />
+            Вернуться к задачам
+          </Button>
         </div>
-      </PageWrapper>
+      </div>
     );
   }
 
-  // Нормализуем язык для корректной работы с CodeEditor
   const normalizedLanguage = (() => {
     switch (language as string) {
       case 'JS':
@@ -243,122 +262,94 @@ for (let i = 0; i < 10; i++) {
   })();
 
   return (
-    <PageWrapper>
-      <div className="code-editor-page">
-        <motion.div
-          className="page-header"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="header-content">
-            <div className="header-left">
-              {isTaskMode ? (
-                <Button
-                  onClick={handleBackToTasks}
-                  variant={ButtonVariant.GHOST}
-                  className="back-button"
-                >
-                  <ArrowLeft size={16} />
-                  Назад к задачам
-                </Button>
-              ) : (
-                <div className="header-text">
-                  <h1>🚀 Редактор кода</h1>
-                </div>
+    <div className="code-editor-page">
+      <div className="compact-header">
+        <div className="header-left">
+          <Button
+            onClick={handleBackToTasks}
+            variant={ButtonVariant.GHOST}
+            className="back-button"
+          >
+            <ArrowLeft size={16} />
+            Назад
+          </Button>
+
+          {isTaskMode && block && (
+            <>
+              <span className="task-title">{block.blockTitle}</span>
+              <div className="task-badges">
+                <span className="difficulty-badge">
+                  Уровень {block.blockLevel}
+                </span>
+                {isJSTask && <span className="language-badge">JavaScript</span>}
+              </div>
+            </>
+          )}
+        </div>
+
+        <div className="header-right">
+          {isTaskMode && isJSTask && (
+            <>
+              <Button
+                onClick={handleGenerateTemplate}
+                variant={ButtonVariant.SECONDARY}
+                size={ButtonSize.SM}
+              >
+                <Code2 size={14} />
+                Заготовка
+              </Button>
+              <Button
+                onClick={handleResetToOriginal}
+                variant={ButtonVariant.GHOST}
+                size={ButtonSize.SM}
+              >
+                Решение
+              </Button>
+            </>
+          )}
+        </div>
+      </div>
+
+      <div className="split-layout">
+        <div className="left-panel" style={{ width: `${leftPanelWidth}%` }}>
+          {isTaskMode ? (
+            <div className="panel-content">
+              <h3>📋 Описание задачи</h3>
+              {block?.textContent && (
+                <MarkdownContent content={block.textContent} />
               )}
             </div>
-
-            {isTaskMode && block && (
-              <div className="header-center">
-                <h1 className="task-title">{block.blockTitle}</h1>
-                <div className="task-meta">
-                  <span className="category">
-                    {block.file.mainCategory} / {block.file.subCategory}
-                  </span>
-                  <span className="level">Уровень {block.blockLevel}</span>
-                  {isJSTask && <span className="js-badge">JavaScript</span>}
-                </div>
-              </div>
-            )}
-
-            {isTaskMode && isJSTask && (
-              <div className="header-right">
-                <div className="template-controls">
-                  <Button
-                    onClick={handleGenerateTemplate}
-                    variant={ButtonVariant.SECONDARY}
-                    title="Создать заготовку кода"
-                  >
-                    <Code2 size={16} />
-                    Заготовка
-                  </Button>
-                  <Button
-                    onClick={handleResetToOriginal}
-                    variant={ButtonVariant.GHOST}
-                    title="Показать полное решение"
-                  >
-                    Полное решение
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {isTaskMode && isJSTask && (
-            <div
-              className={`template-status ${isTemplateGenerated ? 'template' : 'original'}`}
-            >
-              <div className="status-content">
-                {isTemplateGenerated ? (
-                  <>
-                    <CheckCircle size={16} className="status-icon" />
-                    <span>
-                      Отображается заготовка кода - реализуйте недостающие части
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <Info size={16} className="status-icon" />
-                    <span>Отображается полное решение задачи</span>
-                  </>
-                )}
+          ) : (
+            <div className="panel-content">
+              <div className="welcome-content">
+                <h2>🚀 Редактор кода Nareshka</h2>
+                <p>
+                  Добро пожаловать в онлайн-редактор кода! Здесь вы можете
+                  решать задачи по программированию и улучшать свои навыки.
+                </p>
               </div>
             </div>
           )}
-        </motion.div>
+        </div>
 
-        {isTaskMode && block?.textContent && (
-          <motion.div
-            className="task-description"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            <h3>📋 Описание задачи</h3>
-            <MarkdownContent content={block.textContent} />
-          </motion.div>
-        )}
+        <div className="resizer" onMouseDown={handleMouseDown} />
 
-        <motion.div
-          className="editor-section"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+        <div
+          className="right-panel"
+          style={{ width: `${100 - leftPanelWidth}%` }}
         >
-          <div className="editor-container">
+          <div className="editor-wrapper">
             <CodeEditor
-              key={`${blockId}-${isTemplateGenerated}-${initialCode.length}`}
+              key={`${blockId}-${normalizedLanguage}`}
               blockId={blockId || undefined}
               initialCode={initialCode}
               initialLanguage={
                 normalizedLanguage as 'JAVASCRIPT' | 'TYPESCRIPT' | 'PYTHON'
               }
-              // height="600px"
             />
           </div>
-        </motion.div>
+        </div>
       </div>
-    </PageWrapper>
+    </div>
   );
 };
