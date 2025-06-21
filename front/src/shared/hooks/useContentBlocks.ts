@@ -239,12 +239,112 @@ export const useUpdateProgress = () => {
       blockId: string;
       action: ContentProgressUpdate['action'];
     }) => contentApi.updateProgress(blockId, { action }),
+
+    onMutate: async ({ blockId, action }) => {
+      await queryClient.cancelQueries({ queryKey: ['content'] });
+
+      const currentBlocks = queryClient.getQueryData([
+        'content',
+        'blocks',
+        'filtered',
+      ]);
+
+      let newCount = 0;
+      if (
+        currentBlocks &&
+        typeof currentBlocks === 'object' &&
+        'pages' in currentBlocks
+      ) {
+        const pages = (currentBlocks as { pages: { data: ContentBlock[] }[] })
+          .pages;
+        for (const page of pages) {
+          const block = page.data.find((b: ContentBlock) => b.id === blockId);
+          if (block) {
+            newCount =
+              action === 'increment'
+                ? (block.currentUserSolvedCount || 0) + 1
+                : Math.max(0, (block.currentUserSolvedCount || 0) - 1);
+            break;
+          }
+        }
+      }
+
+      dispatch(
+        updateBlockProgress({
+          blockId,
+          solvedCount: newCount,
+        })
+      );
+
+      queryClient.setQueriesData(
+        { queryKey: ['content', 'blocks', 'filtered'] },
+        (oldData: unknown) => {
+          if (!oldData || typeof oldData !== 'object' || !('pages' in oldData))
+            return oldData;
+
+          const data = oldData as { pages: { data: ContentBlock[] }[] };
+          return {
+            ...data,
+            pages: data.pages.map((page) => ({
+              ...page,
+              data: page.data.map((block: ContentBlock) =>
+                block.id === blockId
+                  ? { ...block, currentUserSolvedCount: newCount }
+                  : block
+              ),
+            })),
+          };
+        }
+      );
+
+      // Оптимистично обновляем кэш для конкретного блока
+      queryClient.setQueryData<ContentBlock>(
+        contentQueryKeys.block(blockId),
+        (oldBlock) => {
+          if (!oldBlock) return oldBlock;
+          return { ...oldBlock, currentUserSolvedCount: newCount };
+        }
+      );
+
+      // Обновляем также старый query key на всякий случай
+      queryClient.setQueryData<ContentBlock>(
+        ['content-block', blockId],
+        (oldBlock) => {
+          if (!oldBlock) return oldBlock;
+          return { ...oldBlock, currentUserSolvedCount: newCount };
+        }
+      );
+
+      return { previousData: currentBlocks, newCount };
+    },
+
     onSuccess: (data, variables) => {
       dispatch(
         updateBlockProgress({
           blockId: variables.blockId,
           solvedCount: data.solvedCount,
         })
+      );
+
+      queryClient.setQueriesData(
+        { queryKey: ['content', 'blocks', 'filtered'] },
+        (oldData: unknown) => {
+          if (!oldData || typeof oldData !== 'object' || !('pages' in oldData))
+            return oldData;
+
+          const dataObj = oldData as { pages: { data: ContentBlock[] }[] };
+          return {
+            ...dataObj,
+            pages: dataObj.pages.map((page) => ({
+              ...page,
+              data: page.data.map((block: ContentBlock) =>
+                block.id === variables.blockId
+                  ? { ...block, currentUserSolvedCount: data.solvedCount }
+                  : block
+              ),
+            })),
+          };
+        }
       );
 
       queryClient.setQueryData<ContentBlock>(
@@ -255,12 +355,24 @@ export const useUpdateProgress = () => {
         }
       );
 
-      queryClient.invalidateQueries({ queryKey: contentQueryKeys.blocks() });
-      queryClient.invalidateQueries({
-        queryKey: contentQueryKeys.block(variables.blockId),
-      });
+      // Обновляем также старый query key на всякий случай
+      queryClient.setQueryData<ContentBlock>(
+        ['content-block', variables.blockId],
+        (oldBlock) => {
+          if (!oldBlock) return oldBlock;
+          return { ...oldBlock, currentUserSolvedCount: data.solvedCount };
+        }
+      );
     },
-    onError: (error) => {
+
+    onError: (error, _variables, context) => {
+      if (context?.previousData) {
+        queryClient.setQueryData(
+          ['content', 'blocks', 'filtered'],
+          context.previousData
+        );
+      }
+
       dispatch(
         setError(
           error instanceof Error ? error.message : 'Ошибка обновления прогресса'
@@ -280,7 +392,7 @@ export const useSearchContentBlocks = (
     queryKey: [...contentQueryKeys.blocks(), 'search', query, filters],
     queryFn: () => contentApi.searchBlocks(query, filters),
     enabled: query.length >= 2,
-    staleTime: 2 * 60 * 1000, // 2 минуты
+    staleTime: 2 * 60 * 1000,
   });
 
   useEffect(() => {
@@ -385,7 +497,7 @@ export const useCompanies = (filters?: {
         credentials: 'include',
       }).then((res) => res.json());
     },
-    staleTime: 30 * 60 * 1000, // 30 минут
+    staleTime: 30 * 60 * 1000,
   });
 
   return query;

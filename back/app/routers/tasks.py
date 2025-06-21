@@ -194,6 +194,9 @@ async def _get_content_blocks(
             "companies": block.companies or [],
             "rawBlockContentHash": block.rawBlockContentHash,
             
+            # Добавляем currentUserSolvedCount для совместимости с фронтендом
+            "currentUserSolvedCount": solved_count,
+            
             "progressEntries": [
                 {
                     "id": f"content_progress_{block.id}",
@@ -299,6 +302,9 @@ async def _get_quiz_cards(
             "questionBlock": unescape_text_content(card.questionBlock),
             "answerBlock": unescape_text_content(card.answerBlock),
             "tags": card.tags,
+            
+            # Добавляем currentUserSolvedCount для совместимости с фронтендом
+            "currentUserSolvedCount": solved_count,
             
             "progressEntries": [
                 {

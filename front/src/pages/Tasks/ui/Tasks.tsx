@@ -159,8 +159,7 @@ const Tasks = () => {
                 onChange={(e) => handleSortChange(e.target.value)}
                 className={styles.sortSelect}
               >
-                <option value="orderInFile">По порядку</option>
-                <option value="blockLevel">По уровню сложности</option>
+                <option value="orderInFile">По порядку в файле</option>
                 <option value="createdAt">По дате создания</option>
                 <option value="updatedAt">По дате обновления</option>
                 <option value="file.webdavPath">По пути файла</option>

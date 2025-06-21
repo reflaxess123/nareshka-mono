@@ -1,5 +1,7 @@
 export {
   ROLE_HIERARCHY,
+  canUseAdvancedFilters,
+  hasNareshkaPlusSubscription,
   hasRole,
   isAdmin,
   isGuest,

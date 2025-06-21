@@ -1,7 +1,9 @@
 import {
+  canUseAdvancedFilters,
   isAdmin as checkIsAdmin,
   isGuest as checkIsGuest,
   isUser as checkIsUser,
+  hasNareshkaPlusSubscription,
   hasRole,
   type UserRole,
 } from '@/entities/User';
@@ -19,11 +21,16 @@ export const useRole = () => {
     return hasRole(userRole, requiredRole);
   };
 
+  const hasNareshkaPlus = hasNareshkaPlusSubscription(user);
+  const canUseFilters = canUseAdvancedFilters(user);
+
   return {
     userRole,
     isAdmin,
     isUser,
     isGuest,
     checkRole,
+    hasNareshkaPlus,
+    canUseFilters,
   };
 };

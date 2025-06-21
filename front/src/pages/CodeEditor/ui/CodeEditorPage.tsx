@@ -1,10 +1,13 @@
+import { ContentProgress } from '@/features/ContentProgress';
 import { contentApi } from '@/shared/api/content';
-import { Button, ButtonSize, ButtonVariant } from '@/shared/components/Button';
+import { Button, ButtonVariant } from '@/shared/components/Button';
 import { CodeEditor } from '@/shared/components/CodeEditor';
 import { MarkdownContent } from '@/shared/components/MarkdownContent';
+import { useRole } from '@/shared/hooks';
+import { contentQueryKeys } from '@/shared/hooks/useContentBlocks';
 import { codeTemplateGenerator } from '@/shared/utils/codeTemplateGenerator';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Code2 } from 'lucide-react';
+import { ArrowLeft, Code, Code2, Eye } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import './CodeEditorPage.scss';
@@ -12,32 +15,27 @@ import './CodeEditorPage.scss';
 export const CodeEditorPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { isGuest } = useRole();
 
   const blockId = searchParams.get('blockId');
   const templateFromUrl = searchParams.get('template');
   const languageFromUrl = searchParams.get('language');
   const processedFromUrl = searchParams.get('processed') === 'true';
 
-  const [initialCode, setInitialCode] = useState('');
-  const [language, setLanguage] = useState(() => {
-    if (languageFromUrl) {
-      return languageFromUrl.toUpperCase() as
-        | 'JAVASCRIPT'
-        | 'TYPESCRIPT'
-        | 'PYTHON';
-    }
-    return 'JAVASCRIPT';
-  });
-
-  const [leftPanelWidth, setLeftPanelWidth] = useState(45);
+  const [initialCode, setInitialCode] = useState<string>('');
+  const [language, setLanguage] = useState<
+    'JAVASCRIPT' | 'TYPESCRIPT' | 'PYTHON'
+  >('JAVASCRIPT');
   const [isResizing, setIsResizing] = useState(false);
+  const [leftPanelWidth, setLeftPanelWidth] = useState(50);
+  const [templateKey, setTemplateKey] = useState(0);
 
   const {
     data: block,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['content-block', blockId],
+    queryKey: contentQueryKeys.block(blockId || ''),
     queryFn: async () => {
       if (!blockId) return null;
       try {
@@ -160,6 +158,7 @@ for (let i = 0; i < 10; i++) {
 
       setInitialCode(block.codeContent);
       setLanguage(detectedLanguage as 'JAVASCRIPT' | 'TYPESCRIPT' | 'PYTHON');
+      setTemplateKey((prev) => prev + 1);
 
       const newSearchParams = new URLSearchParams(searchParams);
       newSearchParams.set('template', encodeURIComponent(block.codeContent));
@@ -176,6 +175,7 @@ for (let i = 0; i < 10; i++) {
 
       setInitialCode(templateResult.template);
       setLanguage(detectedLanguage as 'JAVASCRIPT' | 'TYPESCRIPT' | 'PYTHON');
+      setTemplateKey((prev) => prev + 1);
 
       const newSearchParams = new URLSearchParams(searchParams);
       newSearchParams.set(
@@ -278,9 +278,6 @@ for (let i = 0; i < 10; i++) {
             <>
               <span className="task-title">{block.blockTitle}</span>
               <div className="task-badges">
-                <span className="difficulty-badge">
-                  Уровень {block.blockLevel}
-                </span>
                 {isJSTask && <span className="language-badge">JavaScript</span>}
               </div>
             </>
@@ -288,24 +285,41 @@ for (let i = 0; i < 10; i++) {
         </div>
 
         <div className="header-right">
-          {isTaskMode && isJSTask && (
+          {isTaskMode && block && !isGuest && (
             <>
-              <Button
-                onClick={handleGenerateTemplate}
-                variant={ButtonVariant.SECONDARY}
-                size={ButtonSize.SM}
-              >
-                <Code2 size={14} />
-                Заготовка
-              </Button>
-              <Button
-                onClick={handleResetToOriginal}
-                variant={ButtonVariant.GHOST}
-                size={ButtonSize.SM}
-              >
-                Решение
-              </Button>
+              <div className="progress-container">
+                <span className="progress-label">Прогресс:</span>
+                <ContentProgress
+                  blockId={block.id}
+                  currentCount={block.currentUserSolvedCount || 0}
+                  variant="default"
+                />
+              </div>
+
+              <div className="header-divider" />
             </>
+          )}
+
+          {isTaskMode && isJSTask && (
+            <div className="template-container">
+              <span className="template-label">Шаблоны:</span>
+              <div className="template-buttons">
+                <button
+                  onClick={handleGenerateTemplate}
+                  className="template-btn"
+                >
+                  <Code size={16} />
+                  Заготовка
+                </button>
+                <button
+                  onClick={handleResetToOriginal}
+                  className="solution-btn"
+                >
+                  <Eye size={16} />
+                  Решение
+                </button>
+              </div>
+            </div>
           )}
         </div>
       </div>
@@ -340,7 +354,7 @@ for (let i = 0; i < 10; i++) {
         >
           <div className="editor-wrapper">
             <CodeEditor
-              key={`${blockId}-${normalizedLanguage}`}
+              key={`${blockId}-${normalizedLanguage}-${templateKey}`}
               blockId={blockId || undefined}
               initialCode={initialCode}
               initialLanguage={

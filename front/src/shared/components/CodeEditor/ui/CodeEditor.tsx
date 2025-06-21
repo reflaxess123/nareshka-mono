@@ -20,14 +20,12 @@ import { codeEditorApi, codeEditorKeys } from '@/shared/api/code-editor';
 import { useTheme } from '@/shared/context';
 import styles from './CodeEditor.module.scss';
 
-// Types
 export interface CodeEditorProps {
   blockId?: string;
   initialCode?: string;
   initialLanguage?: string;
   onCodeChange?: (code: string) => void;
   onExecutionComplete?: (result: CodeExecutionResponse) => void;
-  // height?: string;
   readOnly?: boolean;
   className?: string;
 }
@@ -44,7 +42,6 @@ export interface LanguageSelectorProps {
   className?: string;
 }
 
-// Language Selector Component
 export const LanguageSelector = ({
   selectedLanguage,
   onLanguageChange,
@@ -79,7 +76,6 @@ export const LanguageSelector = ({
   );
 };
 
-// Code Execution Panel Component
 export const CodeExecutionPanel = ({
   execution,
   isLoading = false,
@@ -206,14 +202,12 @@ export const CodeExecutionPanel = ({
   );
 };
 
-// Main Code Editor Component
 export const CodeEditor = ({
   blockId,
   initialCode = '',
   initialLanguage = 'PYTHON',
   onCodeChange,
   onExecutionComplete,
-  // height = 'auto',
   readOnly = false,
   className = '',
 }: CodeEditorProps) => {
@@ -225,11 +219,11 @@ export const CodeEditor = ({
     useState<CodeExecutionResponse>();
   const [isExecuting, setIsExecuting] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [codeOverridden, setCodeOverridden] = useState(false);
 
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const queryClient = useQueryClient();
 
-  // Load saved solution if blockId is provided
   const { data: solutions } = useQuery({
     queryKey: codeEditorKeys.blockSolutions(blockId || ''),
     queryFn: () =>
@@ -237,7 +231,6 @@ export const CodeEditor = ({
     enabled: !!blockId,
   });
 
-  // Save solution mutation
   const saveSolutionMutation = useMutation({
     mutationFn: codeEditorApi.saveSolution,
     onSuccess: () => {
@@ -270,19 +263,19 @@ export const CodeEditor = ({
     },
   });
 
-  // Update language when initialLanguage prop changes
   useEffect(() => {
     setLanguage(initialLanguage);
   }, [initialLanguage]);
 
-  // Update code when initialCode prop changes
   useEffect(() => {
-    setCode(initialCode);
+    if (initialCode !== code) {
+      setCode(initialCode);
+      setCodeOverridden(true);
+    }
   }, [initialCode]);
 
-  // Load saved solution when data is available
   useEffect(() => {
-    if (solutions && solutions.length > 0) {
+    if (solutions && solutions.length > 0 && !codeOverridden) {
       const savedSolution = solutions.find(
         (s) => s.supportedLanguage.language === language
       );
@@ -290,40 +283,36 @@ export const CodeEditor = ({
         setCode(savedSolution.sourceCode);
       }
     }
-  }, [solutions, language]);
+  }, [solutions, language, codeOverridden]);
 
-  // Handle code changes
   const handleCodeChange = useCallback(
     (value: string | undefined) => {
       const newCode = value || '';
       setCode(newCode);
+      setCodeOverridden(false);
       onCodeChange?.(newCode);
     },
     [onCodeChange]
   );
 
-  // Handle language change
   const handleLanguageChange = useCallback(
     (newLanguage: string) => {
       setLanguage(newLanguage);
 
-      // Try to load saved solution for the new language
-      if (solutions) {
+      if (solutions && !codeOverridden) {
         const savedSolution = solutions.find(
           (s) => s.supportedLanguage.language === newLanguage
         );
         if (savedSolution) {
           setCode(savedSolution.sourceCode);
         } else {
-          // Set default code template for the language
           setCode(getDefaultCodeTemplate(newLanguage));
         }
       }
     },
-    [solutions]
+    [solutions, codeOverridden]
   );
 
-  // Execute code
   const handleExecuteCode = useCallback(() => {
     if (!code.trim()) return;
 
@@ -337,7 +326,6 @@ export const CodeEditor = ({
     executeCodeMutation.mutate(request);
   }, [code, language, stdin, blockId, executeCodeMutation]);
 
-  // Save solution
   const handleSaveSolution = useCallback(() => {
     if (!blockId || !code.trim()) return;
 
@@ -349,7 +337,6 @@ export const CodeEditor = ({
     });
   }, [blockId, language, code, saveSolutionMutation]);
 
-  // Monaco editor configuration
   const monacoTheme = theme === 'dark' ? 'vs-dark' : 'vs-light';
 
   const editorOptions: editor.IStandaloneEditorConstructionOptions = {
@@ -386,7 +373,6 @@ export const CodeEditor = ({
 
   return (
     <div className={`${styles.codeEditorContainer} ${className}`}>
-      {/* Editor Toolbar */}
       <div className={styles.editorToolbar}>
         <div className={styles.toolbarLeft}>
           <LanguageSelector
@@ -433,7 +419,6 @@ export const CodeEditor = ({
         </div>
       </div>
 
-      {/* Settings Panel */}
       {showSettings && (
         <div className={styles.settingsPanel}>
           <div className={styles.settingGroup}>
@@ -450,7 +435,6 @@ export const CodeEditor = ({
         </div>
       )}
 
-      {/* Monaco Editor */}
       <div className={styles.editorWrapper}>
         <Editor
           height={editorHeight}
@@ -466,7 +450,6 @@ export const CodeEditor = ({
         />
       </div>
 
-      {/* Execution Results */}
       {(isExecuting || executeCodeMutation.isPending || currentExecution) && (
         <CodeExecutionPanel
           execution={currentExecution}
@@ -478,7 +461,6 @@ export const CodeEditor = ({
   );
 };
 
-// Helper functions
 function getMonacoLanguage(language: string): string {
   const languageMap: Record<string, string> = {
     PYTHON: 'python',

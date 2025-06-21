@@ -5,6 +5,8 @@ import {
 } from '@/entities/ContentBlock';
 import { ButtonVariant } from '@/shared/components/Button/model/types';
 import { Button } from '@/shared/components/Button/ui/Button';
+import { Modal } from '@/shared/components/Modal';
+import { SubscriptionPrompt } from '@/shared/components/SubscriptionPrompt';
 import {
   translateMainCategory,
   translateSubCategory,
@@ -14,6 +16,7 @@ import {
   useCompanies,
   useContentCategories,
 } from '@/shared/hooks/useContentBlocks';
+import { useRole } from '@/shared/hooks/useRole';
 import { ChevronDown, ChevronUp, X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import styles from './ContentFilters.module.scss';
@@ -35,17 +38,17 @@ export const ContentFilters = ({
   const dispatch = useAppDispatch();
   const filters = useAppSelector(selectContentBlocksFilters);
   const { data: categories } = useContentCategories();
+  const { canUseFilters } = useRole();
 
-  // Состояние для развертывания секций фильтров
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+
   const [expandedSections, setExpandedSections] = useState({
     topics: true,
     companies: true,
-    difficulty: true,
     importance: true,
     progress: true,
   });
 
-  // Hook для отслеживания размера экрана
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -59,7 +62,6 @@ export const ContentFilters = ({
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
-  // Автоматически сворачиваем некоторые секции на мобильных для экономии места
   useEffect(() => {
     if (isMobile) {
       setExpandedSections((prev) => ({
@@ -71,20 +73,17 @@ export const ContentFilters = ({
       setExpandedSections({
         topics: true,
         companies: true,
-        difficulty: true,
         importance: true,
         progress: true,
       });
     }
   }, [isMobile]);
 
-  // Получаем компании с учетом текущих фильтров по категориям
   const { data: companies } = useCompanies({
     mainCategories: filters.mainCategories,
     subCategories: filters.subCategories,
   });
 
-  // Обработка множественного выбора категорий
   const handleMainCategoryToggle = useCallback(
     (categoryName: string, checked: boolean) => {
       const currentCategories = filters.mainCategories || [];
@@ -99,8 +98,8 @@ export const ContentFilters = ({
       const newFilters = {
         ...filters,
         mainCategories: newCategories.length > 0 ? newCategories : undefined,
-        subCategories: undefined, // Сбрасываем подкатегории при изменении основных
-        page: 1, // Сбрасываем страницу
+        subCategories: undefined,
+        page: 1,
       };
 
       dispatch(setFilters(newFilters));
@@ -109,7 +108,6 @@ export const ContentFilters = ({
     [dispatch, filters, onFiltersChange]
   );
 
-  // Обработка множественного выбора подкатегорий
   const handleSubCategoryToggle = useCallback(
     (subCategoryName: string, checked: boolean) => {
       const currentSubCategories = filters.subCategories || [];
@@ -127,7 +125,7 @@ export const ContentFilters = ({
         ...filters,
         subCategories:
           newSubCategories.length > 0 ? newSubCategories : undefined,
-        page: 1, // Сбрасываем страницу
+        page: 1,
       };
 
       dispatch(setFilters(newFilters));
@@ -136,9 +134,13 @@ export const ContentFilters = ({
     [dispatch, filters, onFiltersChange]
   );
 
-  // Обработка множественного выбора компаний
   const handleCompanyToggle = useCallback(
     (companyName: string, checked: boolean) => {
+      if (!canUseFilters) {
+        setShowSubscriptionModal(true);
+        return;
+      }
+
       const currentCompanies = filters.companies || [];
 
       let newCompanies: string[];
@@ -159,34 +161,9 @@ export const ContentFilters = ({
       dispatch(setFilters(newFilters));
       onFiltersChange?.(newFilters);
     },
-    [dispatch, filters, onFiltersChange]
+    [dispatch, filters, onFiltersChange, canUseFilters]
   );
 
-  // Обработка фильтра сложности
-  const handleDifficultyToggle = useCallback(
-    (difficulty: 'easy' | 'medium' | 'hard', checked: boolean) => {
-      const currentDifficulties = filters.difficulties || [];
-
-      let newDifficulties: ('easy' | 'medium' | 'hard')[];
-      if (checked) {
-        newDifficulties = [...currentDifficulties, difficulty];
-      } else {
-        newDifficulties = currentDifficulties.filter((d) => d !== difficulty);
-      }
-
-      const newFilters = {
-        ...filters,
-        difficulties: newDifficulties.length > 0 ? newDifficulties : undefined,
-        page: 1,
-      };
-
-      dispatch(setFilters(newFilters));
-      onFiltersChange?.(newFilters);
-    },
-    [dispatch, filters, onFiltersChange]
-  );
-
-  // Обработка фильтра важности
   const handleImportanceToggle = useCallback(
     (importance: 'low' | 'medium' | 'high', checked: boolean) => {
       const currentImportance = filters.importance || [];
@@ -210,7 +187,6 @@ export const ContentFilters = ({
     [dispatch, filters, onFiltersChange]
   );
 
-  // Обработка фильтра прогресса
   const handleProgressToggle = useCallback(
     (progress: 'completed' | 'not_completed', checked: boolean) => {
       const currentProgress = filters.progress || [];
@@ -245,7 +221,6 @@ export const ContentFilters = ({
       subCategories: undefined,
       onlyUnsolved: undefined,
       companies: undefined,
-      difficulties: undefined,
       importance: undefined,
       progress: undefined,
     };
@@ -260,7 +235,6 @@ export const ContentFilters = ({
       filters.mainCategories?.length ||
       filters.subCategories?.length ||
       filters.companies?.length ||
-      filters.difficulties?.length ||
       filters.importance?.length ||
       filters.progress?.length
     );
@@ -272,8 +246,7 @@ export const ContentFilters = ({
       [section]: !prev[section],
     }));
   };
-
-  // Получаем все доступные подкатегории на основе выбранных основных категорий
+  
   const getAvailableSubCategories = () => {
     if (!filters.mainCategories?.length || !categories) return [];
 
@@ -294,7 +267,6 @@ export const ContentFilters = ({
 
   return (
     <div className={`${styles.contentFilters} ${className || ''}`}>
-      {/* Reset button */}
       {hasActiveFilters() && (
         <div className={styles.resetSection}>
           <Button
@@ -308,7 +280,6 @@ export const ContentFilters = ({
         </div>
       )}
 
-      {/* Topics Filter */}
       <div className={styles.filterSection}>
         <button
           className={styles.sectionHeader}
@@ -324,7 +295,6 @@ export const ContentFilters = ({
 
         {expandedSections.topics && (
           <div className={styles.sectionContent}>
-            {/* Main Categories */}
             <div className={styles.filterGroup}>
               <label className={styles.filterLabel}>Основные категории</label>
               <div className={styles.checkboxGroup}>
@@ -352,7 +322,6 @@ export const ContentFilters = ({
               </div>
             </div>
 
-            {/* Sub Categories */}
             {filters.mainCategories?.length &&
               filters.mainCategories.length > 0 && (
                 <div className={styles.filterGroup}>
@@ -389,7 +358,6 @@ export const ContentFilters = ({
         )}
       </div>
 
-      {/* Company Filter */}
       <div className={styles.filterSection}>
         <button
           className={styles.sectionHeader}
@@ -427,59 +395,6 @@ export const ContentFilters = ({
         )}
       </div>
 
-      {/* Difficulty Filter */}
-      <div className={styles.filterSection}>
-        <button
-          className={styles.sectionHeader}
-          onClick={() => toggleSection('difficulty')}
-        >
-          <span>Сложность</span>
-          {expandedSections.difficulty ? (
-            <ChevronUp size={16} />
-          ) : (
-            <ChevronDown size={16} />
-          )}
-        </button>
-
-        {expandedSections.difficulty && (
-          <div className={styles.sectionContent}>
-            <div className={styles.checkboxGroupHorizontal}>
-              <label className={styles.checkboxLabel}>
-                <input
-                  type="checkbox"
-                  checked={filters.difficulties?.includes('easy') || false}
-                  onChange={(e) =>
-                    handleDifficultyToggle('easy', e.target.checked)
-                  }
-                />
-                <span>Легкая</span>
-              </label>
-              <label className={styles.checkboxLabel}>
-                <input
-                  type="checkbox"
-                  checked={filters.difficulties?.includes('medium') || false}
-                  onChange={(e) =>
-                    handleDifficultyToggle('medium', e.target.checked)
-                  }
-                />
-                <span>Средняя</span>
-              </label>
-              <label className={styles.checkboxLabel}>
-                <input
-                  type="checkbox"
-                  checked={filters.difficulties?.includes('hard') || false}
-                  onChange={(e) =>
-                    handleDifficultyToggle('hard', e.target.checked)
-                  }
-                />
-                <span>Сложная</span>
-              </label>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Importance Filter */}
       <div className={styles.filterSection}>
         <button
           className={styles.sectionHeader}
@@ -531,7 +446,6 @@ export const ContentFilters = ({
         )}
       </div>
 
-      {/* Progress Filter */}
       <div className={styles.filterSection}>
         <button
           className={styles.sectionHeader}
@@ -572,6 +486,18 @@ export const ContentFilters = ({
           </div>
         )}
       </div>
+
+      <Modal
+        isOpen={showSubscriptionModal}
+        onClose={() => setShowSubscriptionModal(false)}
+        closeOnOverlay={true}
+        closeOnEsc={true}
+      >
+        <SubscriptionPrompt
+          feature="Фильтр по компаниям"
+          description="Фильтрация задач по компаниям доступна только пользователям с подпиской Нарешка+ или администраторам"
+        />
+      </Modal>
     </div>
   );
 };

@@ -6,6 +6,19 @@
   gap: 8px;
 }
 
+.animateSpin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .default {
   flex-wrap: wrap;
 }
@@ -91,7 +104,6 @@
   width: 100%;
 }
 
-// Стили для гостевых элементов
 .guestCompact {
   background: var(--bg-secondary);
   border-radius: 6px;

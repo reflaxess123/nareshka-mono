@@ -5,7 +5,8 @@ import {
 import { Button } from '@/shared/components/Button/ui/Button';
 import { useRole } from '@/shared/hooks';
 import { useUpdateProgress } from '@/shared/hooks/useContentBlocks';
-import { Check, LogIn, Minus, Plus, X } from 'lucide-react';
+import { Check, Loader2, LogIn, Minus, Plus, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import styles from './ContentProgress.module.scss';
 
 interface ContentProgressProps {
@@ -24,9 +25,22 @@ export const ContentProgress = ({
   const updateProgressMutation = useUpdateProgress();
   const { isGuest } = useRole();
 
+  const [lastKnownCount, setLastKnownCount] = useState(currentCount);
+  const [pendingAction, setPendingAction] = useState<
+    'increment' | 'decrement' | null
+  >(null);
+
+  useEffect(() => {
+    if (!updateProgressMutation.isPending) {
+      setLastKnownCount(currentCount);
+      setPendingAction(null);
+    }
+  }, [currentCount, updateProgressMutation.isPending]);
+
   const handleIncrement = async () => {
     if (updateProgressMutation.isPending) return;
 
+    setPendingAction('increment');
     try {
       await updateProgressMutation.mutateAsync({
         blockId,
@@ -34,12 +48,18 @@ export const ContentProgress = ({
       });
     } catch (error) {
       console.error('Ошибка увеличения прогресса:', error);
+      setPendingAction(null);
     }
   };
 
   const handleDecrement = async () => {
-    if (updateProgressMutation.isPending || currentCount <= 0) return;
+    if (
+      updateProgressMutation.isPending ||
+      (currentCount <= 0 && lastKnownCount <= 0)
+    )
+      return;
 
+    setPendingAction('decrement');
     try {
       await updateProgressMutation.mutateAsync({
         blockId,
@@ -47,8 +67,13 @@ export const ContentProgress = ({
       });
     } catch (error) {
       console.error('Ошибка уменьшения прогресса:', error);
+      setPendingAction(null);
     }
   };
+
+  // Определяем должна ли показываться кнопка "Отменить"
+  const shouldShowCancelButton =
+    currentCount > 0 || lastKnownCount > 0 || pendingAction === 'increment';
 
   // Для гостей показываем приглашение к авторизации
   if (isGuest) {
@@ -105,19 +130,31 @@ export const ContentProgress = ({
           className={`${styles.compactButton} ${styles.increment}`}
           aria-label="Отметить как решено"
         >
-          <Plus size={16} />
+          {updateProgressMutation.isPending && pendingAction === 'increment' ? (
+            <Loader2 size={16} className={styles.animateSpin} />
+          ) : (
+            <Plus size={16} />
+          )}
         </button>
 
-        {currentCount > 0 && (
+        {shouldShowCancelButton && (
           <>
             <span className={styles.count}>{currentCount}</span>
             <button
               onClick={handleDecrement}
-              disabled={updateProgressMutation.isPending}
+              disabled={
+                updateProgressMutation.isPending ||
+                (currentCount <= 0 && lastKnownCount <= 0)
+              }
               className={`${styles.compactButton} ${styles.decrement}`}
               aria-label="Убрать отметку"
             >
-              <Minus size={16} />
+              {updateProgressMutation.isPending &&
+              pendingAction === 'decrement' ? (
+                <Loader2 size={16} className={styles.animateSpin} />
+              ) : (
+                <Minus size={16} />
+              )}
             </button>
           </>
         )}
@@ -141,18 +178,35 @@ export const ContentProgress = ({
             disabled={updateProgressMutation.isPending}
             size={ButtonSize.SM}
             variant={ButtonVariant.PRIMARY}
-            leftIcon={<Check size={16} />}
+            leftIcon={
+              updateProgressMutation.isPending &&
+              pendingAction === 'increment' ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Check size={16} />
+              )
+            }
           >
             Решено
           </Button>
 
-          {currentCount > 0 && (
+          {shouldShowCancelButton && (
             <Button
               onClick={handleDecrement}
-              disabled={updateProgressMutation.isPending}
+              disabled={
+                updateProgressMutation.isPending ||
+                (currentCount <= 0 && lastKnownCount <= 0)
+              }
               size={ButtonSize.SM}
               variant={ButtonVariant.GHOST}
-              leftIcon={<X size={16} />}
+              leftIcon={
+                updateProgressMutation.isPending &&
+                pendingAction === 'decrement' ? (
+                  <Loader2 size={16} className={styles.animateSpin} />
+                ) : (
+                  <X size={16} />
+                )
+              }
             >
               Отменить
             </Button>
@@ -174,18 +228,34 @@ export const ContentProgress = ({
         variant={
           currentCount > 0 ? ButtonVariant.SECONDARY : ButtonVariant.OUTLINED
         }
-        leftIcon={<Check size={16} />}
+        leftIcon={
+          updateProgressMutation.isPending && pendingAction === 'increment' ? (
+            <Loader2 size={16} className={styles.animateSpin} />
+          ) : (
+            <Check size={16} />
+          )
+        }
       >
         {currentCount > 0 ? `Решено (${currentCount})` : 'Решено'}
       </Button>
 
-      {currentCount > 0 && (
+      {shouldShowCancelButton && (
         <Button
           onClick={handleDecrement}
-          disabled={updateProgressMutation.isPending}
+          disabled={
+            updateProgressMutation.isPending ||
+            (currentCount <= 0 && lastKnownCount <= 0)
+          }
           size={ButtonSize.SM}
           variant={ButtonVariant.GHOST}
-          leftIcon={<X size={16} />}
+          leftIcon={
+            updateProgressMutation.isPending &&
+            pendingAction === 'decrement' ? (
+              <Loader2 size={16} className={styles.animateSpin} />
+            ) : (
+              <X size={16} />
+            )
+          }
         >
           Отменить
         </Button>

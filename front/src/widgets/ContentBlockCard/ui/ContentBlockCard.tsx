@@ -1,5 +1,4 @@
 import type { ContentBlock } from '@/entities/ContentBlock';
-import { ContentProgress } from '@/features/ContentProgress';
 import { Button, ButtonVariant } from '@/shared/components/Button';
 import { MarkdownContent } from '@/shared/components/MarkdownContent';
 import { Modal } from '@/shared/components/Modal';
@@ -222,11 +221,6 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
           <div className={styles.header}>
             <h3 className={styles.title}>{block.blockTitle}</h3>
             <div className={styles.headerActions}>
-              <ContentProgress
-                blockId={block.id}
-                currentCount={block.currentUserSolvedCount}
-                variant="compact"
-              />
               {isAdmin && (
                 <button
                   className={styles.editButton}
@@ -244,7 +238,6 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
             <span className={styles.category}>
               {block.file.mainCategory} / {block.file.subCategory}
             </span>
-            <span className={styles.level}>H{block.blockLevel}</span>
           </div>
 
           {block.textContent && (
@@ -270,11 +263,6 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
             <div className={styles.titleRow}>
               <h2 className={styles.title}>{block.blockTitle}</h2>
               <div className={styles.titleActions}>
-                <ContentProgress
-                  blockId={block.id}
-                  currentCount={block.currentUserSolvedCount}
-                  variant={variant === 'detailed' ? 'detailed' : 'default'}
-                />
                 {isAdmin && (
                   <button
                     className={styles.editButton}
@@ -292,8 +280,6 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
               <span className={styles.category}>
                 {block.file.mainCategory} / {block.file.subCategory}
               </span>
-              <span className={styles.level}>Уровень {block.blockLevel}</span>
-              <span className={styles.order}>#{block.orderInFile}</span>
               {block.companies && block.companies.length > 0 && (
                 <div className={styles.companies}>
                   <span className={styles.companiesLabel}>Компании:</span>
@@ -389,23 +375,26 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
             </button>
           )}
 
-          <footer className={styles.footer}>
-            <div className={styles.fileInfo}>
-              <span className={styles.filePath}>{block.file.webdavPath}</span>
-            </div>
+          {isAdmin && (
+            <footer className={styles.footer}>
+              <div className={styles.fileInfo}>
+                <span className={styles.filePath}>{block.file.webdavPath}</span>
+              </div>
 
-            <div className={styles.timestamps}>
-              <time className={styles.timestamp}>
-                Создано: {new Date(block.createdAt).toLocaleDateString('ru-RU')}
-              </time>
-              {block.updatedAt !== block.createdAt && (
+              <div className={styles.timestamps}>
                 <time className={styles.timestamp}>
-                  Обновлено:{' '}
-                  {new Date(block.updatedAt).toLocaleDateString('ru-RU')}
+                  Создано:{' '}
+                  {new Date(block.createdAt).toLocaleDateString('ru-RU')}
                 </time>
-              )}
-            </div>
-          </footer>
+                {block.updatedAt !== block.createdAt && (
+                  <time className={styles.timestamp}>
+                    Обновлено:{' '}
+                    {new Date(block.updatedAt).toLocaleDateString('ru-RU')}
+                  </time>
+                )}
+              </div>
+            </footer>
+          )}
         </article>
 
         {showEditModal &&
