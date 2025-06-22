@@ -4,7 +4,7 @@ import { MarkdownContent } from '@/shared/components/MarkdownContent';
 import { Modal } from '@/shared/components/Modal';
 import { Text } from '@/shared/components/Text';
 import { useRole } from '@/shared/hooks';
-import { codeTemplateGenerator } from '@/shared/utils/codeTemplateGenerator';
+import { CodeTemplateGenerator } from '@/shared/utils/codeTemplateGenerator';
 import {
   Check,
   ChevronDown,
@@ -197,13 +197,16 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
     };
 
     const handleTryInEditor = () => {
-      const templateResult = codeTemplateGenerator.generateTemplate(block);
+      const templateResult = CodeTemplateGenerator.generateTemplate(
+        block.codeContent || '',
+        block.codeLanguage || 'javascript'
+      );
 
       const params = new URLSearchParams({
         blockId: block.id,
-        template: templateResult.template,
-        language: templateResult.language,
-        processed: templateResult.isProcessed.toString(),
+        template: templateResult,
+        language: block.codeLanguage || 'javascript',
+        processed: 'true',
       });
 
       navigate(`/code-editor?${params.toString()}`);
@@ -344,14 +347,14 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
                   variant={ButtonVariant.PRIMARY}
                   className={styles.tryEditorButton}
                   title={
-                    codeTemplateGenerator.isJavaScriptTask(block)
+                    CodeTemplateGenerator.isJavaScriptTask(block)
                       ? 'Попробовать решить в редакторе (будет создана заготовка)'
                       : 'Открыть в редакторе (код будет скопирован как есть)'
                   }
                 >
                   <Terminal size={16} color="var(--text-primary)" />
                   <Text text="Попробовать решить в редакторе" />
-                  {codeTemplateGenerator.isJavaScriptTask(block) && (
+                  {CodeTemplateGenerator.isJavaScriptTask(block) && (
                     <span className={styles.jsLabel}>JS</span>
                   )}
                 </Button>

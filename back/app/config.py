@@ -57,6 +57,16 @@ class Settings(BaseSettings):
         alias="ALLOWED_ORIGINS"
     )
 
+    # OpenAI / ProxyAPI
+    proxyapi_key: str = Field(default="", description="ProxyAPI key for OpenAI")
+
+    # Устанавливаем переменную окружения чтобы ai_test_generator мог её использовать
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        import os
+        if self.proxyapi_key:
+            os.environ["PROXYAPI_KEY"] = self.proxyapi_key
+
     @property
     def allowed_origins(self) -> List[str]:
         """Парсинг allowed_origins из строки"""
@@ -79,3 +89,4 @@ settings = Settings()
 print(f"DEBUG: Database URL loaded: {settings.database_url}")
 print(f"DEBUG: Redis URL loaded: {settings.redis_url}")
 print(f"DEBUG: CORS origins loaded: {settings.allowed_origins}")
+print(f"DEBUG: ProxyAPI key loaded: {'*' * (len(settings.proxyapi_key) - 8) + settings.proxyapi_key[-8:] if settings.proxyapi_key else 'NOT SET'}")

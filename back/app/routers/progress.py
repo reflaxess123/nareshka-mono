@@ -5,6 +5,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import and_, desc, func
 from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.exc import IntegrityError
 
 from ..auth import get_current_user_from_session_required
 from ..database import get_db
@@ -198,7 +199,7 @@ async def record_task_attempt(
     request: Request,
     db: Session = Depends(get_db)
 ):
-    """Записать попытку решения задачи"""
+    """Записать попытку решения задачи с транзакционной безопасностью"""
     
     current_user = get_current_user_from_session_required(request, db)
     
@@ -206,42 +207,51 @@ async def record_task_attempt(
         if current_user.role != "ADMIN":
             raise HTTPException(status_code=403, detail="Can only record attempts for yourself")
     
-    last_attempt = db.query(TaskAttempt).filter(
-        and_(TaskAttempt.userId == attempt_data.userId, TaskAttempt.blockId == attempt_data.blockId)
-    ).order_by(desc(TaskAttempt.attemptNumber)).first()
-    
-    next_attempt_number = (last_attempt.attemptNumber + 1) if last_attempt else 1
-    
-    attempt = TaskAttempt(
-        id=str(uuid.uuid4()),
-        userId=attempt_data.userId,
-        blockId=attempt_data.blockId,
-        sourceCode=attempt_data.sourceCode,
-        language=attempt_data.language,
-        isSuccessful=attempt_data.isSuccessful,
-        attemptNumber=next_attempt_number,
-        executionTimeMs=attempt_data.executionTimeMs,
-        memoryUsedMB=attempt_data.memoryUsedMB,
-        errorMessage=attempt_data.errorMessage,
-        stderr=attempt_data.stderr,
-        durationMinutes=attempt_data.durationMinutes
-    )
-    
-    db.add(attempt)
-    db.flush()
-    
-    if attempt_data.isSuccessful:
-        await _create_or_update_solution(db, attempt_data, next_attempt_number)
+    try:
+        db.begin()
+        
+        last_attempt = db.query(TaskAttempt).filter(
+            and_(TaskAttempt.userId == attempt_data.userId, TaskAttempt.blockId == attempt_data.blockId)
+        ).order_by(desc(TaskAttempt.attemptNumber)).with_for_update().first()
+        
+        next_attempt_number = (last_attempt.attemptNumber + 1) if last_attempt else 1
+        
+        attempt = TaskAttempt(
+            id=str(uuid.uuid4()),
+            userId=attempt_data.userId,
+            blockId=attempt_data.blockId,
+            sourceCode=attempt_data.sourceCode,
+            language=attempt_data.language,
+            isSuccessful=attempt_data.isSuccessful,
+            attemptNumber=next_attempt_number,
+            executionTimeMs=attempt_data.executionTimeMs,
+            memoryUsedMB=attempt_data.memoryUsedMB,
+            errorMessage=attempt_data.errorMessage,
+            stderr=attempt_data.stderr,
+            durationMinutes=attempt_data.durationMinutes
+        )
+        
+        db.add(attempt)
+        db.flush()
+        
+        await _update_category_progress(db, attempt_data.userId, attempt_data.blockId, attempt_data.isSuccessful, next_attempt_number)
+        
+        if attempt_data.isSuccessful:
+            await _create_or_update_solution(db, attempt_data, next_attempt_number)
+        
         await _update_user_stats(db, attempt_data.userId)
-    else:
-        await _update_user_stats(db, attempt_data.userId)
-    
-    await _update_category_progress(db, attempt_data.userId, attempt_data.blockId, attempt_data.isSuccessful)
-    
-    db.commit()
-    db.refresh(attempt)
-    
-    return attempt
+        
+        db.commit()
+        db.refresh(attempt)
+        
+        return attempt
+        
+    except IntegrityError as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=f"Database integrity error: {str(e)}")
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Failed to record attempt: {str(e)}")
 
 
 @router.get("/analytics", response_model=ProgressAnalytics)
@@ -296,7 +306,7 @@ async def _create_or_update_solution(db: Session, attempt_data: TaskAttemptCreat
     
     existing_solution = db.query(TaskSolution).filter(
         and_(TaskSolution.userId == attempt_data.userId, TaskSolution.blockId == attempt_data.blockId)
-    ).first()
+    ).with_for_update().first()
     
     if existing_solution:
         if attempt_number < existing_solution.totalAttempts:
@@ -314,7 +324,8 @@ async def _create_or_update_solution(db: Session, attempt_data: TaskAttemptCreat
             language=attempt_data.language,
             totalAttempts=attempt_number,
             timeToSolveMinutes=attempt_data.durationMinutes or 0,
-            firstAttempt=datetime.now()
+            firstAttempt=datetime.now(),
+            solvedAt=datetime.now()
         )
         db.add(solution)
 
@@ -322,15 +333,15 @@ async def _create_or_update_solution(db: Session, attempt_data: TaskAttemptCreat
 async def _update_user_stats(db: Session, user_id: int):
     """Обновляет общую статистику пользователя"""
     
-    user = db.query(User).filter(User.id == user_id).first()
-    if user:
+    user = db.query(User).filter(User.id == user_id).with_for_update().first()
+    if user:    
         total_solved = db.query(func.count(TaskSolution.id)).filter(TaskSolution.userId == user_id).scalar() or 0
         
         user.totalTasksSolved = total_solved
         user.lastActivityDate = datetime.now()
 
 
-async def _update_category_progress(db: Session, user_id: int, block_id: str, is_successful: bool):
+async def _update_category_progress(db: Session, user_id: int, block_id: str, is_successful: bool, attempt_number: int):
     """Обновляет прогресс пользователя по категории"""
     
     block = db.query(ContentBlock).options(joinedload(ContentBlock.file)).filter(ContentBlock.id == block_id).first()
@@ -346,15 +357,20 @@ async def _update_category_progress(db: Session, user_id: int, block_id: str, is
             UserCategoryProgress.mainCategory == main_category,
             UserCategoryProgress.subCategory == sub_category
         )
-    ).first()
+    ).with_for_update().first()
     
     if not progress:
         total_tasks = db.query(func.count(ContentBlock.id)).join(ContentFile).filter(
             and_(
                 ContentFile.mainCategory == main_category,
-                ContentFile.subCategory == sub_category
+                ContentFile.subCategory == sub_category,
+                ContentBlock.codeContent.isnot(None)
             )
         ).scalar() or 0
+        
+        has_solved_this_task = db.query(TaskSolution).filter(
+            and_(TaskSolution.userId == user_id, TaskSolution.blockId == block_id)
+        ).first() is not None
         
         progress = UserCategoryProgress(
             id=str(uuid.uuid4()),
@@ -364,24 +380,53 @@ async def _update_category_progress(db: Session, user_id: int, block_id: str, is
             totalTasks=total_tasks,
             firstAttempt=datetime.now(),
             attemptedTasks=1,
-            completedTasks=1 if is_successful else 0
+            completedTasks=1 if (is_successful and not has_solved_this_task) else 0
         )
         db.add(progress)
+        
     else:
-        existing_attempts = db.query(func.count(TaskAttempt.id)).filter(
+        
+        previous_attempts_count = db.query(func.count(TaskAttempt.id)).filter(
             and_(TaskAttempt.userId == user_id, TaskAttempt.blockId == block_id)
         ).scalar() or 0
         
-        if existing_attempts == 1:
+        if previous_attempts_count == 1:
             progress.attemptedTasks += 1
-            if is_successful:
+        
+        if is_successful:
+            has_solved_before = db.query(TaskSolution).filter(
+                and_(TaskSolution.userId == user_id, TaskSolution.blockId == block_id)
+            ).first() is not None
+            
+            if not has_solved_before:
                 progress.completedTasks += 1
     
-    progress.lastActivity = datetime.now()
-    
+    progress
     if progress.attemptedTasks > 0:
-        progress.averageAttempts = 1.0
-        progress.successRate = float(progress.completedTasks) / float(progress.attemptedTasks) * 100
+        all_attempts = db.query(TaskAttempt).join(ContentBlock).join(ContentFile).filter(
+            and_(
+                TaskAttempt.userId == user_id,
+                ContentFile.mainCategory == main_category,
+                ContentFile.subCategory == sub_category
+            )
+        ).all()
+        
+        if all_attempts:
+            task_attempts = {}
+            for attempt in all_attempts:
+                task_id = attempt.blockId
+                if task_id not in task_attempts:
+                    task_attempts[task_id] = 0
+                task_attempts[task_id] += 1
+            
+            total_task_attempts = sum(task_attempts.values())
+            unique_tasks_attempted = len(task_attempts.keys())
+            progress.averageAttempts = total_task_attempts / unique_tasks_attempted if unique_tasks_attempted > 0 else 1.0
+            
+            progress.successRate = float(progress.completedTasks) / float(progress.attemptedTasks) * 100
+            
+            total_time = sum([a.durationMinutes for a in all_attempts if a.durationMinutes]) or 0
+            progress.totalTimeSpentMinutes = total_time
 
 
 @router.get("/health")

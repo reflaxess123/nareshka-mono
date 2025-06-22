@@ -434,3 +434,90 @@ class ProgressAnalytics(BaseModel):
     
     class Config:
         from_attributes = True
+
+
+# ========================
+# TEST CASES SCHEMAS
+# ========================
+
+class TestCaseBase(BaseModel):
+    blockId: str
+    name: str
+    description: Optional[str] = None
+    input: str = ""
+    expectedOutput: str
+    isPublic: bool = True
+    difficulty: str = "BASIC"
+    weight: float = 1.0
+    timeoutSeconds: int = 5
+    isActive: bool = True
+    orderIndex: int = 0
+
+
+class TestCaseCreate(TestCaseBase):
+    pass
+
+
+class TestCaseAIGenerate(BaseModel):
+    blockId: str
+    count: int = 3  # Количество тест-кейсов для генерации
+    difficulty: str = "BASIC"
+    includeEdgeCases: bool = True
+    includeErrorCases: bool = False
+
+
+class TestCaseResponse(TestCaseBase):
+    id: str
+    isAIGenerated: bool
+    generationPrompt: Optional[str] = None
+    generatedAt: Optional[datetime] = None
+    generationModel: Optional[str] = None
+    executionCount: int
+    passRate: float
+    createdAt: datetime
+    updatedAt: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class TestValidationResultBase(BaseModel):
+    testCaseId: str
+    attemptId: str
+    passed: bool
+    actualOutput: Optional[str] = None
+    executionTimeMs: Optional[int] = None
+    errorMessage: Optional[str] = None
+    outputMatch: bool = False
+    outputSimilarity: float = 0.0
+
+
+class TestValidationResultCreate(TestValidationResultBase):
+    pass
+
+
+class TestValidationResultResponse(TestValidationResultBase):
+    id: str
+    createdAt: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class TestCasesResponse(BaseModel):
+    blockId: str
+    testCases: List[TestCaseResponse]
+    totalTests: int
+    publicTests: int
+    hiddenTests: int
+    lastGenerated: Optional[datetime] = None
+
+
+class ValidationResult(BaseModel):
+    blockId: str
+    allTestsPassed: bool
+    testsResults: List[TestValidationResultResponse]
+    totalTests: int
+    passedTests: int
+    score: float  # Балл с учетом весов тест-кейсов
+    validatedAt: datetime

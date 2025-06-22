@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MarkdownContent } from '../../shared/components/MarkdownContent';
-import { codeTemplateGenerator } from '../../shared/utils/codeTemplateGenerator';
+import { CodeTemplateGenerator } from '../../shared/utils/codeTemplateGenerator';
 import './TopicTaskModal.scss';
 
 interface Task {
@@ -70,14 +70,16 @@ const TopicTaskModal: React.FC<TopicTaskModalProps> = ({
       const blockData = await response.json();
 
       if (blockData) {
-        const templateResult =
-          codeTemplateGenerator.generateTemplate(blockData);
+        const templateResult = CodeTemplateGenerator.generateTemplate(
+          blockData.codeContent || '',
+          blockData.codeLanguage || 'javascript'
+        );
 
         const params = new URLSearchParams({
           blockId: task.id,
-          template: templateResult.template,
-          language: templateResult.language,
-          processed: templateResult.isProcessed.toString(),
+          template: templateResult,
+          language: blockData.codeLanguage || 'javascript',
+          processed: 'true',
         });
 
         navigate(`/code-editor?${params.toString()}`);

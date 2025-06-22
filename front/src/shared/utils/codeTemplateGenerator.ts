@@ -1,436 +1,206 @@
-export interface TaskTemplateOptions {
-  removeImplementation: boolean;
-  keepComments: boolean;
-  keepExamples: boolean;
-  addTodoComments: boolean;
-}
-
-export interface TemplateResult {
-  template: string;
-  language: string;
-  isProcessed: boolean; // true если была обработка, false если просто скопировано
-}
-
 /**
- * Генератор заготовок кода для задач
- * Улучшен на основе анализа 269 реальных задач
+ * Генератор шаблонов кода для различных языков программирования
+ * Очищает реализации функций/методов, оставляя только сигнатуры
  */
 export class CodeTemplateGenerator {
-  private readonly JS_CATEGORIES = [
-    'JS ТЕОРИЯ',
-    'REACT',
-    'NODE.JS',
-    'TYPESCRIPT',
-    'JS',
-  ];
-
-  private readonly JS_LANGUAGES = ['javascript', 'typescript', 'js', 'ts'];
+  /**
+   * Генерирует шаблон кода на основе исходного кода
+   */
+  static generateTemplate(sourceCode: string, language: string): string {
+    const generator = new CodeTemplateGenerator();
+    return generator.processCode(sourceCode, language);
+  }
 
   /**
-   * Определяет, является ли задача JavaScript-задачей
+   * Проверяет, является ли задача JavaScript/TypeScript
    */
-  isJavaScriptTask(block: {
+  static isJavaScriptTask(block: {
     codeLanguage?: string;
-    file: {
-      mainCategory: string;
-      subCategory: string;
-    };
+    file: { mainCategory: string; subCategory: string };
     codeContent?: string;
   }): boolean {
-    // 1. Проверяем язык кода
+    // Проверяем язык кода
     if (block.codeLanguage) {
       const lang = block.codeLanguage.toLowerCase();
-      if (this.JS_LANGUAGES.includes(lang)) {
-        return true;
-      }
+      return (
+        lang === 'javascript' ||
+        lang === 'js' ||
+        lang === 'typescript' ||
+        lang === 'ts'
+      );
     }
 
-    // 2. Проверяем категории файла
-    const mainCat = block.file.mainCategory?.toUpperCase();
-    const subCat = block.file.subCategory?.toUpperCase();
-
+    // Проверяем категорию
     if (
-      this.JS_CATEGORIES.some(
-        (cat) => mainCat?.includes(cat) || subCat?.includes(cat)
-      )
+      block.file?.mainCategory?.toLowerCase().includes('javascript') ||
+      block.file?.subCategory?.toLowerCase().includes('javascript')
     ) {
       return true;
     }
 
-    // 3. Эвристическая проверка содержимого кода
+    // Проверяем содержимое кода на JS синтаксис
     if (block.codeContent) {
-      return this.detectJavaScriptSyntax(block.codeContent);
+      const jsPatterns = [
+        /function\s+\w+/,
+        /const\s+\w+\s*=/,
+        /let\s+\w+\s*=/,
+        /var\s+\w+\s*=/,
+        /class\s+\w+/,
+        /=>\s*{/,
+        /console\.log/,
+        /require\(/,
+        /import\s+/,
+        /export\s+/,
+      ];
+
+      return jsPatterns.some((pattern) => pattern.test(block.codeContent!));
     }
 
     return false;
   }
 
   /**
-   * Определяет JS синтаксис в коде эвристически
+   * Основной метод обработки кода
    */
-  private detectJavaScriptSyntax(code: string): boolean {
-    const jsPatterns = [
-      /class\s+\w+/,
-      /function\s+\w+\s*\(/,
-      /const\s+\w+\s*=/,
-      /let\s+\w+\s*=/,
-      /=>\s*{/,
-      /console\.log/,
-      /require\(/,
-      /import\s+.*from/,
-      /export\s+(default|const|function|class)/,
-    ];
-
-    return jsPatterns.some((pattern) => pattern.test(code));
-  }
-
-  /**
-   * Генерирует заготовку кода
-   */
-  generateTemplate(block: {
-    codeContent?: string;
-    codeLanguage?: string;
-    file: {
-      mainCategory: string;
-      subCategory: string;
-    };
-  }): TemplateResult {
-    if (!block.codeContent) {
-      return {
-        template: '// Код задачи не найден',
-        language: block.codeLanguage || 'javascript',
-        isProcessed: false,
-      };
+  processCode(sourceCode: string, language: string): string {
+    if (!sourceCode || !sourceCode.trim()) {
+      return this.getDefaultTemplate(language);
     }
 
-    // Определяем, нужна ли обработка
-    if (this.isJavaScriptTask(block)) {
-      return {
-        template: this.processJavaScriptCode(block.codeContent),
-        language: block.codeLanguage || 'javascript',
-        isProcessed: true,
-      };
-    } else {
-      // Для не-JS задач просто копируем код
-      return {
-        template: block.codeContent,
-        language: block.codeLanguage || 'text',
-        isProcessed: false,
-      };
+    try {
+      switch (language.toLowerCase()) {
+        case 'javascript':
+        case 'js':
+          return this.processJavaScript(sourceCode);
+        case 'typescript':
+        case 'ts':
+          return this.processTypeScript(sourceCode);
+        case 'python':
+          return this.processPython(sourceCode);
+        case 'java':
+          return this.processJava(sourceCode);
+        case 'cpp':
+        case 'c++':
+          return this.processCpp(sourceCode);
+        case 'c':
+          return this.processC(sourceCode);
+        default:
+          return sourceCode;
+      }
+    } catch (error) {
+      console.warn(
+        'Template generation failed, returning original code:',
+        error
+      );
+      return sourceCode;
     }
   }
 
-  /**
-   * Обрабатывает JavaScript код и создает заготовку
-   * КАРДИНАЛЬНО УЛУЧШЕН на основе анализа реальных данных
-   */
-  private processJavaScriptCode(code: string): string {
-    // ЭТАП 1: Предварительная очистка и нормализация
-    const cleanedCode = this.preprocessCode(code);
-
-    // ЭТАП 2: Умное разделение на блоки
-    const parts = this.smartSplitCode(cleanedCode);
-
-    // ЭТАП 3: Обработка каждого типа блоков
-    const result: string[] = [];
+  private processJavaScript(code: string): string {
+    let result = code;
 
     // Обрабатываем классы
-    parts.classes.forEach((classCode) => {
-      result.push(this.processClassAdvanced(classCode));
-    });
+    result = this.processClasses(result);
 
     // Обрабатываем функции
-    parts.functions.forEach((funcCode) => {
-      result.push(this.processFunctionAdvanced(funcCode));
-    });
+    result = this.processFunctions(result);
 
-    // Добавляем остальной код (импорты, комментарии)
-    if (parts.other.trim()) {
-      result.push(parts.other.trim());
-    }
-
-    // Добавляем примеры в конце
-    if (parts.examples.length > 0) {
-      result.push('');
-      parts.examples.forEach((example) => {
-        result.push(example.trim());
-      });
-    }
-
-    return result.join('\n\n').trim();
-  }
-
-  /**
-   * НОВЫЙ: Предварительная обработка кода
-   * Решает проблемы с комментариями и сложным синтаксисом
-   */
-  private preprocessCode(code: string): string {
-    let processed = code;
-
-    // 1. Временно заменяем строки и регулярные выражения
-    const stringReplacements = new Map<string, string>();
-    let stringCounter = 0;
-
-    // Заменяем строки в кавычках
-    processed = processed.replace(/"[^"]*"/g, (match) => {
-      const placeholder = `__STRING_${stringCounter++}__`;
-      stringReplacements.set(placeholder, match);
-      return placeholder;
-    });
-
-    // Заменяем строки в одинарных кавычках
-    processed = processed.replace(/'[^']*'/g, (match) => {
-      const placeholder = `__STRING_${stringCounter++}__`;
-      stringReplacements.set(placeholder, match);
-      return placeholder;
-    });
-
-    // Заменяем шаблонные строки
-    processed = processed.replace(/`[^`]*`/g, (match) => {
-      const placeholder = `__TEMPLATE_${stringCounter++}__`;
-      stringReplacements.set(placeholder, match);
-      return placeholder;
-    });
-
-    // Заменяем регулярные выражения
-    processed = processed.replace(/\/[^/\n]+\/[gimuy]*/g, (match) => {
-      const placeholder = `__REGEX_${stringCounter++}__`;
-      stringReplacements.set(placeholder, match);
-      return placeholder;
-    });
-
-    // 2. Обрабатываем комментарии более аккуратно
-    // Удаляем блочные комментарии
-    processed = processed.replace(/\/\*[\s\S]*?\*\//g, '');
-
-    // Обрабатываем строчные комментарии - сохраняем только важные
-    processed = processed.replace(/\/\/.*$/gm, (match) => {
-      const comment = match.toLowerCase();
-      // Сохраняем комментарии с примерами
-      if (
-        comment.includes('пример') ||
-        comment.includes('example') ||
-        comment.includes('использование') ||
-        comment.includes('usage') ||
-        comment.includes('тест') ||
-        comment.includes('test')
-      ) {
-        return match;
-      }
-      // Удаляем остальные комментарии
-      return '';
-    });
-
-    // 3. Восстанавливаем строки и регулярки
-    for (const [placeholder, original] of stringReplacements) {
-      processed = processed.replace(placeholder, original);
-    }
-
-    return processed;
-  }
-
-  /**
-   * НОВЫЙ: Умное разделение кода на блоки
-   * Учитывает сложные случаи из анализа
-   */
-  private smartSplitCode(code: string): {
-    classes: string[];
-    functions: string[];
-    examples: string[];
-    other: string;
-  } {
-    const result = {
-      classes: [] as string[],
-      functions: [] as string[],
-      examples: [] as string[],
-      other: '',
-    };
-
-    const lines = code.split('\n');
-    let currentBlock = '';
-    let blockType: 'class' | 'function' | 'example' | 'other' = 'other';
-    let braceCount = 0;
-    let inExample = false;
-    let skipUntilBraceBalance = false;
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      const trimmed = line.trim();
-
-      // Пропускаем пустые строки в начале блоков
-      if (!trimmed && !currentBlock.trim()) {
-        continue;
-      }
-
-      // Проверяем начало примера
-      if (this.isExampleLineAdvanced(trimmed)) {
-        this.saveCurrentBlock(result, blockType, currentBlock);
-        inExample = true;
-        blockType = 'example';
-        currentBlock = line;
-        continue;
-      }
-
-      // Если в примере, продолжаем до конца файла
-      if (inExample) {
-        currentBlock += '\n' + line;
-        continue;
-      }
-
-      // Проверяем начало класса (улучшенная логика)
-      if (braceCount === 0 && this.isClassStart(trimmed)) {
-        this.saveCurrentBlock(result, blockType, currentBlock);
-        blockType = 'class';
-        currentBlock = line;
-        braceCount = this.countBraces(line).open;
-        skipUntilBraceBalance = braceCount > 0;
-        continue;
-      }
-
-      // Проверяем начало функции (улучшенная логика)
-      if (braceCount === 0 && this.isFunctionStartAdvanced(trimmed)) {
-        this.saveCurrentBlock(result, blockType, currentBlock);
-        blockType = 'function';
-        currentBlock = line;
-        braceCount = this.countBraces(line).open;
-        skipUntilBraceBalance = braceCount > 0;
-        continue;
-      }
-
-      // Добавляем строку к текущему блоку
-      currentBlock += (currentBlock ? '\n' : '') + line;
-
-      // Считаем скобки для классов и функций
-      if (blockType === 'class' || blockType === 'function') {
-        const braces = this.countBraces(line);
-        braceCount += braces.open - braces.close;
-
-        // Если блок закончился
-        if (braceCount <= 0 && skipUntilBraceBalance) {
-          this.saveCurrentBlock(result, blockType, currentBlock);
-          currentBlock = '';
-          blockType = 'other';
-          skipUntilBraceBalance = false;
-        }
-      }
-    }
-
-    // Добавляем последний блок
-    this.saveCurrentBlock(result, blockType, currentBlock);
+    // Обрабатываем стрелочные функции
+    result = this.processArrowFunctions(result);
 
     return result;
   }
 
-  /**
-   * НОВЫЙ: Улучшенное определение примеров
-   */
-  private isExampleLineAdvanced(line: string): boolean {
-    const exampleMarkers = [
-      '// пример',
-      '// example',
-      '// использование',
-      '// usage',
-      '// тест',
-      '// test',
-      'console.log(',
-      'console.error(',
-      'console.warn(',
-    ];
-
-    const lowerLine = line.toLowerCase();
-    return exampleMarkers.some((marker) => lowerLine.includes(marker));
+  private processTypeScript(code: string): string {
+    // TypeScript обрабатывается так же как JavaScript
+    return this.processJavaScript(code);
   }
 
-  /**
-   * НОВЫЙ: Улучшенное определение начала класса
-   */
-  private isClassStart(line: string): boolean {
-    // Учитываем наследование и экспорты
-    return /^(export\s+)?(default\s+)?class\s+\w+(\s+extends\s+\w+)?\s*{?/.test(
-      line
-    );
+  private processPython(code: string): string {
+    const lines = code.split('\n');
+    const result: string[] = [];
+    let inFunction = false;
+    let functionIndent = '';
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+
+      // Определяем начало функции/метода
+      if (line.trim().startsWith('def ')) {
+        inFunction = true;
+        functionIndent = line.match(/^(\s*)/)?.[1] || '';
+        result.push(line);
+        result.push(functionIndent + '    pass');
+        continue;
+      }
+
+      // Проверяем конец функции
+      if (inFunction) {
+        const currentIndent = line.match(/^(\s*)/)?.[1] || '';
+        if (line.trim() && currentIndent.length <= functionIndent.length) {
+          inFunction = false;
+          result.push(line);
+        }
+        continue;
+      }
+
+      // Обычные строки
+      if (!inFunction) {
+        result.push(line);
+      }
+    }
+
+    return result.join('\n');
   }
 
-  /**
-   * НОВЫЙ: Улучшенное определение начала функции
-   */
-  private isFunctionStartAdvanced(line: string): boolean {
-    // Обычные функции
-    if (/^(export\s+)?(default\s+)?function\s+\w+\s*\(/.test(line)) {
-      return true;
-    }
+  private processJava(code: string): string {
+    let result = code;
 
-    // Стрелочные функции с const/let
-    if (/^(const|let|var)\s+\w+\s*=\s*(\([^)]*\)\s*)?=>\s*{?/.test(line)) {
-      return true;
-    }
+    // Обрабатываем методы в классах
+    result = this.processJavaClasses(result);
 
-    // Функции как значения
-    if (/^(const|let|var)\s+\w+\s*=\s*function\s*\(/.test(line)) {
-      return true;
-    }
-
-    // Асинхронные функции
-    if (/^(export\s+)?(default\s+)?async\s+function\s+\w+\s*\(/.test(line)) {
-      return true;
-    }
-
-    return false;
+    return result;
   }
 
-  /**
-   * НОВЫЙ: Точный подсчет скобок
-   */
-  private countBraces(line: string): { open: number; close: number } {
-    // Исключаем скобки в строках и комментариях
-    let cleanLine = line;
+  private processCpp(code: string): string {
+    let result = code;
 
-    // Удаляем строки
-    cleanLine = cleanLine.replace(/"[^"]*"/g, '');
-    cleanLine = cleanLine.replace(/'[^']*'/g, '');
-    cleanLine = cleanLine.replace(/`[^`]*`/g, '');
+    // Обрабатываем функции и методы
+    result = this.processCppFunctions(result);
 
-    // Удаляем комментарии
-    cleanLine = cleanLine.replace(/\/\/.*$/, '');
-    cleanLine = cleanLine.replace(/\/\*.*?\*\//, '');
-
-    const open = (cleanLine.match(/{/g) || []).length;
-    const close = (cleanLine.match(/}/g) || []).length;
-
-    return { open, close };
+    return result;
   }
 
-  /**
-   * НОВЫЙ: Сохранение блока с проверками
-   */
-  private saveCurrentBlock(
-    result: {
-      classes: string[];
-      functions: string[];
-      examples: string[];
-      other: string;
-    },
-    blockType: string,
-    content: string
-  ) {
-    const trimmedContent = content.trim();
-    if (!trimmedContent) return;
-
-    if (blockType === 'other') {
-      result.other += (result.other ? '\n' : '') + trimmedContent;
-    } else if (blockType === 'class') {
-      result.classes.push(trimmedContent);
-    } else if (blockType === 'function') {
-      result.functions.push(trimmedContent);
-    } else if (blockType === 'example') {
-      result.examples.push(trimmedContent);
-    }
+  private processC(code: string): string {
+    return this.processCppFunctions(code);
   }
 
-  /**
-   * НОВЫЙ: Продвинутая обработка классов
-   * Учитывает async методы, геттеры/сеттеры, статические методы
-   */
+  private processClasses(code: string): string {
+    const classRegex = /class\s+\w+(?:\s+extends\s+\w+)?\s*\{[\s\S]*?\}/g;
+
+    return code.replace(classRegex, (classMatch) => {
+      return this.processClassAdvanced(classMatch);
+    });
+  }
+
+  private processFunctions(code: string): string {
+    const functionRegex =
+      /(?:async\s+)?function\s+\w+\s*\([^)]*\)\s*\{[\s\S]*?\}/g;
+
+    return code.replace(functionRegex, (funcMatch) => {
+      return this.processFunctionAdvanced(funcMatch);
+    });
+  }
+
+  private processArrowFunctions(code: string): string {
+    // Простые стрелочные функции
+    const simpleArrowRegex = /(\w+\s*=\s*\([^)]*\)\s*=>\s*)\{[\s\S]*?\}/g;
+
+    return code.replace(simpleArrowRegex, (_, signature) => {
+      return `${signature}{\n  // Implement function\n}`;
+    });
+  }
+
   private processClassAdvanced(classCode: string): string {
     const lines = classCode.split('\n');
     const result: string[] = [];
@@ -440,18 +210,9 @@ export class CodeTemplateGenerator {
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
-      const trimmed = line.trim();
 
-      // Пропускаем пустые строки
-      if (!trimmed) {
-        if (!insideMethod) {
-          result.push(line);
-        }
-        continue;
-      }
-
-      // Если это начало метода (улучшенная логика)
-      if (!insideMethod && this.isMethodStartAdvanced(trimmed)) {
+      // Проверяем начало метода
+      if (this.isMethodDeclaration(line) && !insideMethod) {
         insideMethod = true;
         methodBraceCount = 0;
         methodIndent = line.match(/^(\s*)/)?.[1] || '    ';
@@ -480,7 +241,7 @@ export class CodeTemplateGenerator {
 
         // Если метод закрыт на той же строке (однострочный)
         if (methodBraceCount <= 0 && braces.open > 0 && braces.close > 0) {
-          result.push(methodIndent + '    // TODO: Implement');
+          result.push(methodIndent + '    // Implement');
           insideMethod = false;
         }
         continue;
@@ -493,7 +254,7 @@ export class CodeTemplateGenerator {
 
         // Если метод закончился (закрывающая скобка)
         if (methodBraceCount <= 0 && braces.close > 0) {
-          result.push(methodIndent + '    // TODO: Implement');
+          result.push(methodIndent + '    // Implement');
           result.push(line); // Добавляем закрывающую скобку
           insideMethod = false;
           continue;
@@ -511,55 +272,7 @@ export class CodeTemplateGenerator {
   }
 
   /**
-   * НОВЫЙ: Улучшенное определение начала метода
-   */
-  private isMethodStartAdvanced(line: string): boolean {
-    const trimmed = line.trim();
-
-    // Пропускаем комментарии и пустые строки
-    if (trimmed.startsWith('//') || trimmed.startsWith('/*') || !trimmed) {
-      return false;
-    }
-
-    // Пропускаем объявления полей класса
-    if (/^\w+\s*[=:;]/.test(trimmed)) {
-      return false;
-    }
-
-    // Конструктор
-    if (/^constructor\s*\(/.test(trimmed)) {
-      return true;
-    }
-
-    // Обычные методы (имя + скобки, но не function)
-    if (
-      /^\w+\s*\([^)]*\)\s*{?/.test(trimmed) &&
-      !trimmed.includes('function') &&
-      !trimmed.includes('=')
-    ) {
-      return true;
-    }
-
-    // Асинхронные методы
-    if (/^async\s+\w+\s*\([^)]*\)\s*{?/.test(trimmed)) {
-      return true;
-    }
-
-    // Статические методы
-    if (/^static\s+(async\s+)?\w+\s*\([^)]*\)\s*{?/.test(trimmed)) {
-      return true;
-    }
-
-    // Геттеры и сеттеры
-    if (/^(get|set)\s+\w+\s*\([^)]*\)\s*{?/.test(trimmed)) {
-      return true;
-    }
-
-    return false;
-  }
-
-  /**
-   * НОВЫЙ: Продвинутая обработка функций
+   * Продвинутая обработка функций
    * Учитывает async функции, стрелочные функции, экспорты
    */
   private processFunctionAdvanced(funcCode: string): string {
@@ -569,7 +282,7 @@ export class CodeTemplateGenerator {
     if (lines.length <= 3) {
       const firstLine = lines[0];
       const lastLine = lines[lines.length - 1];
-      return `${firstLine}\n  // TODO: Implement function\n${lastLine}`;
+      return `${firstLine}\n  // Implement function\n${lastLine}`;
     }
 
     // Для сложных функций - более умная обработка
@@ -593,8 +306,8 @@ export class CodeTemplateGenerator {
 
       // Если это последняя строка или функция закончилась
       if (i === lines.length - 1 || (braceCount <= 0 && foundOpenBrace)) {
-        if (!result.some((l) => l.includes('// TODO'))) {
-          result.push('  // TODO: Implement function');
+        if (!result.some((l) => l.includes('// Implement'))) {
+          result.push('  // Implement function');
         }
         result.push(line);
         break;
@@ -605,7 +318,73 @@ export class CodeTemplateGenerator {
 
     return result.join('\n');
   }
-}
 
-// Экспортируем экземпляр для использования
-export const codeTemplateGenerator = new CodeTemplateGenerator();
+  private processJavaClasses(code: string): string {
+    // Упрощенная обработка Java классов
+    const methodRegex =
+      /((?:public|private|protected|static|\s)*\w+\s+\w+\s*\([^)]*\)\s*\{)[\s\S]*?(\})/g;
+
+    return code.replace(methodRegex, (_, opening, closing) => {
+      return `${opening}\n        // Implement method\n    ${closing}`;
+    });
+  }
+
+  private processCppFunctions(code: string): string {
+    // Упрощенная обработка C/C++ функций
+    const functionRegex = /(\w+\s+\w+\s*\([^)]*\)\s*\{)[\s\S]*?(\})/g;
+
+    return code.replace(functionRegex, (_, opening, closing) => {
+      return `${opening}\n    // Implement function\n${closing}`;
+    });
+  }
+
+  private isMethodDeclaration(line: string): boolean {
+    const trimmed = line.trim();
+
+    // JavaScript/TypeScript методы
+    const patterns = [
+      /^\w+\s*\(/, // methodName(
+      /^async\s+\w+\s*\(/, // async methodName(
+      /^static\s+\w+\s*\(/, // static methodName(
+      /^get\s+\w+\s*\(/, // get propertyName(
+      /^set\s+\w+\s*\(/, // set propertyName(
+    ];
+
+    return patterns.some((pattern) => pattern.test(trimmed));
+  }
+
+  private countBraces(line: string): { open: number; close: number } {
+    // Исключаем скобки в строках и комментариях
+    const cleanLine = line
+      .replace(/"[^"]*"/g, '')
+      .replace(/'[^']*'/g, '')
+      .replace(/\/\/.*$/, '');
+
+    const open = (cleanLine.match(/\{/g) || []).length;
+    const close = (cleanLine.match(/\}/g) || []).length;
+
+    return { open, close };
+  }
+
+  private getDefaultTemplate(language: string): string {
+    switch (language.toLowerCase()) {
+      case 'javascript':
+      case 'js':
+        return 'function solution() {\n  // Implement your solution here\n}';
+      case 'typescript':
+      case 'ts':
+        return 'function solution(): any {\n  // Implement your solution here\n}';
+      case 'python':
+        return 'def solution():\n    # Implement your solution here\n    pass';
+      case 'java':
+        return 'public class Solution {\n    public void solution() {\n        // Implement your solution here\n    }\n}';
+      case 'cpp':
+      case 'c++':
+        return '#include <iostream>\n\nint main() {\n    // Implement your solution here\n    return 0;\n}';
+      case 'c':
+        return '#include <stdio.h>\n\nint main() {\n    // Implement your solution here\n    return 0;\n}';
+      default:
+        return '// Implement your solution here';
+    }
+  }
+}

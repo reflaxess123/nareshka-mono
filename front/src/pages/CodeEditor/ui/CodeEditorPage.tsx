@@ -5,7 +5,8 @@ import { CodeEditor } from '@/shared/components/CodeEditor';
 import { MarkdownContent } from '@/shared/components/MarkdownContent';
 import { useRole } from '@/shared/hooks';
 import { contentQueryKeys } from '@/shared/hooks/useContentBlocks';
-import { codeTemplateGenerator } from '@/shared/utils/codeTemplateGenerator';
+import { useProgressTracking } from '@/shared/hooks/useProgressTracking';
+import { CodeTemplateGenerator } from '@/shared/utils/codeTemplateGenerator';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Code, Code2, Eye } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -30,6 +31,10 @@ export const CodeEditorPage = () => {
   const [leftPanelWidth, setLeftPanelWidth] = useState(50);
   const [templateKey, setTemplateKey] = useState(0);
 
+  const { getTestCases } = useProgressTracking({
+    showToasts: true,
+  });
+
   const {
     data: block,
     isLoading,
@@ -48,6 +53,19 @@ export const CodeEditorPage = () => {
     enabled: !!blockId,
   });
 
+  useEffect(() => {
+    if (blockId && block && block.codeContent) {
+      console.log(
+        '🤖 Автоматически запускаем генерацию тест-кейсов для задачи:',
+        blockId
+      );
+
+      // ✅ УБРАНО: уведомление о генерации тест-кейсов
+      // Тихо загружаем тест-кейсы в фоне без уведомлений
+      getTestCases(blockId);
+    }
+  }, [blockId, block?.id, getTestCases]); // ✅ УБРАЛИ showInfoMessage из зависимостей
+
   const determineLanguageFromBlock = (block: {
     codeLanguage?: string;
     file: {
@@ -56,7 +74,7 @@ export const CodeEditorPage = () => {
     };
     codeContent?: string;
   }): string => {
-    const isJSTask = codeTemplateGenerator.isJavaScriptTask(block);
+    const isJSTask = CodeTemplateGenerator.isJavaScriptTask(block);
 
     if (isJSTask) {
       const codeLanguage = block.codeLanguage?.toLowerCase();
@@ -111,10 +129,13 @@ export const CodeEditorPage = () => {
 
     if (blockId && !isLoading) {
       if (block && block.codeContent) {
-        const templateResult = codeTemplateGenerator.generateTemplate(block);
+        const templateResult = CodeTemplateGenerator.generateTemplate(
+          block.codeContent || '',
+          block.codeLanguage || 'javascript'
+        );
         const detectedLanguage = determineLanguageFromBlock(block);
 
-        setInitialCode(templateResult.template);
+        setInitialCode(templateResult);
         setLanguage(detectedLanguage as 'JAVASCRIPT' | 'TYPESCRIPT' | 'PYTHON');
       }
       return;
@@ -170,20 +191,20 @@ for (let i = 0; i < 10; i++) {
 
   const handleGenerateTemplate = () => {
     if (block) {
-      const templateResult = codeTemplateGenerator.generateTemplate(block);
+      const templateResult = CodeTemplateGenerator.generateTemplate(
+        block.codeContent || '',
+        block.codeLanguage || 'javascript'
+      );
       const detectedLanguage = determineLanguageFromBlock(block);
 
-      setInitialCode(templateResult.template);
+      setInitialCode(templateResult);
       setLanguage(detectedLanguage as 'JAVASCRIPT' | 'TYPESCRIPT' | 'PYTHON');
       setTemplateKey((prev) => prev + 1);
 
       const newSearchParams = new URLSearchParams(searchParams);
-      newSearchParams.set(
-        'template',
-        encodeURIComponent(templateResult.template)
-      );
+      newSearchParams.set('template', encodeURIComponent(templateResult));
       newSearchParams.set('language', detectedLanguage);
-      newSearchParams.set('processed', templateResult.isProcessed.toString());
+      newSearchParams.set('processed', 'true');
       navigate(`?${newSearchParams.toString()}`, { replace: true });
     }
   };
@@ -219,7 +240,7 @@ for (let i = 0; i < 10; i++) {
 
   const isTaskMode = !!blockId;
   const isJSTask = block
-    ? codeTemplateGenerator.isJavaScriptTask(block)
+    ? CodeTemplateGenerator.isJavaScriptTask(block)
     : false;
 
   if (isTaskMode && isLoading) {
@@ -332,6 +353,8 @@ for (let i = 0; i < 10; i++) {
               {block?.textContent && (
                 <MarkdownContent content={block.textContent} />
               )}
+
+              {/* ✅ УБРАНО: блок AI тест-кейсов */}
             </div>
           ) : (
             <div className="panel-content">
@@ -342,6 +365,8 @@ for (let i = 0; i < 10; i++) {
                   решать задачи по программированию и улучшать свои навыки.
                 </p>
               </div>
+
+              {/* ✅ УБРАНО: блок AI тест-кейсов */}
             </div>
           )}
         </div>

@@ -7,6 +7,7 @@ import {
   Play,
   Save,
   Settings,
+  TestTube,
   XCircle,
 } from 'lucide-react';
 import type { editor } from 'monaco-editor';
@@ -18,6 +19,7 @@ import type {
 } from '@/shared/api/code-editor';
 import { codeEditorApi, codeEditorKeys } from '@/shared/api/code-editor';
 import { useTheme } from '@/shared/context';
+import { useProgressTracking } from '@/shared/hooks/useProgressTracking';
 import styles from './CodeEditor.module.scss';
 
 export interface CodeEditorProps {
@@ -217,12 +219,17 @@ export const CodeEditor = ({
   const [stdin, setStdin] = useState('');
   const [currentExecution, setCurrentExecution] =
     useState<CodeExecutionResponse>();
+  const [validationResult, setValidationResult] = useState<any>();
   const [isExecuting, setIsExecuting] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [codeOverridden, setCodeOverridden] = useState(false);
 
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const queryClient = useQueryClient();
+
+  const { validateSolution, isValidating } = useProgressTracking({
+    showToasts: true,
+  });
 
   const { data: solutions } = useQuery({
     queryKey: codeEditorKeys.blockSolutions(blockId || ''),
@@ -337,6 +344,30 @@ export const CodeEditor = ({
     });
   }, [blockId, language, code, saveSolutionMutation]);
 
+  const handleValidateSolution = useCallback(() => {
+    if (!blockId || !code.trim()) return;
+
+    validateSolution(
+      {
+        blockId,
+        sourceCode: code,
+        language,
+      },
+      {
+        onSuccess: (result) => {
+          setValidationResult(result);
+        },
+        onError: (error) => {
+          console.error('❌ Validation failed:', error);
+          setValidationResult({
+            error: 'Validation failed: ' + error.message,
+            allTestsPassed: false,
+          });
+        },
+      }
+    );
+  }, [blockId, code, language, validateSolution]);
+
   const monacoTheme = theme === 'dark' ? 'vs-dark' : 'vs-light';
 
   const editorOptions: editor.IStandaloneEditorConstructionOptions = {
@@ -409,6 +440,21 @@ export const CodeEditor = ({
             )}
           </button>
 
+          {blockId && (
+            <button
+              onClick={handleValidateSolution}
+              disabled={isValidating || !code.trim()}
+              className={`${styles.toolbarButton} ${styles.validateButton}`}
+              title="Validate Solution Against Test Cases"
+            >
+              {isValidating ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <TestTube className="w-4 h-4" />
+              )}
+            </button>
+          )}
+
           <button
             onClick={() => setShowSettings(!showSettings)}
             className={`${styles.toolbarButton} ${styles.settingsButton}`}
@@ -456,6 +502,84 @@ export const CodeEditor = ({
           isLoading={isExecuting || executeCodeMutation.isPending}
           onClear={() => setCurrentExecution(undefined)}
         />
+      )}
+
+      {validationResult && (
+        <div className={styles.validationPanel}>
+          <div className={styles.validationHeader}>
+            <div className={styles.validationStatus}>
+              {validationResult.allTestsPassed ? (
+                <CheckCircle className="w-4 h-4 text-green-500" />
+              ) : (
+                <XCircle className="w-4 h-4 text-red-500" />
+              )}
+              <span>
+                {validationResult.allTestsPassed
+                  ? `✅ All tests passed! (${validationResult.passedTests || 0}/${validationResult.totalTests || 0})`
+                  : `❌ Tests failed: ${validationResult.passedTests || 0}/${validationResult.totalTests || 0}`}
+              </span>
+            </div>
+            <button
+              onClick={() => setValidationResult(undefined)}
+              className={styles.clearButton}
+            >
+              Clear
+            </button>
+          </div>
+
+          {validationResult.error && (
+            <div className={styles.validationError}>
+              <h4>Error:</h4>
+              <p>{validationResult.error}</p>
+            </div>
+          )}
+
+          {validationResult.testsResults && (
+            <div className={styles.testResults}>
+              <h4>Test Results:</h4>
+              {validationResult.testsResults.map((test: any, index: number) => (
+                <div
+                  key={test.testCaseId || index}
+                  className={`${styles.testResult} ${
+                    test.passed ? styles.testPassed : styles.testFailed
+                  }`}
+                >
+                  <div className={styles.testName}>
+                    {test.passed ? '✅' : '❌'}{' '}
+                    {test.testName || `Test ${index + 1}`}
+                  </div>
+                  {test.isPublic && (
+                    <div className={styles.testDetails}>
+                      {test.input && (
+                        <div>
+                          <strong>Input:</strong> {test.input}
+                        </div>
+                      )}
+                      <div>
+                        <strong>Expected:</strong> {test.expectedOutput}
+                      </div>
+                      {test.actualOutput && (
+                        <div>
+                          <strong>Actual:</strong> {test.actualOutput}
+                        </div>
+                      )}
+                      {test.error && (
+                        <div className={styles.testError}>
+                          <strong>Error:</strong> {test.error}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {!test.isPublic && (
+                    <div className={styles.testDetails}>
+                      <em>Hidden test case</em>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       )}
     </div>
   );

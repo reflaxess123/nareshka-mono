@@ -25,6 +25,7 @@ httpx = "*"
 psycopg2-binary = "^2.9.10"
 email-validator = "^2.2.0"
 docker = "^7.1.0"
+aiohttp = ">=3.8.0,<3.10.0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.6.0"
