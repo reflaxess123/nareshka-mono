@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from app.auth import get_current_user_from_session
 from app.config import settings
 from app.database import get_db
-from app.routers import admin, auth, code_editor, content, mindmap, stats, theory, tasks
+from app.routers import admin, auth, code_editor, content, mindmap, progress, stats, theory, tasks
 
 app = FastAPI(
     title="Nareshka Learning Platform API",
@@ -33,6 +33,7 @@ app.include_router(stats.router)
 app.include_router(admin.router)
 app.include_router(code_editor.router)
 app.include_router(mindmap.router)
+app.include_router(progress.router)
 
 @app.get("/")
 async def root():

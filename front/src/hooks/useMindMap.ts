@@ -1,8 +1,9 @@
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 import type {
   TopicMindMapData,
   TopicMindMapFilters,
-  TopicMindMapResponse,
 } from '../types/newMindmap';
 
 interface UseMindMapResult {
@@ -17,66 +18,49 @@ interface UseMindMapResult {
 export const useMindMap = (
   initialFilters?: Partial<TopicMindMapFilters>
 ): UseMindMapResult => {
-  const [data, setData] = useState<TopicMindMapData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<TopicMindMapFilters>({
     structure_type: 'topics',
     ...initialFilters,
   });
 
-  const fetchMindMapData = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  const query = useQuery<TopicMindMapData>({
+    queryKey: ['mindmap', filters],
+    queryFn: async () => {
+      try {
+        const searchParams = new URLSearchParams();
 
-      // Строим URL с параметрами
-      const params = new URLSearchParams();
+        if (filters.structure_type) {
+          searchParams.append('structure_type', filters.structure_type);
+        }
+        if (filters.difficulty_filter) {
+          searchParams.append('difficulty_filter', filters.difficulty_filter);
+        }
+        if (filters.topic_filter) {
+          searchParams.append('topic_filter', filters.topic_filter);
+        }
 
-      if (filters.structure_type) {
-        params.append('structure_type', filters.structure_type);
+        const url = `/api/mindmap/generate?${searchParams.toString()}`;
+
+        const response = await axios.get(url);
+
+        if (response.data?.error) {
+          throw new Error(response.data.error);
+        }
+
+        return response.data;
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          const errorMessage = error.response?.data?.detail || error.message;
+          throw new Error(errorMessage);
+        }
+        throw error;
       }
-      if (filters.difficulty_filter) {
-        params.append('difficulty_filter', filters.difficulty_filter);
-      }
-      if (filters.topic_filter) {
-        params.append('topic_filter', filters.topic_filter);
-      }
-      if (filters.concept_filter) {
-        params.append('concept_filter', filters.concept_filter);
-      }
-
-      const url = `/api/mindmap/generate?${params.toString()}`;
-
-      console.log('🚀 Загружаем MindMap:', { url, filters });
-
-      const response = await fetch(url);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result: TopicMindMapResponse = await response.json();
-
-      if (!result.success) {
-        throw new Error(result.error || 'Неизвестная ошибка');
-      }
-
-      if (!result.data) {
-        throw new Error('Данные не получены');
-      }
-
-      console.log('✅ MindMap загружена:', result.data);
-      setData(result.data);
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Неизвестная ошибка';
-      console.error('❌ Ошибка загрузки MindMap:', errorMessage);
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  }, [filters]);
+    },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    retry: 2,
+    retryDelay: 1000,
+  });
 
   const updateFilters = useCallback(
     (newFilters: Partial<TopicMindMapFilters>) => {
@@ -86,24 +70,23 @@ export const useMindMap = (
   );
 
   const refetch = useCallback(() => {
-    fetchMindMapData();
-  }, [fetchMindMapData]);
+    query.refetch();
+  }, [query.refetch]);
 
   useEffect(() => {
-    fetchMindMapData();
-  }, [fetchMindMapData]);
+    query.refetch();
+  }, [query.refetch]);
 
   return {
-    data,
-    loading,
-    error,
+    data: query.data || null,
+    loading: query.isLoading,
+    error: query.error?.message || null,
     refetch,
     updateFilters,
     filters,
   };
 };
 
-// Дополнительный хук для работы с задачами
 export const useTaskDetails = (taskId: string | null) => {
   const [task, setTask] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -153,4 +136,22 @@ export const useTaskDetails = (taskId: string | null) => {
     error,
     refetch: fetchTask,
   };
+};
+
+export const useTopicTasks = (topicKey: string, difficultyFilter?: string) => {
+  return useQuery({
+    queryKey: ['topic-tasks', topicKey, difficultyFilter],
+    queryFn: async () => {
+      const searchParams = new URLSearchParams();
+      if (difficultyFilter) {
+        searchParams.append('difficulty_filter', difficultyFilter);
+      }
+
+      const url = `/api/mindmap/topic/${topicKey}/tasks?${searchParams.toString()}`;
+      const response = await axios.get(url);
+      return response.data;
+    },
+    enabled: !!topicKey,
+    staleTime: 5 * 60 * 1000,
+  });
 };

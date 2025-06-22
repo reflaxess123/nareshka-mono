@@ -4,10 +4,9 @@ from typing import List, Optional
 
 from pydantic import BaseModel, EmailStr
 
-from .models import CardState, CodeLanguage, ExecutionStatus, UserRole
+from .models import CardState, CodeLanguage, ExecutionStatus, UserRole, ProgressStatus
 
 
-# Схемы для пользователей
 class UserBase(BaseModel):
     email: EmailStr
 
@@ -30,7 +29,6 @@ class UserResponse(UserBase):
         from_attributes = True
 
 
-# Схемы для аутентификации
 class Token(BaseModel):
     access_token: str
     token_type: str
@@ -40,7 +38,6 @@ class TokenData(BaseModel):
     email: Optional[str] = None
 
 
-# Схемы для контента
 class ContentFileBase(BaseModel):
     webdavPath: str
     mainCategory: str
@@ -89,7 +86,6 @@ class ContentBlockResponse(ContentBlockBase):
         from_attributes = True
 
 
-# Схемы для прогресса контента
 class UserContentProgressBase(BaseModel):
     solvedCount: int = 0
 
@@ -110,7 +106,6 @@ class UserContentProgressResponse(UserContentProgressBase):
         from_attributes = True
 
 
-# Схемы для теоретических карточек
 class TheoryCardBase(BaseModel):
     ankiGuid: str
     cardType: str
@@ -136,7 +131,6 @@ class TheoryCardResponse(TheoryCardBase):
         from_attributes = True
 
 
-# Схемы для прогресса теории
 class UserTheoryProgressBase(BaseModel):
     solvedCount: int = 0
     easeFactor: Decimal = Decimal("2.50")
@@ -165,7 +159,6 @@ class UserTheoryProgressResponse(UserTheoryProgressBase):
         from_attributes = True
 
 
-# Схемы для ответов API
 class MessageResponse(BaseModel):
     message: str
 
@@ -174,7 +167,6 @@ class ErrorResponse(BaseModel):
     detail: str
 
 
-# Схемы для статистики
 class UserStatsResponse(BaseModel):
     totalBlocks: int
     completedBlocks: int
@@ -186,7 +178,6 @@ class UserStatsResponse(BaseModel):
         from_attributes = True
 
 
-# Схемы для редактора кода
 class SupportedLanguagePublic(BaseModel):
     id: str
     name: str
@@ -270,3 +261,176 @@ class ExecutionStats(BaseModel):
     successfulExecutions: int
     averageExecutionTime: float
     languageStats: List[LanguageStat]
+
+
+class UserCategoryProgressBase(BaseModel):
+    mainCategory: str
+    subCategory: Optional[str] = None
+    totalTasks: int = 0
+    completedTasks: int = 0
+    attemptedTasks: int = 0
+    averageAttempts: Decimal = Decimal("0.0")
+    totalTimeSpentMinutes: int = 0
+    successRate: Decimal = Decimal("0.0")
+    firstAttempt: Optional[datetime] = None
+    lastActivity: Optional[datetime] = None
+
+
+class UserCategoryProgressCreate(UserCategoryProgressBase):
+    userId: int
+
+
+class UserCategoryProgressResponse(UserCategoryProgressBase):
+    id: str
+    userId: int
+    createdAt: datetime
+    updatedAt: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class TaskAttemptBase(BaseModel):
+    sourceCode: str
+    language: str
+    isSuccessful: bool = False
+    executionTimeMs: Optional[int] = None
+    memoryUsedMB: Optional[float] = None
+    errorMessage: Optional[str] = None
+    stderr: Optional[str] = None
+    durationMinutes: Optional[int] = None
+
+
+class TaskAttemptCreate(TaskAttemptBase):
+    userId: int
+    blockId: str
+
+
+class TaskAttemptResponse(TaskAttemptBase):
+    id: str
+    userId: int
+    blockId: str
+    attemptNumber: int
+    createdAt: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class TaskSolutionBase(BaseModel):
+    finalCode: str
+    language: str
+    totalAttempts: int
+    timeToSolveMinutes: int
+    firstAttempt: datetime
+
+
+class TaskSolutionCreate(TaskSolutionBase):
+    userId: int
+    blockId: str
+
+
+class TaskSolutionResponse(TaskSolutionBase):
+    id: str
+    userId: int
+    blockId: str
+    solvedAt: datetime
+    createdAt: datetime
+    updatedAt: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class LearningPathBase(BaseModel):
+    name: str
+    description: Optional[str] = None
+    blockIds: List[str]
+    prerequisites: List[str] = []
+    difficulty: Optional[str] = None
+    estimatedHours: Optional[int] = None
+    tags: List[str] = []
+    isActive: bool = True
+    orderIndex: int = 0
+
+
+class LearningPathCreate(LearningPathBase):
+    pass
+
+
+class LearningPathResponse(LearningPathBase):
+    id: str
+    createdAt: datetime
+    updatedAt: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class UserPathProgressBase(BaseModel):
+    currentBlockIndex: int = 0
+    completedBlockIds: List[str] = []
+    isCompleted: bool = False
+    startedAt: datetime
+    completedAt: Optional[datetime] = None
+    lastActivity: Optional[datetime] = None
+
+
+class UserPathProgressCreate(UserPathProgressBase):
+    userId: int
+    pathId: str
+
+
+class UserPathProgressResponse(UserPathProgressBase):
+    id: str
+    userId: int
+    pathId: str
+    createdAt: datetime
+    updatedAt: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class CategoryProgressSummary(BaseModel):
+    mainCategory: str
+    subCategory: Optional[str] = None
+    totalTasks: int
+    completedTasks: int
+    attemptedTasks: int
+    completionRate: float
+    averageAttempts: float
+    totalTimeSpent: int
+    lastActivity: Optional[datetime]
+    status: str
+
+
+class UserDetailedProgressResponse(BaseModel):
+    userId: int
+    totalTasksSolved: int
+    lastActivityDate: Optional[datetime]
+    
+    overallStats: dict
+    
+    categoryProgress: List[CategoryProgressSummary]
+    
+    recentAttempts: List[TaskAttemptResponse]
+    
+    recentSolutions: List[TaskSolutionResponse]
+    
+    learningPaths: List[UserPathProgressResponse]
+
+    class Config:
+        from_attributes = True
+
+
+class ProgressAnalytics(BaseModel):
+    totalUsers: int
+    activeUsers: int  
+    totalTasksSolved: int
+    averageTasksPerUser: float
+    mostPopularCategories: List[dict]
+    strugglingAreas: List[dict]
+    
+    class Config:
+        from_attributes = True

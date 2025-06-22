@@ -3,6 +3,7 @@ import { Button } from '@/shared/components/Button/ui/Button';
 import { PageWrapper } from '@/shared/components/PageWrapper/ui/PageWrapper';
 import { Text, TextSize } from '@/shared/components/Text';
 import { useDetailedStats } from '@/shared/hooks/useAdminAPI';
+import { ProgressAnalyticsDashboard } from '@/widgets/ProgressAnalyticsDashboard';
 import { BarChart3, FileText, Target, TrendingUp, Users } from 'lucide-react';
 import styles from './DetailedStats.module.scss';
 
@@ -38,10 +39,7 @@ export const DetailedStats = () => {
         <div className={styles.detailedStats}>
           <div className={styles.loading}>
             <BarChart3 size={48} className={styles.loadingIcon} />
-            <Text
-              text="📊 Загрузка детальной статистики..."
-              size={TextSize.LG}
-            />
+            <Text text="Загрузка детальной статистики..." size={TextSize.LG} />
           </div>
         </div>
       </PageWrapper>
@@ -53,7 +51,7 @@ export const DetailedStats = () => {
       <PageWrapper>
         <div className={styles.detailedStats}>
           <div className={styles.error}>
-            <Text text="❌ Ошибка загрузки" size={TextSize.LG} />
+            <Text text="Ошибка загрузки" size={TextSize.LG} />
             <Text
               text={error instanceof Error ? error.message : 'Нет данных'}
               size={TextSize.MD}
@@ -74,7 +72,7 @@ export const DetailedStats = () => {
           <div className={styles.titleSection}>
             <BarChart3 size={32} className={styles.titleIcon} />
             <div>
-              <Text text="📊 Детальная статистика" size={TextSize.LG} />
+              <Text text="Детальная статистика" size={TextSize.LG} />
               <Text
                 text="Расширенные метрики и аналитика системы"
                 size={TextSize.MD}
@@ -89,23 +87,16 @@ export const DetailedStats = () => {
               variant={ButtonVariant.SECONDARY}
               disabled={loading}
             >
-              🔄 Обновить
+              Обновить
             </Button>
-            <button className={styles.actionButton}>
-              📊 Подробная статистика
-            </button>
-            <button className={styles.actionButton}>
-              👥 Управление пользователями
-            </button>
           </div>
         </div>
 
         <div className={styles.statsGrid}>
-          {/* Пользователи */}
           <div className={styles.statsSection}>
             <div className={styles.sectionHeader}>
               <Users size={24} />
-              <Text text="👥 Пользователи" size={TextSize.LG} />
+              <Text text="Пользователи" size={TextSize.LG} />
             </div>
 
             <div className={styles.metricsGrid}>
@@ -137,11 +128,10 @@ export const DetailedStats = () => {
             </div>
           </div>
 
-          {/* Контент */}
           <div className={styles.statsSection}>
             <div className={styles.sectionHeader}>
               <FileText size={24} />
-              <Text text="📚 Контент" size={TextSize.LG} />
+              <Text text="Контент" size={TextSize.LG} />
             </div>
 
             <div className={styles.metricsGrid}>
@@ -175,11 +165,10 @@ export const DetailedStats = () => {
             </div>
           </div>
 
-          {/* Прогресс */}
           <div className={styles.statsSection}>
             <div className={styles.sectionHeader}>
               <Target size={24} />
-              <Text text="📈 Прогресс" size={TextSize.LG} />
+              <Text text="Прогресс" size={TextSize.LG} />
             </div>
 
             <div className={styles.metricsGrid}>
@@ -207,13 +196,9 @@ export const DetailedStats = () => {
               </div>
             </div>
 
-            {/* Топ активных пользователей */}
             {stats.progress.mostActiveUsers.length > 0 && (
               <div className={styles.topList}>
-                <Text
-                  text="🏆 Самые активные пользователи"
-                  size={TextSize.MD}
-                />
+                <Text text="Самые активные пользователи" size={TextSize.MD} />
                 <div className={styles.topItems}>
                   {stats.progress.mostActiveUsers
                     .slice(0, 5)
@@ -231,11 +216,10 @@ export const DetailedStats = () => {
             )}
           </div>
 
-          {/* Система */}
           <div className={styles.statsSection}>
             <div className={styles.sectionHeader}>
               <TrendingUp size={24} />
-              <Text text="⚙️ Система" size={TextSize.LG} />
+              <Text text="Система" size={TextSize.LG} />
             </div>
 
             <div className={styles.metricsGrid}>
@@ -269,12 +253,11 @@ export const DetailedStats = () => {
             </div>
           </div>
 
-          {/* Топ категории */}
           {stats.progress.topCategories.length > 0 && (
             <div className={styles.statsSection}>
               <div className={styles.sectionHeader}>
                 <Target size={24} />
-                <Text text="📂 Популярные категории" size={TextSize.LG} />
+                <Text text="Популярные категории" size={TextSize.LG} />
               </div>
 
               <div className={styles.topList}>
@@ -296,6 +279,10 @@ export const DetailedStats = () => {
               </div>
             </div>
           )}
+        </div>
+
+        <div className={styles.progressAnalyticsSection}>
+          <ProgressAnalyticsDashboard autoRefresh={true} />
         </div>
       </div>
     </PageWrapper>

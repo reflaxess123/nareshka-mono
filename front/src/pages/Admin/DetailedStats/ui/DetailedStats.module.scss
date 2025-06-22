@@ -225,3 +225,12 @@
   border-radius: var(--radius-sm);
   flex-shrink: 0;
 }
+
+.progressAnalyticsSection {
+  margin-top: var(--space-6);
+  grid-column: 1 / -1;
+
+  @include mobile {
+    margin-top: var(--space-4);
+  }
+}

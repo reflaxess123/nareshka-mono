@@ -10,6 +10,7 @@ from sqlalchemy import (
     Column,
     DateTime,
     Enum as SQLEnum,
+    Float,
     ForeignKey,
     Index,
     Integer,
@@ -35,6 +36,13 @@ class CardState(str, Enum):
     RELEARNING = "RELEARNING"
 
 
+class ProgressStatus(str, Enum):
+    NOT_STARTED = "NOT_STARTED"
+    IN_PROGRESS = "IN_PROGRESS"
+    COMPLETED = "COMPLETED"
+    STRUGGLING = "STRUGGLING"
+
+
 class User(Base):
     __tablename__ = "User"
 
@@ -45,9 +53,15 @@ class User(Base):
     createdAt = Column(DateTime, default=func.now(), nullable=False)
     updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
 
-    # Связи
+    totalTasksSolved = Column(Integer, default=0, server_default="0", nullable=False)
+    lastActivityDate = Column(DateTime, nullable=True)
+
     progress = relationship("UserContentProgress", back_populates="user")
     theoryProgress = relationship("UserTheoryProgress", back_populates="user")
+    categoryProgress = relationship("UserCategoryProgress", back_populates="user")
+    taskAttempts = relationship("TaskAttempt", back_populates="user")
+    taskSolutions = relationship("TaskSolution", back_populates="user")
+    pathProgress = relationship("UserPathProgress", back_populates="user")
 
 
 class ContentFile(Base):
@@ -61,7 +75,6 @@ class ContentFile(Base):
     createdAt = Column(DateTime, default=func.now(), nullable=False)
     updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
 
-    # Связи
     blocks = relationship("ContentBlock", back_populates="file")
 
 
@@ -88,9 +101,10 @@ class ContentBlock(Base):
     createdAt = Column(DateTime, default=func.now(), nullable=False)
     updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
 
-    # Связи
     file = relationship("ContentFile", back_populates="blocks")
     progressEntries = relationship("UserContentProgress", back_populates="block")
+    taskAttempts = relationship("TaskAttempt", back_populates="block")
+    taskSolutions = relationship("TaskSolution", back_populates="block")
 
     __table_args__ = (Index("idx_contentblock_fileid", "fileId"),)
 
@@ -106,7 +120,6 @@ class UserContentProgress(Base):
     createdAt = Column(DateTime, default=func.now(), nullable=False)
     updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
 
-    # Связи
     user = relationship("User", back_populates="progress")
     block = relationship("ContentBlock", back_populates="progressEntries")
 
@@ -133,7 +146,6 @@ class TheoryCard(Base):
     createdAt = Column(DateTime, default=func.now(), nullable=False)
     updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
 
-    # Связи
     progressEntries = relationship("UserTheoryProgress", back_populates="card")
 
     __table_args__ = (
@@ -149,12 +161,10 @@ class UserTheoryProgress(Base):
     userId = Column(Integer, ForeignKey("User.id", ondelete="CASCADE"), nullable=False)
     cardId = Column(String, ForeignKey("TheoryCard.id", ondelete="CASCADE"), nullable=False)
 
-    # Существующие поля
     solvedCount = Column(Integer, default=0, nullable=False)
 
-    # Поля для интервального повторения
     easeFactor: Decimal = Column(DECIMAL(3, 2), default=2.50, nullable=False)
-    interval = Column(Integer, default=1, nullable=False)  # в днях
+    interval = Column(Integer, default=1, nullable=False)
     dueDate = Column(DateTime)
     reviewCount = Column(Integer, default=0, nullable=False)
     lapseCount = Column(Integer, default=0, nullable=False)
@@ -165,7 +175,6 @@ class UserTheoryProgress(Base):
     createdAt = Column(DateTime, default=func.now(), nullable=False)
     updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
 
-    # Связи
     user = relationship("User", back_populates="theoryProgress")
     card = relationship("TheoryCard", back_populates="progressEntries")
 
@@ -177,7 +186,6 @@ class UserTheoryProgress(Base):
     )
 
 
-# Модели для редактора кода
 class CodeLanguage(str, Enum):
     PYTHON = "PYTHON"
     JAVASCRIPT = "JAVASCRIPT"
@@ -200,7 +208,6 @@ class ExecutionStatus(str, Enum):
     MEMORY_LIMIT = "MEMORY_LIMIT"
 
 
-# Модели для редактора кода
 class SupportedLanguage(Base):
     __tablename__ = "SupportedLanguage"
 
@@ -219,7 +226,6 @@ class SupportedLanguage(Base):
     createdAt = Column(DateTime, default=func.now(), nullable=False)
     updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
 
-    # Связи
     executions = relationship("CodeExecution", back_populates="language")
     solutions = relationship("UserCodeSolution", back_populates="language")
 
@@ -246,7 +252,6 @@ class CodeExecution(Base):
     createdAt = Column(DateTime, default=func.now(), nullable=False)
     completedAt = Column(DateTime)
 
-    # Связи
     user = relationship("User")
     block = relationship("ContentBlock")
     language = relationship("SupportedLanguage", back_populates="executions")
@@ -269,7 +274,6 @@ class UserCodeSolution(Base):
     sourceCode = Column(Text, nullable=False)
     isCompleted = Column(Boolean, default=False, nullable=False)
 
-    # Статистика
     executionCount = Column(Integer, default=0, nullable=False)
     successfulExecutions = Column(Integer, default=0, nullable=False)
     lastExecutionId = Column(String)
@@ -277,7 +281,6 @@ class UserCodeSolution(Base):
     createdAt = Column(DateTime, default=func.now(), nullable=False)
     updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
 
-    # Связи
     user = relationship("User")
     block = relationship("ContentBlock")
     language = relationship("SupportedLanguage", back_populates="solutions")
@@ -286,4 +289,157 @@ class UserCodeSolution(Base):
         Index("idx_usercodesolution_userid", "userId"),
         Index("idx_usercodesolution_blockid", "blockId"),
         Index("idx_usercodesolution_userid_blockid_languageid", "userId", "blockId", "languageId", unique=True),
+    )
+
+
+class UserCategoryProgress(Base):
+    __tablename__ = "UserCategoryProgress"
+
+    id = Column(String, primary_key=True)
+    userId = Column(Integer, ForeignKey("User.id", ondelete="CASCADE"), nullable=False)
+    
+    mainCategory = Column(String, nullable=False)
+    subCategory = Column(String, nullable=True)
+    
+    totalTasks = Column(Integer, default=0, nullable=False)
+    completedTasks = Column(Integer, default=0, nullable=False)
+    attemptedTasks = Column(Integer, default=0, nullable=False)
+    
+    averageAttempts = Column(DECIMAL(4, 2), default=0.0, nullable=False)
+    totalTimeSpentMinutes = Column(Integer, default=0, nullable=False)
+    successRate = Column(DECIMAL(5, 2), default=0.0, nullable=False)
+    
+    firstAttempt = Column(DateTime)
+    lastActivity = Column(DateTime)
+    
+    createdAt = Column(DateTime, default=func.now(), nullable=False)
+    updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
+
+    user = relationship("User", back_populates="categoryProgress")
+
+    __table_args__ = (
+        Index("idx_usercategoryprogress_userid", "userId"),
+        Index("idx_usercategoryprogress_maincategory", "mainCategory"),
+        Index("idx_usercategoryprogress_subcategory", "subCategory"),
+        Index("idx_usercategoryprogress_userid_maincategory_subcategory", "userId", "mainCategory", "subCategory", unique=True),
+        Index("idx_usercategoryprogress_lastactivity", "lastActivity"),
+    )
+
+
+class TaskAttempt(Base):
+    __tablename__ = "TaskAttempt"
+
+    id = Column(String, primary_key=True)
+    userId = Column(Integer, ForeignKey("User.id", ondelete="CASCADE"), nullable=False)
+    blockId = Column(String, ForeignKey("ContentBlock.id", ondelete="CASCADE"), nullable=False)
+    
+    sourceCode = Column(Text, nullable=False)
+    language = Column(String, nullable=False)
+    isSuccessful = Column(Boolean, default=False, nullable=False)
+    attemptNumber = Column(Integer, nullable=False)
+    
+    executionTimeMs = Column(Integer)
+    memoryUsedMB = Column(Float)
+    errorMessage = Column(Text)
+    stderr = Column(Text)
+    
+    durationMinutes = Column(Integer)
+    createdAt = Column(DateTime, default=func.now(), nullable=False)
+
+    user = relationship("User", back_populates="taskAttempts")
+    block = relationship("ContentBlock", back_populates="taskAttempts")
+
+    __table_args__ = (
+        Index("idx_taskattempt_userid", "userId"),
+        Index("idx_taskattempt_blockid", "blockId"),
+        Index("idx_taskattempt_issuccessful", "isSuccessful"),
+        Index("idx_taskattempt_createdat", "createdAt"),
+        Index("idx_taskattempt_userid_blockid", "userId", "blockId"),
+    )
+
+
+class TaskSolution(Base):
+    __tablename__ = "TaskSolution"
+
+    id = Column(String, primary_key=True)
+    userId = Column(Integer, ForeignKey("User.id", ondelete="CASCADE"), nullable=False)
+    blockId = Column(String, ForeignKey("ContentBlock.id", ondelete="CASCADE"), nullable=False)
+    
+    finalCode = Column(Text, nullable=False)
+    language = Column(String, nullable=False)
+    
+    totalAttempts = Column(Integer, nullable=False)
+    timeToSolveMinutes = Column(Integer, nullable=False)
+    
+    firstAttempt = Column(DateTime, nullable=False)
+    solvedAt = Column(DateTime, default=func.now(), nullable=False)
+    
+    createdAt = Column(DateTime, default=func.now(), nullable=False)
+    updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
+
+    user = relationship("User", back_populates="taskSolutions")
+    block = relationship("ContentBlock", back_populates="taskSolutions")
+
+    __table_args__ = (
+        Index("idx_tasksolution_userid", "userId"),
+        Index("idx_tasksolution_blockid", "blockId"),
+        Index("idx_tasksolution_solvedat", "solvedAt"),
+        Index("idx_tasksolution_userid_blockid", "userId", "blockId", unique=True),
+    )
+
+
+class LearningPath(Base):
+    __tablename__ = "LearningPath"
+
+    id = Column(String, primary_key=True)
+    name = Column(String, nullable=False)
+    description = Column(Text)
+    
+    blockIds = Column(ARRAY(String), nullable=False)
+    prerequisites = Column(ARRAY(String), default=[], nullable=False)
+    
+    difficulty = Column(String)
+    estimatedHours = Column(Integer)
+    tags = Column(ARRAY(String), default=[], nullable=False)
+    
+    isActive = Column(Boolean, default=True, nullable=False)
+    orderIndex = Column(Integer, default=0, nullable=False)
+    
+    createdAt = Column(DateTime, default=func.now(), nullable=False)
+    updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
+
+    userProgress = relationship("UserPathProgress", back_populates="path")
+
+    __table_args__ = (
+        Index("idx_learningpath_isactive", "isActive"),
+        Index("idx_learningpath_difficulty", "difficulty"),
+    )
+
+
+class UserPathProgress(Base):
+    __tablename__ = "UserPathProgress"
+
+    id = Column(String, primary_key=True)
+    userId = Column(Integer, ForeignKey("User.id", ondelete="CASCADE"), nullable=False)
+    pathId = Column(String, ForeignKey("LearningPath.id", ondelete="CASCADE"), nullable=False)
+    
+    currentBlockIndex = Column(Integer, default=0, nullable=False)
+    completedBlockIds = Column(ARRAY(String), default=[], nullable=False)
+    isCompleted = Column(Boolean, default=False, nullable=False)
+    
+    startedAt = Column(DateTime, default=func.now(), nullable=False)
+    completedAt = Column(DateTime)
+    lastActivity = Column(DateTime)
+    
+    createdAt = Column(DateTime, default=func.now(), nullable=False)
+    updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
+
+    user = relationship("User", back_populates="pathProgress")
+    path = relationship("LearningPath", back_populates="userProgress")
+
+    __table_args__ = (
+        Index("idx_userpathprogress_userid", "userId"),
+        Index("idx_userpathprogress_pathid", "pathId"),
+        Index("idx_userpathprogress_userid_pathid", "userId", "pathId", unique=True),
+        Index("idx_userpathprogress_lastactivity", "lastActivity"),
     )
