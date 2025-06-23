@@ -213,7 +213,22 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
     };
 
     const shouldShowEditorButton = (): boolean => {
-      return !!(block.codeContent && block.codeContent.trim());
+      if (!block.codeContent || !block.codeContent.trim()) {
+        return false;
+      }
+
+      const language = block.codeLanguage?.toLowerCase();
+      if (
+        language === 'react' ||
+        language === 'jsx' ||
+        language === 'tsx' ||
+        language === 'typescript' ||
+        language === 'ts'
+      ) {
+        return false;
+      }
+
+      return true;
     };
 
     if (variant === 'compact') {

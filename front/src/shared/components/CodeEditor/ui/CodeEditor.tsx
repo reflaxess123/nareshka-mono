@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import type { editor } from 'monaco-editor';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
 
 import type {
   CodeExecutionRequest,
@@ -21,6 +22,29 @@ import { codeEditorApi, codeEditorKeys } from '@/shared/api/code-editor';
 import { useTheme } from '@/shared/context';
 import { useProgressTracking } from '@/shared/hooks/useProgressTracking';
 import styles from './CodeEditor.module.scss';
+
+// Types for validation result
+interface TestResult {
+  testCaseId?: string;
+  testName?: string;
+  passed: boolean;
+  isPublic: boolean;
+  input?: string;
+  expectedOutput?: string;
+  actualOutput?: string;
+  error?: string;
+}
+
+interface ValidationResult {
+  allTestsPassed: boolean;
+  passedTests?: number;
+  totalTests?: number;
+  error?: string;
+  testsResults?: TestResult[];
+}
+
+// Constants for localStorage keys
+const VALIDATION_WARNING_KEY = 'nareshka_validation_warning_shown';
 
 export interface CodeEditorProps {
   blockId?: string;
@@ -219,7 +243,7 @@ export const CodeEditor = ({
   const [stdin, setStdin] = useState('');
   const [currentExecution, setCurrentExecution] =
     useState<CodeExecutionResponse>();
-  const [validationResult, setValidationResult] = useState<any>();
+  const [validationResult, setValidationResult] = useState<ValidationResult>();
   const [isExecuting, setIsExecuting] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [codeOverridden, setCodeOverridden] = useState(false);
@@ -241,7 +265,30 @@ export const CodeEditor = ({
   const saveSolutionMutation = useMutation({
     mutationFn: codeEditorApi.saveSolution,
     onSuccess: () => {
+      // Show success notification
+      toast.success('💾 Решение успешно сохранено!', {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+
+      // Invalidate queries to refresh data
       queryClient.invalidateQueries({ queryKey: codeEditorKeys.solutions() });
+    },
+    onError: (error) => {
+      // Show error notification
+      toast.error('❌ Не удалось сохранить решение', {
+        position: 'top-right',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+      console.error('Save solution error:', error);
     },
   });
 
@@ -283,7 +330,8 @@ export const CodeEditor = ({
 
   useEffect(() => {
     if (solutions && solutions.length > 0 && !codeOverridden) {
-      const savedSolution = solutions.find(
+      const validSolutions = solutions.filter((s) => s && s.supportedLanguage);
+      const savedSolution = validSolutions.find(
         (s) => s.supportedLanguage.language === language
       );
       if (savedSolution) {
@@ -307,7 +355,10 @@ export const CodeEditor = ({
       setLanguage(newLanguage);
 
       if (solutions && !codeOverridden) {
-        const savedSolution = solutions.find(
+        const validSolutions = solutions.filter(
+          (s) => s && s.supportedLanguage
+        );
+        const savedSolution = validSolutions.find(
           (s) => s.supportedLanguage.language === newLanguage
         );
         if (savedSolution) {
@@ -347,6 +398,25 @@ export const CodeEditor = ({
   const handleValidateSolution = useCallback(() => {
     if (!blockId || !code.trim()) return;
 
+    const hasSeenWarning = localStorage.getItem(VALIDATION_WARNING_KEY);
+
+    if (!hasSeenWarning) {
+      // Show warning toast
+      toast.warning(
+        '⚠️ Внимание! Валидация через тест-кейсы — экспериментальная функция и может допускать ошибки.',
+        {
+          position: 'top-center',
+          autoClose: 8000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        }
+      );
+
+      localStorage.setItem(VALIDATION_WARNING_KEY, 'true');
+    }
+
     validateSolution(
       {
         blockId,
@@ -356,6 +426,21 @@ export const CodeEditor = ({
       {
         onSuccess: (result) => {
           setValidationResult(result);
+
+          // Show additional notification for successful solution increment
+          if (result.allTestsPassed) {
+            toast.success(
+              '🎯 Счетчик решений увеличен! Задача засчитана как решенная.',
+              {
+                position: 'top-right',
+                autoClose: 4000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+              }
+            );
+          }
         },
         onError: (error) => {
           console.error('❌ Validation failed:', error);
@@ -537,46 +622,48 @@ export const CodeEditor = ({
           {validationResult.testsResults && (
             <div className={styles.testResults}>
               <h4>Test Results:</h4>
-              {validationResult.testsResults.map((test: any, index: number) => (
-                <div
-                  key={test.testCaseId || index}
-                  className={`${styles.testResult} ${
-                    test.passed ? styles.testPassed : styles.testFailed
-                  }`}
-                >
-                  <div className={styles.testName}>
-                    {test.passed ? '✅' : '❌'}{' '}
-                    {test.testName || `Test ${index + 1}`}
-                  </div>
-                  {test.isPublic && (
-                    <div className={styles.testDetails}>
-                      {test.input && (
+              {validationResult.testsResults.map(
+                (test: TestResult, index: number) => (
+                  <div
+                    key={test.testCaseId || index}
+                    className={`${styles.testResult} ${
+                      test.passed ? styles.testPassed : styles.testFailed
+                    }`}
+                  >
+                    <div className={styles.testName}>
+                      {test.passed ? '✅' : '❌'}{' '}
+                      {test.testName || `Test ${index + 1}`}
+                    </div>
+                    {test.isPublic && (
+                      <div className={styles.testDetails}>
+                        {test.input && (
+                          <div>
+                            <strong>Input:</strong> {test.input}
+                          </div>
+                        )}
                         <div>
-                          <strong>Input:</strong> {test.input}
+                          <strong>Expected:</strong> {test.expectedOutput}
                         </div>
-                      )}
-                      <div>
-                        <strong>Expected:</strong> {test.expectedOutput}
+                        {test.actualOutput && (
+                          <div>
+                            <strong>Actual:</strong> {test.actualOutput}
+                          </div>
+                        )}
+                        {test.error && (
+                          <div className={styles.testError}>
+                            <strong>Error:</strong> {test.error}
+                          </div>
+                        )}
                       </div>
-                      {test.actualOutput && (
-                        <div>
-                          <strong>Actual:</strong> {test.actualOutput}
-                        </div>
-                      )}
-                      {test.error && (
-                        <div className={styles.testError}>
-                          <strong>Error:</strong> {test.error}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                  {!test.isPublic && (
-                    <div className={styles.testDetails}>
-                      <em>Hidden test case</em>
-                    </div>
-                  )}
-                </div>
-              ))}
+                    )}
+                    {!test.isPublic && (
+                      <div className={styles.testDetails}>
+                        <em>Hidden test case</em>
+                      </div>
+                    )}
+                  </div>
+                )
+              )}
             </div>
           )}
         </div>
