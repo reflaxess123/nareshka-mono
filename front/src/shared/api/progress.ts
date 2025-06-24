@@ -1,3 +1,4 @@
+import type { AxiosRequestConfig } from 'axios';
 import { apiInstance } from './base';
 
 export interface LearningPath {
@@ -14,12 +15,25 @@ export interface CategoryProgressSummary {
   subCategory?: string;
   totalTasks: number;
   completedTasks: number;
-  attemptedTasks: number;
   completionRate: number;
-  averageAttempts: number;
-  totalTimeSpent: number;
-  lastActivity?: string;
-  status: 'not_started' | 'in_progress' | 'completed' | 'struggling';
+  status: 'not_started' | 'in_progress' | 'completed';
+}
+
+export interface SubCategoryProgress {
+  subCategory: string;
+  totalTasks: number;
+  completedTasks: number;
+  completionRate: number;
+  status: 'not_started' | 'in_progress' | 'completed';
+}
+
+export interface GroupedCategoryProgress {
+  mainCategory: string;
+  totalTasks: number;
+  completedTasks: number;
+  completionRate: number;
+  status: 'not_started' | 'in_progress' | 'completed';
+  subCategories: SubCategoryProgress[];
 }
 
 export interface TaskAttempt {
@@ -52,20 +66,30 @@ export interface TaskSolution {
   updatedAt: string;
 }
 
+export interface SimplifiedOverallStats {
+  totalTasksSolved: number;
+  totalTasksAvailable: number;
+  completionRate: number;
+}
+
+export interface RecentActivityItem {
+  id: string;
+  blockId: string;
+  blockTitle: string;
+  category: string;
+  subCategory?: string;
+  isSuccessful: boolean;
+  activityType: 'attempt' | 'solution';
+  timestamp: string;
+}
+
 export interface UserDetailedProgress {
   userId: number;
-  totalTasksSolved: number;
   lastActivityDate?: string;
-  overallStats: {
-    totalAttempts: number;
-    successfulAttempts: number;
-    successRate: number;
-    totalTimeSpent: number;
-  };
+  overallStats: SimplifiedOverallStats;
   categoryProgress: CategoryProgressSummary[];
-  recentAttempts: TaskAttempt[];
-  recentSolutions: TaskSolution[];
-  learningPaths: LearningPath[];
+  groupedCategoryProgress: GroupedCategoryProgress[];
+  recentActivity: RecentActivityItem[];
 }
 
 export interface ProgressAnalytics {
@@ -101,14 +125,25 @@ export interface TaskAttemptCreate {
 // API функции
 const progressAPI = {
   // Получить детальный прогресс текущего пользователя
-  async getMyProgress(): Promise<UserDetailedProgress> {
-    const response = await apiInstance.get('/progress/user/my/detailed');
+  async getMyProgress(
+    options?: AxiosRequestConfig
+  ): Promise<UserDetailedProgress> {
+    const response = await apiInstance.get(
+      '/progress/user/my/detailed',
+      options
+    );
     return response.data;
   },
 
   // Получить прогресс конкретного пользователя (для админов)
-  async getUserProgress(userId: number): Promise<UserDetailedProgress> {
-    const response = await apiInstance.get(`/progress/user/${userId}/detailed`);
+  async getUserProgress(
+    userId: number,
+    options?: AxiosRequestConfig
+  ): Promise<UserDetailedProgress> {
+    const response = await apiInstance.get(
+      `/progress/user/${userId}/detailed`,
+      options
+    );
     return response.data;
   },
 

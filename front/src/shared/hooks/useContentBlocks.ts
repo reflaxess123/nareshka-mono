@@ -363,6 +363,9 @@ export const useUpdateProgress = () => {
           return { ...oldBlock, currentUserSolvedCount: data.solvedCount };
         }
       );
+
+      // ИСПРАВЛЕНИЕ: Инвалидируем кэш прогресса для обновления профиля
+      queryClient.invalidateQueries({ queryKey: ['progress'] });
     },
 
     onError: (error, _variables, context) => {

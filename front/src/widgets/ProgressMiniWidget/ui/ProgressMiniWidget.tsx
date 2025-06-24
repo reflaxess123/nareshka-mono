@@ -53,13 +53,7 @@ const ProgressMiniWidget: React.FC<ProgressMiniWidgetProps> = ({
       7 * 24 * 60 * 60 * 1000 // 7 дней
     : false;
 
-  const overallProgress =
-    progressData?.categoryProgress && progressData.categoryProgress.length > 0
-      ? progressData.categoryProgress.reduce(
-          (sum, cat) => sum + cat.completionRate,
-          0
-        ) / progressData.categoryProgress.length
-      : 0;
+  const overallProgress = progressData?.overallStats?.completionRate || 0;
 
   if (loading) {
     return (
@@ -107,10 +101,12 @@ const ProgressMiniWidget: React.FC<ProgressMiniWidgetProps> = ({
         </div>
       </div>
 
-      {/* Основная статистика */}
+      {/* Упрощенная статистика */}
       <div className={styles.stats}>
         <div className={styles.stat}>
-          <div className={styles.value}>{progressData.totalTasksSolved}</div>
+          <div className={styles.value}>
+            {progressData.overallStats.totalTasksSolved}
+          </div>
           <div className={styles.label}>Решено</div>
         </div>
 
@@ -118,21 +114,18 @@ const ProgressMiniWidget: React.FC<ProgressMiniWidgetProps> = ({
 
         <div className={styles.stat}>
           <div className={styles.value}>
-            {Math.round(progressData.overallStats.successRate)}%
+            {progressData.overallStats.totalTasksAvailable}
           </div>
-          <div className={styles.label}>Успех</div>
+          <div className={styles.label}>Всего</div>
         </div>
 
         <div className={styles.divider}></div>
 
         <div className={styles.stat}>
           <div className={styles.value}>
-            {Math.round(
-              progressData.overallStats.totalAttempts /
-                Math.max(progressData.totalTasksSolved, 1)
-            )}
+            {Math.round(progressData.overallStats.completionRate)}%
           </div>
-          <div className={styles.label}>Попыток</div>
+          <div className={styles.label}>Прогресс</div>
         </div>
       </div>
 
@@ -149,11 +142,9 @@ const ProgressMiniWidget: React.FC<ProgressMiniWidgetProps> = ({
           status={
             overallProgress === 100
               ? 'completed'
-              : overallProgress > 60
+              : overallProgress > 20
                 ? 'in_progress'
-                : overallProgress > 20
-                  ? 'struggling'
-                  : 'not_started'
+                : 'not_started'
           }
           size="small"
           showLabel={false}
@@ -164,6 +155,11 @@ const ProgressMiniWidget: React.FC<ProgressMiniWidgetProps> = ({
       {showCategories && progressData.categoryProgress.length > 0 && (
         <div className={styles.categories}>
           {progressData.categoryProgress
+            .filter(
+              (category) =>
+                ['JS', 'React', 'TS'].includes(category.mainCategory) ||
+                ['JavaScript', 'TypeScript'].includes(category.mainCategory)
+            )
             .slice(0, 3)
             .sort((a, b) => b.completionRate - a.completionRate)
             .map((category, index) => (

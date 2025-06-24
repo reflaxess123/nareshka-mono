@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, List
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import and_, desc, func
@@ -16,6 +16,7 @@ from ..models import (
     TaskSolution,
     User,
     UserCategoryProgress,
+    UserContentProgress,
     UserPathProgress,
 )
 from ..schemas import (
@@ -23,10 +24,147 @@ from ..schemas import (
     TaskAttemptResponse,
     UserDetailedProgressResponse,
     CategoryProgressSummary,
-    ProgressAnalytics
+    SimplifiedOverallStats,
+    RecentActivityItem,
+    ProgressAnalytics,
+    GroupedCategoryProgress,
+    SubCategoryProgress
 )
 
 router = APIRouter(prefix="/api/progress", tags=["Progress"])
+
+
+async def get_unified_category_progress(db: Session, user_id: int):
+    """Получает унифицированный прогресс по категориям для ВСЕХ существующих категорий и подкатегорий (по ContentFile)"""
+    # Получаем все уникальные пары (mainCategory, subCategory) из ContentFile
+    all_categories = db.query(
+        ContentFile.mainCategory,
+        ContentFile.subCategory
+    ).filter(
+        ContentFile.mainCategory != 'Test',
+        ContentFile.subCategory != 'Test'
+    ).distinct().all()
+
+    category_summaries = []
+
+    for main_category, sub_category in all_categories:
+        # Общее количество задач в категории (с кодом)
+        total_tasks = db.query(func.count(ContentBlock.id)).join(ContentFile).filter(
+            ContentFile.mainCategory == main_category,
+            ContentFile.subCategory == sub_category,
+            ContentBlock.codeContent.isnot(None)
+        ).scalar() or 0
+
+        # Количество решённых задач (solvedCount > 0)
+        completed_tasks = db.query(func.count(UserContentProgress.id)).filter(
+            UserContentProgress.userId == user_id,
+            UserContentProgress.solvedCount > 0
+        ).join(ContentBlock).join(ContentFile).filter(
+            ContentFile.mainCategory == main_category,
+            ContentFile.subCategory == sub_category
+        ).scalar() or 0
+
+        # Количество задач, с которыми взаимодействовал пользователь
+        attempted_tasks = db.query(func.count(UserContentProgress.id)).filter(
+            UserContentProgress.userId == user_id
+        ).join(ContentBlock).join(ContentFile).filter(
+            ContentFile.mainCategory == main_category,
+            ContentFile.subCategory == sub_category
+        ).scalar() or 0
+
+        # Рассчитываем процент завершения
+        completion_rate = (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0
+
+        # Определяем статус
+        status = "not_started"
+        if completed_tasks > 0:
+            if completion_rate >= 100:
+                status = "completed"
+            else:
+                status = "in_progress"
+        elif attempted_tasks > 0:
+            status = "in_progress"
+
+        # Добавляем ВСЕ категории (даже если нет задач с кодом)
+        category_summaries.append(CategoryProgressSummary(
+            mainCategory=main_category,
+            subCategory=sub_category,
+            totalTasks=total_tasks,
+            completedTasks=completed_tasks,
+            completionRate=float(completion_rate),
+            status=status
+        ))
+
+    return category_summaries
+
+
+async def get_simplified_overall_stats(db: Session, user_id: int):
+    """Получает упрощенную общую статистику на основе UserContentProgress"""
+    
+    # Общее количество доступных задач (исключаем тестовые)
+    total_available = db.query(func.count(ContentBlock.id)).join(ContentFile).filter(
+        and_(
+            ContentFile.mainCategory != 'Test',
+            ContentFile.subCategory != 'Test',
+            ContentBlock.codeContent.isnot(None)  # Только задачи с кодом
+        )
+    ).scalar() or 0
+    
+    # Количество решенных задач пользователем
+    total_solved = db.query(func.count(UserContentProgress.id)).filter(
+        and_(
+            UserContentProgress.userId == user_id,
+            UserContentProgress.solvedCount > 0
+        )
+    ).join(ContentBlock).join(ContentFile).filter(
+        and_(
+            ContentFile.mainCategory != 'Test',
+            ContentFile.subCategory != 'Test'
+        )
+    ).scalar() or 0
+    
+    # Рассчитываем процент завершения
+    completion_rate = (total_solved / total_available * 100) if total_available > 0 else 0
+    
+    return SimplifiedOverallStats(
+        totalTasksSolved=total_solved,
+        totalTasksAvailable=total_available,
+        completionRate=float(completion_rate)
+    )
+
+
+async def get_recent_activity(db: Session, user_id: int, limit: int = 10):
+    """Получает недавнюю активность с названиями задач"""
+    
+    # Получаем недавние попытки с информацией о блоках
+    recent_attempts = db.query(
+        TaskAttempt.id,
+        TaskAttempt.blockId,
+        TaskAttempt.isSuccessful,
+        TaskAttempt.createdAt,
+        ContentBlock.blockTitle,
+        ContentFile.mainCategory,
+        ContentFile.subCategory
+    ).join(ContentBlock, TaskAttempt.blockId == ContentBlock.id).join(
+        ContentFile, ContentBlock.fileId == ContentFile.id
+    ).filter(
+        TaskAttempt.userId == user_id
+    ).order_by(desc(TaskAttempt.createdAt)).limit(limit).all()
+    
+    activity_items = []
+    for attempt in recent_attempts:
+        activity_items.append(RecentActivityItem(
+            id=attempt.id,
+            blockId=attempt.blockId,
+            blockTitle=attempt.blockTitle,
+            category=attempt.mainCategory,
+            subCategory=attempt.subCategory,
+            isSuccessful=attempt.isSuccessful,
+            activityType="attempt",
+            timestamp=attempt.createdAt
+        ))
+    
+    return activity_items
 
 
 @router.get("/user/my/detailed", response_model=UserDetailedProgressResponse)
@@ -44,69 +182,25 @@ async def get_my_detailed_progress(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
-    total_attempts = db.query(func.count(TaskAttempt.id)).filter(TaskAttempt.userId == user_id).scalar() or 0
-    successful_attempts = db.query(func.count(TaskAttempt.id)).filter(
-        and_(TaskAttempt.userId == user_id, TaskAttempt.isSuccessful == True)
-    ).scalar() or 0
+    # Получаем упрощенную общую статистику на основе UserContentProgress
+    overall_stats = await get_simplified_overall_stats(db, user_id)
     
-    overall_stats = {
-        "totalAttempts": total_attempts,
-        "successfulAttempts": successful_attempts,
-        "successRate": (successful_attempts / total_attempts * 100) if total_attempts > 0 else 0,
-        "totalTimeSpent": db.query(func.sum(TaskAttempt.durationMinutes)).filter(TaskAttempt.userId == user_id).scalar() or 0
-    }
+    # Получаем прогресс по категориям
+    category_summaries = await get_unified_category_progress(db, user_id)
     
-    category_progress = db.query(UserCategoryProgress).filter(
-        UserCategoryProgress.userId == user_id
-    ).all()
+    # Группируем категории по основным категориям
+    grouped_categories = group_categories_by_main(category_summaries)
     
-    category_summaries = []
-    for progress in category_progress:
-        completion_rate = (progress.completedTasks / progress.totalTasks * 100) if progress.totalTasks > 0 else 0
-        
-        status = "not_started"
-        if progress.attemptedTasks > 0:
-            if completion_rate >= 90:
-                status = "completed"
-            elif progress.averageAttempts > 3:
-                status = "struggling"
-            else:
-                status = "in_progress"
-        
-        category_summaries.append(CategoryProgressSummary(
-            mainCategory=progress.mainCategory,
-            subCategory=progress.subCategory,
-            totalTasks=progress.totalTasks,
-            completedTasks=progress.completedTasks,
-            attemptedTasks=progress.attemptedTasks,
-            completionRate=float(completion_rate),
-            averageAttempts=float(progress.averageAttempts),
-            totalTimeSpent=progress.totalTimeSpentMinutes,
-            lastActivity=progress.lastActivity,
-            status=status
-        ))
-    
-    recent_attempts = db.query(TaskAttempt).filter(
-        TaskAttempt.userId == user_id
-    ).order_by(desc(TaskAttempt.createdAt)).limit(10).all()
-    
-    recent_solutions = db.query(TaskSolution).filter(
-        TaskSolution.userId == user_id
-    ).order_by(desc(TaskSolution.solvedAt)).limit(10).all()
-    
-    learning_paths = db.query(UserPathProgress).filter(
-        UserPathProgress.userId == user_id
-    ).options(joinedload(UserPathProgress.path)).all()
+    # Получаем недавнюю активность с названиями задач
+    recent_activity = await get_recent_activity(db, user_id, limit=10)
     
     return UserDetailedProgressResponse(
         userId=user_id,
-        totalTasksSolved=user.totalTasksSolved or 0,
         lastActivityDate=user.lastActivityDate,
         overallStats=overall_stats,
         categoryProgress=category_summaries,
-        recentAttempts=recent_attempts,
-        recentSolutions=recent_solutions,
-        learningPaths=learning_paths
+        groupedCategoryProgress=grouped_categories or [],
+        recentActivity=recent_activity
     )
 
 
@@ -127,69 +221,25 @@ async def get_user_detailed_progress(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
-    total_attempts = db.query(func.count(TaskAttempt.id)).filter(TaskAttempt.userId == user_id).scalar() or 0
-    successful_attempts = db.query(func.count(TaskAttempt.id)).filter(
-        and_(TaskAttempt.userId == user_id, TaskAttempt.isSuccessful == True)
-    ).scalar() or 0
+    # Получаем упрощенную общую статистику на основе UserContentProgress
+    overall_stats = await get_simplified_overall_stats(db, user_id)
     
-    overall_stats = {
-        "totalAttempts": total_attempts,
-        "successfulAttempts": successful_attempts,
-        "successRate": (successful_attempts / total_attempts * 100) if total_attempts > 0 else 0,
-        "totalTimeSpent": db.query(func.sum(TaskAttempt.durationMinutes)).filter(TaskAttempt.userId == user_id).scalar() or 0
-    }
+    # Получаем прогресс по категориям
+    category_summaries = await get_unified_category_progress(db, user_id)
     
-    category_progress = db.query(UserCategoryProgress).filter(
-        UserCategoryProgress.userId == user_id
-    ).all()
+    # Группируем категории по основным категориям
+    grouped_categories = group_categories_by_main(category_summaries)
     
-    category_summaries = []
-    for progress in category_progress:
-        completion_rate = (progress.completedTasks / progress.totalTasks * 100) if progress.totalTasks > 0 else 0
-        
-        status = "not_started"
-        if progress.attemptedTasks > 0:
-            if completion_rate >= 90:
-                status = "completed"
-            elif progress.averageAttempts > 3:
-                status = "struggling"
-            else:
-                status = "in_progress"
-        
-        category_summaries.append(CategoryProgressSummary(
-            mainCategory=progress.mainCategory,
-            subCategory=progress.subCategory,
-            totalTasks=progress.totalTasks,
-            completedTasks=progress.completedTasks,
-            attemptedTasks=progress.attemptedTasks,
-            completionRate=float(completion_rate),
-            averageAttempts=float(progress.averageAttempts),
-            totalTimeSpent=progress.totalTimeSpentMinutes,
-            lastActivity=progress.lastActivity,
-            status=status
-        ))
-    
-    recent_attempts = db.query(TaskAttempt).filter(
-        TaskAttempt.userId == user_id
-    ).order_by(desc(TaskAttempt.createdAt)).limit(10).all()
-    
-    recent_solutions = db.query(TaskSolution).filter(
-        TaskSolution.userId == user_id
-    ).order_by(desc(TaskSolution.solvedAt)).limit(10).all()
-    
-    learning_paths = db.query(UserPathProgress).filter(
-        UserPathProgress.userId == user_id
-    ).options(joinedload(UserPathProgress.path)).all()
+    # Получаем недавнюю активность с названиями задач
+    recent_activity = await get_recent_activity(db, user_id, limit=10)
     
     return UserDetailedProgressResponse(
         userId=user_id,
-        totalTasksSolved=user.totalTasksSolved or 0,
         lastActivityDate=user.lastActivityDate,
         overallStats=overall_stats,
         categoryProgress=category_summaries,
-        recentAttempts=recent_attempts,
-        recentSolutions=recent_solutions,
-        learningPaths=learning_paths
+        groupedCategoryProgress=grouped_categories or [],
+        recentActivity=recent_activity
     )
 
 
@@ -302,7 +352,7 @@ async def get_progress_analytics(
 
 
 async def _create_or_update_solution(db: Session, attempt_data: TaskAttemptCreate, attempt_number: int):
-    """Создает или обновляет решение задачи"""
+    """Создает или обновляет решение задачи и синхронизирует с UserContentProgress"""
     
     existing_solution = db.query(TaskSolution).filter(
         and_(TaskSolution.userId == attempt_data.userId, TaskSolution.blockId == attempt_data.blockId)
@@ -328,14 +378,54 @@ async def _create_or_update_solution(db: Session, attempt_data: TaskAttemptCreat
             solvedAt=datetime.now()
         )
         db.add(solution)
+        
+        # ИСПРАВЛЕНИЕ: автоматически обновляем UserContentProgress при решении задачи
+        await _sync_user_content_progress_with_solution(db, attempt_data.userId, attempt_data.blockId)
+
+
+async def _sync_user_content_progress_with_solution(db: Session, user_id: int, block_id: str):
+    """Синхронизирует UserContentProgress с созданием TaskSolution"""
+    
+    # Проверяем, есть ли уже запись UserContentProgress
+    progress = db.query(UserContentProgress).filter(
+        and_(
+            UserContentProgress.userId == user_id,
+            UserContentProgress.blockId == block_id
+        )
+    ).first()
+    
+    if progress:
+        # Если solvedCount = 0, устанавливаем его в 1 (задача решена через CodeEditor)
+        if progress.solvedCount == 0:
+            progress.solvedCount = 1
+    else:
+        # Создаем новую запись с solvedCount = 1
+        progress = UserContentProgress(
+            id=str(uuid.uuid4()),
+            userId=user_id,
+            blockId=block_id,
+            solvedCount=1
+        )
+        db.add(progress)
 
 
 async def _update_user_stats(db: Session, user_id: int):
-    """Обновляет общую статистику пользователя"""
+    """Обновляет общую статистику пользователя на основе UserContentProgress"""
     
     user = db.query(User).filter(User.id == user_id).with_for_update().first()
     if user:    
-        total_solved = db.query(func.count(TaskSolution.id)).filter(TaskSolution.userId == user_id).scalar() or 0
+        # ИСПРАВЛЕНИЕ: используем UserContentProgress для единообразия
+        total_solved = db.query(func.count(UserContentProgress.id)).filter(
+            and_(
+                UserContentProgress.userId == user_id,
+                UserContentProgress.solvedCount > 0
+            )
+        ).join(ContentBlock).join(ContentFile).filter(
+            and_(
+                ContentFile.mainCategory != 'Test',
+                ContentFile.subCategory != 'Test'
+            )
+        ).scalar() or 0
         
         user.totalTasksSolved = total_solved
         user.lastActivityDate = datetime.now()
@@ -427,6 +517,49 @@ async def _update_category_progress(db: Session, user_id: int, block_id: str, is
             
             total_time = sum([a.durationMinutes for a in all_attempts if a.durationMinutes]) or 0
             progress.totalTimeSpentMinutes = total_time
+
+
+def group_categories_by_main(category_summaries: List[CategoryProgressSummary]) -> List[GroupedCategoryProgress]:
+    grouped = {}
+    for category in category_summaries:
+        main_category = category.mainCategory
+        if main_category not in grouped:
+            grouped[main_category] = {
+                'mainCategory': main_category,
+                'totalTasks': 0,
+                'completedTasks': 0,
+                'subCategories': []
+            }
+        grouped[main_category]['subCategories'].append(SubCategoryProgress(
+            subCategory=category.subCategory or 'Общие',
+            totalTasks=category.totalTasks,
+            completedTasks=category.completedTasks,
+            completionRate=category.completionRate,
+            status=category.status
+        ))
+        grouped[main_category]['totalTasks'] += category.totalTasks
+        grouped[main_category]['completedTasks'] += category.completedTasks
+    result = []
+    for main_category, data in grouped.items():
+        total_tasks = data['totalTasks']
+        completed_tasks = data['completedTasks']
+        completion_rate = (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0
+        status = "not_started"
+        if completed_tasks > 0:
+            if completion_rate >= 100:
+                status = "completed"
+            else:
+                status = "in_progress"
+        result.append(GroupedCategoryProgress(
+            mainCategory=main_category,
+            totalTasks=total_tasks,
+            completedTasks=completed_tasks,
+            completionRate=float(completion_rate),
+            status=status,
+            subCategories=data['subCategories']
+        ))
+    result.sort(key=lambda x: x.mainCategory)
+    return result
 
 
 @router.get("/health")

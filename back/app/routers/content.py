@@ -1,14 +1,16 @@
 import logging
 from typing import Optional
+from datetime import datetime
+from uuid import uuid4
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel
-from sqlalchemy import asc, desc, func, or_
-from sqlalchemy.orm import Session
+from sqlalchemy import asc, desc, func, or_, and_
+from sqlalchemy.orm import Session, joinedload
 
 from ..auth import get_current_user_from_session, get_current_user_from_session_required
 from ..database import get_db
-from ..models import ContentBlock, ContentFile, UserContentProgress
+from ..models import ContentBlock, ContentFile, UserContentProgress, UserCategoryProgress, User
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +21,115 @@ def unescape_text_content(text: Optional[str]) -> Optional[str]:
     if not text:
         return text
     return text.replace("\\n", "\n").replace("\\t", "\t")
+
+
+async def update_user_total_stats_from_content_progress(db: Session, user_id: int):
+    """Обновляет общую статистику пользователя на основе UserContentProgress"""
+    
+    user = db.query(User).filter(User.id == user_id).first()
+    if user:
+        # Считаем решенные задачи на основе UserContentProgress
+        total_solved = db.query(func.count(UserContentProgress.id)).filter(
+            and_(
+                UserContentProgress.userId == user_id,
+                UserContentProgress.solvedCount > 0
+            )
+        ).join(ContentBlock).join(ContentFile).filter(
+            and_(
+                ContentFile.mainCategory != 'Test',
+                ContentFile.subCategory != 'Test'
+            )
+        ).scalar() or 0
+        
+        user.totalTasksSolved = total_solved
+        user.lastActivityDate = datetime.now()
+
+
+async def update_category_progress_from_content_progress(db: Session, user_id: int, block_id: str):
+    """Обновляет прогресс по категории на основе UserContentProgress"""
+    
+    # Получаем блок с информацией о файле
+    block = db.query(ContentBlock).options(joinedload(ContentBlock.file)).filter(ContentBlock.id == block_id).first()
+    if not block or not block.file:
+        return
+    
+    main_category = block.file.mainCategory
+    sub_category = block.file.subCategory
+    
+    # Находим или создаем запись категорийного прогресса
+    category_progress = db.query(UserCategoryProgress).filter(
+        and_(
+            UserCategoryProgress.userId == user_id,
+            UserCategoryProgress.mainCategory == main_category,
+            UserCategoryProgress.subCategory == sub_category
+        )
+    ).first()
+    
+    if not category_progress:
+        # Считаем общее количество задач в этой категории
+        total_tasks = db.query(func.count(ContentBlock.id)).join(ContentFile).filter(
+            and_(
+                ContentFile.mainCategory == main_category,
+                ContentFile.subCategory == sub_category,
+                ContentBlock.codeContent.isnot(None)  # Только задачи с кодом
+            )
+        ).scalar() or 0
+        
+        category_progress = UserCategoryProgress(
+            id=str(uuid4()),
+            userId=user_id,
+            mainCategory=main_category,
+            subCategory=sub_category,
+            totalTasks=total_tasks,
+            firstAttempt=datetime.now()
+        )
+        db.add(category_progress)
+    
+    # Пересчитываем статистику на основе UserContentProgress
+    solved_blocks = db.query(func.count(UserContentProgress.id)).filter(
+        and_(
+            UserContentProgress.userId == user_id,
+            UserContentProgress.solvedCount > 0
+        )
+    ).join(ContentBlock).join(ContentFile).filter(
+        and_(
+            ContentFile.mainCategory == main_category,
+            ContentFile.subCategory == sub_category
+        )
+    ).scalar() or 0
+    
+    attempted_blocks = db.query(func.count(UserContentProgress.id)).filter(
+        UserContentProgress.userId == user_id
+    ).join(ContentBlock).join(ContentFile).filter(
+        and_(
+            ContentFile.mainCategory == main_category,
+            ContentFile.subCategory == sub_category
+        )
+    ).scalar() or 0
+    
+    # Обновляем статистику
+    category_progress.completedTasks = solved_blocks
+    category_progress.attemptedTasks = attempted_blocks
+    category_progress.lastActivity = datetime.now()
+    
+    # Рассчитываем успешность
+    if attempted_blocks > 0:
+        category_progress.successRate = (solved_blocks / attempted_blocks) * 100
+    
+    # Рассчитываем среднее количество попыток (приблизительно, так как UserContentProgress хранит только количество решений)
+    avg_solved_count = db.query(func.avg(UserContentProgress.solvedCount)).filter(
+        and_(
+            UserContentProgress.userId == user_id,
+            UserContentProgress.solvedCount > 0
+        )
+    ).join(ContentBlock).join(ContentFile).filter(
+        and_(
+            ContentFile.mainCategory == main_category,
+            ContentFile.subCategory == sub_category
+        )
+    ).scalar() or 1.0
+    
+    category_progress.averageAttempts = float(avg_solved_count)
 
 
 @router.get("/blocks")
@@ -119,6 +230,7 @@ async def get_content_blocks(
             "isCodeFoldable": block.isCodeFoldable,
             "codeFoldTitle": block.codeFoldTitle,
             "extractedUrls": block.extractedUrls,
+            "companies": block.companies if block.companies else [],
             "rawBlockContentHash": block.rawBlockContentHash,
             "createdAt": block.createdAt,
             "updatedAt": block.updatedAt
@@ -141,6 +253,12 @@ async def get_content_blocks(
                 }
                 for entry in progress_entries
             ]
+            
+            # Добавляем currentUserSolvedCount для совместимости с frontend
+            total_solved_count = sum(entry.solvedCount for entry in progress_entries)
+            base_block["currentUserSolvedCount"] = total_solved_count
+        else:
+            base_block["currentUserSolvedCount"] = 0
 
         result.append(base_block)
 
@@ -326,6 +444,7 @@ async def get_content_block(
         "isCodeFoldable": block.isCodeFoldable,
         "codeFoldTitle": block.codeFoldTitle,
         "extractedUrls": block.extractedUrls,
+        "companies": block.companies if block.companies else [],
         "rawBlockContentHash": block.rawBlockContentHash,
         "createdAt": block.createdAt,
         "updatedAt": block.updatedAt
@@ -348,6 +467,12 @@ async def get_content_block(
             }
             for entry in progress_entries
         ]
+        
+        # Добавляем currentUserSolvedCount для совместимости с frontend
+        total_solved_count = sum(entry.solvedCount for entry in progress_entries)
+        base_block["currentUserSolvedCount"] = total_solved_count
+    else:
+        base_block["currentUserSolvedCount"] = 0
 
     return base_block
 
@@ -393,7 +518,6 @@ async def update_content_block_progress(
             if progress:
                 progress.solvedCount += 1
             else:
-                from uuid import uuid4
                 progress = UserContentProgress(
                     id=str(uuid4()),
                     userId=user_id,
@@ -404,7 +528,6 @@ async def update_content_block_progress(
         elif progress and progress.solvedCount > 0:
             progress.solvedCount -= 1
         elif not progress:
-            from uuid import uuid4
             progress = UserContentProgress(
                 id=str(uuid4()),
                 userId=user_id,
@@ -412,6 +535,12 @@ async def update_content_block_progress(
                 solvedCount=0
             )
             db.add(progress)
+
+        # Обновляем категорийный прогресс
+        await update_category_progress_from_content_progress(db, user_id, block_id)
+        
+        # ИСПРАВЛЕНИЕ: Обновляем общую статистику пользователя при изменении UserContentProgress
+        await update_user_total_stats_from_content_progress(db, user_id)
 
         db.commit()
         db.refresh(progress)

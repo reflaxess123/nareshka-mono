@@ -1,12 +1,13 @@
 import progressApi, { type UserDetailedProgress } from '@/shared/api/progress';
 import { ProgressBar } from '@/shared/components/ProgressBar';
+import axios from 'axios';
 import {
   Activity,
   BookOpen,
+  CheckCircle,
   Clock,
   Target,
   TrendingUp,
-  Zap,
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import styles from './UserProgressDashboard.module.scss';
@@ -14,6 +15,22 @@ import styles from './UserProgressDashboard.module.scss';
 interface UserProgressDashboardProps {
   userId?: number;
   compact?: boolean;
+}
+
+function toMoscowTime(dateString: string) {
+  const date = new Date(dateString);
+  // Получаем UTC-время и прибавляем 3 часа
+  const msk = new Date(date.getTime() + 3 * 60 * 60 * 1000);
+  return (
+    msk.toLocaleString('ru-RU', {
+      day: '2-digit',
+      month: '2-digit',
+      year: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    }) + ' МСК'
+  );
 }
 
 const UserProgressDashboard: React.FC<UserProgressDashboardProps> = ({
@@ -27,17 +44,24 @@ const UserProgressDashboard: React.FC<UserProgressDashboardProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const source = axios.CancelToken.source();
     const fetchProgress = async () => {
       try {
         setLoading(true);
         setError(null);
 
         const data = userId
-          ? await progressApi.getUserProgress(userId)
-          : await progressApi.getMyProgress();
+          ? await progressApi.getUserProgress(userId, {
+              cancelToken: source.token,
+            })
+          : await progressApi.getMyProgress({ cancelToken: source.token });
 
         setProgressData(data);
       } catch (err) {
+        if (axios.isCancel(err)) {
+          // Не показываем ошибку отмены
+          return;
+        }
         setError(err instanceof Error ? err.message : 'Ошибка загрузки данных');
       } finally {
         setLoading(false);
@@ -45,14 +69,10 @@ const UserProgressDashboard: React.FC<UserProgressDashboardProps> = ({
     };
 
     fetchProgress();
+    return () => {
+      source.cancel('Component unmounted or effect cleaned up');
+    };
   }, [userId]);
-
-  const formatTime = (minutes: number) => {
-    if (minutes < 60) return `${minutes}м`;
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-    return `${hours}ч ${remainingMinutes}м`;
-  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('ru-RU', {
@@ -69,8 +89,6 @@ const UserProgressDashboard: React.FC<UserProgressDashboardProps> = ({
         return 'Завершено';
       case 'in_progress':
         return 'В процессе';
-      case 'struggling':
-        return 'Сложности';
       case 'not_started':
         return 'Не начато';
       default:
@@ -84,14 +102,14 @@ const UserProgressDashboard: React.FC<UserProgressDashboardProps> = ({
         return 'completed';
       case 'in_progress':
         return 'inProgress';
-      case 'struggling':
-        return 'struggling';
       case 'not_started':
         return 'notStarted';
       default:
         return 'notStarted';
     }
   };
+
+  // Фиктивные названия задач не нужны - будем использовать реальные данные из API
 
   if (loading) {
     return (
@@ -133,108 +151,139 @@ const UserProgressDashboard: React.FC<UserProgressDashboardProps> = ({
         )}
       </div>
 
-      {/* Общая статистика */}
+      {/* Упрощенная общая статистика */}
       <div className={styles.overallStats}>
         <div className={styles.statCard}>
           <div className={styles.statValue}>
-            {progressData.totalTasksSolved}
+            {progressData.overallStats?.totalTasksSolved || 0}
           </div>
           <div className={styles.statLabel}>Решено задач</div>
-          <div className={styles.statDescription}>Всего выполнено</div>
-        </div>
-
-        <div className={styles.statCard}>
-          <div className={styles.statValue}>
-            {Math.round(progressData.overallStats.successRate)}%
-          </div>
-          <div className={styles.statLabel}>Успешность</div>
           <div className={styles.statDescription}>
-            {progressData.overallStats.successfulAttempts} из{' '}
-            {progressData.overallStats.totalAttempts}
+            из {progressData.overallStats?.totalTasksAvailable || 0} доступных
           </div>
         </div>
 
         <div className={styles.statCard}>
           <div className={styles.statValue}>
-            {Math.round(
-              progressData.overallStats.totalAttempts /
-                Math.max(progressData.totalTasksSolved, 1)
-            )}
+            {Math.round(progressData.overallStats?.completionRate || 0)}%
           </div>
-          <div className={styles.statLabel}>Среднее попыток</div>
-          <div className={styles.statDescription}>На задачу</div>
-        </div>
-
-        <div className={styles.statCard}>
-          <div className={styles.statValue}>
-            {formatTime(progressData.overallStats.totalTimeSpent)}
-          </div>
-          <div className={styles.statLabel}>Время</div>
-          <div className={styles.statDescription}>Общее время изучения</div>
+          <div className={styles.statLabel}>Прогресс</div>
+          <div className={styles.statDescription}>Общий процент завершения</div>
         </div>
       </div>
 
       {/* Прогресс по категориям */}
-      {progressData.categoryProgress.length > 0 && (
-        <div className={styles.categoriesSection}>
-          <div className={styles.sectionTitle}>
-            <BookOpen className={styles.icon} />
-            Прогресс по категориям
+      {progressData.groupedCategoryProgress &&
+        progressData.groupedCategoryProgress.length > 0 && (
+          <div className={styles.categoriesSection}>
+            <div className={styles.sectionTitle}>
+              <BookOpen className={styles.icon} />
+              Прогресс по категориям
+            </div>
+
+            <div className={styles.categoriesGrid}>
+              {(progressData.groupedCategoryProgress || []).map(
+                (category, index) => (
+                  <div key={index} className={styles.categoryCard}>
+                    <div className={styles.categoryHeader}>
+                      <div className={styles.categoryName}>
+                        {category.mainCategory}
+                      </div>
+                      <div
+                        className={`${styles.statusBadge} ${styles[getStatusClass(category.status)]}`}
+                      >
+                        {getStatusText(category.status)}
+                      </div>
+                    </div>
+
+                    <ProgressBar
+                      percentage={category.completionRate}
+                      status={
+                        category.status as
+                          | 'not_started'
+                          | 'in_progress'
+                          | 'completed'
+                      }
+                      title=""
+                      current={category.completedTasks}
+                      total={category.totalTasks}
+                      showStats={false}
+                    />
+
+                    {/* Общий прогресс категории */}
+                    <div className={styles.tasksIndicator}>
+                      <div className={styles.indicatorLabel}>
+                        Общий прогресс:
+                      </div>
+                      <div className={styles.progressSummary}>
+                        <span className={styles.progressText}>
+                          {category.completedTasks > 0
+                            ? `Решено ${category.completedTasks} из ${category.totalTasks} задач`
+                            : `Доступно ${category.totalTasks} задач`}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Подкатегории */}
+                    <div className={styles.subCategoriesContainer}>
+                      <div className={styles.subCategoriesLabel}>
+                        Подкатегории:
+                      </div>
+                      <div className={styles.subCategoriesList}>
+                        {category.subCategories.map((subCategory, subIndex) => (
+                          <div
+                            key={subIndex}
+                            className={styles.subCategoryItem}
+                          >
+                            <div className={styles.subCategoryHeader}>
+                              <span className={styles.subCategoryName}>
+                                {subCategory.subCategory}
+                              </span>
+                              <span className={styles.subCategoryProgress}>
+                                {subCategory.completedTasks}/
+                                {subCategory.totalTasks}
+                              </span>
+                            </div>
+                            <div className={styles.subCategoryBar}>
+                              <div
+                                className={styles.subCategoryFill}
+                                style={{
+                                  width: `${subCategory.completionRate}%`,
+                                }}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className={styles.categoryStats}>
+                      <div className={styles.stat}>
+                        <CheckCircle className={styles.icon} />
+                        <span className={styles.solvedCount}>
+                          {category.completedTasks}
+                        </span>
+                        <span className={styles.statSeparator}>/</span>
+                        <span className={styles.totalCount}>
+                          {category.totalTasks}
+                        </span>
+                        <span className={styles.statLabel}>задач</span>
+                      </div>
+                      <div className={styles.stat}>
+                        <Target className={styles.icon} />
+                        <span className={styles.progressPercent}>
+                          {Math.round(category.completionRate)}%
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )
+              )}
+            </div>
           </div>
+        )}
 
-          <div className={styles.categoriesGrid}>
-            {progressData.categoryProgress.map((category, index) => (
-              <div key={index} className={styles.categoryCard}>
-                <div className={styles.categoryHeader}>
-                  <div className={styles.categoryName}>
-                    {category.mainCategory}
-                    {category.subCategory && ` • ${category.subCategory}`}
-                  </div>
-                  <div
-                    className={`${styles.statusBadge} ${styles[getStatusClass(category.status)]}`}
-                  >
-                    {getStatusText(category.status)}
-                  </div>
-                </div>
-
-                <ProgressBar
-                  percentage={category.completionRate}
-                  status={
-                    category.status as
-                      | 'not_started'
-                      | 'in_progress'
-                      | 'completed'
-                      | 'struggling'
-                  }
-                  title=""
-                  current={category.completedTasks}
-                  total={category.totalTasks}
-                  showStats
-                  attempts={Math.round(category.averageAttempts)}
-                  timeSpent={Math.round(category.totalTimeSpent)}
-                />
-
-                <div className={styles.categoryStats}>
-                  <div className={styles.stat}>
-                    <Target className={styles.icon} />
-                    {category.completedTasks}/{category.totalTasks}
-                  </div>
-                  <div className={styles.stat}>
-                    <Zap className={styles.icon} />
-                    {Math.round(category.averageAttempts)} попыток
-                  </div>
-                  <div className={styles.stat}>
-                    <Clock className={styles.icon} />
-                    {formatTime(category.totalTimeSpent)}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Недавняя активность */}
+      {/* Недавняя активность с нормальными названиями */}
       {!compact && (
         <div className={styles.recentActivity}>
           <div className={styles.sectionTitle}>
@@ -242,27 +291,22 @@ const UserProgressDashboard: React.FC<UserProgressDashboardProps> = ({
             Недавняя активность
           </div>
 
-          {progressData.recentAttempts.length > 0 ? (
+          {progressData.recentActivity &&
+          progressData.recentActivity.length > 0 ? (
             <div className={styles.activityList}>
-              {progressData.recentAttempts.slice(0, 5).map((attempt) => (
-                <div
-                  key={attempt.id}
-                  className={`${styles.activityItem} ${attempt.isSuccessful ? styles.success : styles.error}`}
-                >
-                  <div className={styles.activityHeader}>
-                    <div className={styles.activityTitle}>
-                      {attempt.isSuccessful ? '✅' : '❌'} Задача{' '}
-                      {attempt.blockId}
-                    </div>
-                    <div className={styles.activityTime}>
-                      {formatDate(attempt.createdAt)}
-                    </div>
-                  </div>
-                  <div className={styles.activityDescription}>
-                    Попытка #{attempt.attemptNumber} • {attempt.language}
-                    {attempt.durationMinutes &&
-                      ` • ${attempt.durationMinutes}м`}
-                  </div>
+              {(progressData.recentActivity || []).map((activity) => (
+                <div key={activity.id} className={styles.activityItem}>
+                  <span>Совершена попытка</span>
+                  <span>{activity.blockTitle}</span>
+                  <span
+                    style={{
+                      marginLeft: 'auto',
+                      color: '#aaa',
+                      fontSize: 12,
+                    }}
+                  >
+                    {toMoscowTime(activity.timestamp)}
+                  </span>
                 </div>
               ))}
             </div>

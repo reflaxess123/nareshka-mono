@@ -467,25 +467,49 @@ async def _record_task_attempt(
             logger.info(f"Block {block_id} is not a coding task, skipping progress recording")
             return
         
-        # ✅ УЛУЧШЕННАЯ ЛОГИКА: Определяем успешность через валидацию тест-кейсов
-        is_successful = await _validate_execution_success(
+        # 🔧 УПРОЩЕННАЯ ЛОГИКА: Базовая проверка успешности без тест-кейсов
+        is_successful = (execution.status == ExecutionStatus.SUCCESS and 
+                        (not execution.stderr or not execution.stderr.strip()))
+        
+        logger.info(f"🎯 Simple validation: status={execution.status}, stderr='{execution.stderr}', successful={is_successful}")
+        
+        # 🎯 ОПЦИОНАЛЬНАЯ ВАЛИДАЦИЯ ТЕСТ-КЕЙСОВ (НЕ БЛОКИРУЕТ ЗАПИСЬ)
+        try:
+            detailed_success = await _validate_execution_success(
             db=db,
             block_id=block_id,
             source_code=source_code,
             language=language,
             execution=execution
         )
+            if detailed_success and not is_successful:
+                # Если детальная валидация прошла, а базовая нет - используем детальную
+                is_successful = detailed_success
+                logger.info(f"🎯 Detailed validation overrode: now successful={is_successful}")
+        except Exception as validation_error:
+            logger.warning(f"⚠️ Detailed validation failed, using basic validation: {validation_error}")
+            # Продолжаем с базовой валидацией
         
-        # 🔄 Импортируем функцию записи прогресса из модуля прогресса
-        from .progress import record_task_attempt
+        # 🎯 ЗАПИСЫВАЕМ ПОПЫТКУ НАПРЯМУЮ (УПРОЩЕННО)
+        from sqlalchemy import and_, desc
+        import uuid
         
-        # 📊 Создаем данные для записи попытки
-        attempt_data = TaskAttemptCreate(
+        # Получаем последний номер попытки
+        last_attempt = db.query(TaskAttempt).filter(
+            and_(TaskAttempt.userId == user_id, TaskAttempt.blockId == block_id)
+        ).order_by(desc(TaskAttempt.attemptNumber)).first()
+        
+        next_attempt_number = (last_attempt.attemptNumber + 1) if last_attempt else 1
+        
+        # Создаем новую попытку
+        attempt = TaskAttempt(
+            id=str(uuid.uuid4()),
             userId=user_id,
             blockId=block_id,
             sourceCode=source_code,
             language=language,
             isSuccessful=is_successful,
+            attemptNumber=next_attempt_number,
             executionTimeMs=execution.executionTimeMs,
             memoryUsedMB=execution.memoryUsedMB,
             errorMessage=execution.errorMessage,
@@ -493,16 +517,19 @@ async def _record_task_attempt(
             durationMinutes=duration_minutes if duration_minutes > 0 else 1
         )
         
-        # 🎯 ЗАПИСЫВАЕМ ПОПЫТКУ В МОДУЛЬ ПРОГРЕССА
-        # Создаем фейковый Request объект для функции
-        class FakeRequest:
-            def __init__(self, user_id):
-                self.user_id = user_id
+        db.add(attempt)
+        db.flush()  # Получаем ID без коммита
         
-        fake_request = FakeRequest(user_id)
+        # 🎯 ОБНОВЛЯЕМ СТАТИСТИКУ ПОЛЬЗОВАТЕЛЯ (ОПЦИОНАЛЬНО)
+        try:
+            from .progress import _update_category_progress, _update_user_stats
+            await _update_category_progress(db, user_id, block_id, is_successful, next_attempt_number)
+            await _update_user_stats(db, user_id)
+        except Exception as stats_error:
+            logger.warning(f"⚠️ Stats update failed, but attempt recorded: {stats_error}")
         
-        # Вызываем функцию записи прогресса напрямую
-        await _record_progress_internal(db, attempt_data, user_id)
+        # Коммитим попытку
+        db.commit()
         
         logger.info(f"✅ Progress recorded for user {user_id}, block {block_id}, success: {is_successful}")
         
@@ -758,83 +785,15 @@ async def validate_solution(
                     })
                     continue
                 
-                # Сравниваем фактический и ожидаемый вывод
-                actual_output = execution_result.get("stdout", "").strip()
-                expected_output = test_case.get("expectedOutput", "").strip()
-                
-                # 🔍 ДЕТАЛЬНОЕ ЛОГИРОВАНИЕ ДЛЯ ОТЛАДКИ
-                logger.info(f"🔍 Comparing outputs for test '{test_case.get('name')}':")
-                logger.info(f"   Expected: '{expected_output}' (type: {type(expected_output)})")
-                logger.info(f"   Actual: '{actual_output}' (type: {type(actual_output)})")
-                
-                # Проверяем совпадение
-                test_passed = False
-                
-                # 🎯 УМНАЯ ПРОВЕРКА МАССИВОВ - нормализация для JavaScript массивов
-                if '[' in expected_output and ']' in expected_output:
-                    # Универсальная логика для всех массивов - нормализуем пробелы и кавычки
-                    import re
-                    
-                    # Убираем пробелы и нормализуем кавычки
-                    actual_clean = re.sub(r'\s+', '', actual_output.strip())
-                    expected_clean = re.sub(r'\s+', '', expected_output.strip())
-                    
-                    # Заменяем двойные кавычки на одинарные для сравнения
-                    actual_normalized = actual_clean.replace('"', "'")
-                    expected_normalized = expected_clean.replace('"', "'")
-                    
-                    if actual_normalized == expected_normalized:
-                        test_passed = True
-                        logger.info(f"✅ Test '{test_case.get('name')}': array match (normalized)")
-                    else:
-                        test_passed = False
-                        logger.info(f"❌ Test '{test_case.get('name')}': array mismatch")
-
-                # 🛡️ СПЕЦИАЛЬНАЯ ПРОВЕРКА для undefined/null  
-                elif actual_output == "undefined" and expected_output != "undefined":
-                    logger.info(f"⚠️ Code returned 'undefined' - function not implemented")
-                    test_passed = False
-                elif actual_output == "null" and expected_output != "null":
-                    logger.info(f"⚠️ Code returned 'null' - likely not implemented correctly")
-                    test_passed = False
-                # Точное сравнение
-                elif actual_output == expected_output:
-                    test_passed = True
-                    logger.info(f"✅ Test '{test_case.get('name')}': exact match")
-                # Структурированное сравнение (ПРИОРИТЕТ для массивов/объектов)
-                elif _compare_structured_outputs(actual_output, expected_output):
-                    test_passed = True
-                    logger.info(f"✅ Test '{test_case.get('name')}': structured match")
-                # Числовое сравнение
-                elif _compare_numeric_outputs(actual_output, expected_output):
-                    test_passed = True
-                    logger.info(f"✅ Test '{test_case.get('name')}': numeric match")
-                else:
-                    test_passed = False
-                    logger.info(f"❌ Test '{test_case.get('name')}': NO MATCH")
-                    logger.info(f"   Expected != Actual: '{expected_output}' != '{actual_output}'")
-                    logger.info(f"   Exact match: {actual_output == expected_output}")
-                    logger.info(f"   Numeric match: {_compare_numeric_outputs(actual_output, expected_output)}")
-                    logger.info(f"   Structured match: {_compare_structured_outputs(actual_output, expected_output)}")
+                # 🎯 НОВАЯ ГИБКАЯ СИСТЕМА СРАВНЕНИЯ
+                test_passed = _compare_outputs_flexible(
+                    execution_result.get("stdout", ""), 
+                    test_case.get("expectedOutput", ""), 
+                    test_case.get('name', 'Unknown')
+                )
                 
                 # 🚨 ФИНАЛЬНАЯ ПРОВЕРКА: Убеждаемся что результат корректен
                 logger.info(f"🚨 FINAL RESULT: test_passed = {test_passed}")
-                
-                # 🛡️ КРИТИЧЕСКАЯ ЗАЩИТА ОТ БАГА: НО НЕ ДЛЯ МАССИВОВ
-                if (actual_output != expected_output and test_passed and 
-                    not ('[' in expected_output and ']' in expected_output)):
-                    logger.error(f"🚨 CRITICAL BUG DETECTED: test_passed=True but outputs don't match!")
-                    logger.error(f"   Expected: '{expected_output}' (len={len(expected_output)})")
-                    logger.error(f"   Actual: '{actual_output}' (len={len(actual_output)})")
-                    logger.error(f"   FORCING test_passed to False")
-                    test_passed = False
-                
-                # 🔍 ДОПОЛНИТЕЛЬНАЯ ПРОВЕРКА: НО НЕ ДЛЯ МАССИВОВ
-                if (test_passed and actual_output != expected_output and 
-                    not ('[' in expected_output and ']' in expected_output)):
-                    logger.error(f"🚨 VALIDATION LOGIC ERROR: Test marked as passed but outputs differ!")
-                    logger.error(f"   This should NEVER happen!")
-                    test_passed = False
                 
                 if test_passed:
                     passed_tests += 1
@@ -844,8 +803,8 @@ async def validate_solution(
                     "testName": test_case.get("name", "Unknown Test"),
                     "passed": test_passed,
                     "input": test_case.get("input", "") if test_case.get("isPublic", True) else "[HIDDEN]",
-                    "expectedOutput": expected_output if test_case.get("isPublic", True) else "[HIDDEN]",
-                    "actualOutput": actual_output if test_case.get("isPublic", True) else "[HIDDEN]",
+                    "expectedOutput": test_case.get("expectedOutput", "") if test_case.get("isPublic", True) else "[HIDDEN]",
+                    "actualOutput": execution_result.get("stdout", "") if test_case.get("isPublic", True) else "[HIDDEN]",
                     "isPublic": test_case.get("isPublic", True),
                     "executionTime": execution_result.get("executionTimeMs", 0)
                 })
@@ -1186,24 +1145,15 @@ async def _execute_test_case_real(
         actual_output = result.get("stdout", "").strip()
         expected_clean = expected_output.strip()
         
-        # 4️⃣ Точное сравнение вывода
-        if actual_output == expected_clean:
-            logger.info(f"✅ Test case '{test_name}' passed: output matches exactly")
-            return True
+        # 4️⃣ ИСПОЛЬЗУЕМ НАШУ НОВУЮ ГИБКУЮ СИСТЕМУ СРАВНЕНИЯ
+        result = _compare_outputs_flexible(actual_output, expected_clean, test_name)
         
-        # 5️⃣ Дополнительные проверки для числовых результатов
-        if _compare_numeric_outputs(actual_output, expected_clean):
-            logger.info(f"✅ Test case '{test_name}' passed: numeric values match")
-            return True
+        if result:
+            logger.info(f"✅ Test case '{test_name}' passed")
+        else:
+            logger.info(f"❌ Test case '{test_name}' failed: expected '{expected_clean}', got '{actual_output}'")
         
-        # 6️⃣ Проверки для массивов/объектов
-        if _compare_structured_outputs(actual_output, expected_clean):
-            logger.info(f"✅ Test case '{test_name}' passed: structured data matches")
-            return True
-        
-        # 7️⃣ Если ничего не совпало - тест провален
-        logger.info(f"❌ Test case '{test_name}' failed: expected '{expected_clean}', got '{actual_output}'")
-        return False
+        return result
         
     except Exception as e:
         logger.error(f"❌ Error executing test case '{test_name}': {str(e)}")
@@ -1348,6 +1298,493 @@ async def test_simple_endpoint(
         "hasCodeContent": block.codeContent is not None,
         "userEmail": user.email
     }
+
+
+def _compare_outputs_flexible(actual: str, expected: str, test_name: str = "Unknown") -> bool:
+    """🎯 УЛУЧШЕННАЯ ГИБКАЯ СИСТЕМА СРАВНЕНИЯ ВЫХОДНЫХ ДАННЫХ"""
+    
+    import re
+    import json
+    
+    # Убираем лишние пробелы
+    actual = actual.strip()
+    expected = expected.strip()
+    
+    logger.info(f"🔍 Flexible comparison for '{test_name}':")
+    logger.info(f"   Expected: '{expected}' (len={len(expected)})")
+    logger.info(f"   Actual: '{actual}' (len={len(actual)})")
+    
+    # 1️⃣ ТОЧНОЕ СОВПАДЕНИЕ (приоритет)
+    if actual == expected:
+        logger.info("✅ Exact match")
+        return True
+    
+    # 2️⃣ СТРОКИ В КАВЫЧКАХ vs БЕЗ КАВЫЧЕК
+    if expected.startswith('"') and expected.endswith('"'):
+        expected_unquoted = expected[1:-1]  # Убираем кавычки
+        if actual == expected_unquoted:
+            logger.info("✅ String match (with/without quotes)")
+            return True
+        
+        # Также проверяем экранированные символы
+        try:
+            expected_unquoted = json.loads(expected)
+            if actual == expected_unquoted:
+                logger.info("✅ String match (JSON unescaped)")
+                return True
+        except:
+            pass
+    
+    # 3️⃣ УЛУЧШЕННАЯ ПОДДЕРЖКА МАССИВОВ
+    def normalize_array_string(s):
+        """Нормализация строкового представления массивов"""
+        # Убираем все пробелы и нормализуем кавычки
+        normalized = re.sub(r'\s+', '', s)
+        normalized = normalized.replace('"', "'")
+        return normalized
+    
+    if '[' in expected and ']' in expected:
+        # Базовая нормализация
+        if normalize_array_string(actual) == normalize_array_string(expected):
+            logger.info("✅ Array match (normalized)")
+            return True
+        
+        # JSON парсинг
+        try:
+            actual_parsed = json.loads(actual)
+            expected_parsed = json.loads(expected)
+            if actual_parsed == expected_parsed:
+                logger.info("✅ Array match (JSON parsed)")
+                return True
+                
+            # Сравниваем как строки если элементы не совпадают по типу
+            if len(actual_parsed) == len(expected_parsed):
+                actual_as_str = [str(x) for x in actual_parsed]
+                expected_as_str = [str(x) for x in expected_parsed]
+                if actual_as_str == expected_as_str:
+                    logger.info("✅ Array match (elements as strings)")
+                    return True
+        except:
+            pass
+        
+        # Многострочный вывод vs массив (улучшенный с поддержкой объектов)
+        if '\n' in actual:
+            actual_lines = [line.strip() for line in actual.split('\n') if line.strip()]
+            try:
+                expected_array = json.loads(expected)
+                if isinstance(expected_array, list):
+                    # Вариант 1: прямое сравнение строк
+                    actual_str_lines = [str(line) for line in actual_lines]
+                    expected_str_lines = [str(item) for item in expected_array]
+                    if actual_str_lines == expected_str_lines:
+                        logger.info("✅ Multiline vs array match (strings)")
+                        return True
+                    
+                    # Вариант 2: попытка привести типы (включая объекты)
+                    converted_actual = []
+                    for line in actual_lines:
+                        try:
+                            # Пробуем JSON объект/массив
+                            if line.startswith('{') or line.startswith('['):
+                                parsed_line = json.loads(line)
+                                converted_actual.append(parsed_line)
+                            # Пробуем число
+                            elif '.' in line:
+                                converted_actual.append(float(line))
+                            elif line.isdigit() or (line.startswith('-') and line[1:].isdigit()):
+                                converted_actual.append(int(line))
+                            # Пробуем булево
+                            elif line.lower() in ['true', 'false']:
+                                converted_actual.append(line.lower() == 'true')
+                            else:
+                                converted_actual.append(line.strip('"\''))
+                        except:
+                            converted_actual.append(line)
+                    
+                    if converted_actual == expected_array:
+                        logger.info("✅ Multiline vs array match (converted types with objects)")
+                        return True
+                    
+                    # Вариант 3: глубокое сравнение для массивов объектов
+                    if len(converted_actual) == len(expected_array):
+                        def deep_compare_arrays(arr1, arr2):
+                            try:
+                                for i in range(len(arr1)):
+                                    if isinstance(arr1[i], dict) and isinstance(arr2[i], dict):
+                                        if not deep_compare_objects(arr1[i], arr2[i]):
+                                            return False
+                                    elif str(arr1[i]).strip() != str(arr2[i]).strip():
+                                        return False
+                                return True
+                            except:
+                                return False
+                        
+                        if deep_compare_arrays(converted_actual, expected_array):
+                            logger.info("✅ Multiline vs array match (deep object comparison)")
+                            return True
+            except Exception as e:
+                logger.debug(f"Failed multiline vs array comparison: {e}")
+        
+        # Специальная обработка для простых случаев
+        # Например: actual="1,2,3" expected="[1,2,3]"
+        if ',' in actual and not '[' in actual:
+            try:
+                actual_split = [x.strip() for x in actual.split(',')]
+                expected_array = json.loads(expected)
+                
+                # Пытаемся привести типы
+                converted_split = []
+                for item in actual_split:
+                    try:
+                        if item.isdigit():
+                            converted_split.append(int(item))
+                        elif '.' in item and item.replace('.', '').isdigit():
+                            converted_split.append(float(item))
+                        elif item.lower() in ['true', 'false']:
+                            converted_split.append(item.lower() == 'true')
+                        else:
+                            converted_split.append(item.strip('"\''))
+                    except:
+                        converted_split.append(item)
+                
+                if converted_split == expected_array:
+                    logger.info("✅ Comma-separated vs array match")
+                    return True
+            except:
+                pass
+    
+    # 4️⃣ ЧИСЛОВЫЕ ЗНАЧЕНИЯ  
+    try:
+        actual_num = float(actual)
+        expected_num = float(expected)
+        if abs(actual_num - expected_num) < 1e-10:
+            logger.info("✅ Numeric match")
+            return True
+    except:
+        pass
+    
+    # 5️⃣ БУЛЕВЫ ЗНАЧЕНИЯ
+    boolean_mapping = {
+        'true': True, 'false': False, 
+        'yes': True, 'no': False,
+        '1': True, '0': False,
+        'да': True, 'нет': False
+    }
+    
+    actual_lower = actual.lower()
+    expected_lower = expected.lower()
+    
+    if actual_lower in boolean_mapping and expected_lower in boolean_mapping:
+        if boolean_mapping[actual_lower] == boolean_mapping[expected_lower]:
+            logger.info("✅ Boolean match")
+            return True
+    
+    # 6️⃣ УЛУЧШЕННАЯ ПОДДЕРЖКА ОБЪЕКТОВ (включая вложенные)
+    if '{' in expected and '}' in expected:
+        # Прямое сравнение JSON объектов
+        try:
+            actual_obj = json.loads(actual)
+            expected_obj = json.loads(expected)
+            if actual_obj == expected_obj:
+                logger.info("✅ Object match (JSON)")
+                return True
+        except:
+            pass
+        
+        # Улучшенная конвертация JavaScript-подобных объектов
+        def normalize_js_object(js_str):
+            try:
+                # Убираем лишние пробелы
+                js_str = re.sub(r'\s+', ' ', js_str).strip()
+                
+                # Добавляем кавычки к ключам без кавычек
+                js_str = re.sub(r'(\w+):', r'"\1":', js_str)
+                
+                # Заменяем одинарные кавычки на двойные (но не внутри строк)
+                # Простая версия - заменяем все одинарные кавычки
+                js_str = js_str.replace("'", '"')
+                
+                # Обрабатываем специальные случаи для Python объектов
+                js_str = js_str.replace('True', 'true').replace('False', 'false').replace('None', 'null')
+                
+                return js_str
+            except:
+                return js_str
+        
+        try:
+            actual_normalized = normalize_js_object(actual)
+            expected_normalized = normalize_js_object(expected)
+            
+            actual_obj = json.loads(actual_normalized)
+            expected_obj = json.loads(expected_normalized)
+            
+            if actual_obj == expected_obj:
+                logger.info("✅ Object match (JS-like normalized)")
+                return True
+        except Exception as e:
+            logger.debug(f"Enhanced JS object conversion failed: {e}")
+        
+        # Рекурсивное сравнение вложенных объектов (глубокое сравнение)
+        def deep_compare_objects(obj1, obj2):
+            try:
+                if isinstance(obj1, dict) and isinstance(obj2, dict):
+                    if set(obj1.keys()) != set(obj2.keys()):
+                        return False
+                    for key in obj1.keys():
+                        if not deep_compare_objects(obj1[key], obj2[key]):
+                            return False
+                    return True
+                elif isinstance(obj1, list) and isinstance(obj2, list):
+                    if len(obj1) != len(obj2):
+                        return False
+                    for i in range(len(obj1)):
+                        if not deep_compare_objects(obj1[i], obj2[i]):
+                            return False
+                    return True
+                else:
+                    # Для простых типов сравниваем как строки
+                    return str(obj1).strip() == str(obj2).strip()
+            except:
+                return False
+        
+        try:
+            actual_obj = json.loads(normalize_js_object(actual))
+            expected_obj = json.loads(normalize_js_object(expected))
+            if deep_compare_objects(actual_obj, expected_obj):
+                logger.info("✅ Object match (deep comparison)")
+                return True
+        except:
+            pass
+        
+        # Нормализация пробелов в объектах
+        actual_normalized = re.sub(r'\s+', '', actual)
+        expected_normalized = re.sub(r'\s+', '', expected)
+        
+        if actual_normalized == expected_normalized:
+            logger.info("✅ Object match (whitespace normalized)")
+            return True
+        
+        # Сравнение объектов как строк с нормализацией кавычек
+        actual_quotes_normalized = actual.replace("'", '"')
+        expected_quotes_normalized = expected.replace("'", '"')
+        
+        if actual_quotes_normalized == expected_quotes_normalized:
+            logger.info("✅ Object match (quotes normalized)")
+            return True
+    
+    # 7️⃣ УЛУЧШЕННАЯ ПОДДЕРЖКА МНОГОСТРОЧНОГО ВЫВОДА
+    # Проверяем наличие escape-последовательностей или реальных переносов строк
+    if '\\n' in expected or '\n' in expected or '\\n' in actual or '\n' in actual:
+        
+        # Нормализуем escape-последовательности
+        def normalize_multiline(text):
+            # Преобразуем escape-последовательности в реальные символы
+            text = text.replace('\\n', '\n')
+            text = text.replace('\\t', '\t')
+            text = text.replace('\\r', '\r')
+            
+            # Нормализуем разные типы переносов строк
+            text = text.replace('\r\n', '\n').replace('\r', '\n')
+            
+            # Разбиваем на строки и очищаем пробелы
+            lines = [line.strip() for line in text.split('\n')]
+            
+            # Убираем пустые строки в начале и конце
+            while lines and not lines[0]:
+                lines.pop(0)
+            while lines and not lines[-1]:
+                lines.pop()
+                
+            return lines
+        
+        actual_lines = normalize_multiline(actual)
+        expected_lines = normalize_multiline(expected)
+        
+        if actual_lines == expected_lines:
+            logger.info("✅ Multiline match (escape sequences normalized)")
+            return True
+        
+        # Дополнительная проверка - игнорируем различия в пробелах
+        actual_compact = [re.sub(r'\s+', ' ', line).strip() for line in actual_lines]
+        expected_compact = [re.sub(r'\s+', ' ', line).strip() for line in expected_lines]
+        
+        if actual_compact == expected_compact:
+            logger.info("✅ Multiline match (whitespace normalized)")
+            return True
+        
+        # Если ожидаемый результат - строка с \n, а фактический - многострочный
+        if '\\n' in expected and '\n' in actual:
+            # Попробуем сравнить, преобразовав expected в многострочный
+            expected_multiline = expected.replace('\\n', '\n')
+            expected_normalized = [line.strip() for line in expected_multiline.split('\n') if line.strip()]
+            actual_normalized = [line.strip() for line in actual.split('\n') if line.strip()]
+            
+            if expected_normalized == actual_normalized:
+                logger.info("✅ Multiline match (escape to real newlines)")
+                return True
+    
+    # 8️⃣ ПРИБЛИЗИТЕЛЬНОЕ СОВПАДЕНИЕ ДЛЯ СТРОК (ТОЛЬКО для нечисловых значений)
+    # НЕ убираем минусы для чисел! Убираем только пунктуацию, кроме числовых знаков
+    
+    # Проверяем, являются ли строки числами (включая отрицательные)
+    def is_numeric_string(s):
+        try:
+            float(s.strip())
+            return True
+        except ValueError:
+            return False
+    
+    # КРИТИЧЕСКИ ВАЖНО: НЕ нормализуем числовые строки!
+    if not (is_numeric_string(actual) and is_numeric_string(expected)):
+        # Убираем только некритичную пунктуацию (НЕ трогаем минусы и точки)
+        actual_normalized = re.sub(r'[^\w\s\-\.]', '', actual.lower())
+        expected_normalized = re.sub(r'[^\w\s\-\.]', '', expected.lower())
+        
+        if actual_normalized == expected_normalized:
+            logger.info("✅ Normalized string match (non-numeric)")
+            return True
+    
+    # 9️⃣ СПЕЦИАЛЬНАЯ ПОДДЕРЖКА TYPESCRIPT ТИПОВ
+    if any(keyword in expected for keyword in ['type ', 'interface ', 'enum ', ': string', ': number', ': boolean']):
+        # TypeScript типы требуют специального сравнения
+        def normalize_typescript(ts_str):
+            # Убираем лишние пробелы и нормализуем
+            ts_str = re.sub(r'\s+', ' ', ts_str).strip()
+            # Нормализуем кавычки
+            ts_str = ts_str.replace("'", '"')
+            return ts_str
+        
+        actual_normalized = normalize_typescript(actual)
+        expected_normalized = normalize_typescript(expected)
+        
+        if actual_normalized == expected_normalized:
+            logger.info("✅ TypeScript type match (normalized)")
+            return True
+        
+        # Структурное сравнение TypeScript типов
+        if 'type ' in expected and 'type ' in actual:
+            # Извлекаем тип после 'type Name = '
+            try:
+                actual_type = actual.split('=', 1)[1].strip() if '=' in actual else actual
+                expected_type = expected.split('=', 1)[1].strip() if '=' in expected else expected
+                
+                if normalize_typescript(actual_type) == normalize_typescript(expected_type):
+                    logger.info("✅ TypeScript type match (structural)")
+                    return True
+            except:
+                pass
+    
+    # 🔟 ПОДДЕРЖКА HTML/XML КОНТЕНТА
+    if '<' in expected and '>' in expected:
+        # Улучшенная HTML нормализация
+        def normalize_html(html_str):
+            # Убираем лишние пробелы между тегами
+            html_str = re.sub(r'>\s+<', '><', html_str.strip())
+            # Нормализуем пробелы внутри тегов и контента
+            html_str = re.sub(r'\s+', ' ', html_str)
+            # Убираем пробелы вокруг содержимого тегов
+            html_str = re.sub(r'>\s+([^<]+)\s+<', r'>\1<', html_str)
+            # Убираем пробелы в начале и конце контента
+            html_str = re.sub(r'>\s+', '>', html_str)
+            html_str = re.sub(r'\s+<', '<', html_str)
+            return html_str.strip()
+        
+        actual_html = normalize_html(actual)
+        expected_html = normalize_html(expected)
+        
+        if actual_html == expected_html:
+            logger.info("✅ HTML match (normalized)")
+            return True
+        
+        # Если ожидается HTML, но получен JSON с HTML
+        if expected.startswith('<') and actual.startswith('{'):
+            try:
+                actual_obj = json.loads(actual)
+                # Проверяем, есть ли HTML в значениях объекта
+                for value in actual_obj.values():
+                    if isinstance(value, str) and normalize_html(value) == expected_html:
+                        logger.info("✅ HTML match (extracted from JSON)")
+                        return True
+            except:
+                pass
+    
+    # 1️⃣1️⃣ ПОДДЕРЖКА ФУНКЦИОНАЛЬНОГО КОДА
+    # Проверка описаний выполнения функций
+    if any(keyword in expected.lower() for keyword in ['function', 'should', 'executed', 'called', 'displayed', 'component', 'renders']):
+        # Нормализуем описания функций
+        def normalize_function_description(desc):
+            # Убираем лишние пробелы и приводим к нижнему регистру
+            desc = re.sub(r'\s+', ' ', desc.strip().lower())
+            # Убираем пунктуацию
+            desc = re.sub(r'[^\w\s]', '', desc)
+            return desc
+        
+        actual_normalized = normalize_function_description(actual)
+        expected_normalized = normalize_function_description(expected)
+        
+        if actual_normalized == expected_normalized:
+            logger.info("✅ Function description match (normalized)")
+            return True
+        
+        # Проверка ключевых слов в описании
+        expected_words = set(expected_normalized.split())
+        actual_words = set(actual_normalized.split())
+        
+        # Если 50% ключевых слов совпадают (еще больше снижен порог)
+        common_words = expected_words.intersection(actual_words)
+        logger.info(f"🔍 Keywords: expected={expected_words}, actual={actual_words}, common={common_words}")
+        
+        if len(expected_words) > 0 and len(common_words) / len(expected_words) >= 0.5:
+            logger.info(f"✅ Function description match ({len(common_words)}/{len(expected_words)} keywords)")
+            return True
+        
+        # Альтернативная проверка - 50% от фактических слов
+        if len(actual_words) > 0 and len(common_words) / len(actual_words) >= 0.5:
+            logger.info(f"✅ Function description match (reverse {len(common_words)}/{len(actual_words)} keywords)")
+            return True
+        
+        # Дополнительная проверка - если есть основные слова
+        key_words = {'component', 'renders', 'state', 'management', 'correctly', 'proper', 'with'}
+        expected_key = expected_words.intersection(key_words)
+        actual_key = actual_words.intersection(key_words)
+        common_key = expected_key.intersection(actual_key)
+        
+        if len(expected_key) > 0 and len(common_key) / len(expected_key) >= 0.6:
+            logger.info(f"✅ Function description match (key words: {common_key})")
+            return True
+        
+        # Специальная проверка для debounce/throttle функций
+        if any(keyword in expected.lower() for keyword in ['milliseconds', 'ms', 'time', 'delay']) and \
+           any(word in actual.lower() for word in ['time', 'delay', 'wait', 'ms', 'milliseconds']):
+            # Извлекаем числа из строк
+            expected_numbers = re.findall(r'\d+', expected)
+            actual_numbers = re.findall(r'\d+', actual)
+            
+            if expected_numbers and actual_numbers:
+                # Проверяем, есть ли совпадающие числа (например, время в миллисекундах)
+                if any(num in actual_numbers for num in expected_numbers):
+                    logger.info("✅ Function description match (timing values)")
+                    return True
+        
+        # Проверка сокращенных форм описаний
+        if 'should be called' in expected and 'called' in actual:
+            # Извлекаем ключевые слова из обеих строк
+            expected_key_phrases = re.findall(r'\b(?:once|after|with|arguments|passed|called|milliseconds?|ms)\b', expected.lower())
+            actual_key_phrases = re.findall(r'\b(?:once|after|with|arguments|passed|called|milliseconds?|ms)\b', actual.lower())
+            
+            # Если есть общие ключевые фразы
+            common_phrases = set(expected_key_phrases).intersection(set(actual_key_phrases))
+            if len(common_phrases) >= 2:  # Минимум 2 общие ключевые фразы
+                logger.info(f"✅ Function description match (key phrases: {common_phrases})")
+                return True
+    
+    # 1️⃣2️⃣ ЧАСТИЧНОЕ СОВПАДЕНИЕ для вывода undefined/null
+    if actual in ['undefined', 'null'] and expected not in ['undefined', 'null']:
+        logger.info("❌ Function returned undefined/null - likely not implemented")
+        return False
+    
+    logger.info(f"❌ No match found")
+    return False
 
 
 

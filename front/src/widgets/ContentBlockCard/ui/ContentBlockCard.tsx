@@ -1,4 +1,5 @@
 import type { ContentBlock } from '@/entities/ContentBlock';
+import { ContentProgress } from '@/features/ContentProgress';
 import { Button, ButtonVariant } from '@/shared/components/Button';
 import { MarkdownContent } from '@/shared/components/MarkdownContent';
 import { Modal } from '@/shared/components/Modal';
@@ -239,6 +240,11 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
           <div className={styles.header}>
             <h3 className={styles.title}>{block.blockTitle}</h3>
             <div className={styles.headerActions}>
+              <ContentProgress
+                blockId={block.id}
+                currentCount={block.currentUserSolvedCount || 0}
+                variant="compact"
+              />
               {isAdmin && (
                 <button
                   className={styles.editButton}
@@ -281,6 +287,11 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
             <div className={styles.titleRow}>
               <h2 className={styles.title}>{block.blockTitle}</h2>
               <div className={styles.titleActions}>
+                <ContentProgress
+                  blockId={block.id}
+                  currentCount={block.currentUserSolvedCount || 0}
+                  variant="default"
+                />
                 {isAdmin && (
                   <button
                     className={styles.editButton}

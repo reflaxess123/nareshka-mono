@@ -397,28 +397,54 @@ class CategoryProgressSummary(BaseModel):
     subCategory: Optional[str] = None
     totalTasks: int
     completedTasks: int
-    attemptedTasks: int
     completionRate: float
-    averageAttempts: float
-    totalTimeSpent: int
-    lastActivity: Optional[datetime]
-    status: str
+    status: str  # not_started, in_progress, completed
+
+
+class SubCategoryProgress(BaseModel):
+    subCategory: str
+    totalTasks: int
+    completedTasks: int
+    completionRate: float
+    status: str  # not_started, in_progress, completed
+
+
+class GroupedCategoryProgress(BaseModel):
+    mainCategory: str
+    totalTasks: int
+    completedTasks: int
+    completionRate: float
+    status: str  # not_started, in_progress, completed
+    subCategories: List[SubCategoryProgress]
+
+
+class SimplifiedOverallStats(BaseModel):
+    totalTasksSolved: int
+    totalTasksAvailable: int
+    completionRate: float
+
+
+class RecentActivityItem(BaseModel):
+    id: str
+    blockId: str
+    blockTitle: str
+    category: str
+    subCategory: Optional[str]
+    isSuccessful: bool
+    activityType: str  # "attempt" или "solution"
+    timestamp: datetime
 
 
 class UserDetailedProgressResponse(BaseModel):
     userId: int
-    totalTasksSolved: int
     lastActivityDate: Optional[datetime]
     
-    overallStats: dict
+    overallStats: SimplifiedOverallStats
     
     categoryProgress: List[CategoryProgressSummary]
+    groupedCategoryProgress: List[GroupedCategoryProgress]
     
-    recentAttempts: List[TaskAttemptResponse]
-    
-    recentSolutions: List[TaskSolutionResponse]
-    
-    learningPaths: List[UserPathProgressResponse]
+    recentActivity: List[RecentActivityItem]
 
     class Config:
         from_attributes = True
