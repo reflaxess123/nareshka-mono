@@ -2,8 +2,7 @@ import { RegisterForm } from '@/features/RegisterForm';
 import { ButtonVariant } from '@/shared/components/Button/model/types';
 import { Button } from '@/shared/components/Button/ui/Button';
 import { Input } from '@/shared/components/Input';
-import { useModal } from '@/shared/hooks';
-import { useLogin } from '@/shared/hooks/useAuth';
+import { useLogin, useModal } from '@/shared/hooks';
 import { useLoginForm } from '../model/hooks';
 import type { LoginFormSchema } from '../model/schema';
 import styles from './LoginForm.module.scss';
@@ -14,7 +13,10 @@ export const LoginForm = () => {
   const loginModal = useModal('login-modal');
 
   const onSubmit = (data: LoginFormSchema) => {
-    loginMutation.mutate({ email: data.username, password: data.password });
+    loginMutation.mutate({
+      email: data.username,
+      password: data.password,
+    });
   };
 
   const registerModal = useModal('register-modal');
@@ -30,7 +32,9 @@ export const LoginForm = () => {
         <p className={styles.title}>Login form</p>
 
         {loginMutation.error && (
-          <p className={styles.error}>{loginMutation.error.message}</p>
+          <p className={styles.error}>
+            {loginMutation.error.message}
+          </p>
         )}
 
         {formState.errors.username && (

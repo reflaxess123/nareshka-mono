@@ -43,8 +43,16 @@ const UserProgressDashboard: React.FC<UserProgressDashboardProps> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const isFirstEffectCall = React.useRef(true);
+
   useEffect(() => {
+    if (import.meta.env.DEV && isFirstEffectCall.current) {
+      isFirstEffectCall.current = false;
+      return;
+    }
+
     const source = axios.CancelToken.source();
+
     const fetchProgress = async () => {
       try {
         setLoading(true);
@@ -182,8 +190,9 @@ const UserProgressDashboard: React.FC<UserProgressDashboardProps> = ({
             </div>
 
             <div className={styles.categoriesGrid}>
-              {(progressData.groupedCategoryProgress || []).map(
-                (category, index) => (
+              {(progressData.groupedCategoryProgress || [])
+                .filter((category) => category.totalTasks > 0) // Скрываем категории без задач с кодом
+                .map((category, index) => (
                   <div key={index} className={styles.categoryCard}>
                     <div className={styles.categoryHeader}>
                       <div className={styles.categoryName}>
@@ -230,30 +239,32 @@ const UserProgressDashboard: React.FC<UserProgressDashboardProps> = ({
                         Подкатегории:
                       </div>
                       <div className={styles.subCategoriesList}>
-                        {category.subCategories.map((subCategory, subIndex) => (
-                          <div
-                            key={subIndex}
-                            className={styles.subCategoryItem}
-                          >
-                            <div className={styles.subCategoryHeader}>
-                              <span className={styles.subCategoryName}>
-                                {subCategory.subCategory}
-                              </span>
-                              <span className={styles.subCategoryProgress}>
-                                {subCategory.completedTasks}/
-                                {subCategory.totalTasks}
-                              </span>
+                        {category.subCategories
+                          .filter((subCategory) => subCategory.totalTasks > 0) // Скрываем подкатегории без задач с кодом
+                          .map((subCategory, subIndex) => (
+                            <div
+                              key={subIndex}
+                              className={styles.subCategoryItem}
+                            >
+                              <div className={styles.subCategoryHeader}>
+                                <span className={styles.subCategoryName}>
+                                  {subCategory.subCategory}
+                                </span>
+                                <span className={styles.subCategoryProgress}>
+                                  {subCategory.completedTasks}/
+                                  {subCategory.totalTasks}
+                                </span>
+                              </div>
+                              <div className={styles.subCategoryBar}>
+                                <div
+                                  className={styles.subCategoryFill}
+                                  style={{
+                                    width: `${subCategory.completionRate}%`,
+                                  }}
+                                />
+                              </div>
                             </div>
-                            <div className={styles.subCategoryBar}>
-                              <div
-                                className={styles.subCategoryFill}
-                                style={{
-                                  width: `${subCategory.completionRate}%`,
-                                }}
-                              />
-                            </div>
-                          </div>
-                        ))}
+                          ))}
                       </div>
                     </div>
 
@@ -277,8 +288,7 @@ const UserProgressDashboard: React.FC<UserProgressDashboardProps> = ({
                       </div>
                     </div>
                   </div>
-                )
-              )}
+                ))}
             </div>
           </div>
         )}

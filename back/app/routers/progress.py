@@ -55,21 +55,23 @@ async def get_unified_category_progress(db: Session, user_id: int):
             ContentBlock.codeContent.isnot(None)
         ).scalar() or 0
 
-        # Количество решённых задач (solvedCount > 0)
+        # Количество решённых задач (solvedCount > 0) - ТОЛЬКО задачи с кодом
         completed_tasks = db.query(func.count(UserContentProgress.id)).filter(
             UserContentProgress.userId == user_id,
             UserContentProgress.solvedCount > 0
         ).join(ContentBlock).join(ContentFile).filter(
             ContentFile.mainCategory == main_category,
-            ContentFile.subCategory == sub_category
+            ContentFile.subCategory == sub_category,
+            ContentBlock.codeContent.isnot(None)  # Только задачи с кодом
         ).scalar() or 0
 
-        # Количество задач, с которыми взаимодействовал пользователь
+        # Количество задач, с которыми взаимодействовал пользователь - ТОЛЬКО задачи с кодом
         attempted_tasks = db.query(func.count(UserContentProgress.id)).filter(
             UserContentProgress.userId == user_id
         ).join(ContentBlock).join(ContentFile).filter(
             ContentFile.mainCategory == main_category,
-            ContentFile.subCategory == sub_category
+            ContentFile.subCategory == sub_category,
+            ContentBlock.codeContent.isnot(None)  # Только задачи с кодом
         ).scalar() or 0
 
         # Рассчитываем процент завершения
@@ -110,7 +112,7 @@ async def get_simplified_overall_stats(db: Session, user_id: int):
         )
     ).scalar() or 0
     
-    # Количество решенных задач пользователем
+    # Количество решенных задач пользователем - ТОЛЬКО задачи с кодом
     total_solved = db.query(func.count(UserContentProgress.id)).filter(
         and_(
             UserContentProgress.userId == user_id,
@@ -119,7 +121,8 @@ async def get_simplified_overall_stats(db: Session, user_id: int):
     ).join(ContentBlock).join(ContentFile).filter(
         and_(
             ContentFile.mainCategory != 'Test',
-            ContentFile.subCategory != 'Test'
+            ContentFile.subCategory != 'Test',
+            ContentBlock.codeContent.isnot(None)  # Только задачи с кодом
         )
     ).scalar() or 0
     

@@ -1,9 +1,10 @@
 import axios from 'axios';
+import { API_CONFIG } from '../config/api.config';
 
 export const apiInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
-  withCredentials: true,
-  timeout: 5000, // 5 секунд таймаут
+  baseURL: API_CONFIG.BASE_URL,
+  withCredentials: API_CONFIG.WITH_CREDENTIALS,
+  timeout: API_CONFIG.TIMEOUT,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -31,3 +32,24 @@ apiInstance.interceptors.response.use(
     return Promise.reject(new Error(errorMessage));
   }
 );
+
+// Функция для Orval mutator
+export const apiClient = <T = unknown>(
+  config: import('axios').AxiosRequestConfig
+): Promise<T> => {
+  const source = axios.CancelToken.source();
+  const promise = apiInstance({
+    ...config,
+    cancelToken: source.token,
+  }).then(({ data }) => data);
+
+  // @ts-expect-error добавляем метод cancel к promise
+  promise.cancel = () => {
+    source.cancel('Query was cancelled');
+  };
+
+  return promise;
+};
+
+// Экспорт для Orval mutator (именованный)
+export default apiClient;

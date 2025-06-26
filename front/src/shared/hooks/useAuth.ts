@@ -5,12 +5,10 @@ import type {
 import { authApi } from '@/shared/api/auth';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-// Ключи для запросов
 export const authKeys = {
   profile: ['auth', 'profile'] as const,
 };
 
-// Хук для получения профиля
 export const useProfile = () => {
   return useQuery({
     queryKey: authKeys.profile,
@@ -18,7 +16,6 @@ export const useProfile = () => {
       try {
         return await authApi.getProfile();
       } catch (error) {
-        // 401 - это нормально, пользователь просто не авторизован
         if (error instanceof Error && error.message.includes('401')) {
           return null;
         }
