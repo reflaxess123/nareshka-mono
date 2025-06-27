@@ -1,21 +1,29 @@
 import { Handle, Position } from '@xyflow/react';
 import React from 'react';
-import type { CenterNodeData } from '../../types/newMindmap';
-import './CenterNode.scss';
+import styles from './CenterNode.module.scss';
+
+interface CenterNodeData {
+  title: string;
+  description: string;
+  overallProgress?: {
+    totalTasks: number;
+    completedTasks: number;
+    completionRate: number;
+  } | null;
+}
 
 interface CenterNodeProps {
-  data: CenterNodeData | Record<string, unknown>;
-  selected?: boolean;
+  data: CenterNodeData;
+  selected: boolean;
 }
 
 const CenterNode: React.FC<CenterNodeProps> = ({ data, selected }) => {
-  const dataRecord = data as Record<string, unknown>;
-  const title = (dataRecord.title as string) || 'JavaScript Skills';
-  const description =
-    (dataRecord.description as string) || 'Изучение JavaScript';
+  const title = data.title || 'JavaScript Skills';
+  const description = data.description || 'Изучение JavaScript';
+  const overallProgress = data.overallProgress;
 
   return (
-    <div className={`center-node ${selected ? 'selected' : ''}`}>
+    <div className={`${styles.centerNode} ${selected ? styles.selected : ''}`}>
       <Handle
         type="source"
         position={Position.Top}
@@ -57,17 +65,39 @@ const CenterNode: React.FC<CenterNodeProps> = ({ data, selected }) => {
         }}
       />
 
-      <div className="center-content">
-        <div className="center-header">
-          <div className="center-icon">
+      <div className={styles.centerContent}>
+        <div className={styles.centerHeader}>
+          <div className={styles.centerIcon}>
             <span role="img" aria-label="JavaScript">
               ⚡
             </span>
           </div>
-          <h2 className="center-title">{title}</h2>
+          <h2 className={styles.centerTitle}>{title}</h2>
         </div>
-        <p className="center-description">{description}</p>
-        <div className="center-badge">
+        <p className={styles.centerDescription}>{description}</p>
+
+        {/* Отображение общего прогресса */}
+        {overallProgress && (
+          <div className={styles.centerProgress}>
+            <div className={styles.progressText}>
+              {overallProgress.completedTasks}/{overallProgress.totalTasks}{' '}
+              задач
+            </div>
+            <div className={styles.progressPercentage}>
+              {Math.round(overallProgress.completionRate)}%
+            </div>
+            <div className={styles.progressBar}>
+              <div
+                className={styles.progressFill}
+                style={{
+                  width: `${Math.min(overallProgress.completionRate, 100)}%`,
+                }}
+              />
+            </div>
+          </div>
+        )}
+
+        <div className={styles.centerBadge}>
           <span>Карта навыков JavaScript</span>
         </div>
       </div>

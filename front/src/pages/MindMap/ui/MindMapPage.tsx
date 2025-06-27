@@ -13,8 +13,8 @@ import {
 import '@xyflow/react/dist/style.css';
 import React, { useCallback, useEffect, useState } from 'react';
 import CenterNode from '../../../components/MindMapNodes/CenterNode';
+import MindMapProgressSidebar from '../../../components/MindMapNodes/MindMapProgressSidebar';
 import TopicNode from '../../../components/MindMapNodes/TopicNode';
-import TopicTaskModal from '../../../components/MindMapNodes/TopicTaskModal';
 import styles from './MindMapPage.module.scss';
 
 interface MindMapData {
@@ -29,6 +29,19 @@ interface MindMapData {
     difficulty?: string;
     topic?: string;
   };
+  overall_progress?: {
+    totalTasks: number;
+    completedTasks: number;
+    completionRate: number;
+  } | null;
+}
+
+interface SelectedTopicData {
+  key: string;
+  title: string;
+  description: string;
+  color: string;
+  icon: string;
 }
 
 const nodeTypes: NodeTypes = {
@@ -44,13 +57,17 @@ const NewMindMapPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
-  const [isTopicModalOpen, setIsTopicModalOpen] = useState(false);
+  const [selectedTopic, setSelectedTopic] = useState<SelectedTopicData | null>(
+    null
+  );
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const fetchMindMap = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/mindmap/generate');
+      const response = await fetch('/api/mindmap/generate', {
+        credentials: 'include',
+      });
       const result = await response.json();
 
       if (result.success && result.data) {
@@ -67,9 +84,26 @@ const NewMindMapPage: React.FC = () => {
 
   const onNodeClick = useCallback((_event: React.MouseEvent, node: Node) => {
     if (node.type === 'topic' && node.data.topic_key) {
-      setSelectedTopic(node.data.topic_key as string);
-      setIsTopicModalOpen(true);
+      const topicData: SelectedTopicData = {
+        key: node.data.topic_key as string,
+        title: node.data.title as string,
+        description: node.data.description as string,
+        color: node.data.color as string,
+        icon: node.data.icon as string,
+      };
+      setSelectedTopic(topicData);
+      setIsSidebarOpen(true);
     }
+  }, []);
+
+  const handleCloseSidebar = useCallback(() => {
+    setIsSidebarOpen(false);
+    setSelectedTopic(null);
+  }, []);
+
+  const handleTaskClick = useCallback((taskId: string) => {
+    // Переход к редактору кода
+    window.location.href = `/code-editor?blockId=${taskId}`;
   }, []);
 
   useEffect(() => {
@@ -114,7 +148,13 @@ const NewMindMapPage: React.FC = () => {
 
   return (
     <div className={styles.mindmapContainer}>
-      <div style={{ width: '100%', height: '100%' }}>
+      <div
+        style={{
+          width: isSidebarOpen ? 'calc(100% - 400px)' : '100%',
+          height: '100%',
+          transition: 'width 0.3s ease-in-out',
+        }}
+      >
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -161,14 +201,13 @@ const NewMindMapPage: React.FC = () => {
         </ReactFlow>
       </div>
 
-      <TopicTaskModal
-        isOpen={isTopicModalOpen}
-        onClose={() => {
-          setIsTopicModalOpen(false);
-          setSelectedTopic(null);
-        }}
-        topicKey={selectedTopic}
+      <MindMapProgressSidebar
+        isOpen={isSidebarOpen}
+        onClose={handleCloseSidebar}
+        selectedTopic={selectedTopic}
+        onTaskClick={handleTaskClick}
       />
+
       <div className={styles.mobileNav}>
         <BottomNavBar />
       </div>

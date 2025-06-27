@@ -1,4 +1,6 @@
-.center-node {
+@use '@/app/styles/helpers' as *;
+
+.centerNode {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border: 3px solid #8b5cf6;
   border-radius: 20px;
@@ -7,10 +9,7 @@
   max-width: 350px;
   box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3);
   transition: all 0.3s ease;
-  font-family:
-    system-ui,
-    -apple-system,
-    sans-serif;
+  font-family: var(--font-family-base);
   color: white;
 
   &:hover {
@@ -23,14 +22,14 @@
     box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.2);
   }
 
-  .center-content {
-    .center-header {
+  .centerContent {
+    .centerHeader {
       display: flex;
       align-items: center;
       gap: 16px;
       margin-bottom: 16px;
 
-      .center-icon {
+      .centerIcon {
         width: 50px;
         height: 50px;
         border-radius: 12px;
@@ -43,7 +42,7 @@
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       }
 
-      .center-title {
+      .centerTitle {
         margin: 0;
         font-size: 20px;
         font-weight: 700;
@@ -52,7 +51,7 @@
       }
     }
 
-    .center-description {
+    .centerDescription {
       margin: 0 0 20px 0;
       font-size: 14px;
       line-height: 1.5;
@@ -60,7 +59,7 @@
       text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     }
 
-    .center-progress {
+    .centerProgress {
       margin: 16px 0 20px 0;
       padding: 16px;
       background: rgba(255, 255, 255, 0.1);
@@ -68,7 +67,7 @@
       border-radius: 12px;
       border: 1px solid rgba(255, 255, 255, 0.2);
 
-      .progress-text {
+      .progressText {
         font-size: 16px;
         font-weight: 600;
         text-align: center;
@@ -76,7 +75,7 @@
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
       }
 
-      .progress-percentage {
+      .progressPercentage {
         font-size: 24px;
         font-weight: 800;
         text-align: center;
@@ -84,14 +83,14 @@
         text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       }
 
-      .progress-bar {
+      .progressBar {
         width: 100%;
         height: 8px;
         background: rgba(255, 255, 255, 0.2);
         border-radius: 4px;
         overflow: hidden;
 
-        .progress-fill {
+        .progressFill {
           height: 100%;
           background: linear-gradient(90deg, #10b981, #34d399);
           border-radius: 4px;
@@ -102,7 +101,7 @@
       }
     }
 
-    .center-stats {
+    .centerStats {
       display: flex;
       align-items: center;
       gap: 16px;
@@ -116,14 +115,14 @@
         text-align: center;
         flex: 1;
 
-        .stat-value {
+        .statValue {
           font-size: 24px;
           font-weight: 800;
           line-height: 1;
           text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        .stat-label {
+        .statLabel {
           font-size: 12px;
           margin-top: 4px;
           opacity: 0.8;
@@ -131,14 +130,14 @@
         }
       }
 
-      .stat-divider {
+      .statDivider {
         width: 1px;
         height: 32px;
         background: rgba(255, 255, 255, 0.3);
       }
     }
 
-    .center-badge {
+    .centerBadge {
       display: flex;
       justify-content: center;
 

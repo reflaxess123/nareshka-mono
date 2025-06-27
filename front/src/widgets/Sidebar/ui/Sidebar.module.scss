@@ -16,9 +16,9 @@
   .sidebar {
     position: fixed;
     left: 0;
-    top: 0;
+    top: var(--navbar-height, 60px);
     width: var(--sidebar-width);
-    height: 100vh;
+    height: calc(100vh - var(--navbar-height, 60px));
     background: var(--sidebar-bg);
     color: var(--sidebar-text);
     padding: 60px 0;
@@ -30,7 +30,7 @@
     flex-direction: column;
     justify-content: space-between;
     padding-left: 25px;
-    z-index: var(--z-fixed);
+    z-index: 1030;
 
     @include mobile {
       display: none;
