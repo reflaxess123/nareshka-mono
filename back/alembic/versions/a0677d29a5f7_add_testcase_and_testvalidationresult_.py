@@ -62,8 +62,7 @@ def upgrade() -> None:
     )
     op.create_index('idx_testvalidation_attemptid', 'TestValidationResult', ['attemptId'], unique=False)
     op.create_index('idx_testvalidation_testcaseid', 'TestValidationResult', ['testCaseId'], unique=False)
-    op.create_index('idx_learningpath_difficulty', 'LearningPath', ['difficulty'], unique=False)
-    op.create_index('idx_learningpath_isactive', 'LearningPath', ['isActive'], unique=False)
+    # Skip index creation as they already exist in the database
     op.alter_column('TaskAttempt', 'memoryUsedMB',
                existing_type=sa.INTEGER(),
                type_=sa.Float(),

@@ -89,12 +89,11 @@ def upgrade() -> None:
     # Convert User role column to ENUM with explicit steps
     # 1. Remove default
     op.execute("ALTER TABLE \"User\" ALTER COLUMN role DROP DEFAULT")
-    # 2. Change column type
-    op.execute("ALTER TABLE \"User\" ALTER COLUMN role TYPE userrole USING role::userrole")
+    # 2. Change column type (cast from text to enum)
+    op.execute("ALTER TABLE \"User\" ALTER COLUMN role TYPE userrole USING role::text::userrole")
     # 3. Set new default
     op.execute("ALTER TABLE \"User\" ALTER COLUMN role SET DEFAULT 'USER'::userrole")
-    op.drop_column('User', 'created_at')
-    op.drop_column('User', 'updated_at')
+    # Note: created_at and updated_at columns don't exist in the User table, so we don't drop them
     # ### end Alembic commands ###
 
 
