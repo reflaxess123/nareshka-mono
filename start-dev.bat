@@ -126,6 +126,25 @@ if not exist "node_modules" (
 )
 cd..
 
+REM Check for .env file and show DB/Redis config
+if not exist "back/.env" (
+    echo ❌ ERROR: 'back/.env' file not found.
+    echo    Please create and configure your backend .env file.
+    pause
+    exit /b 1
+) else (
+    echo ✓ Found back/.env
+    echo Current DATABASE_URL and REDIS_URL:
+    for /f "usebackq tokens=*" %%a in (`findstr /b /c:"DATABASE_URL=" back/.env`) do echo   %%a
+    for /f "usebackq tokens=*" %%a in (`findstr /b /c:"REDIS_URL=" back/.env`) do echo   %%a
+)
+
+REM === Auto-update DATABASE_URL and REDIS_URL in .env ===
+set NEW_DATABASE_URL=DATABASE_URL=postgresql://postgres:nbmbovmpeoz9pyjw@103.74.93.55:8001/postgres
+set NEW_REDIS_URL=REDIS_URL=redis://default:qe1yqfyuv0oo0ysg@103.74.93.55:6384
+powershell -Command "(Get-Content back/.env) -replace '^DATABASE_URL=.*', '%NEW_DATABASE_URL%' | Set-Content back/.env"
+powershell -Command "(Get-Content back/.env) -replace '^REDIS_URL=.*', '%NEW_REDIS_URL%' | Set-Content back/.env"
+
 echo.
 echo ==========================================
 echo STARTING SERVERS
