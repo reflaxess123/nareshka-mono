@@ -206,10 +206,9 @@
             border-radius: 8px;
             padding: 16px;
             transition: all 0.2s ease;
+            cursor: pointer;
 
             &.clickable {
-              cursor: pointer;
-
               &:hover {
                 border-color: var(--accent-color);
                 transform: translateY(-1px);

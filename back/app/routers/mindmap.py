@@ -4,10 +4,10 @@ from typing import Dict, Any, Optional
 from datetime import datetime
 
 from ..database import get_db
-from ..mindmap_config import get_all_topics, get_topic_config
+from ..mindmap_config import get_all_topics, get_topic_config, get_technology_center, get_available_technologies
 from ..auth import get_current_user_from_session_required
 from ..models import ContentBlock, ContentFile, UserContentProgress
-from sqlalchemy import func, and_
+from sqlalchemy import func, and_, asc
 
 router = APIRouter(prefix="/api/mindmap", tags=["mindmap"])
 
@@ -16,6 +16,7 @@ async def generate_mindmap(
     request: Request,
     db: Session = Depends(get_db),
     structure_type: str = "topics",
+    technology: str = "javascript",
     difficulty_filter: Optional[str] = None,
     topic_filter: Optional[str] = None
 ) -> Dict[str, Any]:
@@ -30,6 +31,7 @@ async def generate_mindmap(
         mindmap_data = generate_topic_based_mindmap(
             db=db,
             user_id=user.id if user else None,
+            technology=technology,
             difficulty_filter=difficulty_filter,
             topic_filter=topic_filter
         )
@@ -40,6 +42,7 @@ async def generate_mindmap(
             "structure_type": structure_type,
             "metadata": {
                 "generated_at": datetime.now().isoformat(),
+                "technology": technology,
                 "filters_applied": {
                     "difficulty": difficulty_filter,
                     "topic": topic_filter
@@ -51,15 +54,47 @@ async def generate_mindmap(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Ошибка генерации mindmap: {str(e)}")
 
+@router.get("/technologies")
+async def get_available_technologies_endpoint() -> Dict[str, Any]:
+    """Получить список доступных технологий для mindmap"""
+    try:
+        technologies = get_available_technologies()
+        technology_configs = {}
+        
+        for tech in technologies:
+            config = get_technology_center(tech)
+            if config:
+                technology_configs[tech] = {
+                    "title": config['title'],
+                    "description": config['description'],
+                    "icon": config['icon'],
+                    "color": config['color']
+                }
+        
+        return {
+            "success": True,
+            "data": {
+                "technologies": technologies,
+                "configs": technology_configs
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Ошибка получения технологий: {str(e)}")
+
 def generate_topic_based_mindmap(
     db: Session,
     user_id: Optional[int] = None,
+    technology: str = "javascript",
     difficulty_filter: Optional[str] = None,
     topic_filter: Optional[str] = None
 ) -> Dict[str, Any]:
     
-    # Используем конфигурацию из отдельного файла
-    md_topics = get_all_topics()
+    # Получаем конфигурацию для выбранной технологии
+    technology_center = get_technology_center(technology)
+    if not technology_center:
+        raise ValueError(f"Неподдерживаемая технология: {technology}")
+    
+    md_topics = get_all_topics(technology)
     
     nodes = []
     edges = []
@@ -69,7 +104,7 @@ def generate_topic_based_mindmap(
     if user_id:
         total_tasks_with_code = db.query(func.count(ContentBlock.id)).join(ContentFile).filter(
             ContentBlock.codeContent.isnot(None),
-            ContentFile.mainCategory == 'JS'  # Считаем только JavaScript задачи
+            ContentFile.mainCategory == technology_center['mainCategory']  # Считаем задачи текущей технологии
         ).scalar() or 0
         
         completed_tasks = db.query(func.count(UserContentProgress.id)).filter(
@@ -77,7 +112,7 @@ def generate_topic_based_mindmap(
             UserContentProgress.solvedCount > 0
         ).join(ContentBlock).join(ContentFile).filter(
             ContentBlock.codeContent.isnot(None),
-            ContentFile.mainCategory == 'JS'  # Считаем только JavaScript задачи
+            ContentFile.mainCategory == technology_center['mainCategory']  # Считаем задачи текущей технологии
         ).scalar() or 0
         
         overall_completion_rate = (completed_tasks / total_tasks_with_code * 100) if total_tasks_with_code > 0 else 0
@@ -93,9 +128,12 @@ def generate_topic_based_mindmap(
         "type": "center",
         "position": {"x": 500, "y": 400},
         "data": {
-            "title": "JavaScript Skills",
-            "description": "Изучение JavaScript",
+            "title": technology_center['title'],
+            "description": technology_center['description'],
+            "icon": technology_center['icon'],
+            "color": technology_center['color'],
             "type": "center",
+            "technology": technology,
             "overallProgress": overall_progress
         }
     })
@@ -117,11 +155,10 @@ def generate_topic_based_mindmap(
         # Получаем прогресс по данной категории если пользователь авторизован
         progress_data = None
         if user_id:
-            # Общее количество задач в категории (с кодом)
+            # Общее количество задач в категории (без фильтра по коду)
             total_tasks = db.query(func.count(ContentBlock.id)).join(ContentFile).filter(
                 ContentFile.mainCategory == topic_config['mainCategory'],
-                ContentFile.subCategory == topic_config['subCategory'],
-                ContentBlock.codeContent.isnot(None)
+                ContentFile.subCategory == topic_config['subCategory']
             ).scalar() or 0
 
             # Количество решённых задач
@@ -130,8 +167,7 @@ def generate_topic_based_mindmap(
                 UserContentProgress.solvedCount > 0
             ).join(ContentBlock).join(ContentFile).filter(
                 ContentFile.mainCategory == topic_config['mainCategory'],
-                ContentFile.subCategory == topic_config['subCategory'],
-                ContentBlock.codeContent.isnot(None)
+                ContentFile.subCategory == topic_config['subCategory']
             ).scalar() or 0
 
             # Рассчитываем процент завершения
@@ -199,12 +235,13 @@ async def get_topic_tasks(
     topic_key: str,
     request: Request,
     db: Session = Depends(get_db),
+    technology: str = "javascript",
     difficulty_filter: Optional[str] = None
 ) -> Dict[str, Any]:
     try:
-        topic_config = get_topic_config(topic_key)
+        topic_config = get_topic_config(topic_key, technology)
         if not topic_config:
-            raise HTTPException(status_code=404, detail=f"Topic '{topic_key}' not found")
+            raise HTTPException(status_code=404, detail=f"Topic '{topic_key}' not found for technology '{technology}'")
         
         # Получаем пользователя (если авторизован)
         user = None
@@ -266,10 +303,9 @@ async def get_topic_tasks(
         # Получаем общую статистику по топику
         topic_stats = None
         if user:
-            total_tasks = sum(1 for task in tasks if task["hasCode"])
-            completed_tasks = sum(1 for task in tasks if task["progress"] and task["progress"]["isCompleted"] and task["hasCode"])
+            total_tasks = len(tasks)  # теперь считаем все задачи, а не только с кодом
+            completed_tasks = sum(1 for task in tasks if task["progress"] and task["progress"]["isCompleted"])
             completion_rate = (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0
-            
             topic_stats = {
                 "totalTasks": total_tasks,
                 "completedTasks": completed_tasks,
@@ -293,3 +329,59 @@ async def get_topic_tasks(
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Ошибка загрузки задач: {str(e)}") 
+
+@router.get("/task/{task_id}")
+async def get_task_detail(
+    task_id: str,
+    request: Request,
+    db: Session = Depends(get_db)
+) -> Dict[str, Any]:
+    try:
+        from ..models import ContentBlock, UserContentProgress
+        block = db.query(ContentBlock).filter(ContentBlock.id == task_id).first()
+        if not block:
+            raise HTTPException(status_code=404, detail=f"Task with id '{task_id}' not found")
+
+        description = block.textContent or ""
+        if description:
+            description = description.replace("\\n", "\n").replace("\\t", "\t")
+
+        # Получаем прогресс по задаче если пользователь авторизован
+        user = None
+        try:
+            user = get_current_user_from_session_required(request, db)
+        except:
+            pass
+        progress = None
+        if user:
+            user_progress = db.query(UserContentProgress).filter(
+                UserContentProgress.userId == user.id,
+                UserContentProgress.blockId == block.id
+            ).first()
+            if user_progress:
+                progress = {
+                    "solvedCount": user_progress.solvedCount,
+                    "isCompleted": user_progress.solvedCount > 0
+                }
+            else:
+                progress = {
+                    "solvedCount": 0,
+                    "isCompleted": False
+                }
+
+        return {
+            "success": True,
+            "task": {
+                "id": block.id,
+                "title": block.blockTitle or "Задача без названия",
+                "description": description,
+                "hasCode": block.codeContent is not None,
+                "codeContent": block.codeContent,
+                "codeLanguage": block.codeLanguage,
+                "progress": progress
+            }
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Ошибка загрузки задачи: {str(e)}") 

@@ -225,3 +225,21 @@ export const TOPIC_ICONS = {
   throttle_debounce: '⏱️',
   numbers: '🔢',
 } as const;
+
+// Добавляем типы для технологий
+export type TechnologyType = 'javascript' | 'react' | 'typescript';
+
+export interface TechnologyConfig {
+  title: string;
+  description: string;
+  icon: string;
+  color: string;
+}
+
+export interface TechnologiesResponse {
+  success: boolean;
+  data: {
+    technologies: TechnologyType[];
+    configs: Record<TechnologyType, TechnologyConfig>;
+  };
+}

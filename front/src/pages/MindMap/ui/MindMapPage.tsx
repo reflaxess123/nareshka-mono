@@ -1,4 +1,6 @@
+import { TechnologySwitcher } from '@/components/TechnologySwitcher';
 import { BottomNavBar } from '@/shared/components/BottomNavBar';
+import type { TechnologyType } from '@/types/mindmap';
 import {
   Background,
   Controls,
@@ -12,9 +14,11 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import React, { useCallback, useEffect, useState } from 'react';
+import { TaskDetailModal } from '../../../components/mindmap/TaskDetailModal';
 import CenterNode from '../../../components/MindMapNodes/CenterNode';
 import MindMapProgressSidebar from '../../../components/MindMapNodes/MindMapProgressSidebar';
 import TopicNode from '../../../components/MindMapNodes/TopicNode';
+import { useTaskDetails } from '../../../hooks/useMindMap';
 import styles from './MindMapPage.module.scss';
 
 interface MindMapData {
@@ -61,26 +65,49 @@ const NewMindMapPage: React.FC = () => {
     null
   );
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [currentTechnology, setCurrentTechnology] =
+    useState<TechnologyType>('javascript');
+  const [theoreticalTaskId, setTheoreticalTaskId] = useState<string | null>(
+    null
+  );
+  const { task: theoreticalTaskDetail } = useTaskDetails(theoreticalTaskId);
 
-  const fetchMindMap = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await fetch('/api/mindmap/generate', {
-        credentials: 'include',
-      });
-      const result = await response.json();
+  const fetchMindMap = useCallback(
+    async (technology: TechnologyType = currentTechnology) => {
+      setLoading(true);
+      try {
+        const params = new URLSearchParams();
+        params.append('technology', technology);
 
-      if (result.success && result.data) {
-        setMindMapData(result.data);
-        setNodes(result.data.nodes);
-        setEdges(result.data.edges);
+        const response = await fetch(
+          `/api/mindmap/generate?${params.toString()}`,
+          {
+            credentials: 'include',
+          }
+        );
+        const result = await response.json();
+
+        if (result.success && result.data) {
+          setMindMapData(result.data);
+          setNodes(result.data.nodes);
+          setEdges(result.data.edges);
+        }
+      } catch {
+        // Игнорируем ошибки
+      } finally {
+        setLoading(false);
       }
-    } catch {
-      // Игнорируем ошибки
-    } finally {
-      setLoading(false);
-    }
-  }, [setNodes, setEdges]);
+    },
+    [currentTechnology, setNodes, setEdges]
+  );
+
+  const handleTechnologyChange = useCallback(
+    (technology: TechnologyType) => {
+      setCurrentTechnology(technology);
+      fetchMindMap(technology);
+    },
+    [fetchMindMap]
+  );
 
   const onNodeClick = useCallback((_event: React.MouseEvent, node: Node) => {
     if (node.type === 'topic' && node.data.topic_key) {
@@ -148,6 +175,13 @@ const NewMindMapPage: React.FC = () => {
 
   return (
     <div className={styles.mindmapContainer}>
+      <div className={styles.technologySwitcherWrapper}>
+        <TechnologySwitcher
+          currentTechnology={currentTechnology}
+          onTechnologyChange={handleTechnologyChange}
+        />
+      </div>
+
       <div
         style={{
           width: isSidebarOpen ? 'calc(100% - 400px)' : '100%',
@@ -205,7 +239,15 @@ const NewMindMapPage: React.FC = () => {
         isOpen={isSidebarOpen}
         onClose={handleCloseSidebar}
         selectedTopic={selectedTopic}
+        currentTechnology={currentTechnology}
         onTaskClick={handleTaskClick}
+        onTheoreticalTaskClick={setTheoreticalTaskId}
+      />
+
+      <TaskDetailModal
+        isOpen={!!theoreticalTaskId}
+        onClose={() => setTheoreticalTaskId(null)}
+        task={theoreticalTaskDetail}
       />
 
       <div className={styles.mobileNav}>

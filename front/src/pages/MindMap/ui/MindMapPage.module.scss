@@ -19,6 +19,28 @@
     ) !important;
   }
 
+  .technologySwitcherWrapper {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    border-radius: 16px;
+    padding: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+
+    @media (max-width: 768px) {
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      transform: none;
+      width: calc(100% - 20px);
+    }
+  }
+
   .header {
     position: absolute;
     top: 0;

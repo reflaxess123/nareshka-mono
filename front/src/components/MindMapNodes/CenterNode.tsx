@@ -5,6 +5,9 @@ import styles from './CenterNode.module.scss';
 interface CenterNodeData {
   title: string;
   description: string;
+  icon?: string;
+  color?: string;
+  technology?: string;
   overallProgress?: {
     totalTasks: number;
     completedTasks: number;
@@ -20,6 +23,9 @@ interface CenterNodeProps {
 const CenterNode: React.FC<CenterNodeProps> = ({ data, selected }) => {
   const title = data.title || 'JavaScript Skills';
   const description = data.description || 'Изучение JavaScript';
+  const icon = data.icon || '⚡';
+  const color = data.color || '#F7DF1E';
+  const technology = data.technology || 'javascript';
   const overallProgress = data.overallProgress;
 
   return (
@@ -28,7 +34,7 @@ const CenterNode: React.FC<CenterNodeProps> = ({ data, selected }) => {
         type="source"
         position={Position.Top}
         style={{
-          background: '#8B5CF6',
+          background: color,
           width: '12px',
           height: '12px',
           top: '-6px',
@@ -38,7 +44,7 @@ const CenterNode: React.FC<CenterNodeProps> = ({ data, selected }) => {
         type="source"
         position={Position.Right}
         style={{
-          background: '#8B5CF6',
+          background: color,
           width: '12px',
           height: '12px',
           right: '-6px',
@@ -48,7 +54,7 @@ const CenterNode: React.FC<CenterNodeProps> = ({ data, selected }) => {
         type="source"
         position={Position.Bottom}
         style={{
-          background: '#8B5CF6',
+          background: color,
           width: '12px',
           height: '12px',
           bottom: '-6px',
@@ -58,7 +64,7 @@ const CenterNode: React.FC<CenterNodeProps> = ({ data, selected }) => {
         type="source"
         position={Position.Left}
         style={{
-          background: '#8B5CF6',
+          background: color,
           width: '12px',
           height: '12px',
           left: '-6px',
@@ -68,8 +74,8 @@ const CenterNode: React.FC<CenterNodeProps> = ({ data, selected }) => {
       <div className={styles.centerContent}>
         <div className={styles.centerHeader}>
           <div className={styles.centerIcon}>
-            <span role="img" aria-label="JavaScript">
-              ⚡
+            <span role="img" aria-label={technology}>
+              {icon}
             </span>
           </div>
           <h2 className={styles.centerTitle}>{title}</h2>
@@ -98,7 +104,7 @@ const CenterNode: React.FC<CenterNodeProps> = ({ data, selected }) => {
         )}
 
         <div className={styles.centerBadge}>
-          <span>Карта навыков JavaScript</span>
+          <span>Карта навыков {title.replace(' Skills', '')}</span>
         </div>
       </div>
     </div>

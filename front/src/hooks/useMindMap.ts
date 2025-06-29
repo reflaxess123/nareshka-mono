@@ -20,6 +20,7 @@ export const useMindMap = (
 ): UseMindMapResult => {
   const [filters, setFilters] = useState<TopicMindMapFilters>({
     structure_type: 'topics',
+    technology: 'javascript',
     ...initialFilters,
   });
 
@@ -31,6 +32,9 @@ export const useMindMap = (
 
         if (filters.structure_type) {
           searchParams.append('structure_type', filters.structure_type);
+        }
+        if (filters.technology) {
+          searchParams.append('technology', filters.technology);
         }
         if (filters.difficulty_filter) {
           searchParams.append('difficulty_filter', filters.difficulty_filter);
@@ -111,7 +115,25 @@ export const useTaskDetails = (taskId: string | null) => {
         throw new Error(result.error || 'Задача не найдена');
       }
 
-      setTask(result.task);
+      // Нормализация task для TaskDetailModal
+      const rawTask = result.task;
+      const normalizedTask = {
+        ...rawTask,
+        text_content: rawTask.text_content || rawTask.description || '',
+        programming_concepts: rawTask.programming_concepts || [],
+        js_features_used: rawTask.js_features_used || [],
+        complexity_score: rawTask.complexity_score || '',
+        estimated_time_minutes: rawTask.estimated_time_minutes || '',
+        code_lines: rawTask.code_lines || 0,
+        code_content: rawTask.code_content || rawTask.codeContent || '',
+        path_titles: rawTask.path_titles || [],
+        target_skill_level: rawTask.target_skill_level || '',
+        pedagogical_type: rawTask.pedagogical_type || '',
+        category: rawTask.category || '',
+        subcategory: rawTask.subcategory || '',
+      };
+
+      setTask(normalizedTask);
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : 'Ошибка загрузки задачи';
@@ -138,11 +160,16 @@ export const useTaskDetails = (taskId: string | null) => {
   };
 };
 
-export const useTopicTasks = (topicKey: string, difficultyFilter?: string) => {
+export const useTopicTasks = (
+  topicKey: string,
+  technology: string = 'javascript',
+  difficultyFilter?: string
+) => {
   return useQuery({
-    queryKey: ['topic-tasks', topicKey, difficultyFilter],
+    queryKey: ['topic-tasks', topicKey, technology, difficultyFilter],
     queryFn: async () => {
       const searchParams = new URLSearchParams();
+      searchParams.append('technology', technology);
       if (difficultyFilter) {
         searchParams.append('difficulty_filter', difficultyFilter);
       }

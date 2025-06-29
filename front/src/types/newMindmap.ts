@@ -116,6 +116,7 @@ export interface TopicMindMapResponse {
 // Фильтры и настройки для новой системы
 export interface TopicMindMapFilters {
   structure_type: 'topics' | 'legacy';
+  technology?: 'javascript' | 'react' | 'typescript';
   difficulty_filter?: 'beginner' | 'intermediate' | 'advanced';
   topic_filter?: string;
   concept_filter?: string;
