@@ -3,7 +3,7 @@ from typing import Optional, List, Dict, Any, Union
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel
-from sqlalchemy import asc, desc, func, or_
+from sqlalchemy import asc, desc, func, or_, text
 from sqlalchemy.orm import Session
 
 from ..auth import get_current_user_from_session
@@ -145,11 +145,9 @@ async def _get_content_blocks(
     
     if companies and companies:
         # Фильтруем по пересечению с массивом companies
+        # Используем правильный оператор для PostgreSQL массивов
         query = query.filter(
-            or_(
-                *[func.lower(func.array_to_string(ContentBlock.companies, ',', '')).contains(company) 
-                  for company in companies]
-            )
+            ContentBlock.companies.op('&&')(companies)
         )
     
     blocks = query.order_by(asc(ContentBlock.orderInFile)).all()
