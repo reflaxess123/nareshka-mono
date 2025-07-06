@@ -64,13 +64,14 @@ class ContentAPI {
     });
 
     const response = await apiInstance.get<ServerContentBlocksResponse>(
-      `/content/blocks?${params.toString()}`
+      `/v2/content/blocks?${params.toString()}`
     );
 
     // Преобразуем данные сервера в нужный формат
     const transformedData: ContentBlocksResponse = {
       data: response.data.blocks.map((block) => ({
         ...block,
+        title: block.blockTitle,
         // Извлекаем solvedCount из первого элемента progressEntries или ставим 0
         currentUserSolvedCount:
           block.progressEntries && block.progressEntries.length > 0
@@ -86,12 +87,13 @@ class ContentAPI {
   // Получение конкретного блока по ID
   async getBlock(blockId: string): Promise<ContentBlock> {
     const response = await apiInstance.get<ServerContentBlock>(
-      `/content/blocks/${blockId}`
+      `/v2/content/blocks/${blockId}`
     );
 
     // Преобразуем данные блока
     const transformedBlock: ContentBlock = {
       ...response.data,
+      title: response.data.blockTitle,
       currentUserSolvedCount:
         response.data.progressEntries &&
         response.data.progressEntries.length > 0
@@ -108,7 +110,7 @@ class ContentAPI {
     data: ContentProgressUpdate
   ): Promise<ContentProgressResponse> {
     const response = await apiInstance.patch(
-      `/content/blocks/${blockId}/progress`,
+      `/v2/content/blocks/${blockId}/progress`,
       data
     );
     return response.data;
@@ -116,7 +118,7 @@ class ContentAPI {
 
   // Получение иерархии категорий
   async getCategories(): Promise<ContentCategory[]> {
-    const response = await apiInstance.get('/content/categories');
+    const response = await apiInstance.get('/v2/content/categories');
     return response.data;
   }
 

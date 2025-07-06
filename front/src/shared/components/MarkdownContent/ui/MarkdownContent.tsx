@@ -17,6 +17,7 @@ const processTableWithLinks = (
   if (
     !content.includes('|') ||
     !content.includes('---') ||
+    !extractedUrls ||
     extractedUrls.length === 0
   ) {
     return content;
@@ -60,7 +61,11 @@ const processTableWithLinks = (
           );
 
           // Если ячейка содержит ключевое слово и есть доступные ссылки
-          if (hasLinkKeyword && urlIndex < extractedUrls.length) {
+          if (
+            hasLinkKeyword &&
+            extractedUrls &&
+            urlIndex < extractedUrls.length
+          ) {
             const url = extractedUrls[urlIndex];
             urlIndex++;
 

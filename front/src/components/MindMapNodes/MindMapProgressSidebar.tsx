@@ -73,7 +73,7 @@ const MindMapProgressSidebar: React.FC<MindMapProgressSidebarProps> = ({
 
     try {
       const response = await fetch(
-        `/api/mindmap/topic/${selectedTopic.key}/tasks?technology=${currentTechnology}`,
+        `/api/v2/mindmap/topic/${selectedTopic.key}/tasks?technology=${currentTechnology}`,
         {
           credentials: 'include',
         }

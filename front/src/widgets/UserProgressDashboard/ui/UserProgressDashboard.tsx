@@ -112,7 +112,7 @@ const UserProgressDashboard: React.FC<UserProgressDashboardProps> = ({
             {(progressData.recentActivity || []).map((activity) => (
               <div key={activity.id} className={styles.activityItem}>
                 <span>Совершена попытка</span>
-                <span>{activity.blockTitle}</span>
+                <span>{activity.title}</span>
                 <span
                   style={{
                     marginLeft: 'auto',

@@ -80,7 +80,7 @@ const NewMindMapPage: React.FC = () => {
         params.append('technology', technology);
 
         const response = await fetch(
-          `/api/mindmap/generate?${params.toString()}`,
+          `/api/v2/mindmap/generate?${params.toString()}`,
           {
             credentials: 'include',
           }

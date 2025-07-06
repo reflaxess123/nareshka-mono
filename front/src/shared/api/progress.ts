@@ -75,7 +75,7 @@ export interface SimplifiedOverallStats {
 export interface RecentActivityItem {
   id: string;
   blockId: string;
-  blockTitle: string;
+  title: string;
   category: string;
   subCategory?: string;
   isSuccessful: boolean;
@@ -129,7 +129,7 @@ const progressAPI = {
     options?: AxiosRequestConfig
   ): Promise<UserDetailedProgress> {
     const response = await apiInstance.get(
-      '/progress/user/my/detailed',
+      '/v2/progress/user/my/detailed',
       options
     );
     return response.data;
@@ -141,7 +141,7 @@ const progressAPI = {
     options?: AxiosRequestConfig
   ): Promise<UserDetailedProgress> {
     const response = await apiInstance.get(
-      `/progress/user/${userId}/detailed`,
+      `/v2/progress/user/${userId}/detailed`,
       options
     );
     return response.data;
@@ -149,19 +149,19 @@ const progressAPI = {
 
   // Записать попытку решения задачи
   async recordAttempt(attempt: TaskAttemptCreate): Promise<TaskAttempt> {
-    const response = await apiInstance.post('/progress/attempts', attempt);
+    const response = await apiInstance.post('/v2/progress/attempts', attempt);
     return response.data;
   },
 
   // Получить аналитику (для админов)
   async getAnalytics(): Promise<ProgressAnalytics> {
-    const response = await apiInstance.get('/progress/analytics');
+    const response = await apiInstance.get('/v2/progress/analytics');
     return response.data;
   },
 
   // Проверка работоспособности
   async healthCheck(): Promise<{ status: string }> {
-    const response = await apiInstance.get('/progress/health');
+    const response = await apiInstance.get('/v2/progress/health');
     return response.data;
   },
 };

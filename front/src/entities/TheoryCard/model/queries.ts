@@ -108,7 +108,7 @@ const useCategories = () => {
             error.message.includes('fetch'))
         ) {
           console.warn('Categories API недоступен (preview режим?)');
-          return [];
+          return { categories: [] };
         }
         throw error;
       }

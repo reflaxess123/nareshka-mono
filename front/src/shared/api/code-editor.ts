@@ -80,7 +80,7 @@ export interface ExecutionStats {
 export const codeEditorApi = {
   // Получение поддерживаемых языков
   async getSupportedLanguages(): Promise<SupportedLanguage[]> {
-    const response = await apiInstance.get('/code-editor/languages');
+    const response = await apiInstance.get('/v2/code-editor/languages');
     return response.data;
   },
 
@@ -88,7 +88,7 @@ export const codeEditorApi = {
   async executeCode(
     request: CodeExecutionRequest
   ): Promise<CodeExecutionResponse> {
-    const response = await apiInstance.post('/code-editor/execute', request);
+    const response = await apiInstance.post('/v2/code-editor/execute', request);
     return response.data;
   },
 
@@ -97,7 +97,7 @@ export const codeEditorApi = {
     executionId: string
   ): Promise<CodeExecutionResponse> {
     const response = await apiInstance.get(
-      `/code-editor/executions/${executionId}`
+      `/v2/code-editor/executions/${executionId}`
     );
     return response.data;
   },
@@ -108,7 +108,7 @@ export const codeEditorApi = {
     limit?: number;
     offset?: number;
   }): Promise<CodeExecutionResponse[]> {
-    const response = await apiInstance.get('/code-editor/executions', {
+    const response = await apiInstance.get('/v2/code-editor/executions', {
       params,
     });
     return response.data;
@@ -116,13 +116,18 @@ export const codeEditorApi = {
 
   // Сохранение решения
   async saveSolution(solution: CodeSolutionCreate): Promise<UserCodeSolution> {
-    const response = await apiInstance.post('/code-editor/solutions', solution);
+    const response = await apiInstance.post(
+      '/v2/code-editor/solutions',
+      solution
+    );
     return response.data;
   },
 
   // Получение решений для блока
   async getBlockSolutions(blockId: string): Promise<UserCodeSolution[]> {
-    const response = await apiInstance.get(`/code-editor/solutions/${blockId}`);
+    const response = await apiInstance.get(
+      `/v2/code-editor/solutions/${blockId}`
+    );
     return response.data;
   },
 
@@ -132,7 +137,7 @@ export const codeEditorApi = {
     update: CodeSolutionUpdate
   ): Promise<UserCodeSolution> {
     const response = await apiInstance.put(
-      `/code-editor/solutions/${solutionId}`,
+      `/v2/code-editor/solutions/${solutionId}`,
       update
     );
     return response.data;
@@ -140,7 +145,7 @@ export const codeEditorApi = {
 
   // Получение статистики
   async getExecutionStats(): Promise<ExecutionStats> {
-    const response = await apiInstance.get('/code-editor/stats');
+    const response = await apiInstance.get('/v2/code-editor/stats');
     return response.data;
   },
 

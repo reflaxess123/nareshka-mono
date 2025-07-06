@@ -26,20 +26,45 @@ export const selectContentBlocksError = (state: RootState) =>
 export const selectContentBlockById = (blockId: string) => (state: RootState) =>
   state.contentBlock.blocks.find((block) => block.id === blockId);
 
+export const selectFilteredBlocks = (state: RootState) => {
+  const { blocks, filters } = state.contentBlock;
+
+  let filteredBlocks = blocks;
+
+  // Фильтр по основным категориям
+  if (filters.mainCategories && filters.mainCategories.length > 0) {
+    filteredBlocks = filteredBlocks.filter(
+      (block) =>
+        block.file && filters.mainCategories!.includes(block.file.mainCategory)
+    );
+  }
+
+  // Фильтр по подкатегориям
+  if (filters.subCategories && filters.subCategories.length > 0) {
+    filteredBlocks = filteredBlocks.filter(
+      (block) =>
+        block.file && filters.subCategories!.includes(block.file.subCategory)
+    );
+  }
+
+  return filteredBlocks;
+};
+
 export const selectContentBlocksByCategories =
   (mainCategories?: string[], subCategories?: string[]) =>
   (state: RootState) => {
     let filteredBlocks = state.contentBlock.blocks;
 
     if (mainCategories && mainCategories.length > 0) {
-      filteredBlocks = filteredBlocks.filter((block) =>
-        mainCategories.includes(block.file.mainCategory)
+      filteredBlocks = filteredBlocks.filter(
+        (block) =>
+          block.file && mainCategories.includes(block.file.mainCategory)
       );
     }
 
     if (subCategories && subCategories.length > 0) {
-      filteredBlocks = filteredBlocks.filter((block) =>
-        subCategories.includes(block.file.subCategory)
+      filteredBlocks = filteredBlocks.filter(
+        (block) => block.file && subCategories.includes(block.file.subCategory)
       );
     }
 
@@ -62,24 +87,27 @@ export const selectTotalSolvedCount = (state: RootState) =>
 
 export const selectUniqueMainCategories = (state: RootState) => {
   const categories = new Set(
-    state.contentBlock.blocks.map((block) => block.file.mainCategory)
+    state.contentBlock.blocks
+      .filter((block) => block.file)
+      .map((block) => block.file!.mainCategory)
   );
   return Array.from(categories);
 };
 
-export const selectUniqueSubCategories =
-  (mainCategory?: string) => (state: RootState) => {
+export const selectUniqueSubCategories = (mainCategory?: string) => {
+  return (state: RootState) => {
     const blocks = mainCategory
       ? state.contentBlock.blocks.filter(
-          (block) => block.file.mainCategory === mainCategory
+          (block) => block.file && block.file.mainCategory === mainCategory
         )
-      : state.contentBlock.blocks;
+      : state.contentBlock.blocks.filter((block) => block.file);
 
     const subCategories = new Set(
-      blocks.map((block) => block.file.subCategory)
+      blocks.map((block) => block.file!.subCategory)
     );
     return Array.from(subCategories);
   };
+};
 
 export const selectHasMorePages = (state: RootState) => {
   const { page, totalPages } = state.contentBlock.pagination;

@@ -164,20 +164,26 @@ export const useUpdateTaskProgress = () => {
       action: 'increment' | 'decrement';
     }) => {
       if (type === 'content_block') {
-        const response = await fetch(`/api/content/blocks/${itemId}/progress`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ action }),
-        });
+        const response = await fetch(
+          `/api/v2/content/blocks/${itemId}/progress`,
+          {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ action }),
+          }
+        );
         return response.json();
       } else {
-        const response = await fetch(`/api/theory/cards/${itemId}/progress`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ action }),
-        });
+        const response = await fetch(
+          `/api/v2/theory/cards/${itemId}/progress`,
+          {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ action }),
+          }
+        );
         return response.json();
       }
     },

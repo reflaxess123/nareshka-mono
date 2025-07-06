@@ -82,14 +82,16 @@ class TasksAPI {
     });
 
     const response = await apiInstance.get<TaskItemsResponse>(
-      `/tasks/items?${params.toString()}`
+      `/v2/tasks/items?${params.toString()}`
     );
 
     return response.data;
   }
 
   async getTaskCategories(): Promise<TaskCategory[]> {
-    const response = await apiInstance.get<TaskCategory[]>('/tasks/categories');
+    const response = await apiInstance.get<TaskCategory[]>(
+      '/v2/tasks/categories'
+    );
     return response.data;
   }
 
@@ -132,8 +134,9 @@ class TasksAPI {
   }
 
   async getCompanies(): Promise<CompaniesResponse> {
-    const response =
-      await apiInstance.get<CompaniesResponse>('/tasks/companies');
+    const response = await apiInstance.get<CompaniesResponse>(
+      '/v2/tasks/companies'
+    );
     return response.data;
   }
 }

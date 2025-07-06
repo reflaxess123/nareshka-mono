@@ -23,12 +23,6 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import styles from './ContentBlockCard.module.scss';
 
-interface ExtendedContentBlock extends ContentBlock {
-  type?: 'content_block' | 'theory_quiz';
-  questionBlock?: string;
-  answerBlock?: string;
-}
-
 enum ModalSize {
   SM = 'sm',
   MD = 'md',
@@ -36,7 +30,7 @@ enum ModalSize {
 }
 
 interface ContentBlockCardProps {
-  block: ExtendedContentBlock;
+  block: ContentBlock;
   className?: string;
   variant?: 'default' | 'compact' | 'detailed';
 }
@@ -52,7 +46,7 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
     const navigate = useNavigate();
 
     const [editData, setEditData] = useState({
-      blockTitle: block.blockTitle,
+      title: block.title,
       textContent: block.textContent || '',
       codeContent: block.codeContent || '',
       codeLanguage: block.codeLanguage || 'javascript',
@@ -80,14 +74,17 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
       try {
         setIsUpdating(true);
 
-        const response = await fetch(`/api/admin/content/blocks/${block.id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify(editData),
-        });
+        const response = await fetch(
+          `/api/v2/admin/content/blocks/${block.id}`,
+          {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify(editData),
+          }
+        );
 
         if (!response.ok) {
           throw new Error('Не удалось обновить блок');
@@ -104,14 +101,14 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
     };
 
     const renderPathTitles = () => {
-      if (block.pathTitles.length <= 1) return null;
+      if (!block.pathTitles || block.pathTitles.length <= 1) return null;
 
       return (
         <div className={styles.pathTitles}>
           {block.pathTitles.slice(0, -1).map((title, index) => (
             <span key={index} className={styles.pathTitle}>
               {title}
-              {index < block.pathTitles.length - 2 && (
+              {index < (block.pathTitles?.length || 0) - 2 && (
                 <span className={styles.pathSeparator}>→</span>
               )}
             </span>
@@ -162,7 +159,7 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
     };
 
     const renderUrls = () => {
-      if (block.extractedUrls.length === 0) return null;
+      if (!block.extractedUrls || block.extractedUrls.length === 0) return null;
 
       const hasMarkdownTable =
         block.textContent?.includes('|') && block.textContent?.includes('---');
@@ -238,7 +235,7 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
           className={`${styles.contentBlockCard} ${styles.compact} ${className || ''}`}
         >
           <div className={styles.header}>
-            <h3 className={styles.title}>{block.blockTitle}</h3>
+            <h3 className={styles.title}>{block.title}</h3>
             <div className={styles.headerActions}>
               <ContentProgress
                 blockId={block.id}
@@ -260,7 +257,9 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
 
           <div className={styles.meta}>
             <span className={styles.category}>
-              {block.file.mainCategory} / {block.file.subCategory}
+              {block.file
+                ? `${block.file.mainCategory} / ${block.file.subCategory}`
+                : `${block.category} / ${block.subCategory}`}
             </span>
           </div>
 
@@ -285,7 +284,7 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
             {renderPathTitles()}
 
             <div className={styles.titleRow}>
-              <h2 className={styles.title}>{block.blockTitle}</h2>
+              <h2 className={styles.title}>{block.title}</h2>
               <div className={styles.titleActions}>
                 <ContentProgress
                   blockId={block.id}
@@ -307,7 +306,9 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
 
             <div className={styles.meta}>
               <span className={styles.category}>
-                {block.file.mainCategory} / {block.file.subCategory}
+                {block.file
+                  ? `${block.file.mainCategory} / ${block.file.subCategory}`
+                  : `${block.category} / ${block.subCategory}`}
               </span>
               {block.companies && block.companies.length > 0 && (
                 <div className={styles.companies}>
@@ -334,7 +335,7 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
                 ) : (
                   <MarkdownContent
                     content={block.textContent}
-                    extractedUrls={block.extractedUrls}
+                    extractedUrls={block.extractedUrls || []}
                   />
                 )}
               </div>
@@ -390,7 +391,7 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
 
           {(block.textContent ||
             block.codeContent ||
-            block.extractedUrls.length > 0) && (
+            (block.extractedUrls && block.extractedUrls.length > 0)) && (
             <button
               className={styles.expandButton}
               onClick={() => setIsCodeExpanded(!isCodeExpanded)}
@@ -407,7 +408,9 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
           {isAdmin && (
             <footer className={styles.footer}>
               <div className={styles.fileInfo}>
-                <span className={styles.filePath}>{block.file.webdavPath}</span>
+                <span className={styles.filePath}>
+                  {block.file ? block.file.webdavPath : 'Theory Quiz (no file)'}
+                </span>
               </div>
 
               <div className={styles.timestamps}>
@@ -450,11 +453,11 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
                   <label>Заголовок блока *</label>
                   <input
                     type="text"
-                    value={editData.blockTitle}
+                    value={editData.title}
                     onChange={(e) =>
                       setEditData((prev) => ({
                         ...prev,
-                        blockTitle: e.target.value,
+                        title: e.target.value,
                       }))
                     }
                     required
@@ -480,15 +483,15 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
                     <label>Уровень блока</label>
                     <input
                       type="number"
-                      value={editData.blockLevel}
+                      value={editData.blockLevel || 0}
                       onChange={(e) =>
                         setEditData((prev) => ({
                           ...prev,
-                          blockLevel: parseInt(e.target.value) || 1,
+                          blockLevel: parseInt(e.target.value),
                         }))
                       }
-                      min="1"
-                      max="6"
+                      className={styles.editModalInput}
+                      placeholder="Уровень заголовка"
                     />
                   </div>
 
@@ -533,13 +536,14 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
                     <label className={styles.checkboxLabel}>
                       <input
                         type="checkbox"
-                        checked={editData.isCodeFoldable}
+                        checked={editData.isCodeFoldable || false}
                         onChange={(e) =>
                           setEditData((prev) => ({
                             ...prev,
                             isCodeFoldable: e.target.checked,
                           }))
                         }
+                        className={styles.editModalCheckbox}
                       />
                       Код сворачиваемый
                     </label>
@@ -573,7 +577,7 @@ export const ContentBlockCard = forwardRef<HTMLElement, ContentBlockCardProps>(
                 <button
                   className={styles.editModalSave}
                   onClick={handleSaveEdit}
-                  disabled={isUpdating || !editData.blockTitle.trim()}
+                  disabled={isUpdating || !editData.title.trim()}
                 >
                   {isUpdating ? 'Сохранение...' : 'Сохранить'}
                 </button>
