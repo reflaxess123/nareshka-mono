@@ -6,7 +6,7 @@ export const useTechnologies = () => {
   return useQuery<TechnologiesResponse>({
     queryKey: ['mindmap-technologies'],
     queryFn: async () => {
-      const response = await axios.get('/api/mindmap/technologies');
+      const response = await axios.get('/api/v2/mindmap/technologies');
       return response.data;
     },
     staleTime: 10 * 60 * 1000, // Кешируем на 10 минут

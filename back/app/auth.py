@@ -8,7 +8,7 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
-from .config import settings
+from .config.new_settings import legacy_settings
 from .database import get_db
 from .models import User
 
@@ -17,7 +17,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 # Redis клиент для сессий
-redis_client = redis.from_url(settings.redis_url, decode_responses=True)
+redis_client = redis.from_url(legacy_settings.redis_url, decode_responses=True)
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -36,17 +36,17 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=settings.access_token_expire_minutes)
+        expire = datetime.utcnow() + timedelta(minutes=legacy_settings.access_token_expire_minutes)
 
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
+    encoded_jwt = jwt.encode(to_encode, legacy_settings.secret_key, algorithm=legacy_settings.algorithm)
     return encoded_jwt
 
 
 def verify_token(token: str, credentials_exception):
     """Проверка JWT токена"""
     try:
-        payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
+        payload = jwt.decode(token, legacy_settings.secret_key, algorithms=[legacy_settings.algorithm])
         email: str = payload.get("sub")
         if email is None:
             raise credentials_exception
@@ -107,21 +107,33 @@ def require_admin(request: Request, db: Session = Depends(get_db)) -> User:
 # Альтернативная система на основе сессий (как в оригинале)
 def create_session(user_id: int, session_id: str) -> None:
     """Создание сессии в Redis"""
-    session_key = f"session:{session_id}"
-    redis_client.setex(session_key, timedelta(days=1), str(user_id))
+    try:
+        session_key = f"session:{session_id}"
+        redis_client.setex(session_key, timedelta(days=1), str(user_id))
+    except Exception as e:
+        print(f"Redis error in create_session: {e}")
+        # Graceful degradation - сессия не создастся, но приложение не упадет
 
 
 def get_session_user_id(session_id: str) -> Optional[int]:
     """Получение ID пользователя из сессии"""
-    session_key = f"session:{session_id}"
-    user_id = redis_client.get(session_key)
-    return int(user_id) if user_id else None
+    try:
+        session_key = f"session:{session_id}"
+        user_id = redis_client.get(session_key)
+        return int(user_id) if user_id else None
+    except Exception as e:
+        print(f"Redis error in get_session_user_id: {e}")
+        return None  # Graceful degradation
 
 
 def delete_session(session_id: str) -> None:
     """Удаление сессии"""
-    session_key = f"session:{session_id}"
-    redis_client.delete(session_key)
+    try:
+        session_key = f"session:{session_id}"
+        redis_client.delete(session_key)
+    except Exception as e:
+        print(f"Redis error in delete_session: {e}")
+        # Graceful degradation - сессия не удалится, но приложение не упадет
 
 
 def get_current_user_from_session(request: Request, db: Session = Depends(get_db)) -> Optional[User]:

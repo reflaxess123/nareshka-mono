@@ -59,7 +59,7 @@ export const useContentBlocks = (filters: ContentBlocksFilters = {}) => {
         }
       });
 
-      return fetch(`/api/tasks/items?${params.toString()}`, {
+      return fetch(`/api/v2/tasks/items?${params.toString()}`, {
         credentials: 'include',
       }).then((res) => res.json());
     },
@@ -121,7 +121,7 @@ export const useInfiniteContentBlocks = (
         }
       );
 
-      return fetch(`/api/tasks/items?${params.toString()}`, {
+      return fetch(`/api/v2/tasks/items?${params.toString()}`, {
         credentials: 'include',
       }).then((res) => res.json());
     },
@@ -199,7 +199,7 @@ export const useContentCategories = () => {
   const query = useQuery({
     queryKey: contentQueryKeys.categories(),
     queryFn: () => {
-      return fetch('/api/tasks/categories', {
+      return fetch('/api/v2/tasks/categories', {
         credentials: 'include',
       }).then((res) => res.json());
     },
@@ -496,7 +496,7 @@ export const useCompanies = (filters?: {
         });
       }
 
-      return fetch(`/api/tasks/companies?${params.toString()}`, {
+      return fetch(`/api/v2/tasks/companies?${params.toString()}`, {
         credentials: 'include',
       }).then((res) => res.json());
     },

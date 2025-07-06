@@ -11,30 +11,33 @@ import { apiInstance } from './base';
 
 export const authApi = {
   async login(credentials: LoginRequest) {
-    const response = await apiInstance.post<User>('/auth/login', credentials);
+    const response = await apiInstance.post<User>(
+      '/v2/auth/login',
+      credentials
+    );
     return response.data;
   },
 
   async register(credentials: RegisterRequest) {
     const response = await apiInstance.post<User>(
-      '/auth/register',
+      '/v2/auth/register',
       credentials
     );
     return response.data;
   },
 
   async logout() {
-    await apiInstance.post('/auth/logout');
+    await apiInstance.post('/v2/auth/logout');
   },
 
   async getProfile() {
-    const response = await apiInstance.get<User>('/profile');
+    const response = await apiInstance.get<User>('/v2/auth/me');
     return response.data;
   },
 
   admin: {
     async getStats(): Promise<AdminStats> {
-      const response = await apiInstance.get<AdminStats>('/admin/stats');
+      const response = await apiInstance.get<AdminStats>('/v2/admin/stats');
       return response.data;
     },
 
@@ -48,12 +51,12 @@ export const authApi = {
         users: AdminUser[];
         total: number;
         pages: number;
-      }>('/admin/users', { params });
+      }>('/v2/admin/users', { params });
       return response.data;
     },
 
     async createUser(data: CreateUserRequest): Promise<AdminUser> {
-      const response = await apiInstance.post<AdminUser>('/admin/users', data);
+      const response = await apiInstance.post<AdminUser>('/v2/admin/users', data);
       return response.data;
     },
 
@@ -62,27 +65,27 @@ export const authApi = {
       data: UpdateUserRequest
     ): Promise<AdminUser> {
       const response = await apiInstance.put<AdminUser>(
-        `/admin/users/${userId}`,
+        `/v2/admin/users/${userId}`,
         data
       );
       return response.data;
     },
 
     async deleteUser(userId: number): Promise<void> {
-      const response = await apiInstance.delete<void>(`/admin/users/${userId}`);
+      const response = await apiInstance.delete<void>(`/v2/admin/users/${userId}`);
       return response.data;
     },
 
     async getContentStats(): Promise<Record<string, unknown>> {
       const response = await apiInstance.get<Record<string, unknown>>(
-        '/admin/content/stats'
+        '/v2/admin/content/stats'
       );
       return response.data;
     },
 
     async deleteContentFile(fileId: string): Promise<void> {
       const response = await apiInstance.delete<void>(
-        `/admin/content/files/${fileId}`
+        `/v2/admin/content/files/${fileId}`
       );
       return response.data;
     },

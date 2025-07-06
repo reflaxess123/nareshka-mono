@@ -58,7 +58,7 @@ export const TheoryCard = ({ card }: TheoryCardProps) => {
     try {
       setIsUpdating(true);
 
-      const response = await fetch(`/api/admin/theory/cards/${card.id}`, {
+      const response = await fetch(`/api/v2/admin/theory/cards/${card.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

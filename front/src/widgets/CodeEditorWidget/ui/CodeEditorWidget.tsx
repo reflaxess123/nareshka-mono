@@ -8,7 +8,7 @@ import { CodeEditor } from '@/shared/components/CodeEditor';
 
 export interface CodeEditorWidgetProps {
   blockId: string;
-  blockTitle: string;
+  title: string;
   codeContent?: string;
   codeLanguage?: string;
   className?: string;
@@ -16,7 +16,7 @@ export interface CodeEditorWidgetProps {
 
 export const CodeEditorWidget = ({
   blockId,
-  blockTitle,
+  title,
   codeContent,
   codeLanguage = 'PYTHON',
   className = '',
@@ -67,7 +67,7 @@ export const CodeEditorWidget = ({
       <div className="widget-header" onClick={toggleExpanded}>
         <div className="header-left">
           <Code className="w-5 h-5 text-blue-500" />
-          <h3 className="widget-title">{blockTitle}</h3>
+          <h3 className="widget-title">{title}</h3>
           {hasSolutions && (
             <span className="solution-badge">
               {solutions.length} решени{solutions.length > 1 ? 'я' : 'е'}

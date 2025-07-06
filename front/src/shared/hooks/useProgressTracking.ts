@@ -96,7 +96,7 @@ export const useProgressTracking = (
         throw new Error('User not authenticated');
       }
 
-      return fetch(`/api/code-editor/validate/${validationData.blockId}`, {
+      return fetch(`/api/v2/code-editor/validate/${validationData.blockId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -155,7 +155,7 @@ export const useProgressTracking = (
         throw new Error('User not authenticated');
       }
 
-      return fetch(`/api/code-editor/test-cases/${blockId}`, {
+      return fetch(`/api/v2/code-editor/test-cases/${blockId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

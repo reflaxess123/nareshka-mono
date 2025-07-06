@@ -10,23 +10,29 @@ export interface ContentFile {
 
 export interface ContentBlock {
   id: string;
-  fileId: string;
-  pathTitles: string[]; // Иерархия заголовков ["Level 1", "Level 2", "Block Title"]
-  blockTitle: string;
-  blockLevel: number; // Уровень заголовка (1-4)
-  orderInFile: number;
-  textContent?: string;
-  codeContent?: string;
-  codeLanguage?: string;
-  isCodeFoldable: boolean;
-  codeFoldTitle?: string;
-  extractedUrls: string[];
-  companies?: string[]; // Список компаний где встречалась задача
-  rawBlockContentHash?: string;
+  fileId?: string | null;
+  pathTitles?: string[] | null; // Иерархия заголовков ["Level 1", "Level 2", "Block Title"]
+  title: string;
+  blockLevel?: number | null; // Уровень заголовка (1-4)
+  orderInFile?: number | null;
+  textContent?: string | null;
+  codeContent?: string | null;
+  codeLanguage?: string | null;
+  isCodeFoldable?: boolean | null;
+  codeFoldTitle?: string | null;
+  extractedUrls?: string[] | null;
+  companies?: string[] | null; // Список компаний где встречалась задача
+  rawBlockContentHash?: string | null;
   createdAt: string;
   updatedAt: string;
   currentUserSolvedCount: number; // Количество решений текущего пользователя
-  file: ContentFile;
+  file?: ContentFile | null;
+  // Дополнительные поля для теоретических квизов
+  type?: 'content_block' | 'theory_quiz';
+  category?: string;
+  subCategory?: string;
+  questionBlock?: string;
+  answerBlock?: string;
 }
 
 export interface ContentBlocksResponse {

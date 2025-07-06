@@ -30,7 +30,7 @@ export const useMindMapData = (
         params.append('concept_filter', conceptFilter);
       }
 
-      const url = `/api/mindmap/generate${params.toString() ? `?${params.toString()}` : ''}`;
+      const url = `/api/v2/mindmap/generate${params.toString() ? `?${params.toString()}` : ''}`;
 
       const response = await fetch(url);
 

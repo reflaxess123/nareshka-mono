@@ -1,5 +1,5 @@
 import type {
-  Category,
+  CategoriesResponse,
   TheoryCardsQueryParams,
   TheoryCardsResponse,
   UpdateProgressRequest,
@@ -49,7 +49,7 @@ export const theoryCardsApi = {
     params: TheoryCardsQueryParams
   ): Promise<TheoryCardsResponse> {
     const response = await apiInstance.get<ServerTheoryCardsResponse>(
-      '/theory/cards',
+      '/v2/theory/cards',
       {
         params,
       }
@@ -78,14 +78,16 @@ export const theoryCardsApi = {
     return transformedData;
   },
 
-  async getCategories() {
-    const response = await apiInstance.get<Category[]>('/theory/categories');
+  async getCategories(): Promise<CategoriesResponse> {
+    const response = await apiInstance.get<CategoriesResponse>(
+      '/v2/theory/categories'
+    );
     return response.data;
   },
 
   async updateProgress(cardId: string, data: UpdateProgressRequest) {
     const response = await apiInstance.patch<UpdateProgressResponse>(
-      `/theory/cards/${cardId}/progress`,
+      `/v2/theory/cards/${cardId}/progress`,
       data
     );
     return response.data;

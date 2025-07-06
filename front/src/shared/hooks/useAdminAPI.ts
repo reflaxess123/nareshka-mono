@@ -97,7 +97,7 @@ export const useOverviewStats = () => {
   return useQuery({
     queryKey: adminQueryKeys.overview(),
     queryFn: async () => {
-      const response = await fetch('/api/stats/overview', {
+      const response = await fetch('/api/v2/stats/overview', {
         credentials: 'include',
       });
 
@@ -126,7 +126,7 @@ export const useContentStats = (
       if (params.category) searchParams.append('category', params.category);
       if (params.includeBlocks) searchParams.append('includeBlocks', 'true');
 
-      const response = await fetch(`/api/stats/content?${searchParams}`, {
+      const response = await fetch(`/api/v2/stats/content?${searchParams}`, {
         credentials: 'include',
       });
 
@@ -156,7 +156,7 @@ export const useTheoryStats = (
       if (params.category) searchParams.append('category', params.category);
       if (params.includeCards) searchParams.append('includeCards', 'true');
 
-      const response = await fetch(`/api/stats/theory?${searchParams}`, {
+      const response = await fetch(`/api/v2/stats/theory?${searchParams}`, {
         credentials: 'include',
       });
 

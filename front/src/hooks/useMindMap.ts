@@ -43,7 +43,7 @@ export const useMindMap = (
           searchParams.append('topic_filter', filters.topic_filter);
         }
 
-        const url = `/api/mindmap/generate?${searchParams.toString()}`;
+        const url = `/api/v2/mindmap/generate?${searchParams.toString()}`;
 
         const response = await axios.get(url);
 
@@ -103,7 +103,7 @@ export const useTaskDetails = (taskId: string | null) => {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/mindmap/task/${taskId}`);
+      const response = await fetch(`/api/v2/mindmap/task/${taskId}`);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -174,7 +174,7 @@ export const useTopicTasks = (
         searchParams.append('difficulty_filter', difficultyFilter);
       }
 
-      const url = `/api/mindmap/topic/${topicKey}/tasks?${searchParams.toString()}`;
+      const url = `/api/v2/mindmap/topic/${topicKey}/tasks?${searchParams.toString()}`;
       const response = await axios.get(url);
       return response.data;
     },

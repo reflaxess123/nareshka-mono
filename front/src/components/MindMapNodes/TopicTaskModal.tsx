@@ -42,7 +42,7 @@ const TopicTaskModal: React.FC<TopicTaskModalProps> = ({
     setError(null);
 
     try {
-      const response = await fetch(`/api/mindmap/topic/${topicKey}/tasks`);
+      const response = await fetch(`/api/v2/mindmap/topic/${topicKey}/tasks`);
       const result = await response.json();
 
       if (result.success) {
@@ -66,7 +66,7 @@ const TopicTaskModal: React.FC<TopicTaskModalProps> = ({
 
   const handleTaskClick = async (task: Task) => {
     try {
-      const response = await fetch(`/api/content/blocks/${task.id}`);
+      const response = await fetch(`/api/v2/content/blocks/${task.id}`);
       const blockData = await response.json();
 
       if (blockData) {

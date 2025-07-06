@@ -67,12 +67,12 @@ export const CodeEditorPage = () => {
   }, [blockId, block?.id, getTestCases]); // ✅ УБРАЛИ showInfoMessage из зависимостей
 
   const determineLanguageFromBlock = (block: {
-    codeLanguage?: string;
-    file: {
+    codeLanguage?: string | null;
+    file?: {
       mainCategory: string;
       subCategory: string;
-    };
-    codeContent?: string;
+    } | null;
+    codeContent?: string | null;
   }): string => {
     const isJSTask = CodeTemplateGenerator.isJavaScriptTask(block);
 
@@ -297,7 +297,7 @@ for (let i = 0; i < 10; i++) {
 
           {isTaskMode && block && (
             <>
-              <span className="task-title">{block.blockTitle}</span>
+              <span className="task-title">{block.title}</span>
               <div className="task-badges">
                 {isJSTask && <span className="language-badge">JavaScript</span>}
               </div>

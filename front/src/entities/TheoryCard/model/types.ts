@@ -71,6 +71,10 @@ export interface Category {
   totalCards: number;
 }
 
+export interface CategoriesResponse {
+  categories: Category[];
+}
+
 // Тип для фильтров
 export interface TheoryFilters {
   category?: string;

@@ -24,6 +24,9 @@ import styles from './ContentFilters.module.scss';
 interface Category {
   name: string;
   subCategories: string[];
+  totalCount: number;
+  contentBlockCount: number;
+  theoryQuizCount: number;
 }
 
 interface ContentFiltersProps {
@@ -246,13 +249,13 @@ export const ContentFilters = ({
       [section]: !prev[section],
     }));
   };
-  
+
   const getAvailableSubCategories = () => {
-    if (!filters.mainCategories?.length || !categories) return [];
+    if (!filters.mainCategories?.length || !categories?.categories) return [];
 
     const allSubCategories = new Set<string>();
     filters.mainCategories.forEach((mainCategory) => {
-      const category = categories.find(
+      const category = categories.categories.find(
         (cat: Category) => cat.name === mainCategory
       );
       if (category) {
@@ -298,7 +301,7 @@ export const ContentFilters = ({
             <div className={styles.filterGroup}>
               <label className={styles.filterLabel}>Основные категории</label>
               <div className={styles.checkboxGroup}>
-                {categories?.map((category: Category) => {
+                {categories?.categories?.map((category: Category) => {
                   const translatedName = translateMainCategory(category.name);
                   const isChecked =
                     filters.mainCategories?.includes(category.name) || false;
@@ -374,22 +377,27 @@ export const ContentFilters = ({
         {expandedSections.companies && (
           <div className={styles.sectionContent}>
             <div className={styles.checkboxGroup}>
-              {companies?.companies?.map((company: string) => {
-                const isChecked = filters.companies?.includes(company) || false;
+              {companies?.companies?.map(
+                (company: { name: string; count: number }) => {
+                  const isChecked =
+                    filters.companies?.includes(company.name) || false;
 
-                return (
-                  <label key={company} className={styles.checkboxLabel}>
-                    <input
-                      type="checkbox"
-                      checked={isChecked}
-                      onChange={(e) =>
-                        handleCompanyToggle(company, e.target.checked)
-                      }
-                    />
-                    <span>{company}</span>
-                  </label>
-                );
-              })}
+                  return (
+                    <label key={company.name} className={styles.checkboxLabel}>
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={(e) =>
+                          handleCompanyToggle(company.name, e.target.checked)
+                        }
+                      />
+                      <span>
+                        {company.name} ({company.count})
+                      </span>
+                    </label>
+                  );
+                }
+              )}
             </div>
           </div>
         )}

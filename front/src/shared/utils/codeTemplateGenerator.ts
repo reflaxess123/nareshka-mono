@@ -39,9 +39,9 @@ export class CodeTemplateGenerator {
    * Проверяет, является ли задача JavaScript/TypeScript (сохранен для совместимости)
    */
   static isJavaScriptTask(block: {
-    codeLanguage?: string;
-    file: { mainCategory: string; subCategory: string };
-    codeContent?: string;
+    codeLanguage?: string | null;
+    file?: { mainCategory: string; subCategory: string } | null;
+    codeContent?: string | null;
   }): boolean {
     // Проверяем язык кода
     if (block.codeLanguage) {
@@ -58,13 +58,15 @@ export class CodeTemplateGenerator {
     }
 
     // Проверяем категорию
-    if (
-      block.file?.mainCategory?.toLowerCase().includes('javascript') ||
-      block.file?.subCategory?.toLowerCase().includes('javascript') ||
-      block.file?.mainCategory?.toLowerCase().includes('react') ||
-      block.file?.subCategory?.toLowerCase().includes('react')
-    ) {
-      return true;
+    if (block.file) {
+      if (
+        block.file.mainCategory?.toLowerCase().includes('javascript') ||
+        block.file.subCategory?.toLowerCase().includes('javascript') ||
+        block.file.mainCategory?.toLowerCase().includes('react') ||
+        block.file.subCategory?.toLowerCase().includes('react')
+      ) {
+        return true;
+      }
     }
 
     // Проверяем содержимое кода на JS синтаксис

@@ -58,7 +58,7 @@ export const TheoryFiltersComponent = ({
     onFiltersChange({ ...filters, onlyUnstudied: checked });
   };
 
-  const selectedCategory = categories?.find(
+  const selectedCategory = categories?.categories?.find(
     (cat) => cat.name === filters.category
   );
 
@@ -95,7 +95,7 @@ export const TheoryFiltersComponent = ({
             disabled={categoriesLoading}
           >
             <option value="all">Все категории</option>
-            {categories?.map((category) => (
+            {categories?.categories?.map((category) => (
               <option
                 key={category.name}
                 value={translateMainCategory(category.name)}
