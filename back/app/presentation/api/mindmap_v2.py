@@ -12,7 +12,7 @@ from ...application.dto.mindmap_dto import (
     TechnologyConfigResponse
 )
 from ...shared.dependencies import get_mindmap_service
-from ...auth import get_current_user_from_session
+from ...shared.dependencies import get_current_user_optional
 
 router = APIRouter(tags=["mindmap"])
 
@@ -23,16 +23,12 @@ async def generate_mindmap(
     technology: str = Query(default="javascript", description="Технология"),
     difficulty_filter: Optional[str] = Query(default=None, description="Фильтр по сложности"),
     topic_filter: Optional[str] = Query(default=None, description="Фильтр по теме"),
-    mindmap_service: MindMapService = Depends(get_mindmap_service)
+    mindmap_service: MindMapService = Depends(get_mindmap_service),
+    user = Depends(get_current_user_optional)
 ):
     """Генерация данных для mindmap"""
     try:
-        # Получаем пользователя (если авторизован)
-        user = None
-        try:
-            user = get_current_user_from_session(request)
-        except:
-            pass  # Пользователь не авторизован, продолжаем без прогресса
+        # Пользователь получен через DI (может быть None если не авторизован)
         
         # Генерируем mindmap
         mindmap_data = mindmap_service.generate_mindmap(
@@ -131,16 +127,12 @@ async def get_topic_tasks(
     request: Request,
     technology: str = Query(default="javascript", description="Технология"),
     difficulty_filter: Optional[str] = Query(default=None, description="Фильтр по сложности"),
-    mindmap_service: MindMapService = Depends(get_mindmap_service)
+    mindmap_service: MindMapService = Depends(get_mindmap_service),
+    user = Depends(get_current_user_optional)
 ):
     """Получить задачи для конкретной темы"""
     try:
-        # Получаем пользователя (если авторизован)
-        user = None
-        try:
-            user = get_current_user_from_session(request)
-        except:
-            pass  # Пользователь не авторизован
+        # Пользователь получен через DI (может быть None если не авторизован)
         
         # Получаем тему с задачами
         topic_with_tasks = mindmap_service.get_topic_with_tasks(
@@ -201,16 +193,12 @@ async def get_topic_tasks(
 async def get_task_detail(
     task_id: str,
     request: Request,
-    mindmap_service: MindMapService = Depends(get_mindmap_service)
+    mindmap_service: MindMapService = Depends(get_mindmap_service),
+    user = Depends(get_current_user_optional)
 ):
     """Получить детали задачи"""
     try:
-        # Получаем пользователя (если авторизован)
-        user = None
-        try:
-            user = get_current_user_from_session(request)
-        except:
-            pass  # Пользователь не авторизован
+        # Пользователь получен через DI (может быть None если не авторизован)
         
         # Получаем детали задачи
         task = mindmap_service.get_task_detail(task_id, user.id if user else None)

@@ -2,87 +2,48 @@
 
 from datetime import datetime
 from typing import List, Optional
-from sqlalchemy import (
-    ARRAY,
-    JSON,
-    Boolean,
-    Column,
-    DateTime,
-    ForeignKey,
-    Index,
-    Integer,
-    String,
-    Text,
-)
-from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
-
-from ...infrastructure.database.connection import Base
+from dataclasses import dataclass, field
 
 
-class ContentFile(Base):
-    __tablename__ = "ContentFile"
-
-    id = Column(String, primary_key=True)
-    webdavPath = Column(String, unique=True, nullable=False)
-    mainCategory = Column(String, nullable=False)
-    subCategory = Column(String, nullable=False)
-    lastFileHash = Column(String)
-    createdAt = Column(DateTime, default=func.now(), nullable=False)
-    updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
-
-    blocks = relationship("ContentBlock", back_populates="file")
+@dataclass
+class ContentFile:
+    """Доменная сущность файла контента"""
+    id: str
+    webdavPath: str
+    mainCategory: str
+    subCategory: str
+    lastFileHash: Optional[str]
+    createdAt: datetime
+    updatedAt: datetime
 
 
-class ContentBlock(Base):
-    __tablename__ = "ContentBlock"
-
-    id = Column(String, primary_key=True)
-    fileId = Column(String, ForeignKey("ContentFile.id", ondelete="CASCADE"), nullable=False)
-    pathTitles = Column(JSON, nullable=False)
-    blockTitle = Column(String, nullable=False)
-    blockLevel = Column(Integer, nullable=False)
-    orderInFile = Column(Integer, nullable=False)
-
-    textContent = Column(Text)
-    codeContent = Column(Text)
-    codeLanguage = Column(String)
-    isCodeFoldable = Column(Boolean, default=False, nullable=False)
-    codeFoldTitle = Column(String)
-
-    extractedUrls: List[str] = Column(ARRAY(String), default=[], nullable=False)
-    companies: List[str] = Column(ARRAY(String), default=[], nullable=False)
-    rawBlockContentHash = Column(String)
-
-    createdAt = Column(DateTime, default=func.now(), nullable=False)
-    updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
-
-    file = relationship("ContentFile", back_populates="blocks")
-    # Остальные отношения будут добавлены после создания других сущностей
-    # progressEntries = relationship("UserContentProgress", back_populates="block")
-    # taskAttempts = relationship("TaskAttempt", back_populates="block")
-    # taskSolutions = relationship("TaskSolution", back_populates="block")
-    # testCases = relationship("TestCase", back_populates="block")
-
-    __table_args__ = (Index("idx_contentblock_fileid", "fileId"),)
+@dataclass
+class ContentBlock:
+    """Доменная сущность блока контента"""
+    id: str
+    fileId: str
+    pathTitles: List[str]
+    blockTitle: str
+    blockLevel: int
+    orderInFile: int
+    textContent: Optional[str]
+    codeContent: Optional[str]
+    codeLanguage: Optional[str]
+    isCodeFoldable: bool
+    codeFoldTitle: Optional[str]
+    extractedUrls: List[str] = field(default_factory=list)
+    companies: List[str] = field(default_factory=list)
+    rawBlockContentHash: Optional[str] = None
+    createdAt: datetime = None
+    updatedAt: datetime = None
 
 
-class UserContentProgress(Base):
-    __tablename__ = "UserContentProgress"
-
-    id = Column(String, primary_key=True)
-    userId = Column(Integer, ForeignKey("User.id", ondelete="CASCADE"), nullable=False)
-    blockId = Column(String, ForeignKey("ContentBlock.id", ondelete="CASCADE"), nullable=False)
-    solvedCount = Column(Integer, default=0, nullable=False)
-
-    createdAt = Column(DateTime, default=func.now(), nullable=False)
-    updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
-
-    # Отношения будут добавлены после создания других сущностей
-    # user = relationship("User", back_populates="progress")
-    # block = relationship("ContentBlock", back_populates="progressEntries")
-
-    __table_args__ = (
-        Index("idx_usercontentprogress_blockid", "blockId"),
-        Index("idx_usercontentprogress_userid_blockid", "userId", "blockId", unique=True),
-    ) 
+@dataclass
+class UserContentProgress:
+    """Доменная сущность прогресса пользователя по контенту"""
+    id: str
+    userId: int
+    blockId: str
+    solvedCount: int
+    createdAt: datetime
+    updatedAt: datetime 

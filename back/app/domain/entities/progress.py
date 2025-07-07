@@ -51,19 +51,15 @@ class TaskSolution:
 class UserCategoryProgress:
     id: str
     userId: int
-    mainCategory: str
-    totalTasks: int
+    category: str
     completedTasks: int
-    attemptedTasks: int
-    averageAttempts: Decimal
-    totalTimeSpentMinutes: int
-    successRate: Decimal
+    totalTasks: int
+    completedTheory: int
+    totalTheory: int
+    completedContent: int
+    totalContent: int
     createdAt: datetime
     updatedAt: datetime
-    
-    subCategory: Optional[str] = None
-    firstAttempt: Optional[datetime] = None
-    lastActivity: Optional[datetime] = None
 
 
 @dataclass
@@ -71,13 +67,9 @@ class LearningPath:
     id: str
     name: str
     description: Optional[str]
-    blockIds: List[str]
-    prerequisites: List[str]
     difficulty: Optional[str]
-    estimatedHours: Optional[int]
-    tags: List[str]
+    estimatedTime: Optional[int]
     isActive: bool
-    orderIndex: int
     createdAt: datetime
     updatedAt: datetime
 
@@ -87,15 +79,14 @@ class UserPathProgress:
     id: str
     userId: int
     pathId: str
-    currentBlockIndex: int
-    completedBlockIds: List[str]
-    isCompleted: bool
-    startedAt: datetime
+    currentStep: int
+    completedSteps: int
+    totalSteps: int
+    status: ProgressStatus
+    startedAt: Optional[datetime]
+    completedAt: Optional[datetime]
     createdAt: datetime
     updatedAt: datetime
-    
-    completedAt: Optional[datetime] = None
-    lastActivity: Optional[datetime] = None
 
 
 @dataclass

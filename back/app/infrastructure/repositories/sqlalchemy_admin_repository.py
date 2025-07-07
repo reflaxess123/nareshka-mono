@@ -13,9 +13,10 @@ from ...domain.entities.admin import (
     AdminContentFile, AdminContentBlock, AdminTheoryCard,
     AdminUser, BulkDeleteResult
 )
-from ...domain.entities.user import User
-from ...domain.entities.content import ContentFile, ContentBlock, UserContentProgress
-from ...domain.entities.theory import TheoryCard, UserTheoryProgress
+from ...domain.entities.user import User as DomainUser
+from ..models.content_models import ContentFile, ContentBlock, UserContentProgress
+from ..models.theory_models import TheoryCard, UserTheoryProgress
+from ..models.user_models import User
 
 
 class SQLAlchemyAdminRepository(AdminRepository):

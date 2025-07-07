@@ -9,8 +9,11 @@ from alembic import context
 # Добавляем корневую директорию в путь
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
-from app.config import settings
-from app.models import Base
+from app.config.new_settings import legacy_settings as settings
+from app.infrastructure.models import Base
+
+# Добавляем импорт всех моделей чтобы alembic видел их
+from app.infrastructure.models import *
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

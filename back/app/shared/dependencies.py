@@ -26,8 +26,9 @@ from ..application.services.stats_service import StatsService
 from ..application.services.mindmap_service import MindMapService
 from ..application.services.admin_service import AdminService
 from ..application.services.auth_service import AuthService
-from ..auth import get_current_user_from_session, get_current_user_from_session_required
-from ..models import User
+from ..application.services.ai_test_generator_service import AITestGeneratorService
+from ..application.services.code_executor_service import CodeExecutorService
+from ..domain.entities.user import User
 from .auth_schemes import oauth2_scheme
 
 
@@ -96,30 +97,57 @@ def get_mindmap_service(
     return MindMapService(mindmap_repository)
 
 
-def get_admin_service(
+def get_auth_service(
     db: Session = Depends(get_db)
+) -> AuthService:
+    """Получение сервиса авторизации"""
+    user_repository = SQLAlchemyUserRepository(db)
+    return AuthService(user_repository)
+
+
+def get_admin_service(
+    db: Session = Depends(get_db),
+    auth_service: AuthService = Depends(get_auth_service)
 ) -> AdminService:
     """Получение сервиса для работы с админкой"""
     admin_repository = SQLAlchemyAdminRepository(db)
-    user_repository = SQLAlchemyUserRepository(db)
-    auth_service = AuthService(user_repository)
     return AdminService(admin_repository, auth_service)
 
 
-def get_current_user_optional(
-    request: Request,
+def get_ai_test_generator_service(
     db: Session = Depends(get_db)
+) -> AITestGeneratorService:
+    """Получение сервиса генерации тест-кейсов через AI"""
+    content_repository = SQLAlchemyContentRepository(db)
+    task_repository = SQLAlchemyTaskRepository(db)
+    return AITestGeneratorService(content_repository, task_repository)
+
+
+def get_code_executor_service(
+    db: Session = Depends(get_db)
+) -> CodeExecutorService:
+    """Получение сервиса выполнения кода"""
+    code_editor_repository = SQLAlchemyCodeEditorRepository(db)
+    return CodeExecutorService(code_editor_repository)
+
+
+async def get_current_user_optional(
+    request: Request,
+    auth_service: AuthService = Depends(get_auth_service)
 ) -> Optional[User]:
     """Получение текущего пользователя (опционально)"""
-    return get_current_user_from_session(request, db)
+    try:
+        return await auth_service.get_user_by_session(request)
+    except HTTPException:
+        return None
 
 
-def get_current_user_required(
+async def get_current_user_required(
     request: Request,
-    db: Session = Depends(get_db)
+    auth_service: AuthService = Depends(get_auth_service)
 ) -> User:
     """Получение текущего пользователя (обязательно)"""
-    return get_current_user_from_session_required(request, db)
+    return await auth_service.get_user_by_session(request)
 
 
 # OAuth2 scheme для JWT аутентификации импортируется из auth_v2
@@ -128,22 +156,18 @@ def get_current_user_required(
 
 async def get_current_user_jwt(
     token: str = Depends(oauth2_scheme),
-    db: Session = Depends(get_db)
+    auth_service: AuthService = Depends(get_auth_service)
 ) -> User:
     """Получение текущего пользователя из JWT токена"""
-    user_repository = SQLAlchemyUserRepository(db)
-    auth_service = AuthService(user_repository)
     return await auth_service.get_user_by_token(token)
 
 
 async def get_current_user_jwt_optional(
     token: str = Depends(oauth2_scheme),
-    db: Session = Depends(get_db)
+    auth_service: AuthService = Depends(get_auth_service)
 ) -> Optional[User]:
     """Получение текущего пользователя из JWT токена (опционально)"""
     try:
-        user_repository = SQLAlchemyUserRepository(db)
-        auth_service = AuthService(user_repository)
         return await auth_service.get_user_by_token(token)
     except:
         return None

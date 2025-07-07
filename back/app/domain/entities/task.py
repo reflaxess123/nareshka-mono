@@ -16,6 +16,34 @@ class TaskType(str, Enum):
 
 
 @dataclass
+class TaskAttempt:
+    """Domain entity для TaskAttempt"""
+    id: str
+    userId: int
+    taskId: str  # blockId в infrastructure
+    code: str  # sourceCode в infrastructure
+    languageId: str  # language в infrastructure
+    result: Optional[str] = None  # isSuccessful преобразованный в текст
+    error: Optional[str] = None  # errorMessage
+    executionTime: Optional[int] = None  # executionTimeMs
+    memory: Optional[float] = None  # memoryUsedMB
+    createdAt: Optional[datetime] = None
+    updatedAt: Optional[datetime] = None
+
+
+@dataclass
+class TaskSolution:
+    """Domain entity для TaskSolution"""
+    id: str
+    userId: int
+    taskId: str  # blockId в infrastructure
+    code: str  # finalCode в infrastructure
+    languageId: str  # language в infrastructure
+    createdAt: Optional[datetime] = None
+    updatedAt: Optional[datetime] = None
+
+
+@dataclass
 class Task:
     """Объединенная сущность для заданий"""
     # Обязательные поля (без значений по умолчанию)
