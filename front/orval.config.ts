@@ -2,7 +2,7 @@ import { defineConfig } from 'orval';
 
 export default defineConfig({
   nareshka: {
-    input: '../back/openapi.json',
+    input: 'http://localhost:4000/openapi.json',
     output: {
       target: 'src/shared/api/generated/api.ts',
       client: 'react-query',
@@ -12,8 +12,8 @@ export default defineConfig({
       prettier: false,
       override: {
         mutator: {
-          path: 'src/shared/api/base.ts',
-          name: 'apiClient',
+          path: 'src/shared/api/generated-mutator.ts',
+          name: 'generatedApiClient',
         },
         query: {
           useQuery: true,

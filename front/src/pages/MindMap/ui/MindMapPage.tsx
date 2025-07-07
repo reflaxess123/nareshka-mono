@@ -1,4 +1,5 @@
 import { TechnologySwitcher } from '@/components/TechnologySwitcher';
+import { useGenerateMindmapApiV2MindmapGenerateGet } from '@/shared/api/generated/api';
 import { BottomNavBar } from '@/shared/components/BottomNavBar';
 import type { TechnologyType } from '@/types/mindmap';
 import {
@@ -57,10 +58,8 @@ const nodeTypes: NodeTypes = {
 };
 
 const NewMindMapPage: React.FC = () => {
-  const [mindMapData, setMindMapData] = useState<MindMapData | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [selectedTopic, setSelectedTopic] = useState<SelectedTopicData | null>(
     null
   );
@@ -72,42 +71,22 @@ const NewMindMapPage: React.FC = () => {
   );
   const { task: theoreticalTaskDetail } = useTaskDetails(theoreticalTaskId);
 
-  const fetchMindMap = useCallback(
-    async (technology: TechnologyType = currentTechnology) => {
-      setLoading(true);
-      try {
-        const params = new URLSearchParams();
-        params.append('technology', technology);
+  // Используем generated hook для получения данных mindmap
+  const {
+    data: mindMapResponse,
+    isLoading: loading,
+    error,
+  } = useGenerateMindmapApiV2MindmapGenerateGet({
+    technology: currentTechnology,
+    structure_type: 'topics',
+  });
 
-        const response = await fetch(
-          `/api/v2/mindmap/generate?${params.toString()}`,
-          {
-            credentials: 'include',
-          }
-        );
-        const result = await response.json();
+  const mindMapData = mindMapResponse?.data as unknown as MindMapData | null;
 
-        if (result.success && result.data) {
-          setMindMapData(result.data);
-          setNodes(result.data.nodes);
-          setEdges(result.data.edges);
-        }
-      } catch {
-        // Игнорируем ошибки
-      } finally {
-        setLoading(false);
-      }
-    },
-    [currentTechnology, setNodes, setEdges]
-  );
-
-  const handleTechnologyChange = useCallback(
-    (technology: TechnologyType) => {
-      setCurrentTechnology(technology);
-      fetchMindMap(technology);
-    },
-    [fetchMindMap]
-  );
+  const handleTechnologyChange = useCallback((technology: TechnologyType) => {
+    setCurrentTechnology(technology);
+    // Хук автоматически обновится при изменении параметров
+  }, []);
 
   const onNodeClick = useCallback((_event: React.MouseEvent, node: Node) => {
     if (node.type === 'topic' && node.data.topic_key) {
@@ -133,9 +112,13 @@ const NewMindMapPage: React.FC = () => {
     window.location.href = `/code-editor?blockId=${taskId}`;
   }, []);
 
+  // Обновляем nodes и edges при изменении данных
   useEffect(() => {
-    fetchMindMap();
-  }, [fetchMindMap]);
+    if (mindMapData?.nodes && mindMapData?.edges) {
+      setNodes(mindMapData.nodes);
+      setEdges(mindMapData.edges);
+    }
+  }, [mindMapData, setNodes, setEdges]);
 
   if (loading) {
     return (
@@ -155,6 +138,25 @@ const NewMindMapPage: React.FC = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div
+        style={{
+          width: '100vw',
+          height: '100vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          fontSize: '18px',
+          color: '#666',
+        }}
+      >
+        ❌ Ошибка загрузки данных:{' '}
+        {error instanceof Error ? error.message : 'Произошла ошибка'}
+      </div>
+    );
+  }
+
   if (!mindMapData) {
     return (
       <div
@@ -168,7 +170,7 @@ const NewMindMapPage: React.FC = () => {
           color: '#666',
         }}
       >
-        ❌ Ошибка загрузки данных
+        ❌ Нет данных для отображения
       </div>
     );
   }

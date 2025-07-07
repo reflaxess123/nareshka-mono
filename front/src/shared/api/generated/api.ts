@@ -25,7 +25,7 @@ import type {
   UseQueryResult
 } from '@tanstack/react-query';
 
-import { apiClient } from '../base';
+import { generatedApiClient } from '../generated-mutator';
 export type AdminContentBlockResponseTypeTextContent = string | null;
 
 export type AdminContentBlockResponseTypeCodeContent = string | null;
@@ -404,10 +404,13 @@ export interface LoginRequestType {
   password: string;
 }
 
+export type LoginResponseTypeSessionId = string | null;
+
 export interface LoginResponseType {
   access_token: string;
   token_type: string;
   user: UserResponseType;
+  session_id?: LoginResponseTypeSessionId;
 }
 
 export type MindMapResponseTypeData = { [key: string]: unknown };
@@ -1467,7 +1470,7 @@ export const healthCheckApiHealthGet = (
 ) => {
       
       
-      return apiClient<unknown>(
+      return generatedApiClient<unknown>(
       {url: `/api/health`, method: 'GET', signal
     },
       );
@@ -1555,7 +1558,7 @@ export const apiRootApiGet = (
 ) => {
       
       
-      return apiClient<unknown>(
+      return generatedApiClient<unknown>(
       {url: `/api/`, method: 'GET', signal
     },
       );
@@ -1644,7 +1647,7 @@ export const loginApiV2AuthLoginPost = (
 ) => {
       
       
-      return apiClient<LoginResponseType>(
+      return generatedApiClient<LoginResponseType>(
       {url: `/api/v2/auth/login`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: loginRequestType, signal
@@ -1710,7 +1713,7 @@ export const registerApiV2AuthRegisterPost = (
 ) => {
       
       
-      return apiClient<RegisterResponseType>(
+      return generatedApiClient<RegisterResponseType>(
       {url: `/api/v2/auth/register`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: registerRequestType, signal
@@ -1776,7 +1779,7 @@ export const getMeApiV2AuthMeGet = (
 ) => {
       
       
-      return apiClient<UserResponseType>(
+      return generatedApiClient<UserResponseType>(
       {url: `/api/v2/auth/me`, method: 'GET', signal
     },
       );
@@ -1865,7 +1868,7 @@ export const logoutApiV2AuthLogoutPost = (
 ) => {
       
       
-      return apiClient<unknown>(
+      return generatedApiClient<unknown>(
       {url: `/api/v2/auth/logout`, method: 'POST', signal
     },
       );
@@ -1929,7 +1932,7 @@ export const getContentBlocksApiV2ContentBlocksGet = (
 ) => {
       
       
-      return apiClient<ContentBlocksListResponseType>(
+      return generatedApiClient<ContentBlocksListResponseType>(
       {url: `/api/v2/content/blocks`, method: 'GET',
         params, signal
     },
@@ -2019,7 +2022,7 @@ export const getContentFilesApiV2ContentFilesGet = (
 ) => {
       
       
-      return apiClient<ContentFilesListResponseType>(
+      return generatedApiClient<ContentFilesListResponseType>(
       {url: `/api/v2/content/files`, method: 'GET',
         params, signal
     },
@@ -2109,7 +2112,7 @@ export const getContentCategoriesApiV2ContentCategoriesGet = (
 ) => {
       
       
-      return apiClient<ContentCategoriesResponseType>(
+      return generatedApiClient<ContentCategoriesResponseType>(
       {url: `/api/v2/content/categories`, method: 'GET', signal
     },
       );
@@ -2198,7 +2201,7 @@ export const getContentSubcategoriesApiV2ContentCategoriesCategorySubcategoriesG
 ) => {
       
       
-      return apiClient<ContentSubcategoriesResponseType>(
+      return generatedApiClient<ContentSubcategoriesResponseType>(
       {url: `/api/v2/content/categories/${category}/subcategories`, method: 'GET', signal
     },
       );
@@ -2287,7 +2290,7 @@ export const getContentBlockApiV2ContentBlocksBlockIdGet = (
 ) => {
       
       
-      return apiClient<ContentBlockResponseType>(
+      return generatedApiClient<ContentBlockResponseType>(
       {url: `/api/v2/content/blocks/${blockId}`, method: 'GET', signal
     },
       );
@@ -2376,7 +2379,7 @@ export const updateContentBlockProgressApiV2ContentBlocksBlockIdProgressPatch = 
  ) => {
       
       
-      return apiClient<UserContentProgressResponseType>(
+      return generatedApiClient<UserContentProgressResponseType>(
       {url: `/api/v2/content/blocks/${blockId}/progress`, method: 'PATCH',
       headers: {'Content-Type': 'application/json', },
       data: progressActionType
@@ -2442,7 +2445,7 @@ export const getTheoryCardsApiV2TheoryCardsGet = (
 ) => {
       
       
-      return apiClient<TheoryCardsListResponseType>(
+      return generatedApiClient<TheoryCardsListResponseType>(
       {url: `/api/v2/theory/cards`, method: 'GET',
         params, signal
     },
@@ -2532,7 +2535,7 @@ export const getTheoryCategoriesApiV2TheoryCategoriesGet = (
 ) => {
       
       
-      return apiClient<TheoryCategoriesResponseType>(
+      return generatedApiClient<TheoryCategoriesResponseType>(
       {url: `/api/v2/theory/categories`, method: 'GET', signal
     },
       );
@@ -2621,7 +2624,7 @@ export const getTheorySubcategoriesApiV2TheoryCategoriesCategorySubcategoriesGet
 ) => {
       
       
-      return apiClient<TheorySubcategoriesResponseType>(
+      return generatedApiClient<TheorySubcategoriesResponseType>(
       {url: `/api/v2/theory/categories/${category}/subcategories`, method: 'GET', signal
     },
       );
@@ -2710,7 +2713,7 @@ export const getTheoryCardApiV2TheoryCardsCardIdGet = (
 ) => {
       
       
-      return apiClient<TheoryCardResponseType>(
+      return generatedApiClient<TheoryCardResponseType>(
       {url: `/api/v2/theory/cards/${cardId}`, method: 'GET', signal
     },
       );
@@ -2799,7 +2802,7 @@ export const updateTheoryCardProgressApiV2TheoryCardsCardIdProgressPatch = (
  ) => {
       
       
-      return apiClient<UserTheoryProgressResponseType>(
+      return generatedApiClient<UserTheoryProgressResponseType>(
       {url: `/api/v2/theory/cards/${cardId}/progress`, method: 'PATCH',
       headers: {'Content-Type': 'application/json', },
       data: progressActionType
@@ -2866,7 +2869,7 @@ export const reviewTheoryCardApiV2TheoryCardsCardIdReviewPost = (
 ) => {
       
       
-      return apiClient<UserTheoryProgressResponseType>(
+      return generatedApiClient<UserTheoryProgressResponseType>(
       {url: `/api/v2/theory/cards/${cardId}/review`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: reviewRatingType, signal
@@ -2932,7 +2935,7 @@ export const getDueTheoryCardsApiV2TheoryCardsDueGet = (
 ) => {
       
       
-      return apiClient<DueCardsResponseType>(
+      return generatedApiClient<DueCardsResponseType>(
       {url: `/api/v2/theory/cards/due`, method: 'GET',
         params, signal
     },
@@ -3022,7 +3025,7 @@ export const getTheoryStatsOverviewApiV2TheoryStatsGet = (
 ) => {
       
       
-      return apiClient<TheoryStatsResponseType>(
+      return generatedApiClient<TheoryStatsResponseType>(
       {url: `/api/v2/theory/stats`, method: 'GET', signal
     },
       );
@@ -3111,7 +3114,7 @@ export const resetTheoryCardProgressApiV2TheoryCardsCardIdResetPost = (
 ) => {
       
       
-      return apiClient<unknown>(
+      return generatedApiClient<unknown>(
       {url: `/api/v2/theory/cards/${cardId}/reset`, method: 'POST', signal
     },
       );
@@ -3175,7 +3178,7 @@ export const getTaskItemsApiV2TasksItemsGet = (
 ) => {
       
       
-      return apiClient<TasksListResponseType>(
+      return generatedApiClient<TasksListResponseType>(
       {url: `/api/v2/tasks/items`, method: 'GET',
         params, signal
     },
@@ -3265,7 +3268,7 @@ export const getTaskCategoriesApiV2TasksCategoriesGet = (
 ) => {
       
       
-      return apiClient<TaskCategoriesResponseType>(
+      return generatedApiClient<TaskCategoriesResponseType>(
       {url: `/api/v2/tasks/categories`, method: 'GET', signal
     },
       );
@@ -3354,7 +3357,7 @@ export const getCompaniesApiV2TasksCompaniesGet = (
 ) => {
       
       
-      return apiClient<TaskCompaniesResponseType>(
+      return generatedApiClient<TaskCompaniesResponseType>(
       {url: `/api/v2/tasks/companies`, method: 'GET',
         params, signal
     },
@@ -3444,7 +3447,7 @@ export const createTaskAttemptApiV2ProgressAttemptsPost = (
 ) => {
       
       
-      return apiClient<TaskAttemptResponseDTOType>(
+      return generatedApiClient<TaskAttemptResponseDTOType>(
       {url: `/api/v2/progress/attempts`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: taskAttemptCreateDTOType, signal
@@ -3510,7 +3513,7 @@ export const getMyDetailedProgressApiV2ProgressUserMyDetailedGet = (
 ) => {
       
       
-      return apiClient<UserDetailedProgressResponseDTOType>(
+      return generatedApiClient<UserDetailedProgressResponseDTOType>(
       {url: `/api/v2/progress/user/my/detailed`, method: 'GET', signal
     },
       );
@@ -3599,7 +3602,7 @@ export const getUserDetailedProgressApiV2ProgressUserUserIdDetailedGet = (
 ) => {
       
       
-      return apiClient<UserDetailedProgressResponseDTOType>(
+      return generatedApiClient<UserDetailedProgressResponseDTOType>(
       {url: `/api/v2/progress/user/${userId}/detailed`, method: 'GET', signal
     },
       );
@@ -3688,7 +3691,7 @@ export const getProgressAnalyticsApiV2ProgressAnalyticsGet = (
 ) => {
       
       
-      return apiClient<ProgressAnalyticsDTOType>(
+      return generatedApiClient<ProgressAnalyticsDTOType>(
       {url: `/api/v2/progress/analytics`, method: 'GET', signal
     },
       );
@@ -3777,7 +3780,7 @@ export const healthCheckApiV2ProgressHealthGet = (
 ) => {
       
       
-      return apiClient<unknown>(
+      return generatedApiClient<unknown>(
       {url: `/api/v2/progress/health`, method: 'GET', signal
     },
       );
@@ -3866,7 +3869,7 @@ export const getSupportedLanguagesApiV2CodeEditorLanguagesGet = (
 ) => {
       
       
-      return apiClient<SupportedLanguageResponseDTOType[]>(
+      return generatedApiClient<SupportedLanguageResponseDTOType[]>(
       {url: `/api/v2/code-editor/languages`, method: 'GET', signal
     },
       );
@@ -3955,7 +3958,7 @@ export const executeCodeApiV2CodeEditorExecutePost = (
 ) => {
       
       
-      return apiClient<CodeExecutionResponseDTOType>(
+      return generatedApiClient<CodeExecutionResponseDTOType>(
       {url: `/api/v2/code-editor/execute`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: codeExecutionRequestDTOType, signal
@@ -4021,7 +4024,7 @@ export const getExecutionResultApiV2CodeEditorExecutionsExecutionIdGet = (
 ) => {
       
       
-      return apiClient<CodeExecutionResponseDTOType>(
+      return generatedApiClient<CodeExecutionResponseDTOType>(
       {url: `/api/v2/code-editor/executions/${executionId}`, method: 'GET', signal
     },
       );
@@ -4110,7 +4113,7 @@ export const getUserExecutionsApiV2CodeEditorExecutionsGet = (
 ) => {
       
       
-      return apiClient<CodeExecutionResponseDTOType[]>(
+      return generatedApiClient<CodeExecutionResponseDTOType[]>(
       {url: `/api/v2/code-editor/executions`, method: 'GET',
         params, signal
     },
@@ -4200,7 +4203,7 @@ export const saveSolutionApiV2CodeEditorSolutionsPost = (
 ) => {
       
       
-      return apiClient<UserCodeSolutionResponseDTOType>(
+      return generatedApiClient<UserCodeSolutionResponseDTOType>(
       {url: `/api/v2/code-editor/solutions`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: userCodeSolutionCreateDTOType, signal
@@ -4266,7 +4269,7 @@ export const getBlockSolutionsApiV2CodeEditorSolutionsBlockIdGet = (
 ) => {
       
       
-      return apiClient<UserCodeSolutionResponseDTOType[]>(
+      return generatedApiClient<UserCodeSolutionResponseDTOType[]>(
       {url: `/api/v2/code-editor/solutions/${blockId}`, method: 'GET', signal
     },
       );
@@ -4355,7 +4358,7 @@ export const updateSolutionApiV2CodeEditorSolutionsSolutionIdPut = (
  ) => {
       
       
-      return apiClient<UserCodeSolutionResponseDTOType>(
+      return generatedApiClient<UserCodeSolutionResponseDTOType>(
       {url: `/api/v2/code-editor/solutions/${solutionId}`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: userCodeSolutionUpdateDTOType
@@ -4421,7 +4424,7 @@ export const getExecutionStatsApiV2CodeEditorStatsGet = (
 ) => {
       
       
-      return apiClient<ExecutionStatsDTOType>(
+      return generatedApiClient<ExecutionStatsDTOType>(
       {url: `/api/v2/code-editor/stats`, method: 'GET', signal
     },
       );
@@ -4510,7 +4513,7 @@ export const getTestCasesApiV2CodeEditorTestCasesBlockIdGet = (
 ) => {
       
       
-      return apiClient<TestCasesResponseDTOType>(
+      return generatedApiClient<TestCasesResponseDTOType>(
       {url: `/api/v2/code-editor/test-cases/${blockId}`, method: 'GET', signal
     },
       );
@@ -4600,7 +4603,7 @@ export const validateSolutionApiV2CodeEditorValidateBlockIdPost = (
 ) => {
       
       
-      return apiClient<ValidationResultDTOType>(
+      return generatedApiClient<ValidationResultDTOType>(
       {url: `/api/v2/code-editor/validate/${blockId}`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: validationRequestDTOType, signal
@@ -4666,7 +4669,7 @@ export const healthCheckApiV2CodeEditorHealthGet = (
 ) => {
       
       
-      return apiClient<unknown>(
+      return generatedApiClient<unknown>(
       {url: `/api/v2/code-editor/health`, method: 'GET', signal
     },
       );
@@ -4755,7 +4758,7 @@ export const getUserStatsOverviewApiV2StatsOverviewGet = (
 ) => {
       
       
-      return apiClient<UserStatsOverviewDTOType>(
+      return generatedApiClient<UserStatsOverviewDTOType>(
       {url: `/api/v2/stats/overview`, method: 'GET', signal
     },
       );
@@ -4844,7 +4847,7 @@ export const getContentStatsApiV2StatsContentGet = (
 ) => {
       
       
-      return apiClient<ContentStatsDTOType>(
+      return generatedApiClient<ContentStatsDTOType>(
       {url: `/api/v2/stats/content`, method: 'GET', signal
     },
       );
@@ -4933,7 +4936,7 @@ export const getTheoryStatsApiV2StatsTheoryGet = (
 ) => {
       
       
-      return apiClient<TheoryStatsDTOType>(
+      return generatedApiClient<TheoryStatsDTOType>(
       {url: `/api/v2/stats/theory`, method: 'GET', signal
     },
       );
@@ -5022,7 +5025,7 @@ export const getRoadmapStatsApiV2StatsRoadmapGet = (
 ) => {
       
       
-      return apiClient<RoadmapStatsDTOType>(
+      return generatedApiClient<RoadmapStatsDTOType>(
       {url: `/api/v2/stats/roadmap`, method: 'GET', signal
     },
       );
@@ -5102,95 +5105,6 @@ export function useGetRoadmapStatsApiV2StatsRoadmapGet<TData = Awaited<ReturnTyp
 
 
 /**
- * Тестовый endpoint для проверки аутентификации
- * @summary Test Auth
- */
-export const testAuthApiV2StatsTestAuthGet = (
-    
- signal?: AbortSignal
-) => {
-      
-      
-      return apiClient<unknown>(
-      {url: `/api/v2/stats/test-auth`, method: 'GET', signal
-    },
-      );
-    }
-  
-
-export const getTestAuthApiV2StatsTestAuthGetQueryKey = () => {
-    return [`/api/v2/stats/test-auth`] as const;
-    }
-
-    
-export const getTestAuthApiV2StatsTestAuthGetQueryOptions = <TData = Awaited<ReturnType<typeof testAuthApiV2StatsTestAuthGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof testAuthApiV2StatsTestAuthGet>>, TError, TData>>, }
-) => {
-
-const {query: queryOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getTestAuthApiV2StatsTestAuthGetQueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof testAuthApiV2StatsTestAuthGet>>> = ({ signal }) => testAuthApiV2StatsTestAuthGet(signal);
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof testAuthApiV2StatsTestAuthGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type TestAuthApiV2StatsTestAuthGetQueryResult = NonNullable<Awaited<ReturnType<typeof testAuthApiV2StatsTestAuthGet>>>
-export type TestAuthApiV2StatsTestAuthGetQueryError = unknown
-
-
-export function useTestAuthApiV2StatsTestAuthGet<TData = Awaited<ReturnType<typeof testAuthApiV2StatsTestAuthGet>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof testAuthApiV2StatsTestAuthGet>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof testAuthApiV2StatsTestAuthGet>>,
-          TError,
-          Awaited<ReturnType<typeof testAuthApiV2StatsTestAuthGet>>
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTestAuthApiV2StatsTestAuthGet<TData = Awaited<ReturnType<typeof testAuthApiV2StatsTestAuthGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof testAuthApiV2StatsTestAuthGet>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof testAuthApiV2StatsTestAuthGet>>,
-          TError,
-          Awaited<ReturnType<typeof testAuthApiV2StatsTestAuthGet>>
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTestAuthApiV2StatsTestAuthGet<TData = Awaited<ReturnType<typeof testAuthApiV2StatsTestAuthGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof testAuthApiV2StatsTestAuthGet>>, TError, TData>>, }
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
- * @summary Test Auth
- */
-
-export function useTestAuthApiV2StatsTestAuthGet<TData = Awaited<ReturnType<typeof testAuthApiV2StatsTestAuthGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof testAuthApiV2StatsTestAuthGet>>, TError, TData>>, }
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getTestAuthApiV2StatsTestAuthGetQueryOptions(options)
-
-  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
-
-  return query;
-}
-
-
-
-
-/**
  * Проверка работоспособности Stats API
  * @summary Health Check
  */
@@ -5200,7 +5114,7 @@ export const healthCheckApiV2StatsHealthGet = (
 ) => {
       
       
-      return apiClient<unknown>(
+      return generatedApiClient<unknown>(
       {url: `/api/v2/stats/health`, method: 'GET', signal
     },
       );
@@ -5289,7 +5203,7 @@ export const generateMindmapApiV2MindmapGenerateGet = (
 ) => {
       
       
-      return apiClient<MindMapResponseType>(
+      return generatedApiClient<MindMapResponseType>(
       {url: `/api/v2/mindmap/generate`, method: 'GET',
         params, signal
     },
@@ -5379,7 +5293,7 @@ export const getAvailableTechnologiesApiV2MindmapTechnologiesGet = (
 ) => {
       
       
-      return apiClient<TechnologiesResponseType>(
+      return generatedApiClient<TechnologiesResponseType>(
       {url: `/api/v2/mindmap/technologies`, method: 'GET', signal
     },
       );
@@ -5469,7 +5383,7 @@ export const getTopicTasksApiV2MindmapTopicTopicKeyTasksGet = (
 ) => {
       
       
-      return apiClient<TopicTasksResponseType>(
+      return generatedApiClient<TopicTasksResponseType>(
       {url: `/api/v2/mindmap/topic/${topicKey}/tasks`, method: 'GET',
         params, signal
     },
@@ -5565,7 +5479,7 @@ export const getTaskDetailApiV2MindmapTaskTaskIdGet = (
 ) => {
       
       
-      return apiClient<TaskDetailResponseWrapperType>(
+      return generatedApiClient<TaskDetailResponseWrapperType>(
       {url: `/api/v2/mindmap/task/${taskId}`, method: 'GET', signal
     },
       );
@@ -5654,7 +5568,7 @@ export const healthCheckApiV2MindmapHealthGet = (
 ) => {
       
       
-      return apiClient<AppApplicationDtoMindmapDtoHealthResponseType>(
+      return generatedApiClient<AppApplicationDtoMindmapDtoHealthResponseType>(
       {url: `/api/v2/mindmap/health`, method: 'GET', signal
     },
       );
@@ -5743,7 +5657,7 @@ export const healthCheckApiV2AdminHealthGet = (
 ) => {
       
       
-      return apiClient<AppApplicationDtoAdminDtoHealthResponseType>(
+      return generatedApiClient<AppApplicationDtoAdminDtoHealthResponseType>(
       {url: `/api/v2/admin/health`, method: 'GET', signal
     },
       );
@@ -5832,7 +5746,7 @@ export const getSystemStatsApiV2AdminStatsGet = (
 ) => {
       
       
-      return apiClient<SystemStatsResponseType>(
+      return generatedApiClient<SystemStatsResponseType>(
       {url: `/api/v2/admin/stats`, method: 'GET', signal
     },
       );
@@ -5921,7 +5835,7 @@ export const getUsersApiV2AdminUsersGet = (
 ) => {
       
       
-      return apiClient<PaginatedUsersResponseType>(
+      return generatedApiClient<PaginatedUsersResponseType>(
       {url: `/api/v2/admin/users`, method: 'GET',
         params, signal
     },
@@ -6011,7 +5925,7 @@ export const createUserApiV2AdminUsersPost = (
 ) => {
       
       
-      return apiClient<AdminUserResponseType>(
+      return generatedApiClient<AdminUserResponseType>(
       {url: `/api/v2/admin/users`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: createUserRequestType, signal
@@ -6077,7 +5991,7 @@ export const updateUserApiV2AdminUsersUserIdPut = (
  ) => {
       
       
-      return apiClient<AdminUserResponseType>(
+      return generatedApiClient<AdminUserResponseType>(
       {url: `/api/v2/admin/users/${userId}`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: updateUserRequestType
@@ -6142,7 +6056,7 @@ export const deleteUserApiV2AdminUsersUserIdDelete = (
  ) => {
       
       
-      return apiClient<unknown>(
+      return generatedApiClient<unknown>(
       {url: `/api/v2/admin/users/${userId}`, method: 'DELETE'
     },
       );
@@ -6206,7 +6120,7 @@ export const getContentStatsApiV2AdminContentStatsGet = (
 ) => {
       
       
-      return apiClient<ContentStatsResponseType>(
+      return generatedApiClient<ContentStatsResponseType>(
       {url: `/api/v2/admin/content/stats`, method: 'GET', signal
     },
       );
@@ -6295,7 +6209,7 @@ export const getContentFilesApiV2AdminContentFilesGet = (
 ) => {
       
       
-      return apiClient<PaginatedContentFilesResponseType>(
+      return generatedApiClient<PaginatedContentFilesResponseType>(
       {url: `/api/v2/admin/content/files`, method: 'GET',
         params, signal
     },
@@ -6385,7 +6299,7 @@ export const createContentFileApiV2AdminContentFilesPost = (
 ) => {
       
       
-      return apiClient<AdminContentFileResponseType>(
+      return generatedApiClient<AdminContentFileResponseType>(
       {url: `/api/v2/admin/content/files`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: createContentFileRequestType, signal
@@ -6451,7 +6365,7 @@ export const updateContentFileApiV2AdminContentFilesFileIdPut = (
  ) => {
       
       
-      return apiClient<AdminContentFileResponseType>(
+      return generatedApiClient<AdminContentFileResponseType>(
       {url: `/api/v2/admin/content/files/${fileId}`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: updateContentFileRequestType
@@ -6516,7 +6430,7 @@ export const deleteContentFileApiV2AdminContentFilesFileIdDelete = (
  ) => {
       
       
-      return apiClient<unknown>(
+      return generatedApiClient<unknown>(
       {url: `/api/v2/admin/content/files/${fileId}`, method: 'DELETE'
     },
       );
@@ -6580,7 +6494,7 @@ export const getContentBlocksApiV2AdminContentBlocksGet = (
 ) => {
       
       
-      return apiClient<PaginatedContentBlocksResponseType>(
+      return generatedApiClient<PaginatedContentBlocksResponseType>(
       {url: `/api/v2/admin/content/blocks`, method: 'GET',
         params, signal
     },
@@ -6670,7 +6584,7 @@ export const createContentBlockApiV2AdminContentBlocksPost = (
 ) => {
       
       
-      return apiClient<AdminContentBlockResponseType>(
+      return generatedApiClient<AdminContentBlockResponseType>(
       {url: `/api/v2/admin/content/blocks`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: createContentBlockRequestType, signal
@@ -6736,7 +6650,7 @@ export const updateContentBlockApiV2AdminContentBlocksBlockIdPut = (
  ) => {
       
       
-      return apiClient<AdminContentBlockResponseType>(
+      return generatedApiClient<AdminContentBlockResponseType>(
       {url: `/api/v2/admin/content/blocks/${blockId}`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: updateContentBlockRequestType
@@ -6801,7 +6715,7 @@ export const deleteContentBlockApiV2AdminContentBlocksBlockIdDelete = (
  ) => {
       
       
-      return apiClient<unknown>(
+      return generatedApiClient<unknown>(
       {url: `/api/v2/admin/content/blocks/${blockId}`, method: 'DELETE'
     },
       );
@@ -6865,7 +6779,7 @@ export const getTheoryCardsApiV2AdminTheoryCardsGet = (
 ) => {
       
       
-      return apiClient<PaginatedTheoryCardsResponseType>(
+      return generatedApiClient<PaginatedTheoryCardsResponseType>(
       {url: `/api/v2/admin/theory/cards`, method: 'GET',
         params, signal
     },
@@ -6955,7 +6869,7 @@ export const createTheoryCardApiV2AdminTheoryCardsPost = (
 ) => {
       
       
-      return apiClient<AdminTheoryCardResponseType>(
+      return generatedApiClient<AdminTheoryCardResponseType>(
       {url: `/api/v2/admin/theory/cards`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: createTheoryCardRequestType, signal
@@ -7021,7 +6935,7 @@ export const updateTheoryCardApiV2AdminTheoryCardsCardIdPut = (
  ) => {
       
       
-      return apiClient<AdminTheoryCardResponseType>(
+      return generatedApiClient<AdminTheoryCardResponseType>(
       {url: `/api/v2/admin/theory/cards/${cardId}`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: updateTheoryCardRequestType
@@ -7086,7 +7000,7 @@ export const deleteTheoryCardApiV2AdminTheoryCardsCardIdDelete = (
  ) => {
       
       
-      return apiClient<unknown>(
+      return generatedApiClient<unknown>(
       {url: `/api/v2/admin/theory/cards/${cardId}`, method: 'DELETE'
     },
       );
@@ -7149,7 +7063,7 @@ export const bulkDeleteContentApiV2AdminContentBulkDeleteDelete = (
  ) => {
       
       
-      return apiClient<BulkDeleteResponseType>(
+      return generatedApiClient<BulkDeleteResponseType>(
       {url: `/api/v2/admin/content/bulk-delete`, method: 'DELETE',
       headers: {'Content-Type': 'application/json', },
       data: bulkDeleteRequestType
@@ -7214,7 +7128,7 @@ export const bulkDeleteTheoryApiV2AdminTheoryBulkDeleteDelete = (
  ) => {
       
       
-      return apiClient<BulkDeleteResponseType>(
+      return generatedApiClient<BulkDeleteResponseType>(
       {url: `/api/v2/admin/theory/bulk-delete`, method: 'DELETE',
       headers: {'Content-Type': 'application/json', },
       data: bulkDeleteRequestType
@@ -7279,7 +7193,7 @@ export const rootGet = (
 ) => {
       
       
-      return apiClient<unknown>(
+      return generatedApiClient<unknown>(
       {url: `/`, method: 'GET', signal
     },
       );
@@ -7367,7 +7281,7 @@ export const redirectRedirectGet = (
 ) => {
       
       
-      return apiClient<unknown>(
+      return generatedApiClient<unknown>(
       {url: `/redirect`, method: 'GET', signal
     },
       );

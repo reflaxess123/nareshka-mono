@@ -19,10 +19,11 @@
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
     "type-watch": "tsc --noEmit --watch",
-    "api:generate": "orval",
+    "api:generate": "bash scripts/generate-api.sh",
     "api:watch": "orval --config orval.config.ts --watch",
     "api:update": "npm run api:generate",
-    "api:migrate": "node scripts/migrate-to-generated-api.js"
+    "api:migrate": "node scripts/migrate-to-generated-api.js",
+    "api:generate-simple": "orval --config orval.config.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",

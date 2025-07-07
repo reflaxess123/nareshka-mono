@@ -2,9 +2,10 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
+import json
 
 from app.config import new_settings
 from app.presentation.api.health import router as health_router
@@ -64,6 +65,13 @@ app.include_router(admin_v2_router, prefix="/api/v2/admin")
 # Старые роутеры удалены - используется только новая архитектура v2
 
 # Алиасы для обратной совместимости с фронтендом удалены
+
+# OpenAPI генерация
+@app.get("/openapi.json", include_in_schema=False)
+async def get_openapi():
+    """Генерация OpenAPI спецификации для фронтенда"""
+    openapi_schema = app.openapi()
+    return JSONResponse(content=openapi_schema)
 
 # Корневые endpoints
 @app.get("/")

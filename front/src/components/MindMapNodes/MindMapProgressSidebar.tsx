@@ -1,5 +1,6 @@
+import { useGetTopicTasksApiV2MindmapTopicTopicKeyTasksGet } from '@/shared/api/generated/api';
 import { CheckCircle, Circle, Clock, X } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import './MindMapProgressSidebar.scss';
 
 interface Task {
@@ -55,44 +56,24 @@ const MindMapProgressSidebar: React.FC<MindMapProgressSidebarProps> = ({
   onTaskClick,
   onTheoreticalTaskClick,
 }) => {
-  const [topicData, setTopicData] = useState<TopicResponse | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (selectedTopic && isOpen) {
-      fetchTopicProgress();
+  const {
+    data: topicResponse,
+    isLoading: loading,
+    error,
+    refetch,
+  } = useGetTopicTasksApiV2MindmapTopicTopicKeyTasksGet(
+    selectedTopic?.key || '',
+    {
+      technology: currentTechnology,
+    },
+    {
+      query: {
+        enabled: !!selectedTopic && isOpen,
+      },
     }
-  }, [selectedTopic, isOpen, currentTechnology]);
+  );
 
-  const fetchTopicProgress = async () => {
-    if (!selectedTopic) return;
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch(
-        `/api/v2/mindmap/topic/${selectedTopic.key}/tasks?technology=${currentTechnology}`,
-        {
-          credentials: 'include',
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('Ошибка загрузки данных о прогрессе');
-      }
-
-      const data = await response.json();
-      console.log('Topic progress data:', data); // Для отладки
-      setTopicData(data);
-    } catch (err) {
-      console.error('Error fetching topic progress:', err);
-      setError(err instanceof Error ? err.message : 'Произошла ошибка');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const topicData = topicResponse as TopicResponse | undefined;
 
   const getStatusIcon = (task: Task) => {
     if (!task.progress)
@@ -155,8 +136,11 @@ const MindMapProgressSidebar: React.FC<MindMapProgressSidebarProps> = ({
 
             {error && (
               <div className="error-state">
-                <p>Ошибка: {error}</p>
-                <button className="retry-button" onClick={fetchTopicProgress}>
+                <p>
+                  Ошибка:{' '}
+                  {error instanceof Error ? error.message : 'Произошла ошибка'}
+                </p>
+                <button className="retry-button" onClick={() => refetch()}>
                   Повторить
                 </button>
               </div>
