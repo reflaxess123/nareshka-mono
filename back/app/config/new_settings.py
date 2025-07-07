@@ -212,4 +212,9 @@ legacy_settings = LegacySettingsAdapter(new_settings)
 print(f"DEBUG: NEW CONFIG - Database URL: {new_settings.database.url}")
 print(f"DEBUG: NEW CONFIG - Redis URL: {new_settings.redis.url}")
 print(f"DEBUG: NEW CONFIG - CORS origins: {new_settings.server.cors_origins}")
-print(f"DEBUG: NEW CONFIG - ProxyAPI key: {'*' * (len(new_settings.external_api.proxy_api_key) - 8) + new_settings.external_api.proxy_api_key[-8:] if new_settings.external_api.proxy_api_key else 'NOT SET'}") 
+print(f"DEBUG: NEW CONFIG - ProxyAPI key: {'*' * (len(new_settings.external_api.proxy_api_key) - 8) + new_settings.external_api.proxy_api_key[-8:] if new_settings.external_api.proxy_api_key else 'NOT SET'}")
+
+
+def get_settings() -> LegacySettingsAdapter:
+    """Возвращает настройки приложения для обратной совместимости"""
+    return legacy_settings 
