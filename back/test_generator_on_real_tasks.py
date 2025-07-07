@@ -25,8 +25,8 @@ from datetime import datetime
 sys.path.append(str(Path(__file__).parent))
 
 try:
-    from app.database import get_session
-    from app.models import ContentBlock
+    from app.infrastructure.database.connection import get_db
+    from app.infrastructure.models.content_models import ContentBlock
     from sqlalchemy.orm import Session
     from sqlalchemy import and_
 except ImportError as e:
@@ -207,7 +207,7 @@ console.log(JSON.stringify(testResult));
         
         # Подключаемся к БД
         print("🔌 Подключение к базе данных...")
-        session = next(get_session())
+        session = next(get_db())
         
         try:
             # Получаем все задачи с кодом

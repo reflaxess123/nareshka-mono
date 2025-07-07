@@ -11,7 +11,7 @@ from app.domain.entities.code_editor import (
     ValidationResult,
     ExecutionStats
 )
-from app.domain.entities.progress import TestCase
+from app.domain.entities.test_case import TestCase
 from app.domain.entities.enums import CodeLanguage, ExecutionStatus
 from app.application.dto.code_editor_dto import (
     SupportedLanguageResponseDTO,

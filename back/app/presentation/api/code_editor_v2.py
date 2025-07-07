@@ -15,7 +15,7 @@ from app.application.dto.code_editor_dto import (
     ValidationRequestDTO,
     ValidationResultDTO
 )
-from app.auth import get_current_user_from_session, get_current_user_from_session_required
+from ...shared.dependencies import get_current_user_optional, get_current_user_required
 from app.shared.dependencies import get_code_editor_service
 from app.infrastructure.database.connection import get_db
 from sqlalchemy.orm import Session
@@ -46,12 +46,12 @@ async def execute_code(
     background_tasks: BackgroundTasks,
     user_request: Request,
     db: Session = Depends(get_db),
-    code_editor_service: CodeEditorService = Depends(get_code_editor_service)
+    code_editor_service: CodeEditorService = Depends(get_code_editor_service),
+    user = Depends(get_current_user_optional)
 ):
     """Выполнение кода в изолированной среде"""
     
-    # Получаем текущего пользователя (может быть None для анонимных)
-    user = get_current_user_from_session(user_request, db)
+    # Пользователь получен через DI (может быть None для анонимных)
     user_id = user.id if user else None
     
     try:
@@ -78,12 +78,12 @@ async def get_execution_result(
     execution_id: str,
     user_request: Request,
     db: Session = Depends(get_db),
-    code_editor_service: CodeEditorService = Depends(get_code_editor_service)
+    code_editor_service: CodeEditorService = Depends(get_code_editor_service),
+    user = Depends(get_current_user_optional)
 ):
     """Получение результата выполнения кода"""
     
-    # Получаем текущего пользователя (может быть None для анонимных)
-    user = get_current_user_from_session(user_request, db)
+    # Пользователь получен через DI (может быть None для анонимных)
     user_id = user.id if user else None
     
     try:
@@ -108,11 +108,12 @@ async def get_user_executions(
     code_editor_service: CodeEditorService = Depends(get_code_editor_service),
     blockId: Optional[str] = None,
     limit: int = 20,
-    offset: int = 0
+    offset: int = 0,
+    user = Depends(get_current_user_required)
 ):
     """Получение истории выполнений пользователя"""
     
-    user = get_current_user_from_session_required(user_request, db)
+    # Пользователь получен через DI (обязательно авторизован)
     
     try:
         executions = await code_editor_service.get_user_executions(user.id, blockId, limit, offset)
@@ -129,11 +130,12 @@ async def save_solution(
     solution: UserCodeSolutionCreateDTO,
     user_request: Request,
     db: Session = Depends(get_db),
-    code_editor_service: CodeEditorService = Depends(get_code_editor_service)
+    code_editor_service: CodeEditorService = Depends(get_code_editor_service),
+    user = Depends(get_current_user_required)
 ):
     """Сохранение решения пользователя"""
     
-    user = get_current_user_from_session_required(user_request, db)
+    # Пользователь получен через DI (обязательно авторизован)
     
     try:
         result = await code_editor_service.save_solution(solution, user.id)
@@ -155,11 +157,12 @@ async def get_block_solutions(
     block_id: str,
     user_request: Request,
     db: Session = Depends(get_db),
-    code_editor_service: CodeEditorService = Depends(get_code_editor_service)
+    code_editor_service: CodeEditorService = Depends(get_code_editor_service),
+    user = Depends(get_current_user_required)
 ):
     """Получение решений пользователя для конкретного блока"""
     
-    user = get_current_user_from_session_required(user_request, db)
+    # Пользователь получен через DI (обязательно авторизован)
     
     try:
         solutions = await code_editor_service.get_block_solutions(user.id, block_id)
@@ -177,11 +180,12 @@ async def update_solution(
     solution_update: UserCodeSolutionUpdateDTO,
     user_request: Request,
     db: Session = Depends(get_db),
-    code_editor_service: CodeEditorService = Depends(get_code_editor_service)
+    code_editor_service: CodeEditorService = Depends(get_code_editor_service),
+    user = Depends(get_current_user_required)
 ):
     """Обновление решения пользователя"""
     
-    user = get_current_user_from_session_required(user_request, db)
+    # Пользователь получен через DI (обязательно авторизован)
     
     try:
         result = await code_editor_service.update_solution(solution_id, user.id, solution_update)
@@ -202,11 +206,12 @@ async def update_solution(
 async def get_execution_stats(
     user_request: Request,
     db: Session = Depends(get_db),
-    code_editor_service: CodeEditorService = Depends(get_code_editor_service)
+    code_editor_service: CodeEditorService = Depends(get_code_editor_service),
+    user = Depends(get_current_user_required)
 ):
     """Получение статистики выполнения кода пользователя"""
     
-    user = get_current_user_from_session_required(user_request, db)
+    # Пользователь получен через DI (обязательно авторизован)
     
     try:
         stats = await code_editor_service.get_execution_stats(user.id)
@@ -223,12 +228,12 @@ async def get_test_cases(
     block_id: str,
     user_request: Request,
     db: Session = Depends(get_db),
-    code_editor_service: CodeEditorService = Depends(get_code_editor_service)
+    code_editor_service: CodeEditorService = Depends(get_code_editor_service),
+    user = Depends(get_current_user_optional)
 ):
     """Получение тест-кейсов для блока"""
     
-    # Получаем пользователя (может быть None)
-    user = get_current_user_from_session(user_request, db)
+    # Пользователь получен через DI (может быть None)
     user_id = user.id if user else None
     
     try:
@@ -259,11 +264,12 @@ async def validate_solution(
     user_request: Request,
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
-    code_editor_service: CodeEditorService = Depends(get_code_editor_service)
+    code_editor_service: CodeEditorService = Depends(get_code_editor_service),
+    user = Depends(get_current_user_required)
 ):
     """Валидация решения против тест-кейсов"""
     
-    user = get_current_user_from_session_required(user_request, db)
+    # Пользователь получен через DI (обязательно авторизован)
     
     try:
         result = await code_editor_service.validate_solution(block_id, validation_request, user.id)

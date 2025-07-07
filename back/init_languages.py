@@ -8,8 +8,9 @@ import uuid
 
 from sqlalchemy.orm import Session
 
-from app.database import engine
-from app.models import CodeLanguage, SupportedLanguage
+from app.infrastructure.database.connection import engine
+from app.infrastructure.models.enums import CodeLanguage
+from app.infrastructure.models.code_execution_models import SupportedLanguage
 
 # Конфигурация поддерживаемых языков
 SUPPORTED_LANGUAGES = [

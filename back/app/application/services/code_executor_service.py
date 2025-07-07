@@ -1,3 +1,7 @@
+"""
+🐳 Сервис выполнения кода в изолированных Docker контейнерах
+"""
+
 import json
 import logging
 import os
@@ -10,7 +14,9 @@ import platform
 import docker
 from docker.errors import APIError, ContainerError, ImageNotFound
 
-from .models import CodeLanguage, ExecutionStatus, SupportedLanguage
+from ...domain.entities.execution import SupportedLanguage, CodeExecution
+from ...domain.entities.enums import CodeLanguage, ExecutionStatus
+from ...domain.repositories.code_editor_repository import CodeEditorRepository
 
 logger = logging.getLogger(__name__)
 
@@ -35,10 +41,11 @@ class CodeExecutionError(Exception):
     pass
 
 
-class CodeExecutor:
-    """Сервис для безопасного выполнения кода в изолированных Docker контейнерах"""
+class CodeExecutorService:
+    """🐳 Сервис для безопасного выполнения кода в изолированных Docker контейнерах"""
 
-    def __init__(self):
+    def __init__(self, code_editor_repository: CodeEditorRepository):
+        self.code_editor_repository = code_editor_repository
         self.docker_client = None
         self.execution_timeout = 30  # Максимальное время выполнения в секундах
         self.max_memory = "256m"  # Максимальная память
@@ -58,8 +65,10 @@ class CodeExecutor:
         self,
         source_code: str,
         language: SupportedLanguage,
-        stdin: Optional[str] = None
-    ) -> Dict[str, Any]:
+        stdin: Optional[str] = None,
+        user_id: Optional[int] = None,
+        block_id: Optional[str] = None
+    ) -> CodeExecution:
         """
         Выполняет код в изолированном Docker контейнере
         
@@ -67,25 +76,49 @@ class CodeExecutor:
             source_code: Исходный код для выполнения
             language: Объект поддерживаемого языка
             stdin: Входные данные для программы
+            user_id: ID пользователя (опционально)
+            block_id: ID блока (опционально)
             
         Returns:
-            Словарь с результатами выполнения
+            CodeExecution объект с результатами выполнения
         """
         execution_id = str(uuid.uuid4())
         start_time = time.time()
 
         logger.info(f"Starting code execution {execution_id} for language {language.language}")
 
+        # Создаем объект CodeExecution
+        execution = CodeExecution(
+            id=execution_id,
+            userId=user_id,
+            blockId=block_id,
+            languageId=language.id,
+            sourceCode=source_code,
+            stdin=stdin,
+            status=ExecutionStatus.PENDING,
+            stdout=None,
+            stderr=None,
+            exitCode=None,
+            executionTimeMs=None,
+            memoryUsedMB=None,
+            containerLogs=None,
+            errorMessage=None,
+            createdAt=time.time(),
+            completedAt=None
+        )
+
         try:
             # Проверяем доступность Docker перед выполнением
             try:
                 self._get_docker_client()
             except CodeExecutionError as e:
-                return {
-                    "status": ExecutionStatus.ERROR,
-                    "errorMessage": str(e),
-                    "executionTimeMs": int((time.time() - start_time) * 1000)
-                }
+                execution.status = ExecutionStatus.ERROR
+                execution.errorMessage = str(e)
+                execution.executionTimeMs = int((time.time() - start_time) * 1000)
+                execution.completedAt = time.time()
+                await self.code_editor_repository.save_execution(execution)
+                return execution
+
             # Создаем временную директорию для файлов в общем месте
             with tempfile.TemporaryDirectory(dir=SHARED_EXEC_DIR) as temp_dir:
                 # Даем права на чтение и выполнение для всех, чтобы
@@ -113,19 +146,29 @@ class CodeExecutor:
                     temp_dir, language, execution_id, stdin_file
                 )
 
-                execution_time = int((time.time() - start_time) * 1000)
-                result["executionTimeMs"] = execution_time
+                # Обновляем объект выполнения
+                execution.status = result["status"]
+                execution.stdout = result.get("stdout")
+                execution.stderr = result.get("stderr")
+                execution.exitCode = result.get("exitCode")
+                execution.executionTimeMs = int((time.time() - start_time) * 1000)
+                execution.memoryUsedMB = result.get("memoryUsedMB")
+                execution.containerLogs = result.get("containerLogs")
+                execution.errorMessage = result.get("errorMessage")
+                execution.completedAt = time.time()
 
-                logger.info(f"Code execution {execution_id} completed in {execution_time}ms")
-                return result
+                logger.info(f"Code execution {execution_id} completed in {execution.executionTimeMs}ms")
 
         except Exception as e:
             logger.error(f"Code execution {execution_id} failed: {str(e)}")
-            return {
-                "status": ExecutionStatus.ERROR,
-                "errorMessage": str(e),
-                "executionTimeMs": int((time.time() - start_time) * 1000)
-            }
+            execution.status = ExecutionStatus.ERROR
+            execution.errorMessage = str(e)
+            execution.executionTimeMs = int((time.time() - start_time) * 1000)
+            execution.completedAt = time.time()
+
+        # Сохраняем результат в репозитории
+        await self.code_editor_repository.save_execution(execution)
+        return execution
 
     async def _run_in_container(
         self,
@@ -200,139 +243,127 @@ class CodeExecutor:
             return {
                 "status": ExecutionStatus.ERROR,
                 "errorMessage": f"Docker image {language.dockerImage} not found",
-                "containerLogs": f"Image {language.dockerImage} not available"
+                "containerLogs": "Docker image not available"
             }
 
-        except APIError as e:
-            if "timeout" in str(e).lower():
-                return {
-                    "status": ExecutionStatus.TIMEOUT,
-                    "errorMessage": f"Execution timed out after {language.timeoutSeconds} seconds",
-                    "containerLogs": f"Container timeout: {str(e)}"
-                }
-            else:
-                return {
-                    "status": ExecutionStatus.ERROR,
-                    "errorMessage": f"Docker API error: {str(e)}",
-                    "containerLogs": f"Docker API error: {str(e)}"
-                }
+        except Exception as e:
+            return {
+                "status": ExecutionStatus.ERROR,
+                "errorMessage": f"Container execution failed: {str(e)}",
+                "containerLogs": f"Unexpected error: {str(e)}"
+            }
 
     def _prepare_command(self, language: SupportedLanguage, stdin_file: Optional[str]) -> str:
         """Подготавливает команду для выполнения в контейнере"""
-
-        if language.language == CodeLanguage.PYTHON:
+        
+        base_command = language.runCommand.replace("{file}", f"main{language.fileExtension}")
+        
+        # Если есть компиляция
+        if language.compileCommand:
+            compile_cmd = language.compileCommand.replace("{file}", f"main{language.fileExtension}")
             if stdin_file:
-                return "sh -c 'python -B main.py < input.txt'"
+                return f"bash -c '{compile_cmd} && {base_command} < input.txt'"
             else:
-                return "python -B main.py"
-
-        elif language.language == CodeLanguage.JAVASCRIPT:
-            if stdin_file:
-                return "sh -c 'node main.js < input.txt'"
-            else:
-                return "node main.js"
-
-        elif language.language == CodeLanguage.JAVA:
-            # Для Java нужна компиляция
-            if stdin_file:
-                return "sh -c 'javac main.java && java Main < input.txt'"
-            else:
-                return "sh -c 'javac main.java && java Main'"
-
-        elif language.language == CodeLanguage.CPP:
-            # Для C++ нужна компиляция
-            if stdin_file:
-                return "sh -c 'g++ -o main main.cpp && ./main < input.txt'"
-            else:
-                return "sh -c 'g++ -o main main.cpp && ./main'"
-
-        elif language.language == CodeLanguage.GO:
-            if stdin_file:
-                return "sh -c 'go run main.go < input.txt'"
-            else:
-                return "go run main.go"
-
+                return f"bash -c '{compile_cmd} && {base_command}'"
         else:
-            # Используем команду из настроек языка
-            base_command = language.runCommand.replace("{file}", f"main{language.fileExtension}")
+            # Только выполнение
             if stdin_file:
-                return f"sh -c '{base_command} < input.txt'"
+                return f"bash -c '{base_command} < input.txt'"
             else:
                 return base_command
 
     def validate_code_safety(self, source_code: str, language: CodeLanguage) -> bool:
         """
-        Базовая проверка безопасности кода
+        Проверяет безопасность кода перед выполнением
         
         Args:
-            source_code: Исходный код
+            source_code: Исходный код для проверки
             language: Язык программирования
             
         Returns:
-            True если код считается безопасным
+            True если код безопасен, False - если содержит опасные конструкции
         """
-        # Список запрещенных паттернов
-        forbidden_patterns = [
-            # Системные команды
-            "system", "exec", "eval", "subprocess", "os.system",
+        
+        # Общие опасные паттерны
+        dangerous_patterns = [
             # Файловые операции
-            "open(", "file(", "input(", "raw_input(",
-            # Сетевые операции
-            "socket", "urllib", "requests", "http",
-            # Импорт опасных модулей
-            "import os", "import sys", "import subprocess",
-            "from os", "from sys", "from subprocess",
-            # Опасные JavaScript функции
-            "require(", "process.", "fs.", "child_process",
-            # Бесконечные циклы (базовая проверка)
-            "while True:", "while(true)", "for(;;)"
+            r'\bopen\s*\(',
+            r'\bfile\s*\(',
+            r'\bwith\s+open',
+            r'\.write\s*\(',
+            r'\.read\s*\(',
+            
+            # Системные вызовы
+            r'\bos\.',
+            r'\bsystem\s*\(',
+            r'\bsubprocess\.',
+            r'\beval\s*\(',
+            r'\bexec\s*\(',
+            
+            # Сеть
+            r'\bsocket\.',
+            r'\brequests\.',
+            r'\burllib\.',
+            r'\bhttplib\.',
+            
+            # Импорты опасных модулей
+            r'import\s+os',
+            r'import\s+sys',
+            r'import\s+subprocess',
+            r'import\s+socket',
+            r'from\s+os\s+import',
+            r'from\s+sys\s+import',
         ]
-
-        source_lower = source_code.lower()
-
-        for pattern in forbidden_patterns:
-            if pattern.lower() in source_lower:
-                logger.warning(f"Potentially unsafe code detected: {pattern}")
+        
+        # Языко-специфичные проверки
+        if language == CodeLanguage.PYTHON:
+            dangerous_patterns.extend([
+                r'__import__\s*\(',
+                r'globals\s*\(',
+                r'locals\s*\(',
+                r'vars\s*\(',
+                r'dir\s*\(',
+            ])
+        elif language == CodeLanguage.JAVASCRIPT:
+            dangerous_patterns.extend([
+                r'require\s*\(',
+                r'fs\.',
+                r'process\.',
+                r'child_process',
+            ])
+        elif language in [CodeLanguage.CPP, CodeLanguage.C]:
+            dangerous_patterns.extend([
+                r'#include\s*<fstream>',
+                r'#include\s*<cstdlib>',
+                r'system\s*\(',
+                r'popen\s*\(',
+            ])
+        
+        # Проверяем код на наличие опасных паттернов
+        import re
+        for pattern in dangerous_patterns:
+            if re.search(pattern, source_code, re.IGNORECASE):
+                logger.warning(f"Dangerous pattern detected: {pattern}")
                 return False
-
-        # Проверка размера кода
-        if len(source_code) > 10000:  # 10KB лимит
-            logger.warning("Code size exceeds limit")
-            return False
-
+        
         return True
 
     async def get_supported_languages(self) -> List[SupportedLanguage]:
-        """Возвращает список поддерживаемых языков"""
-        # В реальной реализации это будет запрос к БД
-        # Пока возвращаем базовые языки
-        return [
-            {
-                "id": "python39",
-                "name": "Python 3.9",
-                "language": CodeLanguage.PYTHON,
-                "version": "3.9",
-                "dockerImage": "python:3.9-alpine",
-                "fileExtension": ".py",
-                "runCommand": "python {file}",
-                "timeoutSeconds": 10,
-                "memoryLimitMB": 128,
-                "isEnabled": True
-            },
-            {
-                "id": "node18",
-                "name": "Node.js 18",
-                "language": CodeLanguage.JAVASCRIPT,
-                "version": "18",
-                "dockerImage": "node:18-alpine",
-                "fileExtension": ".js",
-                "runCommand": "node {file}",
-                "timeoutSeconds": 10,
-                "memoryLimitMB": 128,
-                "isEnabled": True
-            }
-        ]
+        """Получает список поддерживаемых языков программирования"""
+        return await self.code_editor_repository.get_supported_languages()
 
+    async def get_execution_by_id(self, execution_id: str) -> Optional[CodeExecution]:
+        """Получает выполнение по ID"""
+        return await self.code_editor_repository.get_execution_by_id(execution_id)
 
-# Глобальный экземпляр исполнителя кода
-code_executor = CodeExecutor()
+    async def get_user_executions(
+        self, 
+        user_id: int, 
+        block_id: Optional[str] = None,
+        limit: int = 20,
+        offset: int = 0
+    ) -> List[CodeExecution]:
+        """Получает историю выполнений пользователя"""
+        return await self.code_editor_repository.get_user_executions(
+            user_id, block_id, limit, offset
+        ) 

@@ -15,7 +15,7 @@ from app.domain.entities.progress import (
     TestCase,
     TestValidationResult
 )
-from app.models import (
+from ..models import (
     TaskAttempt as TaskAttemptModel,
     TaskSolution as TaskSolutionModel,
     UserCategoryProgress as UserCategoryProgressModel,

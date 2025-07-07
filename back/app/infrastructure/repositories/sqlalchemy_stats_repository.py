@@ -18,7 +18,7 @@ from app.domain.entities.stats import (
     SubCategoryRoadmapStats,
     ItemStats
 )
-from app.models import (
+from ..models import (
     ContentBlock,
     ContentFile,
     TheoryCard,

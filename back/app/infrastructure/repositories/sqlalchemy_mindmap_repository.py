@@ -6,7 +6,7 @@ from ...domain.repositories.mindmap_repository import MindMapRepository
 from ...domain.entities.mindmap import (
     TechnologyCenter, Topic, TaskDetail, TopicStats, TopicWithTasks
 )
-from ...models import ContentBlock, ContentFile, UserContentProgress
+from ..models import ContentBlock, ContentFile, UserContentProgress
 from ...mindmap_config import (
     TECHNOLOGY_CENTERS, TECHNOLOGY_TOPICS, 
     get_technology_center, get_technology_topics,

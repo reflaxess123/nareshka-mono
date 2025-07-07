@@ -5,8 +5,8 @@ from sqlalchemy import and_, func, or_, asc, desc, text
 from sqlalchemy.orm import Session
 
 from ...domain.entities.task import Task, TaskCategory, TaskCompany, TaskType
-from ...domain.entities.content import ContentBlock, UserContentProgress
-from ...domain.entities.theory import TheoryCard, UserTheoryProgress
+from ..models.content_models import ContentBlock, UserContentProgress
+from ..models.theory_models import TheoryCard, UserTheoryProgress
 from ...domain.repositories.task_repository import TaskRepository
 
 
@@ -106,7 +106,7 @@ class SQLAlchemyTaskRepository(TaskRepository):
         user_id: Optional[int] = None
     ) -> List[Task]:
         """Получение заданий типа content_block"""
-        from ...domain.entities.content import ContentFile
+        from ..models.content_models import ContentFile
         
         query = self.session.query(ContentBlock).join(ContentFile)
         
@@ -238,7 +238,7 @@ class SQLAlchemyTaskRepository(TaskRepository):
     
     async def get_task_categories(self) -> List[TaskCategory]:
         """Получение списка категорий заданий с подкатегориями и статистикой"""
-        from ...domain.entities.content import ContentFile
+        from ..models.content_models import ContentFile
         
         # Получаем статистику по content blocks
         content_stats = self.session.query(
@@ -309,7 +309,7 @@ class SQLAlchemyTaskRepository(TaskRepository):
         sub_categories: Optional[List[str]] = None
     ) -> List[TaskCompany]:
         """Получение списка компаний из заданий с количеством"""
-        from ...domain.entities.content import ContentFile
+        from ..models.content_models import ContentFile
         
         # Получаем все content blocks с компаниями
         query = self.session.query(ContentBlock).join(ContentFile).filter(

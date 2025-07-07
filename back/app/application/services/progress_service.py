@@ -4,7 +4,8 @@ from datetime import datetime
 from decimal import Decimal
 
 from app.domain.repositories.progress_repository import ProgressRepository
-from app.domain.entities.progress import TaskAttempt, TaskSolution, UserCategoryProgress
+from app.domain.entities.task import TaskAttempt, TaskSolution
+from app.domain.entities.progress import UserCategoryProgress
 from app.application.dto.progress_dto import (
     TaskAttemptCreateDTO, 
     TaskAttemptResponseDTO,
@@ -35,17 +36,15 @@ class ProgressService:
         attempt = TaskAttempt(
             id=str(uuid.uuid4()),
             userId=attempt_data.userId,
-            blockId=attempt_data.blockId,
-            sourceCode=attempt_data.sourceCode,
-            language=attempt_data.language,
-            isSuccessful=attempt_data.isSuccessful,
-            attemptNumber=attempt_number,
+            taskId=attempt_data.blockId,  # blockId -> taskId
+            code=attempt_data.sourceCode,  # sourceCode -> code
+            languageId=attempt_data.language,  # language -> languageId
+            result="success" if attempt_data.isSuccessful else "failed",  # isSuccessful -> result
+            error=attempt_data.errorMessage,  # errorMessage -> error
+            executionTime=attempt_data.executionTimeMs,  # executionTimeMs -> executionTime
+            memory=attempt_data.memoryUsedMB,  # memoryUsedMB -> memory
             createdAt=datetime.now(),
-            executionTimeMs=attempt_data.executionTimeMs,
-            memoryUsedMB=attempt_data.memoryUsedMB,
-            errorMessage=attempt_data.errorMessage,
-            stderr=attempt_data.stderr,
-            durationMinutes=attempt_data.durationMinutes
+            updatedAt=datetime.now()
         )
         
         # Сохраняем попытку
@@ -75,17 +74,17 @@ class ProgressService:
         return TaskAttemptResponseDTO(
             id=created_attempt.id,
             userId=created_attempt.userId,
-            blockId=created_attempt.blockId,
-            sourceCode=created_attempt.sourceCode,
-            language=created_attempt.language,
-            isSuccessful=created_attempt.isSuccessful,
-            attemptNumber=created_attempt.attemptNumber,
+            blockId=created_attempt.taskId,  # taskId -> blockId для DTO
+            sourceCode=created_attempt.code,  # code -> sourceCode для DTO
+            language=created_attempt.languageId,  # languageId -> language для DTO
+            isSuccessful=created_attempt.result == "success",  # result -> isSuccessful для DTO
+            attemptNumber=1,  # Значение по умолчанию
             createdAt=created_attempt.createdAt,
-            executionTimeMs=created_attempt.executionTimeMs,
-            memoryUsedMB=created_attempt.memoryUsedMB,
-            errorMessage=created_attempt.errorMessage,
-            stderr=created_attempt.stderr,
-            durationMinutes=created_attempt.durationMinutes
+            executionTimeMs=created_attempt.executionTime,  # executionTime -> executionTimeMs для DTO
+            memoryUsedMB=created_attempt.memory,  # memory -> memoryUsedMB для DTO
+            errorMessage=created_attempt.error,  # error -> errorMessage для DTO
+            stderr=None,  # Не используется в новой модели
+            durationMinutes=None  # Не используется в новой модели
         )
 
     async def get_user_detailed_progress(self, user_id: int) -> UserDetailedProgressResponseDTO:
@@ -216,10 +215,8 @@ class ProgressService:
         
         if existing_solution:
             # Обновляем существующее решение
-            existing_solution.finalCode = attempt_data.sourceCode
-            existing_solution.language = attempt_data.language
-            existing_solution.totalAttempts = attempt_number
-            existing_solution.solvedAt = datetime.now()
+            existing_solution.code = attempt_data.sourceCode  # finalCode -> code
+            existing_solution.languageId = attempt_data.language  # language -> languageId
             existing_solution.updatedAt = datetime.now()
             
             await self.progress_repository.update_task_solution(existing_solution)
@@ -228,13 +225,9 @@ class ProgressService:
             new_solution = TaskSolution(
                 id=str(uuid.uuid4()),
                 userId=attempt_data.userId,
-                blockId=attempt_data.blockId,
-                finalCode=attempt_data.sourceCode,
-                language=attempt_data.language,
-                totalAttempts=attempt_number,
-                timeToSolveMinutes=attempt_data.durationMinutes or 0,
-                firstAttempt=datetime.now(),
-                solvedAt=datetime.now(),
+                taskId=attempt_data.blockId,  # blockId -> taskId
+                code=attempt_data.sourceCode,  # finalCode -> code
+                languageId=attempt_data.language,  # language -> languageId
                 createdAt=datetime.now(),
                 updatedAt=datetime.now()
             )
