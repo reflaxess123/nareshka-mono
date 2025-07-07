@@ -1,4 +1,9 @@
 import { authApi } from '@/shared/api/auth';
+import {
+  useGetContentStatsApiV2StatsContentGet,
+  useGetTheoryStatsApiV2StatsTheoryGet,
+  useGetUserStatsOverviewApiV2StatsOverviewGet,
+} from '@/shared/api/generated/api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 // Ключи для кэширования
@@ -94,21 +99,11 @@ export const useDetailedStats = () => {
 
 // Хук для получения статистики обзора
 export const useOverviewStats = () => {
-  return useQuery({
-    queryKey: adminQueryKeys.overview(),
-    queryFn: async () => {
-      const response = await fetch('/api/v2/stats/overview', {
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      return response.json();
+  return useGetUserStatsOverviewApiV2StatsOverviewGet({
+    query: {
+      staleTime: 5 * 60 * 1000, // 5 минут
+      retry: 3,
     },
-    staleTime: 5 * 60 * 1000, // 5 минут
-    retry: 3,
   });
 };
 
@@ -119,26 +114,12 @@ export const useContentStats = (
     includeBlocks?: boolean;
   } = {}
 ) => {
-  return useQuery({
-    queryKey: adminQueryKeys.contentStats(params),
-    queryFn: async () => {
-      const searchParams = new URLSearchParams();
-      if (params.category) searchParams.append('category', params.category);
-      if (params.includeBlocks) searchParams.append('includeBlocks', 'true');
-
-      const response = await fetch(`/api/v2/stats/content?${searchParams}`, {
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      return response.json();
+  return useGetContentStatsApiV2StatsContentGet({
+    query: {
+      enabled: Object.keys(params).length > 0,
+      staleTime: 5 * 60 * 1000, // 5 минут
+      retry: 3,
     },
-    enabled: Object.keys(params).length > 0,
-    staleTime: 5 * 60 * 1000, // 5 минут
-    retry: 3,
   });
 };
 
@@ -149,26 +130,12 @@ export const useTheoryStats = (
     includeCards?: boolean;
   } = {}
 ) => {
-  return useQuery({
-    queryKey: adminQueryKeys.theoryStats(params),
-    queryFn: async () => {
-      const searchParams = new URLSearchParams();
-      if (params.category) searchParams.append('category', params.category);
-      if (params.includeCards) searchParams.append('includeCards', 'true');
-
-      const response = await fetch(`/api/v2/stats/theory?${searchParams}`, {
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      return response.json();
+  return useGetTheoryStatsApiV2StatsTheoryGet({
+    query: {
+      enabled: Object.keys(params).length > 0,
+      staleTime: 5 * 60 * 1000, // 5 минут
+      retry: 3,
     },
-    enabled: Object.keys(params).length > 0,
-    staleTime: 5 * 60 * 1000, // 5 минут
-    retry: 3,
   });
 };
 

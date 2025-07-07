@@ -1,4 +1,8 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import {
+  useGetContentBlockApiV2ContentBlocksBlockIdGet,
+  useGetTopicTasksApiV2MindmapTopicTopicKeyTasksGet,
+} from '@/shared/api/generated/api';
+import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MarkdownContent } from '../../shared/components/MarkdownContent';
 import { CodeTemplateGenerator } from '../../shared/utils/codeTemplateGenerator';
@@ -10,13 +14,7 @@ interface Task {
   description: string;
 }
 
-interface Topic {
-  key: string;
-  title: string;
-  icon: string;
-  color: string;
-  description: string;
-}
+// Удален неиспользуемый интерфейс Topic
 
 interface TopicTaskModalProps {
   isOpen: boolean;
@@ -30,68 +28,69 @@ const TopicTaskModal: React.FC<TopicTaskModalProps> = ({
   topicKey,
 }) => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [topic, setTopic] = useState<Topic | null>(null);
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
-  const fetchTopicTasks = useCallback(async () => {
-    if (!topicKey) return;
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch(`/api/v2/mindmap/topic/${topicKey}/tasks`);
-      const result = await response.json();
-
-      if (result.success) {
-        setTopic(result.topic);
-        setTasks(result.tasks);
-      } else {
-        setError('Ошибка загрузки задач');
-      }
-    } catch {
-      setError('Ошибка сети');
-    } finally {
-      setLoading(false);
+  // Используем generated hook для получения задач по теме
+  const {
+    data: topicResponse,
+    isLoading: loading,
+    error,
+    refetch,
+  } = useGetTopicTasksApiV2MindmapTopicTopicKeyTasksGet(
+    topicKey || '',
+    {},
+    {
+      query: {
+        enabled: !!topicKey && isOpen,
+      },
     }
-  }, [topicKey]);
+  );
 
-  useEffect(() => {
-    if (isOpen && topicKey) {
-      fetchTopicTasks();
-    }
-  }, [isOpen, topicKey, fetchTopicTasks]);
+  // Используем generated hook для получения блока контента при клике на задачу
+  const { refetch: refetchBlock } =
+    useGetContentBlockApiV2ContentBlocksBlockIdGet(selectedTaskId || '', {
+      query: {
+        enabled: !!selectedTaskId,
+      },
+    });
 
-  const handleTaskClick = async (task: Task) => {
-    try {
-      const response = await fetch(`/api/v2/content/blocks/${task.id}`);
-      const blockData = await response.json();
+  const topic = topicResponse?.topic;
+  const tasks = topicResponse?.tasks || [];
 
-      if (blockData) {
-        const templateResult = CodeTemplateGenerator.generateTemplate(
-          blockData.codeContent || '',
-          blockData.codeLanguage || 'javascript'
-        );
+  // Обрабатываем клик по задаче
+  const handleTaskClick = useCallback(
+    async (task: Task) => {
+      setSelectedTaskId(task.id);
 
-        const params = new URLSearchParams({
-          blockId: task.id,
-          template: templateResult,
-          language: blockData.codeLanguage || 'javascript',
-          processed: 'true',
-        });
+      try {
+        const blockResponse = await refetchBlock();
+        const blockData = blockResponse.data;
 
-        navigate(`/code-editor?${params.toString()}`);
-      } else {
+        if (blockData) {
+          const templateResult = CodeTemplateGenerator.generateTemplate(
+            blockData.codeContent || '',
+            blockData.codeLanguage || 'javascript'
+          );
+
+          const params = new URLSearchParams({
+            blockId: task.id,
+            template: templateResult,
+            language: blockData.codeLanguage || 'javascript',
+            processed: 'true',
+          });
+
+          navigate(`/code-editor?${params.toString()}`);
+        } else {
+          navigate(`/code-editor?blockId=${task.id}`);
+        }
+      } catch (error) {
+        console.error('Ошибка получения данных блока:', error);
         navigate(`/code-editor?blockId=${task.id}`);
       }
-    } catch (error) {
-      console.error('Ошибка получения данных блока:', error);
-      navigate(`/code-editor?blockId=${task.id}`);
-    }
-    onClose();
-  };
+      onClose();
+    },
+    [refetchBlock, navigate, onClose]
+  );
 
   if (!isOpen) return null;
 
@@ -128,8 +127,8 @@ const TopicTaskModal: React.FC<TopicTaskModalProps> = ({
 
           {error && (
             <div className="error-state">
-              <p>❌ {error}</p>
-              <button onClick={fetchTopicTasks} className="retry-button">
+              <p>❌ {error instanceof Error ? error.message : 'Произошла ошибка'}</p>
+              <button onClick={() => refetch()} className="retry-button">
                 Повторить
               </button>
             </div>
