@@ -3,10 +3,8 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
 
-from ...domain.entities.user import User as DomainUser
 from ...domain.repositories.user_repository import UserRepository
-from ..models.user_models import User as InfraUser
-from ..mappers.user_mapper import UserMapper
+from ..models.user_models import User
 
 
 class SQLAlchemyUserRepository(UserRepository):
@@ -15,51 +13,53 @@ class SQLAlchemyUserRepository(UserRepository):
     def __init__(self, session: Session):
         self.session = session
     
-    async def get_by_id(self, id: str) -> Optional[DomainUser]:
+    async def get_by_id(self, id: str) -> Optional[User]:
         """Получить пользователя по ID"""
-        infra_user = self.session.query(InfraUser).filter(InfraUser.id == int(id)).first()
-        return UserMapper.to_domain(infra_user) if infra_user else None
+        return self.session.query(User).filter(User.id == int(id)).first()
     
-    async def get_by_email(self, email: str) -> Optional[DomainUser]:
+    async def get_by_email(self, email: str) -> Optional[User]:
         """Получить пользователя по email"""
-        infra_user = self.session.query(InfraUser).filter(InfraUser.email == email).first()
-        return UserMapper.to_domain(infra_user) if infra_user else None
+        return self.session.query(User).filter(User.email == email).first()
     
-    async def get_all(self, limit: int = 100, offset: int = 0) -> List[DomainUser]:
+    async def get_all(self, limit: int = 100, offset: int = 0) -> List[User]:
         """Получить всех пользователей с пагинацией"""
-        infra_users = self.session.query(InfraUser).offset(offset).limit(limit).all()
-        return UserMapper.to_domain_list(infra_users)
+        return self.session.query(User).offset(offset).limit(limit).all()
     
-    async def create(self, entity: DomainUser) -> DomainUser:
+    async def create(self, entity: User) -> User:
         """Создать пользователя"""
-        infra_user = UserMapper.to_infrastructure(entity)
-        self.session.add(infra_user)
+        self.session.add(entity)
         self.session.flush()  # Получаем ID без commit
-        return UserMapper.to_domain(infra_user)
+        return entity
     
-    async def update(self, entity: DomainUser) -> DomainUser:
+    async def update(self, entity: User) -> User:
         """Обновить пользователя"""
-        # Получаем существующий Infrastructure объект
-        infra_user = self.session.query(InfraUser).filter(InfraUser.id == int(entity.id)).first()
-        if not infra_user:
+        # Получаем существующий объект
+        existing_user = self.session.query(User).filter(User.id == int(entity.id)).first()
+        if not existing_user:
             raise ValueError(f"User with id {entity.id} not found")
         
         # Обновляем данные
-        updated_infra_user = UserMapper.update_infrastructure_from_domain(infra_user, entity)
-        return UserMapper.to_domain(updated_infra_user)
+        existing_user.email = entity.email
+        existing_user.password = entity.password
+        existing_user.role = entity.role
+        existing_user.updatedAt = entity.updatedAt
+        existing_user.totalTasksSolved = entity.totalTasksSolved
+        existing_user.lastActivityDate = entity.lastActivityDate
+        
+        return existing_user
     
     async def delete(self, id: str) -> bool:
         """Удалить пользователя"""
-        infra_user = self.session.query(InfraUser).filter(InfraUser.id == int(id)).first()
-        if infra_user:
-            self.session.delete(infra_user)
+        user = self.session.query(User).filter(User.id == int(id)).first()
+        if user:
+            self.session.delete(user)
             return True
         return False
     
     async def exists(self, id: str) -> bool:
         """Проверить существование пользователя"""
-        return self.session.query(InfraUser).filter(InfraUser.id == int(id)).first() is not None
+        return self.session.query(User).filter(User.id == int(id)).first() is not None
     
     async def email_exists(self, email: str) -> bool:
         """Проверить существование email"""
-        return self.session.query(InfraUser).filter(InfraUser.email == email).first() is not None 
+        return self.session.query(User).filter(User.email == email).first() is not None 

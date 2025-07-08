@@ -4,7 +4,7 @@ from abc import abstractmethod
 from typing import Optional
 
 from .base_repository import BaseRepository
-from ..entities.user import User
+from ...infrastructure.models.user_models import User
 
 
 class UserRepository(BaseRepository[User]):

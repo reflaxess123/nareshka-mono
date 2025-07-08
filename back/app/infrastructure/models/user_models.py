@@ -31,4 +31,7 @@ class User(Base):
     categoryProgress = relationship("UserCategoryProgress", back_populates="user")
     taskAttempts = relationship("TaskAttempt", back_populates="user")
     taskSolutions = relationship("TaskSolution", back_populates="user")
-    pathProgress = relationship("UserPathProgress", back_populates="user") 
+    pathProgress = relationship("UserPathProgress", back_populates="user")
+    
+    class Config:
+        from_attributes = True 

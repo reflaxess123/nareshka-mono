@@ -16,12 +16,15 @@ from dataclasses import dataclass
 
 import aiohttp
 
-from ...domain.entities.content import ContentBlock
-from ...domain.entities.progress import TestCase
+from ...core.logging import get_logger
 from ...domain.repositories.content_repository import ContentRepository
 from ...domain.repositories.task_repository import TaskRepository
+from ...infrastructure.models.content_models import ContentBlock
+from ...domain.entities.progress_types import TestCase
+from ...config import new_settings
 from ..dto.test_case_dto import TestCaseAIGenerate
 
+logger = get_logger(__name__)
 
 @dataclass
 class OpenAIConfig:
@@ -82,7 +85,7 @@ class AITestGeneratorService:
         
         # 2️⃣ Анализ задачи
         task_analysis = self._analyze_task(block)
-        print(f"📊 Task analysis: {task_analysis}")
+        logger.info(f"📊 Task analysis: {task_analysis}")
         
         # 3️⃣ Генерация через OpenAI
         try:
@@ -90,10 +93,10 @@ class AITestGeneratorService:
             if patterns:
                 return await self._create_test_cases(patterns, generate_request, "openai")
         except Exception as e:
-            print(f"❌ OpenAI generation failed: {e}")
+            logger.error(f"❌ OpenAI generation failed: {e}")
         
         # 4️⃣ Fallback на паттерны
-        print("🔄 Falling back to pattern-based generation")
+        logger.info("🔄 Falling back to pattern-based generation")
         patterns = self._generate_with_patterns(block, generate_request, task_analysis)
         return await self._create_test_cases(patterns, generate_request, "patterns")
     
@@ -256,12 +259,12 @@ Return ONLY the JSON array, no additional text or markdown formatting.
                 )
                 patterns.append(pattern)
             
-            print(f"✅ Parsed {len(patterns)} test cases from AI response")
+            logger.info(f"✅ Parsed {len(patterns)} test cases from AI response")
             return patterns
         
         except (json.JSONDecodeError, KeyError) as e:
-            print(f"❌ Failed to parse AI response: {e}")
-            print(f"Raw response: {response[:200]}...")
+            logger.error(f"❌ Failed to parse AI response: {e}")
+            logger.error(f"Raw response: {response[:200]}...")
             return []
     
     def _analyze_task(self, block: ContentBlock) -> Dict:

@@ -14,7 +14,7 @@ import platform
 import docker
 from docker.errors import APIError, ContainerError, ImageNotFound
 
-from ...domain.entities.execution import SupportedLanguage, CodeExecution
+from ...domain.entities.code_editor_types import SupportedLanguage, CodeExecution
 from ...domain.entities.enums import CodeLanguage, ExecutionStatus
 from ...domain.repositories.code_editor_repository import CodeEditorRepository
 

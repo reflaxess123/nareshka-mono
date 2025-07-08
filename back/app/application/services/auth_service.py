@@ -10,11 +10,14 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 
 from ...config import new_settings
-from ...domain.entities.user import User
-from ...domain.entities.enums import UserRole
+from ...infrastructure.models.user_models import User
+from ...infrastructure.models.enums import UserRole
 from ...domain.repositories.user_repository import UserRepository
 from ..dto.auth_dto import LoginRequest, LoginResponse, RegisterRequest, RegisterResponse, UserResponse, TokenData
+from ...core.logging import get_logger
+from ...core.exceptions import GracefulDegradation, RedisException
 
+logger = get_logger(__name__)
 
 class AuthService:
     """Сервис авторизации"""
@@ -102,12 +105,9 @@ class AuthService:
         hashed_password = self.get_password_hash(register_request.password)
         
         new_user = User(
-            id=None,  # Auto-increment
             email=register_request.email,
             password=hashed_password,
             role=UserRole.USER,
-            createdAt=datetime.utcnow(),
-            updatedAt=datetime.utcnow(),
             totalTasksSolved=0,
             lastActivityDate=None
         )
@@ -125,7 +125,7 @@ class AuthService:
             session_key = f"session:{session_id}"
             self.redis_client.setex(session_key, timedelta(days=new_settings.auth.session_expire_days), str(user_id))
         except Exception as e:
-            print(f"Redis error in create_session: {e}")
+            GracefulDegradation.handle_redis_error("create_session", e)
             # Graceful degradation - сессия не создастся, но приложение не упадет
     
     def get_session_user_id(self, session_id: str) -> Optional[int]:
@@ -135,8 +135,7 @@ class AuthService:
             user_id = self.redis_client.get(session_key)
             return int(user_id) if user_id else None
         except Exception as e:
-            print(f"Redis error in get_session_user_id: {e}")
-            return None  # Graceful degradation
+            return GracefulDegradation.handle_redis_error("get_session_user_id", e, None)
     
     def delete_session(self, session_id: str) -> None:
         """Удаление сессии"""
@@ -144,7 +143,7 @@ class AuthService:
             session_key = f"session:{session_id}"
             self.redis_client.delete(session_key)
         except Exception as e:
-            print(f"Redis error in delete_session: {e}")
+            GracefulDegradation.handle_redis_error("delete_session", e)
             # Graceful degradation - сессия не удалится, но приложение не упадет
     
     async def get_user_by_token(self, token: str) -> User:

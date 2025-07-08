@@ -2,16 +2,16 @@
 
 from typing import List, Optional, Tuple, Dict, Any
 from uuid import uuid4
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 from sqlalchemy import and_, func, or_, asc, desc
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 
-from ...domain.entities.theory import TheoryCard as DomainTheoryCard, UserTheoryProgress as DomainUserTheoryProgress
-from ...domain.entities.enums import CardState
 from ...domain.repositories.theory_repository import TheoryRepository
-from ..models.theory_models import TheoryCard as InfraTheoryCard, UserTheoryProgress as InfraUserTheoryProgress
-from ..mappers.theory_mapper import TheoryMapper
+from ...domain.entities.theory_types import TheoryCard as DomainTheoryCard, UserTheoryProgress as DomainUserTheoryProgress
+from ...domain.entities.enums import CardState
+from ..models.theory_models import TheoryCard as SQLTheoryCard, UserTheoryProgress as SQLUserTheoryProgress
 
 
 class SQLAlchemyTheoryRepository(TheoryRepository):
@@ -36,51 +36,51 @@ class SQLAlchemyTheoryRepository(TheoryRepository):
         """Получение теоретических карточек с пагинацией и фильтрацией"""
         offset = (page - 1) * limit
         
-        query = self.session.query(InfraTheoryCard).filter(
-            ~InfraTheoryCard.category.ilike('%QUIZ%'),
-            ~InfraTheoryCard.category.ilike('%ПРАКТИКА%')
+        query = self.session.query(SQLTheoryCard).filter(
+            ~SQLTheoryCard.category.ilike('%QUIZ%'),
+            ~SQLTheoryCard.category.ilike('%ПРАКТИКА%')
         )
         
         # Фильтры
         if category:
-            query = query.filter(func.lower(InfraTheoryCard.category) == func.lower(category))
+            query = query.filter(func.lower(SQLTheoryCard.category) == func.lower(category))
         
         if sub_category:
-            query = query.filter(func.lower(InfraTheoryCard.subCategory) == func.lower(sub_category))
+            query = query.filter(func.lower(SQLTheoryCard.subCategory) == func.lower(sub_category))
         
         if deck:
-            query = query.filter(InfraTheoryCard.deck.ilike(f"%{deck}%"))
+            query = query.filter(SQLTheoryCard.deck.ilike(f"%{deck}%"))
         
         # Поиск
         if search_query and search_query.strip():
             search_term = f"%{search_query.strip()}%"
             query = query.filter(
                 or_(
-                    InfraTheoryCard.questionBlock.ilike(search_term),
-                    InfraTheoryCard.answerBlock.ilike(search_term),
-                    InfraTheoryCard.category.ilike(search_term),
-                    InfraTheoryCard.subCategory.ilike(search_term)
+                    SQLTheoryCard.questionBlock.ilike(search_term),
+                    SQLTheoryCard.answerBlock.ilike(search_term),
+                    SQLTheoryCard.category.ilike(search_term),
+                    SQLTheoryCard.subCategory.ilike(search_term)
                 )
             )
         
         # Фильтр неизученных карточек
         if only_unstudied and user_id:
-            studied_card_ids = self.session.query(InfraUserTheoryProgress.cardId).filter(
-                InfraUserTheoryProgress.userId == user_id,
-                InfraUserTheoryProgress.solvedCount > 0
+            studied_card_ids = self.session.query(SQLUserTheoryProgress.cardId).filter(
+                SQLUserTheoryProgress.userId == user_id,
+                SQLUserTheoryProgress.solvedCount > 0
             ).subquery()
             
-            query = query.filter(~InfraTheoryCard.id.in_(studied_card_ids))
+            query = query.filter(~SQLTheoryCard.id.in_(studied_card_ids))
         
         # Сортировка
         if sort_by == "createdAt":
-            order_field = InfraTheoryCard.createdAt
+            order_field = SQLTheoryCard.createdAt
         elif sort_by == "updatedAt":
-            order_field = InfraTheoryCard.updatedAt
+            order_field = SQLTheoryCard.updatedAt
         elif sort_by == "orderIndex":
-            order_field = InfraTheoryCard.orderIndex
+            order_field = SQLTheoryCard.orderIndex
         else:
-            order_field = InfraTheoryCard.orderIndex
+            order_field = SQLTheoryCard.orderIndex
         
         if sort_order == "desc":
             query = query.order_by(desc(order_field))
@@ -97,19 +97,19 @@ class SQLAlchemyTheoryRepository(TheoryRepository):
     
     async def get_theory_card_by_id(self, card_id: str) -> Optional[DomainTheoryCard]:
         """Получение теоретической карточки по ID"""
-        infra_card = self.session.query(InfraTheoryCard).filter(InfraTheoryCard.id == card_id).first()
+        infra_card = self.session.query(SQLTheoryCard).filter(SQLTheoryCard.id == card_id).first()
         return TheoryMapper.theory_card_to_domain(infra_card) if infra_card else None
     
     async def get_theory_categories(self) -> List[Dict[str, Any]]:
         """Получение списка категорий с подкатегориями и количеством карточек"""
         categories_data = self.session.query(
-            InfraTheoryCard.category,
-            InfraTheoryCard.subCategory,
-            func.count(InfraTheoryCard.id).label("count")
+            SQLTheoryCard.category,
+            SQLTheoryCard.subCategory,
+            func.count(SQLTheoryCard.id).label("count")
         ).filter(
-            ~InfraTheoryCard.category.ilike('%QUIZ%'),
-            ~InfraTheoryCard.category.ilike('%ПРАКТИКА%')
-        ).group_by(InfraTheoryCard.category, InfraTheoryCard.subCategory).all()
+            ~SQLTheoryCard.category.ilike('%QUIZ%'),
+            ~SQLTheoryCard.category.ilike('%ПРАКТИКА%')
+        ).group_by(SQLTheoryCard.category, SQLTheoryCard.subCategory).all()
         
         grouped_categories = {}
         
@@ -144,13 +144,13 @@ class SQLAlchemyTheoryRepository(TheoryRepository):
     async def get_theory_subcategories(self, category: str) -> List[str]:
         """Получение списка подкатегорий для категории"""
         return [
-            row[0] for row in self.session.query(InfraTheoryCard.subCategory)
+            row[0] for row in self.session.query(SQLTheoryCard.subCategory)
             .filter(
-                func.lower(InfraTheoryCard.category) == func.lower(category),
-                InfraTheoryCard.subCategory.isnot(None)
+                func.lower(SQLTheoryCard.category) == func.lower(category),
+                SQLTheoryCard.subCategory.isnot(None)
             )
             .distinct()
-            .order_by(InfraTheoryCard.subCategory)
+            .order_by(SQLTheoryCard.subCategory)
             .all()
         ]
     
@@ -160,10 +160,10 @@ class SQLAlchemyTheoryRepository(TheoryRepository):
         card_id: str
     ) -> Optional[DomainUserTheoryProgress]:
         """Получение прогресса пользователя по карточке"""
-        infra_progress = self.session.query(InfraUserTheoryProgress).filter(
+        infra_progress = self.session.query(SQLUserTheoryProgress).filter(
             and_(
-                InfraUserTheoryProgress.userId == user_id,
-                InfraUserTheoryProgress.cardId == card_id
+                SQLUserTheoryProgress.userId == user_id,
+                SQLUserTheoryProgress.cardId == card_id
             )
         ).first()
         return TheoryMapper.user_theory_progress_to_domain(infra_progress) if infra_progress else None
@@ -175,10 +175,10 @@ class SQLAlchemyTheoryRepository(TheoryRepository):
         **progress_data
     ) -> DomainUserTheoryProgress:
         """Создание или обновление прогресса пользователя"""
-        infra_progress = self.session.query(InfraUserTheoryProgress).filter(
+        infra_progress = self.session.query(SQLUserTheoryProgress).filter(
             and_(
-                InfraUserTheoryProgress.userId == user_id,
-                InfraUserTheoryProgress.cardId == card_id
+                SQLUserTheoryProgress.userId == user_id,
+                SQLUserTheoryProgress.cardId == card_id
             )
         ).first()
         
@@ -190,7 +190,7 @@ class SQLAlchemyTheoryRepository(TheoryRepository):
             infra_progress.updatedAt = datetime.utcnow()
         else:
             # Создаем новый прогресс
-            infra_progress = InfraUserTheoryProgress(
+            infra_progress = SQLUserTheoryProgress(
                 id=str(uuid4()),
                 userId=user_id,
                 cardId=card_id,
@@ -211,11 +211,11 @@ class SQLAlchemyTheoryRepository(TheoryRepository):
         now = datetime.utcnow()
         
         # Карточки со сроком повторения
-        due_infra_cards = self.session.query(InfraTheoryCard).join(InfraUserTheoryProgress).filter(
+        due_infra_cards = self.session.query(SQLTheoryCard).join(SQLUserTheoryProgress).filter(
             and_(
-                InfraUserTheoryProgress.userId == user_id,
-                InfraUserTheoryProgress.dueDate <= now,
-                InfraUserTheoryProgress.cardState != CardState.NEW
+                SQLUserTheoryProgress.userId == user_id,
+                SQLUserTheoryProgress.dueDate <= now,
+                SQLUserTheoryProgress.cardState != CardState.NEW
             )
         ).limit(limit).all()
         
@@ -224,12 +224,12 @@ class SQLAlchemyTheoryRepository(TheoryRepository):
             remaining_limit = limit - len(due_infra_cards)
             
             # Карточки без прогресса
-            new_cards_subquery = self.session.query(InfraUserTheoryProgress.cardId).filter(
-                InfraUserTheoryProgress.userId == user_id
+            new_cards_subquery = self.session.query(SQLUserTheoryProgress.cardId).filter(
+                SQLUserTheoryProgress.userId == user_id
             ).subquery()
             
-            new_infra_cards = self.session.query(InfraTheoryCard).filter(
-                ~InfraTheoryCard.id.in_(new_cards_subquery)
+            new_infra_cards = self.session.query(SQLTheoryCard).filter(
+                ~SQLTheoryCard.id.in_(new_cards_subquery)
             ).limit(remaining_limit).all()
             
             due_infra_cards.extend(new_infra_cards)
@@ -239,33 +239,33 @@ class SQLAlchemyTheoryRepository(TheoryRepository):
     async def get_theory_stats(self, user_id: int) -> Dict[str, Any]:
         """Получение статистики изучения теории пользователя"""
         # Общее количество карточек
-        total_cards = self.session.query(func.count(InfraTheoryCard.id)).filter(
-            ~InfraTheoryCard.category.ilike('%QUIZ%'),
-            ~InfraTheoryCard.category.ilike('%ПРАКТИКА%')
+        total_cards = self.session.query(func.count(SQLTheoryCard.id)).filter(
+            ~SQLTheoryCard.category.ilike('%QUIZ%'),
+            ~SQLTheoryCard.category.ilike('%ПРАКТИКА%')
         ).scalar() or 0
         
         # Изученные карточки
-        studied_cards = self.session.query(func.count(InfraUserTheoryProgress.id)).filter(
-            InfraUserTheoryProgress.userId == user_id,
-            InfraUserTheoryProgress.solvedCount > 0
+        studied_cards = self.session.query(func.count(SQLUserTheoryProgress.id)).filter(
+            SQLUserTheoryProgress.userId == user_id,
+            SQLUserTheoryProgress.solvedCount > 0
         ).scalar() or 0
         
         # Статистика по категориям
         category_stats = self.session.query(
-            InfraTheoryCard.category,
-            func.count(InfraTheoryCard.id).label('total'),
-            func.count(InfraUserTheoryProgress.id).label('studied')
+            SQLTheoryCard.category,
+            func.count(SQLTheoryCard.id).label('total'),
+            func.count(SQLUserTheoryProgress.id).label('studied')
         ).outerjoin(
-            InfraUserTheoryProgress, 
+            SQLUserTheoryProgress, 
             and_(
-                InfraUserTheoryProgress.cardId == InfraTheoryCard.id,
-                InfraUserTheoryProgress.userId == user_id,
-                InfraUserTheoryProgress.solvedCount > 0
+                SQLUserTheoryProgress.cardId == SQLTheoryCard.id,
+                SQLUserTheoryProgress.userId == user_id,
+                SQLUserTheoryProgress.solvedCount > 0
             )
         ).filter(
-            ~InfraTheoryCard.category.ilike('%QUIZ%'),
-            ~InfraTheoryCard.category.ilike('%ПРАКТИКА%')
-        ).group_by(InfraTheoryCard.category).all()
+            ~SQLTheoryCard.category.ilike('%QUIZ%'),
+            ~SQLTheoryCard.category.ilike('%ПРАКТИКА%')
+        ).group_by(SQLTheoryCard.category).all()
         
         categories = []
         for category, total, studied in category_stats:
@@ -285,10 +285,10 @@ class SQLAlchemyTheoryRepository(TheoryRepository):
     
     async def reset_card_progress(self, user_id: int, card_id: str) -> bool:
         """Сброс прогресса по карточке"""
-        progress = self.session.query(InfraUserTheoryProgress).filter(
+        progress = self.session.query(SQLUserTheoryProgress).filter(
             and_(
-                InfraUserTheoryProgress.userId == user_id,
-                InfraUserTheoryProgress.cardId == card_id
+                SQLUserTheoryProgress.userId == user_id,
+                SQLUserTheoryProgress.cardId == card_id
             )
         ).first()
         

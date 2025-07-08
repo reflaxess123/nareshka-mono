@@ -29,6 +29,9 @@ class ContentFile(Base):
     updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
 
     blocks = relationship("ContentBlock", back_populates="file")
+    
+    class Config:
+        from_attributes = True
 
 
 class ContentBlock(Base):
@@ -61,6 +64,9 @@ class ContentBlock(Base):
     testCases = relationship("TestCase", back_populates="block")
 
     __table_args__ = (Index("idx_contentblock_fileid", "fileId"),)
+    
+    class Config:
+        from_attributes = True
 
 
 class UserContentProgress(Base):
@@ -80,4 +86,7 @@ class UserContentProgress(Base):
     __table_args__ = (
         Index("idx_usercontentprogress_blockid", "blockId"),
         Index("idx_usercontentprogress_userid_blockid", "userId", "blockId", unique=True),
-    ) 
+    )
+    
+    class Config:
+        from_attributes = True 

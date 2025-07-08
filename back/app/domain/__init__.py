@@ -1,1 +1,1 @@
-"""Domain layer - бизнес-логика и сущности""" 
+"""Domain layer.""" 

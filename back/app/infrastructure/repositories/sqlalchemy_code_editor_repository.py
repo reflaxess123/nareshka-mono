@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import IntegrityError
 
 from app.domain.repositories.code_editor_repository import CodeEditorRepository
-from ...domain.entities.code_editor import (
+from ...domain.entities.code_editor_types import (
     SupportedLanguage as SupportedLanguageEntity,
     CodeExecution as CodeExecutionEntity,
     UserCodeSolution as UserCodeSolutionEntity,
@@ -20,7 +20,7 @@ from ...domain.entities.code_editor import (
     ValidationResult,
     ExecutionStats
 )
-from ...domain.entities.test_case import TestCase as TestCaseEntity
+from ...domain.entities.progress_types import TestCase as TestCaseEntity
 from ...domain.entities.enums import CodeLanguage, ExecutionStatus
 from ..models.code_execution_models import (
     SupportedLanguage as SupportedLanguageModel,
@@ -30,8 +30,6 @@ from ..models.code_execution_models import (
 from ..models.test_case_models import TestCase as TestCaseModel
 from ..models.content_models import ContentBlock
 from ..models.user_models import User
-from ..mappers.execution_mapper import ExecutionMapper
-from ..mappers.test_case_mapper import TestCaseMapper
 
 logger = logging.getLogger(__name__)
 

@@ -2,21 +2,11 @@ from typing import Dict, List, Any
 from sqlalchemy.orm import Session
 
 from app.domain.repositories.stats_repository import StatsRepository
-from app.domain.entities.stats import (
+from app.domain.entities.stats_types import (
     UserStatsOverview,
     ContentStats,
     TheoryStats,
-    RoadmapStats,
-    CategoryContentStats,
-    SubCategoryContentStats,
-    ContentBlockStats,
-    CategoryTheoryStats,
-    SubCategoryTheoryStats,
-    TheoryCardStats,
-    OverallProgressStats,
-    CategoryRoadmapStats,
-    SubCategoryRoadmapStats,
-    ItemStats
+    RoadmapStats
 )
 from ..models import (
     ContentBlock,

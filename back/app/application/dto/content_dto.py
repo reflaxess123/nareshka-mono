@@ -4,24 +4,19 @@ from datetime import datetime
 from typing import List, Optional
 from pydantic import BaseModel
 
+from .base_dto import IdentifiedResponse, PaginatedResponse, NamedListResponse
 
-class ContentFileResponse(BaseModel):
+
+class ContentFileResponse(IdentifiedResponse):
     """Ответ с информацией о файле контента"""
-    id: str
     webdavPath: str
     mainCategory: str
     subCategory: str
     lastFileHash: Optional[str] = None
-    createdAt: datetime
-    updatedAt: datetime
-    
-    class Config:
-        from_attributes = True
 
 
-class ContentBlockResponse(BaseModel):
+class ContentBlockResponse(IdentifiedResponse):
     """Ответ с информацией о блоке контента"""
-    id: str
     fileId: str
     pathTitles: List[str]
     blockTitle: str
@@ -38,14 +33,8 @@ class ContentBlockResponse(BaseModel):
     companies: List[str] = []
     rawBlockContentHash: Optional[str] = None
     
-    createdAt: datetime
-    updatedAt: datetime
-    
     # Связанные данные
     file: Optional[ContentFileResponse] = None
-    
-    class Config:
-        from_attributes = True
 
 
 class ContentBlockWithProgressResponse(ContentBlockResponse):
@@ -53,17 +42,11 @@ class ContentBlockWithProgressResponse(ContentBlockResponse):
     userProgress: int = 0
 
 
-class UserContentProgressResponse(BaseModel):
+class UserContentProgressResponse(IdentifiedResponse):
     """Ответ с информацией о прогрессе пользователя"""
-    id: str
     userId: int
     blockId: str
     solvedCount: int
-    createdAt: datetime
-    updatedAt: datetime
-    
-    class Config:
-        from_attributes = True
 
 
 class ProgressAction(BaseModel):
@@ -71,53 +54,26 @@ class ProgressAction(BaseModel):
     action: str  # "increment" или "decrement"
 
 
-class ContentBlocksListResponse(BaseModel):
-    """Ответ со списком блоков контента"""
-    blocks: List[ContentBlockResponse]
-    total: int
-    page: int
-    limit: int
-    totalPages: int
-    
-    @classmethod
-    def create(cls, blocks: List[ContentBlockResponse], total: int, page: int, limit: int):
-        """Создание ответа со списком блоков"""
-        total_pages = (total + limit - 1) // limit
-        return cls(
-            blocks=blocks,
-            total=total,
-            page=page,
-            limit=limit,
-            totalPages=total_pages
-        )
-
-
-class ContentFilesListResponse(BaseModel):
-    """Ответ со списком файлов контента"""
-    files: List[ContentFileResponse]
-    total: int
-    page: int
-    limit: int
-    totalPages: int
-    
-    @classmethod
-    def create(cls, files: List[ContentFileResponse], total: int, page: int, limit: int):
-        """Создание ответа со списком файлов"""
-        total_pages = (total + limit - 1) // limit
-        return cls(
-            files=files,
-            total=total,
-            page=page,
-            limit=limit,
-            totalPages=total_pages
-        )
+# Типизированные пагинированные ответы
+ContentBlocksListResponse = PaginatedResponse[ContentBlockResponse]
+ContentFilesListResponse = PaginatedResponse[ContentFileResponse]
 
 
 class ContentCategoriesResponse(BaseModel):
     """Ответ со списком категорий"""
     categories: List[str]
+    
+    @classmethod
+    def create(cls, categories: List[str]) -> 'ContentCategoriesResponse':
+        """Создание ответа с категориями"""
+        return cls(categories=categories)
 
 
 class ContentSubcategoriesResponse(BaseModel):
     """Ответ со списком подкатегорий"""
-    subcategories: List[str] 
+    subcategories: List[str]
+    
+    @classmethod
+    def create(cls, subcategories: List[str]) -> 'ContentSubcategoriesResponse':
+        """Создание ответа с подкатегориями"""
+        return cls(subcategories=subcategories) 

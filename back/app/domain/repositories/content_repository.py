@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 from typing import List, Optional, Tuple
-from ..entities.content import ContentFile, ContentBlock, UserContentProgress
+from ...infrastructure.models.content_models import ContentFile, ContentBlock, UserContentProgress
 
 
 class ContentRepository(ABC):

@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List, Optional, Dict, Any
 from datetime import datetime
 
-from ..entities.code_editor import (
+from ..entities.code_editor_types import (
     SupportedLanguage,
     CodeExecution,
     UserCodeSolution,
@@ -10,7 +10,7 @@ from ..entities.code_editor import (
     ValidationResult,
     ExecutionStats
 )
-from ..entities.progress import TestCase
+from ..entities.progress_types import TestCase
 from ..entities.enums import CodeLanguage, ExecutionStatus
 
 

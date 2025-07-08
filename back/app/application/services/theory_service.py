@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from fastapi import HTTPException, status
 
-from ...domain.entities.theory import TheoryCard, UserTheoryProgress
+from ...domain.entities.theory_types import TheoryCard, UserTheoryProgress
 from ...domain.entities.enums import CardState
 from ...domain.repositories.theory_repository import TheoryRepository
 from ..dto.theory_dto import (

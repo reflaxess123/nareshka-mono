@@ -4,7 +4,7 @@ from typing import Optional, List, Dict, Any
 from pydantic import BaseModel
 
 from app.domain.entities.enums import CodeLanguage, ExecutionStatus
-from app.domain.entities.code_editor import TestCaseExecution
+from app.domain.entities.code_editor_types import TestCaseExecution
 
 
 # SupportedLanguage DTOs

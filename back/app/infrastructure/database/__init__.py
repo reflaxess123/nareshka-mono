@@ -1,1 +1,1 @@
-"""Конфигурация базы данных и Unit of Work""" 
+"""Database infrastructure.""" 

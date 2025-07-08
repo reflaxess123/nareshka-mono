@@ -1,7 +1,7 @@
 """Сервис для работы с заданиями"""
 
 from typing import List, Optional, Tuple
-from ...domain.entities.task import Task, TaskCategory, TaskCompany
+from ...domain.entities.task_types import Task, TaskCategory, TaskCompany
 from ...domain.repositories.task_repository import TaskRepository
 from ..dto.task_dto import (
     TasksListResponse,

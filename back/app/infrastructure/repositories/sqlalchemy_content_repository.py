@@ -6,10 +6,8 @@ from datetime import datetime
 from sqlalchemy import and_, func, or_, asc, desc
 from sqlalchemy.orm import Session, joinedload
 
-from ...domain.entities.content import ContentFile as DomainContentFile, ContentBlock as DomainContentBlock, UserContentProgress as DomainUserContentProgress
 from ...domain.repositories.content_repository import ContentRepository
-from ..models.content_models import ContentFile as InfraContentFile, ContentBlock as InfraContentBlock, UserContentProgress as InfraUserContentProgress
-from ..mappers.content_mapper import ContentMapper
+from ..models.content_models import ContentFile, ContentBlock, UserContentProgress
 
 
 class SQLAlchemyContentRepository(ContentRepository):
@@ -25,26 +23,25 @@ class SQLAlchemyContentRepository(ContentRepository):
         main_category: Optional[str] = None,
         sub_category: Optional[str] = None,
         webdav_path: Optional[str] = None
-    ) -> Tuple[List[DomainContentFile], int]:
+    ) -> Tuple[List[ContentFile], int]:
         """Получение файлов контента с пагинацией"""
         offset = (page - 1) * limit
         
-        query = self.session.query(InfraContentFile)
+        query = self.session.query(ContentFile)
         
         if main_category:
-            query = query.filter(func.lower(InfraContentFile.mainCategory) == func.lower(main_category))
+            query = query.filter(func.lower(ContentFile.mainCategory) == func.lower(main_category))
         
         if sub_category:
-            query = query.filter(func.lower(InfraContentFile.subCategory) == func.lower(sub_category))
+            query = query.filter(func.lower(ContentFile.subCategory) == func.lower(sub_category))
         
         if webdav_path:
-            query = query.filter(InfraContentFile.webdavPath.ilike(f"%{webdav_path}%"))
+            query = query.filter(ContentFile.webdavPath.ilike(f"%{webdav_path}%"))
         
         total = query.count()
-        infra_files = query.order_by(InfraContentFile.webdavPath).offset(offset).limit(limit).all()
+        files = query.order_by(ContentFile.webdavPath).offset(offset).limit(limit).all()
         
-        domain_files = ContentMapper.content_file_list_to_domain(infra_files)
-        return domain_files, total
+        return files, total
     
     async def get_content_blocks(
         self,
@@ -57,49 +54,49 @@ class SQLAlchemyContentRepository(ContentRepository):
         search_query: Optional[str] = None,
         sort_by: str = "orderInFile",
         sort_order: str = "asc"
-    ) -> Tuple[List[DomainContentBlock], int]:
+    ) -> Tuple[List[ContentBlock], int]:
         """Получение блоков контента с пагинацией и фильтрацией"""
         offset = (page - 1) * limit
         
-        query = self.session.query(InfraContentBlock).join(InfraContentFile)
+        query = self.session.query(ContentBlock).join(ContentFile)
         
         # Фильтры
         if webdav_path:
-            query = query.filter(InfraContentFile.webdavPath.ilike(f"%{webdav_path}%"))
+            query = query.filter(ContentFile.webdavPath.ilike(f"%{webdav_path}%"))
         
         if main_category:
-            query = query.filter(func.lower(InfraContentFile.mainCategory) == func.lower(main_category))
+            query = query.filter(func.lower(ContentFile.mainCategory) == func.lower(main_category))
         
         if sub_category:
-            query = query.filter(func.lower(InfraContentFile.subCategory) == func.lower(sub_category))
+            query = query.filter(func.lower(ContentFile.subCategory) == func.lower(sub_category))
         
         if file_path_id:
-            query = query.filter(InfraContentFile.id == file_path_id)
+            query = query.filter(ContentFile.id == file_path_id)
         
         # Поиск
         if search_query and search_query.strip():
             search_term = f"%{search_query.strip()}%"
             query = query.filter(
                 or_(
-                    InfraContentBlock.blockTitle.ilike(search_term),
-                    InfraContentBlock.textContent.ilike(search_term),
-                    InfraContentBlock.codeFoldTitle.ilike(search_term)
+                    ContentBlock.blockTitle.ilike(search_term),
+                    ContentBlock.textContent.ilike(search_term),
+                    ContentBlock.codeFoldTitle.ilike(search_term)
                 )
             )
         
         # Сортировка
         if sort_by == "createdAt":
-            order_field = InfraContentBlock.createdAt
+            order_field = ContentBlock.createdAt
         elif sort_by == "updatedAt":
-            order_field = InfraContentBlock.updatedAt
+            order_field = ContentBlock.updatedAt
         elif sort_by == "orderInFile":
-            order_field = InfraContentBlock.orderInFile
+            order_field = ContentBlock.orderInFile
         elif sort_by == "blockLevel":
-            order_field = InfraContentBlock.blockLevel
+            order_field = ContentBlock.blockLevel
         elif sort_by == "file.webdavPath":
-            order_field = InfraContentFile.webdavPath
+            order_field = ContentFile.webdavPath
         else:
-            order_field = InfraContentBlock.orderInFile
+            order_field = ContentBlock.orderInFile
         
         if sort_order == "desc":
             query = query.order_by(desc(order_field))
@@ -107,35 +104,32 @@ class SQLAlchemyContentRepository(ContentRepository):
             query = query.order_by(asc(order_field))
         
         total = query.count()
-        infra_blocks = query.options(joinedload(InfraContentBlock.file)).offset(offset).limit(limit).all()
+        blocks = query.options(joinedload(ContentBlock.file)).offset(offset).limit(limit).all()
         
-        domain_blocks = ContentMapper.content_block_list_to_domain(infra_blocks)
-        return domain_blocks, total
+        return blocks, total
     
-    async def get_content_block_by_id(self, block_id: str) -> Optional[DomainContentBlock]:
+    async def get_content_block_by_id(self, block_id: str) -> Optional[ContentBlock]:
         """Получение блока контента по ID"""
-        infra_block = self.session.query(InfraContentBlock).options(
-            joinedload(InfraContentBlock.file)
-        ).filter(InfraContentBlock.id == block_id).first()
-        
-        return ContentMapper.content_block_to_domain(infra_block) if infra_block else None
+        return self.session.query(ContentBlock).options(
+            joinedload(ContentBlock.file)
+        ).filter(ContentBlock.id == block_id).first()
     
     async def get_content_categories(self) -> List[str]:
         """Получение списка основных категорий"""
         return [
-            row[0] for row in self.session.query(InfraContentFile.mainCategory)
+            row[0] for row in self.session.query(ContentFile.mainCategory)
             .distinct()
-            .order_by(InfraContentFile.mainCategory)
+            .order_by(ContentFile.mainCategory)
             .all()
         ]
     
     async def get_content_subcategories(self, category: str) -> List[str]:
         """Получение списка подкатегорий для категории"""
         return [
-            row[0] for row in self.session.query(InfraContentFile.subCategory)
-            .filter(func.lower(InfraContentFile.mainCategory) == func.lower(category))
+            row[0] for row in self.session.query(ContentFile.subCategory)
+            .filter(func.lower(ContentFile.mainCategory) == func.lower(category))
             .distinct()
-            .order_by(InfraContentFile.subCategory)
+            .order_by(ContentFile.subCategory)
             .all()
         ]
     
@@ -143,36 +137,34 @@ class SQLAlchemyContentRepository(ContentRepository):
         self, 
         user_id: int, 
         block_id: str
-    ) -> Optional[DomainUserContentProgress]:
+    ) -> Optional[UserContentProgress]:
         """Получение прогресса пользователя по блоку"""
-        infra_progress = self.session.query(InfraUserContentProgress).filter(
+        return self.session.query(UserContentProgress).filter(
             and_(
-                InfraUserContentProgress.userId == user_id,
-                InfraUserContentProgress.blockId == block_id
+                UserContentProgress.userId == user_id,
+                UserContentProgress.blockId == block_id
             )
         ).first()
-        
-        return ContentMapper.user_content_progress_to_domain(infra_progress) if infra_progress else None
     
     async def create_or_update_user_progress(
         self,
         user_id: int,
         block_id: str,
         solved_count: int
-    ) -> DomainUserContentProgress:
+    ) -> UserContentProgress:
         """Создание или обновление прогресса пользователя"""
-        infra_progress = self.session.query(InfraUserContentProgress).filter(
+        progress = self.session.query(UserContentProgress).filter(
             and_(
-                InfraUserContentProgress.userId == user_id,
-                InfraUserContentProgress.blockId == block_id
+                UserContentProgress.userId == user_id,
+                UserContentProgress.blockId == block_id
             )
         ).first()
         
-        if infra_progress:
-            infra_progress.solvedCount = solved_count
-            infra_progress.updatedAt = datetime.utcnow()
+        if progress:
+            progress.solvedCount = solved_count
+            progress.updatedAt = datetime.utcnow()
         else:
-            infra_progress = InfraUserContentProgress(
+            progress = UserContentProgress(
                 id=str(uuid4()),
                 userId=user_id,
                 blockId=block_id,
@@ -180,20 +172,20 @@ class SQLAlchemyContentRepository(ContentRepository):
                 createdAt=datetime.utcnow(),
                 updatedAt=datetime.utcnow()
             )
-            self.session.add(infra_progress)
+            self.session.add(progress)
         
-        return ContentMapper.user_content_progress_to_domain(infra_progress)
+        return progress
     
     async def get_user_total_solved_count(self, user_id: int) -> int:
         """Получение общего количества решенных задач пользователя"""
-        return self.session.query(func.count(InfraUserContentProgress.id)).filter(
+        return self.session.query(func.count(UserContentProgress.id)).filter(
             and_(
-                InfraUserContentProgress.userId == user_id,
-                InfraUserContentProgress.solvedCount > 0
+                UserContentProgress.userId == user_id,
+                UserContentProgress.solvedCount > 0
             )
-        ).join(InfraContentBlock).join(InfraContentFile).filter(
+        ).join(ContentBlock).join(ContentFile).filter(
             and_(
-                InfraContentFile.mainCategory != 'Test',
-                InfraContentFile.subCategory != 'Test'
+                ContentFile.mainCategory != 'Test',
+                ContentFile.subCategory != 'Test'
             )
         ).scalar() or 0 

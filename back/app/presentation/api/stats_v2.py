@@ -1,20 +1,20 @@
-from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+"""API для работы со статистикой v2"""
 
-from app.application.services.stats_service import StatsService
-from app.application.dto.stats_dto import (
+from typing import List, Optional
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import JSONResponse
+
+from ...application.dto.stats_dto import (
     UserStatsOverviewDTO,
     ContentStatsDTO,
     TheoryStatsDTO,
     RoadmapStatsDTO
 )
-from app.shared.dependencies import get_stats_service, get_current_user_optional
-from app.infrastructure.database.connection import get_db
-from app.domain.entities.user import User
+from ...application.services.stats_service import StatsService
+from ...infrastructure.models.user_models import User
+from ...shared.dependencies import get_current_user_optional, get_stats_service
 
-
-router = APIRouter()
+router = APIRouter(prefix="/stats", tags=["stats"])
 
 
 @router.get("/overview", response_model=UserStatsOverviewDTO)
@@ -95,7 +95,6 @@ async def get_roadmap_stats(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to get roadmap stats: {str(e)}"
         )
-
 
 
 @router.get("/health")

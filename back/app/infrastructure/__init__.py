@@ -1,1 +1,1 @@
-"""Infrastructure layer - реализации и внешние интеграции""" 
+"""Infrastructure layer.""" 

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional, Dict, Any
-from ..entities.mindmap import (
+from ..entities.mindmap_types import (
     TechnologyCenter, Topic, TaskDetail, TopicStats, TopicWithTasks
 )
 

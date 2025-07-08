@@ -1,1 +1,1 @@
-"""Presentation layer - HTTP API и контроллеры""" 
+"""Presentation layer.""" 
