@@ -2,7 +2,7 @@
 
 from typing import List, Optional, Dict, Any
 from ...domain.repositories.admin_repository import AdminRepository
-from ...domain.entities.admin import (
+from ...domain.entities.admin_types import (
     SystemStats, UserStats, ContentStats, TheoryStats,
     AdminContentFile, AdminContentBlock, AdminTheoryCard,
     AdminUser, BulkDeleteResult

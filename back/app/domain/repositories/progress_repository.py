@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List, Optional, Dict, Any
 from datetime import datetime
 
-from ..entities.progress import (
+from ..entities.progress_types import (
     TaskAttempt, 
     TaskSolution, 
     UserCategoryProgress, 

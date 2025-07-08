@@ -1,8 +1,10 @@
 """Admin API endpoints."""
 
-from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, Query
+from typing import Optional, List
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from starlette.status import HTTP_404_NOT_FOUND, HTTP_400_BAD_REQUEST
+from fastapi.responses import JSONResponse
+from sqlalchemy.orm import Session
 
 from ...application.services.admin_service import AdminService
 from ...application.dto.admin_dto import (
@@ -17,7 +19,8 @@ from ...application.dto.admin_dto import (
     HealthResponse
 )
 from ...shared.dependencies import get_admin_service, get_current_admin_session
-from ...domain.entities.user import User
+from ...infrastructure.models.user_models import User
+from ...core.exceptions import NotFoundException
 
 router = APIRouter(tags=["Admin"])
 
@@ -33,16 +36,13 @@ async def get_system_stats(
     admin_service: AdminService = Depends(get_admin_service),
     current_user: User = Depends(get_current_admin_session)
 ):
-    """Получение общей статистики системы"""
-    try:
-        stats = await admin_service.get_system_stats()
-        return SystemStatsResponse(
-            users=stats.users,
-            content=stats.content,
-            progress=stats.progress
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    """Получение системной статистики"""
+    stats = await admin_service.get_system_stats()
+    return SystemStatsResponse(
+        users=stats.users,
+        content=stats.content,
+        progress=stats.progress
+    )
 
 
 @router.get("/users", response_model=PaginatedUsersResponse)
@@ -55,36 +55,33 @@ async def get_users(
     current_user: User = Depends(get_current_admin_session)
 ):
     """Получение списка пользователей"""
-    try:
-        skip = (page - 1) * limit
-        users, total = await admin_service.get_users_with_stats(
-            skip=skip,
-            limit=limit,
-            role=role,
-            search=search
-        )
-        
-        return PaginatedUsersResponse(
-            users=[
-                UserStatsResponse(
-                    id=user.id,
-                    email=user.email,
-                    role=user.role,
-                    created_at=user.created_at,
-                    updated_at=user.updated_at,
-                    _count={
-                        "progress": user.content_progress_count,
-                        "theoryProgress": user.theory_progress_count
-                    }
-                ) for user in users
-            ],
-            total=total,
-            page=page,
-            limit=limit,
-            totalPages=(total + limit - 1) // limit if limit > 0 else 0
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    skip = (page - 1) * limit
+    users, total = await admin_service.get_users_with_stats(
+        skip=skip,
+        limit=limit,
+        role=role,
+        search=search
+    )
+    
+    return PaginatedUsersResponse(
+        users=[
+            UserStatsResponse(
+                id=user.id,
+                email=user.email,
+                role=user.role,
+                created_at=user.created_at,
+                updated_at=user.updated_at,
+                _count={
+                    "progress": user.content_progress_count,
+                    "theoryProgress": user.theory_progress_count
+                }
+            ) for user in users
+        ],
+        total=total,
+        page=page,
+        limit=limit,
+        totalPages=(total + limit - 1) // limit if limit > 0 else 0
+    )
 
 
 @router.post("/users", response_model=AdminUserResponse)
@@ -94,25 +91,22 @@ async def create_user(
     current_user: User = Depends(get_current_admin_session)
 ):
     """Создание нового пользователя"""
-    try:
-        user = await admin_service.create_user(
-            email=user_data.email,
-            password=user_data.password,
-            role=user_data.role
-        )
-        return AdminUserResponse(
-            id=user.id,
-            email=user.email,
-            role=user.role,
-            created_at=user.created_at,
-            updated_at=user.updated_at,
-            _count={
-                "progress": user.content_progress_count,
-                "theoryProgress": user.theory_progress_count
-            }
-        )
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    user = await admin_service.create_user(
+        email=user_data.email,
+        password=user_data.password,
+        role=user_data.role
+    )
+    return AdminUserResponse(
+        id=user.id,
+        email=user.email,
+        role=user.role,
+        created_at=user.created_at,
+        updated_at=user.updated_at,
+        _count={
+            "progress": user.content_progress_count,
+            "theoryProgress": user.theory_progress_count
+        }
+    )
 
 
 @router.put("/users/{user_id}", response_model=AdminUserResponse)
@@ -123,32 +117,27 @@ async def update_user(
     current_user: User = Depends(get_current_admin_session)
 ):
     """Обновление пользователя"""
-    try:
-        user = await admin_service.update_user(
-            user_id=user_id,
-            email=user_data.email,
-            password=user_data.password,
-            role=user_data.role
-        )
-        
-        if not user:
-            raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="Пользователь не найден")
-        
-        return AdminUserResponse(
-            id=user.id,
-            email=user.email,
-            role=user.role,
-            created_at=user.created_at,
-            updated_at=user.updated_at,
-            _count={
-                "progress": user.content_progress_count,
-                "theoryProgress": user.theory_progress_count
-            }
-        )
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    user = await admin_service.update_user(
+        user_id=user_id,
+        email=user_data.email,
+        password=user_data.password,
+        role=user_data.role
+    )
+    
+    if not user:
+        raise NotFoundException("User", user_id)
+    
+    return AdminUserResponse(
+        id=user.id,
+        email=user.email,
+        role=user.role,
+        created_at=user.created_at,
+        updated_at=user.updated_at,
+        _count={
+            "progress": user.content_progress_count,
+            "theoryProgress": user.theory_progress_count
+        }
+    )
 
 
 @router.delete("/users/{user_id}")
@@ -158,16 +147,11 @@ async def delete_user(
     current_user: User = Depends(get_current_admin_session)
 ):
     """Удаление пользователя"""
-    try:
-        deleted = await admin_service.delete_user(user_id)
-        if not deleted:
-            raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="Пользователь не найден")
-        
-        return {"message": "Пользователь успешно удален"}
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    deleted = await admin_service.delete_user(user_id)
+    if not deleted:
+        raise NotFoundException("User", user_id)
+    
+    return {"message": "Пользователь успешно удален"}
 
 
 @router.get("/content/stats", response_model=ContentStatsResponse)
@@ -176,16 +160,13 @@ async def get_content_stats(
     current_user: User = Depends(get_current_admin_session)
 ):
     """Получение статистики контента"""
-    try:
-        stats = await admin_service.get_content_stats()
-        return ContentStatsResponse(
-            total_files=stats.total_files,
-            total_blocks=stats.total_blocks,
-            files_by_category=stats.files_by_category,
-            blocks_by_category=stats.blocks_by_category
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    stats = await admin_service.get_content_stats()
+    return ContentStatsResponse(
+        total_files=stats.total_files,
+        total_blocks=stats.total_blocks,
+        files_by_category=stats.files_by_category,
+        blocks_by_category=stats.blocks_by_category
+    )
 
 
 @router.get("/content/files", response_model=PaginatedContentFilesResponse)
@@ -198,36 +179,33 @@ async def get_content_files(
     current_user: User = Depends(get_current_admin_session)
 ):
     """Получение списка файлов контента"""
-    try:
-        skip = (page - 1) * limit
-        files, total = await admin_service.get_content_files(
-            skip=skip,
-            limit=limit,
-            category=category,
-            search=search
-        )
-        
-        return PaginatedContentFilesResponse(
-            files=[
-                AdminContentFileResponse(
-                    id=file.id,
-                    webdav_path=file.webdav_path,
-                    main_category=file.main_category,
-                    sub_category=file.sub_category,
-                    created_at=file.created_at,
-                    updated_at=file.updated_at,
-                    _count={
-                        "blocks": file.blocks_count
-                    }
-                ) for file in files
-            ],
-            total=total,
-            page=page,
-            limit=limit,
-            totalPages=(total + limit - 1) // limit if limit > 0 else 0
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    skip = (page - 1) * limit
+    files, total = await admin_service.get_content_files(
+        skip=skip,
+        limit=limit,
+        category=category,
+        search=search
+    )
+    
+    return PaginatedContentFilesResponse(
+        files=[
+            AdminContentFileResponse(
+                id=file.id,
+                webdav_path=file.webdav_path,
+                main_category=file.main_category,
+                sub_category=file.sub_category,
+                created_at=file.created_at,
+                updated_at=file.updated_at,
+                _count={
+                    "blocks": file.blocks_count
+                }
+            ) for file in files
+        ],
+        total=total,
+        page=page,
+        limit=limit,
+        totalPages=(total + limit - 1) // limit if limit > 0 else 0
+    )
 
 
 @router.post("/content/files", response_model=AdminContentFileResponse)

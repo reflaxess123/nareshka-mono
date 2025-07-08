@@ -5,8 +5,6 @@ from fastapi import Depends, Request, HTTPException, status
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer
 
-from ..domain.repositories.unit_of_work import UnitOfWork
-from ..infrastructure.database.unit_of_work import SQLAlchemyUnitOfWork
 from ..infrastructure.database.connection import get_db
 from ..infrastructure.repositories.sqlalchemy_content_repository import SQLAlchemyContentRepository
 from ..infrastructure.repositories.sqlalchemy_theory_repository import SQLAlchemyTheoryRepository
@@ -28,17 +26,8 @@ from ..application.services.admin_service import AdminService
 from ..application.services.auth_service import AuthService
 from ..application.services.ai_test_generator_service import AITestGeneratorService
 from ..application.services.code_executor_service import CodeExecutorService
-from ..domain.entities.user import User
+from ..infrastructure.models.user_models import User
 from .auth_schemes import oauth2_scheme
-
-
-def get_unit_of_work() -> Generator[UnitOfWork, None, None]:
-    """Получение Unit of Work для внедрения зависимостей"""
-    uow = SQLAlchemyUnitOfWork()
-    try:
-        yield uow
-    finally:
-        pass  # Cleanup происходит в context manager
 
 
 def get_content_service(
@@ -148,10 +137,6 @@ async def get_current_user_required(
 ) -> User:
     """Получение текущего пользователя (обязательно)"""
     return await auth_service.get_user_by_session(request)
-
-
-# OAuth2 scheme для JWT аутентификации импортируется из auth_v2
-# oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v2/auth/login")
 
 
 async def get_current_user_jwt(

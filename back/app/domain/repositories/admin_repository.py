@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 from typing import List, Optional, Dict, Any
-from ..entities.admin import (
+from ..entities.admin_types import (
     SystemStats, UserStats, ContentStats, TheoryStats,
     AdminContentFile, AdminContentBlock, AdminTheoryCard,
     AdminUser, BulkDeleteResult

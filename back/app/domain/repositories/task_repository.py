@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 from typing import List, Optional, Tuple, Dict, Any
-from ..entities.task import Task, TaskCategory, TaskCompany
+from ..entities.task_types import Task, TaskCategory, TaskCompany
 
 
 class TaskRepository(ABC):

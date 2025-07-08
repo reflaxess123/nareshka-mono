@@ -3,21 +3,30 @@
 from typing import List, Optional, Dict, Any
 from sqlalchemy import func, desc, or_, and_
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from datetime import datetime
 import uuid
 
 from ...domain.repositories.admin_repository import AdminRepository
-from ...domain.entities.admin import (
+from ...domain.entities.admin_types import (
     SystemStats, UserStats, ContentStats, TheoryStats,
     AdminContentFile, AdminContentBlock, AdminTheoryCard,
     AdminUser, BulkDeleteResult
 )
-from ...domain.entities.user import User as DomainUser
-from ..models.content_models import ContentFile, ContentBlock, UserContentProgress
+from ...infrastructure.models.user_models import User
+from ..models.content_models import ContentFile, ContentBlock, UserContentProgress as UserContentProgressModel
 from ..models.theory_models import TheoryCard, UserTheoryProgress
-from ..models.user_models import User
+from ..models.progress_models import UserCategoryProgress
+from ..models.code_execution_models import CodeExecution
+from ...core.exceptions import (
+    DatabaseException,
+    NotFoundException,
+    ConflictException,
+    map_sqlalchemy_error
+)
+from ...core.logging import get_logger
 
+logger = get_logger(__name__)
 
 class SQLAlchemyAdminRepository(AdminRepository):
     """SQLAlchemy реализация AdminRepository"""
@@ -45,7 +54,7 @@ class SQLAlchemyAdminRepository(AdminRepository):
             total_theory_cards = self.session.query(TheoryCard).count()
             
             # Статистика прогресса
-            total_content_progress = self.session.query(UserContentProgress).count()
+            total_content_progress = self.session.query(UserContentProgressModel).count()
             total_theory_progress = self.session.query(UserTheoryProgress).count()
             
             return SystemStats(
@@ -66,7 +75,7 @@ class SQLAlchemyAdminRepository(AdminRepository):
                 }
             )
         except SQLAlchemyError as e:
-            raise Exception(f"Ошибка получения статистики: {str(e)}")
+            raise DatabaseException(f"Ошибка получения статистики: {str(e)}")
     
     async def get_users_with_stats(
         self, 
@@ -95,8 +104,8 @@ class SQLAlchemyAdminRepository(AdminRepository):
             # Добавляем подсчет прогресса для каждого пользователя
             users_with_stats = []
             for user in users:
-                content_progress_count = self.session.query(UserContentProgress).filter(
-                    UserContentProgress.user_id == user.id
+                content_progress_count = self.session.query(UserContentProgressModel).filter(
+                    UserContentProgressModel.user_id == user.id
                 ).count()
                 
                 theory_progress_count = self.session.query(UserTheoryProgress).filter(
@@ -116,7 +125,7 @@ class SQLAlchemyAdminRepository(AdminRepository):
             return users_with_stats, total
             
         except SQLAlchemyError as e:
-            raise Exception(f"Ошибка получения пользователей: {str(e)}")
+            raise DatabaseException(f"Ошибка получения пользователей: {str(e)}")
     
     async def create_user(self, email: str, password_hash: str, role: str) -> AdminUser:
         """Создать нового пользователя"""
@@ -124,7 +133,7 @@ class SQLAlchemyAdminRepository(AdminRepository):
             # Проверяем существование пользователя
             existing_user = self.session.query(User).filter(User.email == email).first()
             if existing_user:
-                raise Exception("Пользователь с таким email уже существует")
+                raise ConflictException("User", email)
             
             user = User(
                 id=str(uuid.uuid4()),
@@ -148,7 +157,7 @@ class SQLAlchemyAdminRepository(AdminRepository):
             
         except SQLAlchemyError as e:
             self.session.rollback()
-            raise Exception(f"Ошибка создания пользователя: {str(e)}")
+            raise DatabaseException(f"Ошибка создания пользователя: {str(e)}")
     
     async def update_user(self, user_id: str, updates: Dict[str, Any]) -> Optional[AdminUser]:
         """Обновить пользователя"""
@@ -174,7 +183,7 @@ class SQLAlchemyAdminRepository(AdminRepository):
             
         except SQLAlchemyError as e:
             self.session.rollback()
-            raise Exception(f"Ошибка обновления пользователя: {str(e)}")
+            raise DatabaseException(f"Ошибка обновления пользователя: {str(e)}")
     
     async def delete_user(self, user_id: str) -> bool:
         """Удалить пользователя"""
@@ -189,7 +198,7 @@ class SQLAlchemyAdminRepository(AdminRepository):
             
         except SQLAlchemyError as e:
             self.session.rollback()
-            raise Exception(f"Ошибка удаления пользователя: {str(e)}")
+            raise DatabaseException(f"Ошибка удаления пользователя: {str(e)}")
     
     async def get_content_stats(self) -> ContentStats:
         """Получить статистику контента"""
@@ -225,7 +234,7 @@ class SQLAlchemyAdminRepository(AdminRepository):
             )
             
         except SQLAlchemyError as e:
-            raise Exception(f"Ошибка получения статистики контента: {str(e)}")
+            raise DatabaseException(f"Ошибка получения статистики контента: {str(e)}")
     
     async def get_content_files(
         self,
@@ -272,7 +281,7 @@ class SQLAlchemyAdminRepository(AdminRepository):
             return files_with_stats, total
             
         except SQLAlchemyError as e:
-            raise Exception(f"Ошибка получения файлов контента: {str(e)}")
+            raise DatabaseException(f"Ошибка получения файлов контента: {str(e)}")
     
     async def create_content_file(
         self,
@@ -306,7 +315,7 @@ class SQLAlchemyAdminRepository(AdminRepository):
             
         except SQLAlchemyError as e:
             self.session.rollback()
-            raise Exception(f"Ошибка создания файла контента: {str(e)}")
+            raise DatabaseException(f"Ошибка создания файла контента: {str(e)}")
     
     async def update_content_file(
         self,
@@ -342,7 +351,7 @@ class SQLAlchemyAdminRepository(AdminRepository):
             
         except SQLAlchemyError as e:
             self.session.rollback()
-            raise Exception(f"Ошибка обновления файла контента: {str(e)}")
+            raise DatabaseException(f"Ошибка обновления файла контента: {str(e)}")
     
     async def delete_content_file(self, file_id: str) -> bool:
         """Удалить файл контента"""
@@ -357,7 +366,7 @@ class SQLAlchemyAdminRepository(AdminRepository):
             
         except SQLAlchemyError as e:
             self.session.rollback()
-            raise Exception(f"Ошибка удаления файла контента: {str(e)}")
+            raise DatabaseException(f"Ошибка удаления файла контента: {str(e)}")
     
     async def get_content_blocks(
         self,
@@ -407,7 +416,7 @@ class SQLAlchemyAdminRepository(AdminRepository):
             return admin_blocks, total
             
         except SQLAlchemyError as e:
-            raise Exception(f"Ошибка получения блоков контента: {str(e)}")
+            raise DatabaseException(f"Ошибка получения блоков контента: {str(e)}")
     
     async def create_content_block(
         self,
@@ -464,7 +473,7 @@ class SQLAlchemyAdminRepository(AdminRepository):
             
         except SQLAlchemyError as e:
             self.session.rollback()
-            raise Exception(f"Ошибка создания блока контента: {str(e)}")
+            raise DatabaseException(f"Ошибка создания блока контента: {str(e)}")
     
     async def update_content_block(
         self,
@@ -503,7 +512,7 @@ class SQLAlchemyAdminRepository(AdminRepository):
             
         except SQLAlchemyError as e:
             self.session.rollback()
-            raise Exception(f"Ошибка обновления блока контента: {str(e)}")
+            raise DatabaseException(f"Ошибка обновления блока контента: {str(e)}")
     
     async def delete_content_block(self, block_id: str) -> bool:
         """Удалить блок контента"""
@@ -518,7 +527,7 @@ class SQLAlchemyAdminRepository(AdminRepository):
             
         except SQLAlchemyError as e:
             self.session.rollback()
-            raise Exception(f"Ошибка удаления блока контента: {str(e)}")
+            raise DatabaseException(f"Ошибка удаления блока контента: {str(e)}")
     
     async def get_theory_cards(
         self,
@@ -566,7 +575,7 @@ class SQLAlchemyAdminRepository(AdminRepository):
             return admin_cards, total
             
         except SQLAlchemyError as e:
-            raise Exception(f"Ошибка получения карточек теории: {str(e)}")
+            raise DatabaseException(f"Ошибка получения карточек теории: {str(e)}")
     
     async def create_theory_card(
         self,
@@ -617,7 +626,7 @@ class SQLAlchemyAdminRepository(AdminRepository):
             
         except SQLAlchemyError as e:
             self.session.rollback()
-            raise Exception(f"Ошибка создания карточки теории: {str(e)}")
+            raise DatabaseException(f"Ошибка создания карточки теории: {str(e)}")
     
     async def update_theory_card(
         self,
@@ -654,7 +663,7 @@ class SQLAlchemyAdminRepository(AdminRepository):
             
         except SQLAlchemyError as e:
             self.session.rollback()
-            raise Exception(f"Ошибка обновления карточки теории: {str(e)}")
+            raise DatabaseException(f"Ошибка обновления карточки теории: {str(e)}")
     
     async def delete_theory_card(self, card_id: str) -> bool:
         """Удалить карточку теории"""
@@ -669,7 +678,7 @@ class SQLAlchemyAdminRepository(AdminRepository):
             
         except SQLAlchemyError as e:
             self.session.rollback()
-            raise Exception(f"Ошибка удаления карточки теории: {str(e)}")
+            raise DatabaseException(f"Ошибка удаления карточки теории: {str(e)}")
     
     async def bulk_delete_content(self, ids: List[str]) -> BulkDeleteResult:
         """Массово удалить контент"""
@@ -713,7 +722,7 @@ class SQLAlchemyAdminRepository(AdminRepository):
             
         except SQLAlchemyError as e:
             self.session.rollback()
-            raise Exception(f"Ошибка массового удаления контента: {str(e)}")
+            raise DatabaseException(f"Ошибка массового удаления контента: {str(e)}")
     
     async def bulk_delete_theory(self, ids: List[str]) -> BulkDeleteResult:
         """Массово удалить теорию"""
@@ -747,4 +756,4 @@ class SQLAlchemyAdminRepository(AdminRepository):
             
         except SQLAlchemyError as e:
             self.session.rollback()
-            raise Exception(f"Ошибка массового удаления теории: {str(e)}") 
+            raise DatabaseException(f"Ошибка массового удаления теории: {str(e)}") 

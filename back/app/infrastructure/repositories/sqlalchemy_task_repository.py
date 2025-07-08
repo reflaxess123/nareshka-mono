@@ -4,7 +4,7 @@ from typing import List, Optional, Tuple, Dict, Any
 from sqlalchemy import and_, func, or_, asc, desc, text
 from sqlalchemy.orm import Session
 
-from ...domain.entities.task import Task, TaskCategory, TaskCompany, TaskType
+from ...domain.entities.task_types import Task, TaskCategory, TaskCompany, TaskType
 from ..models.content_models import ContentBlock, UserContentProgress
 from ..models.theory_models import TheoryCard, UserTheoryProgress
 from ...domain.repositories.task_repository import TaskRepository

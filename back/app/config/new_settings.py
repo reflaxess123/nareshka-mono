@@ -10,20 +10,14 @@ from enum import Enum
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 ENV_FILE_PATH = BASE_DIR / ".env"
 
-print(f"DEBUG: Looking for .env file at: {ENV_FILE_PATH}")
-
 # Читаем .env файл
 if ENV_FILE_PATH.exists():
-    print(f"DEBUG: .env file found, loading...")
     with open(ENV_FILE_PATH, 'r', encoding='utf-8') as f:
         for line in f:
             line = line.strip()
             if line and not line.startswith('#') and '=' in line:
                 key, value = line.split('=', 1)
                 os.environ[key] = value
-                print(f"DEBUG: Loaded env var: {key}={value[:10]}...")
-else:
-    print(f"DEBUG: .env file NOT found at {ENV_FILE_PATH}")
 
 
 class Environment(str, Enum):
@@ -207,12 +201,6 @@ def create_new_settings() -> ApplicationSettings:
 # Глобальная конфигурация
 new_settings = create_new_settings()
 legacy_settings = LegacySettingsAdapter(new_settings)
-
-# Вывод отладочной информации
-print(f"DEBUG: NEW CONFIG - Database URL: {new_settings.database.url}")
-print(f"DEBUG: NEW CONFIG - Redis URL: {new_settings.redis.url}")
-print(f"DEBUG: NEW CONFIG - CORS origins: {new_settings.server.cors_origins}")
-print(f"DEBUG: NEW CONFIG - ProxyAPI key: {'*' * (len(new_settings.external_api.proxy_api_key) - 8) + new_settings.external_api.proxy_api_key[-8:] if new_settings.external_api.proxy_api_key else 'NOT SET'}")
 
 
 def get_settings() -> LegacySettingsAdapter:

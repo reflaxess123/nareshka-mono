@@ -1,46 +1,53 @@
-"""DTO для авторизации"""
+"""DTO для аутентификации"""
 
-from datetime import datetime
 from typing import Optional
+from datetime import datetime
 from pydantic import BaseModel, EmailStr
 
-from ...domain.entities.enums import UserRole
+from ...infrastructure.models.enums import UserRole
+from .base_dto import IdentifiedResponse, MessageResponse
 
 
 class LoginRequest(BaseModel):
+    """Запрос на вход"""
     email: EmailStr
     password: str
-
-
-class LoginResponse(BaseModel):
-    access_token: str
-    token_type: str
-    user: "UserResponse"
-    session_id: Optional[str] = None  # Для сессионной авторизации
-
-
-class UserResponse(BaseModel):
-    id: int
-    email: str
-    role: UserRole
-    createdAt: datetime
-    totalTasksSolved: int
-    lastActivityDate: Optional[datetime]
-
-    class Config:
-        from_attributes = True
 
 
 class RegisterRequest(BaseModel):
+    """Запрос на регистрацию"""
     email: EmailStr
     password: str
 
 
+class UserResponse(IdentifiedResponse):
+    """Ответ с данными пользователя"""
+    email: str
+    role: UserRole
+    totalTasksSolved: int
+    lastActivityDate: Optional[datetime]
+
+
+class LoginResponse(BaseModel):
+    """Ответ на успешный вход"""
+    access_token: str
+    token_type: str
+    user: UserResponse
+    session_id: Optional[str] = None
+
+
 class RegisterResponse(BaseModel):
+    """Ответ на успешную регистрацию"""
     user: UserResponse
     message: str
 
 
+class LogoutResponse(MessageResponse):
+    """Ответ на выход"""
+    pass
+
+
 class TokenData(BaseModel):
-    email: Optional[str] = None
-    user_id: Optional[int] = None 
+    """Данные токена"""
+    email: str
+    user_id: int 

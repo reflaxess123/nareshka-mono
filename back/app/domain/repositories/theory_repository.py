@@ -1,13 +1,13 @@
-"""Интерфейс репозитория для работы с теоретическими карточками"""
+"""Интерфейс репозитория для работы с теорией"""
 
 from abc import ABC, abstractmethod
 from typing import List, Optional, Tuple, Dict, Any
 from datetime import datetime
-from ..entities.theory import TheoryCard, UserTheoryProgress
+from ..entities.theory_types import TheoryCard, UserTheoryProgress
 
 
 class TheoryRepository(ABC):
-    """Абстрактный репозиторий для работы с теоретическими карточками"""
+    """Абстрактный репозиторий для работы с теорией"""
     
     @abstractmethod
     async def get_theory_cards(

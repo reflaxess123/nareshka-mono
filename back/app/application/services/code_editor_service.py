@@ -3,7 +3,7 @@ from typing import List, Optional, Dict, Any
 from datetime import datetime
 
 from app.domain.repositories.code_editor_repository import CodeEditorRepository
-from app.domain.entities.code_editor import (
+from app.domain.entities.code_editor_types import (
     SupportedLanguage,
     CodeExecution,
     UserCodeSolution,
@@ -11,7 +11,7 @@ from app.domain.entities.code_editor import (
     ValidationResult,
     ExecutionStats
 )
-from app.domain.entities.test_case import TestCase
+from app.domain.entities.progress_types import TestCase
 from app.domain.entities.enums import CodeLanguage, ExecutionStatus
 from app.application.dto.code_editor_dto import (
     SupportedLanguageResponseDTO,

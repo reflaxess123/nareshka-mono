@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict, List, Any
 
-from ..entities.stats import (
+from ..entities.stats_types import (
     UserStatsOverview,
     ContentStats,
     TheoryStats,

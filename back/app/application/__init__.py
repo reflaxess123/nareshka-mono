@@ -1,1 +1,1 @@
-"""Application layer - бизнес-сервисы и DTO""" 
+"""Application layer.""" 

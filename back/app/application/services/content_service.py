@@ -4,7 +4,7 @@ from typing import List, Optional, Tuple
 from datetime import datetime
 from fastapi import HTTPException, status
 
-from ...domain.entities.content import ContentFile, ContentBlock, UserContentProgress
+from ...infrastructure.models.content_models import ContentFile, ContentBlock, UserContentProgress
 from ...domain.repositories.content_repository import ContentRepository
 from ..dto.content_dto import (
     ContentBlockResponse,
@@ -144,11 +144,17 @@ class ContentService:
             )
         
         # Сохраняем новый прогресс
-        return await self.content_repository.create_or_update_user_progress(
+        progress = await self.content_repository.create_or_update_user_progress(
             user_id=user_id,
             block_id=block_id,
             solved_count=new_count
         )
+        
+        # Сохраняем изменения в базе данных
+        if hasattr(self.content_repository, 'session'):
+            self.content_repository.session.commit()
+        
+        return progress
     
     async def get_user_total_solved_count(self, user_id: int) -> int:
         """Получение общего количества решенных задач пользователя"""

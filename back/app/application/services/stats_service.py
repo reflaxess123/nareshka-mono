@@ -1,5 +1,5 @@
 from app.domain.repositories.stats_repository import StatsRepository
-from app.domain.entities.stats import (
+from app.domain.entities.stats_types import (
     UserStatsOverview,
     ContentStats,
     TheoryStats,

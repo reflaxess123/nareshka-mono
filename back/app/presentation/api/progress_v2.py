@@ -1,5 +1,8 @@
-from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, status
+"""API для работы с прогрессом v2"""
+
+from typing import List, Optional
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import JSONResponse
 
 from app.application.services.progress_service import ProgressService
 from app.application.dto.progress_dto import (
@@ -10,11 +13,11 @@ from app.application.dto.progress_dto import (
 )
 from app.shared.dependencies import get_progress_service, get_current_user_optional
 from app.infrastructure.database.connection import get_db
-from app.domain.entities.user import User
+from app.infrastructure.models.user_models import User
 from sqlalchemy.orm import Session
 
 
-router = APIRouter()
+router = APIRouter(prefix="/progress", tags=["progress"])
 
 
 @router.post("/attempts", response_model=TaskAttemptResponseDTO)

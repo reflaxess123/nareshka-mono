@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, and_, asc
 
 from ...domain.repositories.mindmap_repository import MindMapRepository
-from ...domain.entities.mindmap import (
+from ...domain.entities.mindmap_types import (
     TechnologyCenter, Topic, TaskDetail, TopicStats, TopicWithTasks
 )
 from ..models import ContentBlock, ContentFile, UserContentProgress

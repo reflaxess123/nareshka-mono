@@ -4,8 +4,8 @@ from datetime import datetime
 from decimal import Decimal
 
 from app.domain.repositories.progress_repository import ProgressRepository
-from app.domain.entities.task import TaskAttempt, TaskSolution
-from app.domain.entities.progress import UserCategoryProgress
+from app.domain.entities.progress_types import TaskAttempt, TaskSolution
+from app.domain.entities.progress_types import UserCategoryProgress
 from app.application.dto.progress_dto import (
     TaskAttemptCreateDTO, 
     TaskAttemptResponseDTO,

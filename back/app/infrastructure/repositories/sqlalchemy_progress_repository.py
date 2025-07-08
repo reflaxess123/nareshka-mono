@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import IntegrityError
 
 from app.domain.repositories.progress_repository import ProgressRepository
-from app.domain.entities.progress import (
+from app.domain.entities.progress_types import (
     TaskAttempt, 
     TaskSolution, 
     UserCategoryProgress, 

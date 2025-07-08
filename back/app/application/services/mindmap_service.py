@@ -3,7 +3,7 @@ from typing import List, Optional, Dict, Any
 from datetime import datetime
 
 from ...domain.repositories.mindmap_repository import MindMapRepository
-from ...domain.entities.mindmap import (
+from ...domain.entities.mindmap_types import (
     TechnologyCenter, Topic, TaskDetail, TopicStats, TopicWithTasks,
     MindMapNode, MindMapEdge, MindMapResponse
 )

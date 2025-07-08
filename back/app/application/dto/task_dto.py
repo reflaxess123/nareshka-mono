@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel
 
-from ...domain.entities.task import Task, TaskType, TaskCategory, TaskCompany
+from ...domain.entities.task_types import Task, TaskType, TaskCategory, TaskCompany
 
 
 class FileResponse(BaseModel):

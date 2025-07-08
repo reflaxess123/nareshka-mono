@@ -1,11 +1,23 @@
-"""Новый main файл с новой архитектурой"""
+#!/usr/bin/env python3
+"""FastAPI приложение nareshka"""
 
+import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 import json
+import os
+from pathlib import Path
+
+# Инициализация логирования перед импортом других модулей
+from app.core.logging import init_default_logging, get_logger
+from app.core.error_handlers import register_exception_handlers
+
+# Инициализируем логирование
+init_default_logging()
+logger = get_logger(__name__)
 
 from app.config import new_settings
 from app.presentation.api.health import router as health_router
@@ -26,9 +38,9 @@ from app.presentation.api.admin_v2 import router as admin_v2_router
 # Событие startup - выполняется один раз при запуске приложения
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("🚀 Приложение запущено")
+    logger.info("🚀 Приложение запущено", extra={"event": "startup"})
     yield
-    print("🔒 Приложение остановлено")
+    logger.info("🔒 Приложение остановлено", extra={"event": "shutdown"})
 
 
 app = FastAPI(
@@ -37,6 +49,9 @@ app = FastAPI(
     version=new_settings.version,
     lifespan=lifespan
 )
+
+# Регистрация обработчиков исключений
+register_exception_handlers(app)
 
 # Настройка CORS
 app.add_middleware(
@@ -88,7 +103,6 @@ async def redirect():
     return RedirectResponse(url="/")
 
 if __name__ == "__main__":
-    import uvicorn
     uvicorn.run(
         "main:app", 
         host=new_settings.server.host, 

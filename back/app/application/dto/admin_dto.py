@@ -1,36 +1,46 @@
-"""Admin DTOs for API requests and responses."""
+"""DTO для административных операций"""
 
-from typing import List, Optional, Dict, Any
-from pydantic import BaseModel, EmailStr
 from datetime import datetime
+from typing import List, Optional, Dict
+from pydantic import BaseModel, EmailStr
+
+from .base_dto import (
+    IdentifiedResponse, 
+    CreateRequest, 
+    UpdateRequest, 
+    BulkActionRequest, 
+    BulkActionResponse,
+    PaginatedResponse,
+    BaseResponse
+)
 
 
 # Request DTOs
-class CreateUserRequest(BaseModel):
+class CreateUserRequest(CreateRequest):
     email: EmailStr
     password: str
     role: str = "USER"
 
 
-class UpdateUserRequest(BaseModel):
+class UpdateUserRequest(UpdateRequest):
     email: Optional[EmailStr] = None
     password: Optional[str] = None
     role: Optional[str] = None
 
 
-class CreateContentFileRequest(BaseModel):
+class CreateContentFileRequest(CreateRequest):
     webdav_path: str
     main_category: str
     sub_category: str
 
 
-class UpdateContentFileRequest(BaseModel):
+class UpdateContentFileRequest(UpdateRequest):
     webdav_path: Optional[str] = None
     main_category: Optional[str] = None
     sub_category: Optional[str] = None
 
 
-class CreateContentBlockRequest(BaseModel):
+class CreateContentBlockRequest(CreateRequest):
     file_id: str
     path_titles: List[str]
     block_title: str
@@ -44,7 +54,7 @@ class CreateContentBlockRequest(BaseModel):
     extracted_urls: List[str] = []
 
 
-class UpdateContentBlockRequest(BaseModel):
+class UpdateContentBlockRequest(UpdateRequest):
     file_id: Optional[str] = None
     path_titles: Optional[List[str]] = None
     block_title: Optional[str] = None
@@ -58,7 +68,7 @@ class UpdateContentBlockRequest(BaseModel):
     extracted_urls: Optional[List[str]] = None
 
 
-class CreateTheoryCardRequest(BaseModel):
+class CreateTheoryCardRequest(CreateRequest):
     anki_guid: Optional[str] = None
     card_type: str
     deck: str
@@ -70,7 +80,7 @@ class CreateTheoryCardRequest(BaseModel):
     order_index: int = 0
 
 
-class UpdateTheoryCardRequest(BaseModel):
+class UpdateTheoryCardRequest(UpdateRequest):
     anki_guid: Optional[str] = None
     card_type: Optional[str] = None
     deck: Optional[str] = None
@@ -82,51 +92,37 @@ class UpdateTheoryCardRequest(BaseModel):
     order_index: Optional[int] = None
 
 
-class BulkDeleteRequest(BaseModel):
-    ids: List[str]
+BulkDeleteRequest = BulkActionRequest  # Алиас для совместимости
 
 
 # Response DTOs
-class SystemStatsResponse(BaseModel):
+class SystemStatsResponse(BaseResponse):
     users: Dict[str, int]
     content: Dict[str, int]
     progress: Dict[str, int]
 
 
-class UserStatsResponse(BaseModel):
-    id: str
+class UserStatsResponse(IdentifiedResponse):
     email: str
     role: str
-    created_at: datetime
-    updated_at: datetime
     _count: Dict[str, int] = {}
 
-    class Config:
-        from_attributes = True
 
-
-class ContentStatsResponse(BaseModel):
+class ContentStatsResponse(BaseResponse):
     total_files: int
     total_blocks: int
     files_by_category: Dict[str, int]
     blocks_by_category: Dict[str, int]
 
 
-class AdminContentFileResponse(BaseModel):
-    id: str
+class AdminContentFileResponse(IdentifiedResponse):
     webdav_path: str
     main_category: str
     sub_category: str
-    created_at: datetime
-    updated_at: datetime
     _count: Dict[str, int] = {}
 
-    class Config:
-        from_attributes = True
 
-
-class AdminContentBlockResponse(BaseModel):
-    id: str
+class AdminContentBlockResponse(IdentifiedResponse):
     file_id: str
     path_titles: List[str]
     block_title: str
@@ -138,15 +134,9 @@ class AdminContentBlockResponse(BaseModel):
     is_code_foldable: bool = False
     code_fold_title: Optional[str] = None
     extracted_urls: List[str] = []
-    created_at: datetime
-    updated_at: datetime
-
-    class Config:
-        from_attributes = True
 
 
-class AdminTheoryCardResponse(BaseModel):
-    id: str
+class AdminTheoryCardResponse(IdentifiedResponse):
     anki_guid: Optional[str] = None
     card_type: str
     deck: str
@@ -156,66 +146,25 @@ class AdminTheoryCardResponse(BaseModel):
     answer_block: str
     tags: List[str] = []
     order_index: int = 0
-    created_at: datetime
-    updated_at: datetime
-
-    class Config:
-        from_attributes = True
 
 
-class AdminUserResponse(BaseModel):
-    id: str
+class AdminUserResponse(IdentifiedResponse):
     email: str
     role: str
-    created_at: datetime
-    updated_at: datetime
     _count: Dict[str, int] = {}
 
-    class Config:
-        from_attributes = True
+
+# Используем алиас BulkActionResponse для совместимости
+BulkDeleteResponse = BulkActionResponse
 
 
-class BulkDeleteResponse(BaseModel):
-    deleted_count: int
-    failed_ids: List[str] = []
-    error_messages: List[str] = []
-
-    class Config:
-        from_attributes = True
+# Типизированные пагинированные ответы - заменяют 4 дублирующихся класса
+PaginatedUsersResponse = PaginatedResponse[UserStatsResponse]
+PaginatedContentFilesResponse = PaginatedResponse[AdminContentFileResponse]
+PaginatedContentBlocksResponse = PaginatedResponse[AdminContentBlockResponse]
+PaginatedTheoryCardsResponse = PaginatedResponse[AdminTheoryCardResponse]
 
 
-class PaginatedUsersResponse(BaseModel):
-    users: List[UserStatsResponse]
-    total: int
-    page: int
-    limit: int
-    totalPages: int = 0
-
-
-class PaginatedContentFilesResponse(BaseModel):
-    files: List[AdminContentFileResponse]
-    total: int
-    page: int
-    limit: int
-    totalPages: int = 0
-
-
-class PaginatedContentBlocksResponse(BaseModel):
-    blocks: List[AdminContentBlockResponse]
-    total: int
-    page: int
-    limit: int
-    totalPages: int = 0
-
-
-class PaginatedTheoryCardsResponse(BaseModel):
-    cards: List[AdminTheoryCardResponse]
-    total: int
-    page: int
-    limit: int
-    totalPages: int = 0
-
-
-class HealthResponse(BaseModel):
+class HealthResponse(BaseResponse):
     status: str
     module: str 
