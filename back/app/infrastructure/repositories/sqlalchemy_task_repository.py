@@ -26,21 +26,21 @@ class SQLAlchemyTaskRepository(TaskRepository):
         """Сортировка списка заданий"""
         def get_sort_key(task: Task):
             if sort_by == "orderInFile":
-                return task.orderInFile or 0
+                return task.order_in_file or 0
             elif sort_by == "orderIndex":
-                return task.orderIndex or 0
+                return task.order_in_file or 0
             elif sort_by == "createdAt":
-                return task.createdAt
+                return task.created_at
             elif sort_by == "updatedAt":
-                return task.updatedAt
+                return task.updated_at
             elif sort_by == "title":
                 return task.title.lower()
             elif sort_by == "category":
-                return task.category.lower()
+                return task.main_category.lower()
             elif sort_by == "subCategory":
-                return (task.subCategory or "").lower()
+                return (task.sub_category or "").lower()
             else:
-                return task.orderInFile or 0
+                return task.order_in_file or 0
         
         reverse = sort_order == "desc"
         return sorted(tasks, key=get_sort_key, reverse=reverse)
@@ -107,8 +107,9 @@ class SQLAlchemyTaskRepository(TaskRepository):
     ) -> List[Task]:
         """Получение заданий типа content_block"""
         from ..models.content_models import ContentFile
+        from sqlalchemy.orm import joinedload
         
-        query = self.session.query(ContentBlock).join(ContentFile)
+        query = self.session.query(ContentBlock).join(ContentFile).options(joinedload(ContentBlock.file))
         
         # Фильтры
         if main_categories:
@@ -293,15 +294,13 @@ class SQLAlchemyTaskRepository(TaskRepository):
         categories = []
         for cat_name, cat_data in categories_map.items():
             category = TaskCategory(
-                name=cat_name,
-                subCategories=sorted(list(cat_data["subCategories"])),
-                totalCount=cat_data["contentBlockCount"] + cat_data["theoryQuizCount"],
-                contentBlockCount=cat_data["contentBlockCount"],
-                theoryQuizCount=cat_data["theoryQuizCount"]
+                main_category=cat_name,
+                sub_category=None,  # Можно добавить логику для подкатегорий если нужно
+                task_count=cat_data["contentBlockCount"] + cat_data["theoryQuizCount"]
             )
             categories.append(category)
         
-        return sorted(categories, key=lambda x: x.name)
+        return sorted(categories, key=lambda x: x.main_category)
     
     async def get_task_companies(
         self,
@@ -342,8 +341,8 @@ class SQLAlchemyTaskRepository(TaskRepository):
         
         # Преобразование в TaskCompany
         companies = [
-            TaskCompany(name=name, count=count)
+            TaskCompany(company=name, task_count=count)
             for name, count in company_counts.items()
         ]
         
-        return sorted(companies, key=lambda x: (-x.count, x.name)) 
+        return sorted(companies, key=lambda x: (-x.task_count, x.company)) 

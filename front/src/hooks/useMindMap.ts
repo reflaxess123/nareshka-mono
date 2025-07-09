@@ -160,25 +160,5 @@ export const useTaskDetails = (taskId: string | null) => {
   };
 };
 
-export const useTopicTasks = (
-  topicKey: string,
-  technology: string = 'javascript',
-  difficultyFilter?: string
-) => {
-  return useQuery({
-    queryKey: ['topic-tasks', topicKey, technology, difficultyFilter],
-    queryFn: async () => {
-      const searchParams = new URLSearchParams();
-      searchParams.append('technology', technology);
-      if (difficultyFilter) {
-        searchParams.append('difficulty_filter', difficultyFilter);
-      }
-
-      const url = `/api/v2/mindmap/topic/${topicKey}/tasks?${searchParams.toString()}`;
-      const response = await axios.get(url);
-      return response.data;
-    },
-    enabled: !!topicKey,
-    staleTime: 5 * 60 * 1000,
-  });
-};
+// Удален устаревший useTopicTasks hook - теперь используется сгенерированный API клиент:
+// useGetTopicTasksApiV2MindmapTopicTopicKeyTasksGet из @/shared/api/generated/api

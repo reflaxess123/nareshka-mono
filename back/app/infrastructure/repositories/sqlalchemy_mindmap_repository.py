@@ -27,7 +27,7 @@ class SqlAlchemyMindMapRepository(MindMapRepository):
         
         return TechnologyCenter(
             technology=technology,
-            title=config['title'],
+            display_name=config['title'],
             description=config['description'],
             icon=config['icon'],
             color=config['color'],
@@ -239,12 +239,13 @@ class SqlAlchemyMindMapRepository(MindMapRepository):
         
         total_tasks = len(tasks)
         completed_tasks = sum(1 for task in tasks if task.progress and task.progress["isCompleted"])
-        completion_rate = (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0
+        progress_percentage = (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0
         
         return TopicStats(
+            topic_key=topic.key,
             total_tasks=total_tasks,
             completed_tasks=completed_tasks,
-            completion_rate=float(completion_rate)
+            progress_percentage=float(progress_percentage)
         )
     
     def get_available_technologies(self) -> List[str]:

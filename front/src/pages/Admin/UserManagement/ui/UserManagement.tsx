@@ -1,3 +1,4 @@
+import type { AdminUser } from '@/entities/User/model/types';
 import { ButtonVariant } from '@/shared/components/Button/model/types';
 import { Button } from '@/shared/components/Button/ui/Button';
 import { PageWrapper } from '@/shared/components/PageWrapper/ui/PageWrapper';
@@ -147,7 +148,7 @@ export const UserManagement = () => {
             </div>
           ) : (
             <div className={styles.usersGrid}>
-              {users.map((user) => (
+              {users.map((user: AdminUser) => (
                 <div key={user.id} className={styles.userCard}>
                   <div className={styles.userInfo}>
                     <div className={styles.userHeader}>

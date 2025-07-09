@@ -174,7 +174,7 @@ async def get_topic_tasks(
             stats_dto = TopicStatsResponse(
                 totalTasks=topic_with_tasks.stats.total_tasks,
                 completedTasks=topic_with_tasks.stats.completed_tasks,
-                completionRate=topic_with_tasks.stats.completion_rate
+                completionRate=topic_with_tasks.stats.progress_percentage
             )
         
         return TopicTasksResponse(

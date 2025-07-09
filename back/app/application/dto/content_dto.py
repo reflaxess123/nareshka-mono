@@ -9,6 +9,7 @@ from .base_dto import IdentifiedResponse, PaginatedResponse, NamedListResponse
 
 class ContentFileResponse(IdentifiedResponse):
     """Ответ с информацией о файле контента"""
+    id: str  # Переопределяем тип ID для ContentFile
     webdavPath: str
     mainCategory: str
     subCategory: str
@@ -17,6 +18,7 @@ class ContentFileResponse(IdentifiedResponse):
 
 class ContentBlockResponse(IdentifiedResponse):
     """Ответ с информацией о блоке контента"""
+    id: str  # Переопределяем тип ID для ContentBlock
     fileId: str
     pathTitles: List[str]
     blockTitle: str
@@ -44,6 +46,7 @@ class ContentBlockWithProgressResponse(ContentBlockResponse):
 
 class UserContentProgressResponse(IdentifiedResponse):
     """Ответ с информацией о прогрессе пользователя"""
+    id: str  # Переопределяем тип ID для UserContentProgress
     userId: int
     blockId: str
     solvedCount: int

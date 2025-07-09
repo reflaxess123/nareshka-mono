@@ -52,6 +52,7 @@ export interface AdminUser {
   role: UserRole;
   createdAt: string;
   updatedAt: string;
+  lastActiveAt?: string;
 }
 
 export interface CreateUserRequest {

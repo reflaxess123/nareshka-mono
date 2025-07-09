@@ -46,17 +46,32 @@ export const authApi = {
       limit?: number;
       role?: string;
       search?: string;
-    }): Promise<{ users: AdminUser[]; total: number; pages: number }> {
-      const response = await apiInstance.get<{
-        users: AdminUser[];
+    }): Promise<{
+      items: AdminUser[];
+      pagination: {
+        page: number;
+        limit: number;
         total: number;
-        pages: number;
+        totalPages: number;
+      };
+    }> {
+      const response = await apiInstance.get<{
+        items: AdminUser[];
+        pagination: {
+          page: number;
+          limit: number;
+          total: number;
+          totalPages: number;
+        };
       }>('/v2/admin/users', { params });
       return response.data;
     },
 
     async createUser(data: CreateUserRequest): Promise<AdminUser> {
-      const response = await apiInstance.post<AdminUser>('/v2/admin/users', data);
+      const response = await apiInstance.post<AdminUser>(
+        '/v2/admin/users',
+        data
+      );
       return response.data;
     },
 
@@ -72,7 +87,9 @@ export const authApi = {
     },
 
     async deleteUser(userId: number): Promise<void> {
-      const response = await apiInstance.delete<void>(`/v2/admin/users/${userId}`);
+      const response = await apiInstance.delete<void>(
+        `/v2/admin/users/${userId}`
+      );
       return response.data;
     },
 

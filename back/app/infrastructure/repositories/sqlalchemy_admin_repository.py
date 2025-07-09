@@ -99,25 +99,25 @@ class SQLAlchemyAdminRepository(AdminRepository):
             total = query.count()
             
             # Получаем пользователей
-            users = query.order_by(desc(User.created_at)).offset(skip).limit(limit).all()
+            users = query.order_by(desc(User.createdAt)).offset(skip).limit(limit).all()
             
             # Добавляем подсчет прогресса для каждого пользователя
             users_with_stats = []
             for user in users:
                 content_progress_count = self.session.query(UserContentProgressModel).filter(
-                    UserContentProgressModel.user_id == user.id
+                    UserContentProgressModel.userId == user.id
                 ).count()
                 
                 theory_progress_count = self.session.query(UserTheoryProgress).filter(
-                    UserTheoryProgress.user_id == user.id
+                    UserTheoryProgress.userId == user.id
                 ).count()
                 
                 users_with_stats.append(UserStats(
                     id=user.id,
                     email=user.email,
                     role=user.role,
-                    created_at=user.created_at,
-                    updated_at=user.updated_at,
+                    created_at=user.createdAt,
+                    updated_at=user.updatedAt,
                     content_progress_count=content_progress_count,
                     theory_progress_count=theory_progress_count
                 ))
@@ -151,8 +151,8 @@ class SQLAlchemyAdminRepository(AdminRepository):
                 id=user.id,
                 email=user.email,
                 role=user.role,
-                created_at=user.created_at,
-                updated_at=user.updated_at
+                created_at=user.createdAt,
+                updated_at=user.updatedAt
             )
             
         except SQLAlchemyError as e:
@@ -170,15 +170,15 @@ class SQLAlchemyAdminRepository(AdminRepository):
                 if hasattr(user, key) and value is not None:
                     setattr(user, key, value)
             
-            user.updated_at = datetime.utcnow()
+            user.updatedAt = datetime.utcnow()
             self.session.commit()
             
             return AdminUser(
                 id=user.id,
                 email=user.email,
                 role=user.role,
-                created_at=user.created_at,
-                updated_at=user.updated_at
+                created_at=user.createdAt,
+                updated_at=user.updatedAt
             )
             
         except SQLAlchemyError as e:

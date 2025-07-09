@@ -173,7 +173,7 @@ class AuthService:
                 detail="Session expired"
             )
         
-        user = await self.user_repository.get_by_id(str(user_id))
+        user = await self.user_repository.get_by_id(user_id)
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

@@ -35,8 +35,8 @@ export const useUsers = () => {
     queryFn: async () => {
       const response = await authApi.admin.getUsers();
       // Адаптируем ответ API к нашему интерфейсу
-      if (response.users) {
-        return response.users;
+      if (response.items && Array.isArray(response.items)) {
+        return response.items;
       } else if (Array.isArray(response)) {
         return response;
       } else {

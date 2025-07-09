@@ -25,7 +25,7 @@ class TimestampedResponse(BaseResponse):
 
 class IdentifiedResponse(TimestampedResponse):
     """Response DTO с ID и временными метками"""
-    id: str
+    id: int
 
 
 class PaginationInfo(BaseModel):
@@ -97,7 +97,7 @@ class CountResponse(BaseModel):
 class BulkActionResponse(BaseModel):
     """Ответ на массовое действие"""
     success_count: int
-    failed_ids: List[str] = []
+    failed_ids: List[int] = []
     error_messages: List[str] = []
     
     @property
@@ -139,7 +139,7 @@ class UpdateRequest(BaseModel):
 
 class BulkActionRequest(BaseModel):
     """Запрос на массовое действие"""
-    ids: List[str]
+    ids: List[int]
     
     def validate_ids(self) -> None:
         """Валидация списка ID"""
