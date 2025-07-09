@@ -13,9 +13,9 @@ class SQLAlchemyUserRepository(UserRepository):
     def __init__(self, session: Session):
         self.session = session
     
-    async def get_by_id(self, id: str) -> Optional[User]:
+    async def get_by_id(self, id: int) -> Optional[User]:
         """Получить пользователя по ID"""
-        return self.session.query(User).filter(User.id == int(id)).first()
+        return self.session.query(User).filter(User.id == id).first()
     
     async def get_by_email(self, email: str) -> Optional[User]:
         """Получить пользователя по email"""
@@ -34,7 +34,7 @@ class SQLAlchemyUserRepository(UserRepository):
     async def update(self, entity: User) -> User:
         """Обновить пользователя"""
         # Получаем существующий объект
-        existing_user = self.session.query(User).filter(User.id == int(entity.id)).first()
+        existing_user = self.session.query(User).filter(User.id == entity.id).first()
         if not existing_user:
             raise ValueError(f"User with id {entity.id} not found")
         
@@ -48,17 +48,17 @@ class SQLAlchemyUserRepository(UserRepository):
         
         return existing_user
     
-    async def delete(self, id: str) -> bool:
+    async def delete(self, id: int) -> bool:
         """Удалить пользователя"""
-        user = self.session.query(User).filter(User.id == int(id)).first()
+        user = self.session.query(User).filter(User.id == id).first()
         if user:
             self.session.delete(user)
             return True
         return False
     
-    async def exists(self, id: str) -> bool:
+    async def exists(self, id: int) -> bool:
         """Проверить существование пользователя"""
-        return self.session.query(User).filter(User.id == int(id)).first() is not None
+        return self.session.query(User).filter(User.id == id).first() is not None
     
     async def email_exists(self, email: str) -> bool:
         """Проверить существование email"""

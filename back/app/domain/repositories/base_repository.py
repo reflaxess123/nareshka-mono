@@ -10,7 +10,7 @@ class BaseRepository(ABC, Generic[T]):
     """Базовый интерфейс репозитория"""
     
     @abstractmethod
-    async def get_by_id(self, id: str) -> Optional[T]:
+    async def get_by_id(self, id: int) -> Optional[T]:
         """Получить сущность по ID"""
         pass
     
@@ -30,11 +30,11 @@ class BaseRepository(ABC, Generic[T]):
         pass
     
     @abstractmethod
-    async def delete(self, id: str) -> bool:
+    async def delete(self, id: int) -> bool:
         """Удалить сущность"""
         pass
     
     @abstractmethod
-    async def exists(self, id: str) -> bool:
+    async def exists(self, id: int) -> bool:
         """Проверить существование сущности"""
         pass 

@@ -126,7 +126,7 @@ class CodeExecutorService:
                 os.chmod(temp_dir, 0o777)
 
                 # Записываем исходный код в файл
-                source_file = os.path.join(temp_dir, f"main{language.fileExtension}")
+                source_file = os.path.join(temp_dir, f"main{language.file_extension}")
                 with open(source_file, "w", encoding="utf-8") as f:
                     f.write(source_code)
                 # Даем права на чтение и запись всем
@@ -185,12 +185,12 @@ class CodeExecutorService:
 
             # Настройки контейнера
             container_config = {
-                "image": language.dockerImage,
+                "image": language.docker_image,
                 "command": command,
                 "working_dir": "/code",
                 "volumes": {temp_dir: {"bind": "/code", "mode": "ro"}},
-                "mem_limit": f"{language.memoryLimitMB}m",
-                "memswap_limit": f"{language.memoryLimitMB}m",
+                "mem_limit": f"{language.memory_limit_mb}m",
+                "memswap_limit": f"{language.memory_limit_mb}m",
                 "cpu_quota": 50000,  # 50% CPU
                 "network_disabled": True,  # Отключаем сеть
                 "read_only": True,  # Только чтение файловой системы
@@ -242,7 +242,7 @@ class CodeExecutorService:
         except ImageNotFound:
             return {
                 "status": ExecutionStatus.ERROR,
-                "errorMessage": f"Docker image {language.dockerImage} not found",
+                "errorMessage": f"Docker image {language.docker_image} not found",
                 "containerLogs": "Docker image not available"
             }
 
@@ -256,11 +256,11 @@ class CodeExecutorService:
     def _prepare_command(self, language: SupportedLanguage, stdin_file: Optional[str]) -> str:
         """Подготавливает команду для выполнения в контейнере"""
         
-        base_command = language.runCommand.replace("{file}", f"main{language.fileExtension}")
+        base_command = language.run_command.replace("{file}", f"main{language.file_extension}")
         
         # Если есть компиляция
-        if language.compileCommand:
-            compile_cmd = language.compileCommand.replace("{file}", f"main{language.fileExtension}")
+        if language.compile_command:
+            compile_cmd = language.compile_command.replace("{file}", f"main{language.file_extension}")
             if stdin_file:
                 return f"bash -c '{compile_cmd} && {base_command} < input.txt'"
             else:

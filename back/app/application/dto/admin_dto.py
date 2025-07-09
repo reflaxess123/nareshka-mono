@@ -103,6 +103,7 @@ class SystemStatsResponse(BaseResponse):
 
 
 class UserStatsResponse(IdentifiedResponse):
+    id: int  # User ID - integer
     email: str
     role: str
     _count: Dict[str, int] = {}
@@ -116,6 +117,7 @@ class ContentStatsResponse(BaseResponse):
 
 
 class AdminContentFileResponse(IdentifiedResponse):
+    id: str  # ContentFile ID - string
     webdav_path: str
     main_category: str
     sub_category: str
@@ -123,6 +125,7 @@ class AdminContentFileResponse(IdentifiedResponse):
 
 
 class AdminContentBlockResponse(IdentifiedResponse):
+    id: str  # ContentBlock ID - string
     file_id: str
     path_titles: List[str]
     block_title: str
@@ -137,6 +140,7 @@ class AdminContentBlockResponse(IdentifiedResponse):
 
 
 class AdminTheoryCardResponse(IdentifiedResponse):
+    id: str  # TheoryCard ID - string
     anki_guid: Optional[str] = None
     card_type: str
     deck: str
@@ -149,6 +153,7 @@ class AdminTheoryCardResponse(IdentifiedResponse):
 
 
 class AdminUserResponse(IdentifiedResponse):
+    id: int  # User ID - integer
     email: str
     role: str
     _count: Dict[str, int] = {}

@@ -50,7 +50,7 @@ class MindMapService:
             type="center",
             position={"x": 500, "y": 400},
             data={
-                "title": tech_center.title,
+                "title": tech_center.display_name,
                 "description": tech_center.description,
                 "icon": tech_center.icon,
                 "color": tech_center.color,
@@ -130,7 +130,7 @@ class MindMapService:
             tech_center = self.mindmap_repository.get_technology_center(tech)
             if tech_center:
                 technology_configs[tech] = {
-                    "title": tech_center.title,
+                    "title": tech_center.display_name,
                     "description": tech_center.description,
                     "icon": tech_center.icon,
                     "color": tech_center.color

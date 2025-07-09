@@ -170,7 +170,7 @@ async def general_exception_handler(
     })
     
     # В production не показываем детали ошибки
-    from ...config import new_settings
+    from app.config import new_settings
     
     if new_settings.server.debug:
         error_details = {

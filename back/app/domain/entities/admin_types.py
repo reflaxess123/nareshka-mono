@@ -14,7 +14,7 @@ class SystemStats(BaseModel):
 
 class UserStats(BaseModel):
     """Статистика пользователя"""
-    id: str
+    id: int
     email: str
     role: str
     created_at: datetime
@@ -40,7 +40,7 @@ class TheoryStats(BaseModel):
 
 class AdminUser(BaseModel):
     """Admin представление пользователя"""
-    id: str
+    id: int
     email: str
     role: str
     created_at: datetime

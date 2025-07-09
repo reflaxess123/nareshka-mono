@@ -42,10 +42,10 @@ class CodeEditorService:
                 name=lang.name,
                 language=lang.language,
                 version=lang.version,
-                fileExtension=lang.fileExtension,
-                timeoutSeconds=lang.timeoutSeconds,
-                memoryLimitMB=lang.memoryLimitMB,
-                isEnabled=lang.isEnabled
+                fileExtension=lang.file_extension,
+                timeoutSeconds=lang.timeout_seconds,
+                memoryLimitMB=lang.memory_limit_mb,
+                isEnabled=lang.is_enabled
             )
             for lang in languages
         ]

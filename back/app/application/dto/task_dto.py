@@ -54,46 +54,42 @@ class TaskResponse(BaseModel):
     @classmethod
     def from_domain(cls, task: Task) -> 'TaskResponse':
         """Создание DTO из доменной модели"""
-        file_response = None
-        if task.type == TaskType.CONTENT_BLOCK and task.fileId:
-            # Здесь должна быть логика получения файла, но для упрощения используем None
-            file_response = FileResponse(
-                id=task.fileId,
-                webdavPath="",  # Требует дополнительного запроса
-                mainCategory=task.category,
-                subCategory=task.subCategory
-            )
-        
         return cls(
             id=task.id,
-            type=task.type.value,
+            type=task.item_type,
             title=task.title,
             description=task.description,
-            category=task.category,
-            subCategory=task.subCategory,
+            category=task.main_category,
+            subCategory=task.sub_category,
             
-            fileId=task.fileId,
-            file=file_response,
-            pathTitles=task.pathTitles,
-            blockLevel=task.blockLevel,
-            orderInFile=task.orderInFile,
-            textContent=task.textContent,
-            codeContent=task.codeContent,
-            codeLanguage=task.codeLanguage,
-            isCodeFoldable=task.isCodeFoldable,
-            codeFoldTitle=task.codeFoldTitle,
-            extractedUrls=task.extractedUrls,
+            # Базовые поля для всех типов
             companies=task.companies,
-            
-            questionBlock=task.questionBlock,
-            answerBlock=task.answerBlock,
             tags=task.tags,
-            orderIndex=task.orderIndex,
+            codeContent=task.code_content,
+            codeLanguage=task.code_language.value if task.code_language else None,
+            orderInFile=task.order_in_file,
             
-            currentUserSolvedCount=task.currentUserSolvedCount,
+            # Поля для content_block (могут быть пустыми для theory_quiz)
+            fileId=None,  # Не доступно в модели Task
+            file=None,
+            pathTitles=None,  # Не доступно в модели Task
+            blockLevel=None,  # Не доступно в модели Task
+            textContent=task.description,  # Используем description
+            isCodeFoldable=None,  # Не доступно в модели Task
+            codeFoldTitle=None,  # Не доступно в модели Task
+            extractedUrls=None,  # Не доступно в модели Task
             
-            createdAt=task.createdAt,
-            updatedAt=task.updatedAt
+            # Поля для theory_quiz
+            questionBlock=task.title if task.item_type == "theory_quiz" else None,
+            answerBlock=task.description if task.item_type == "theory_quiz" else None,
+            orderIndex=task.order_in_file,
+            
+            # Прогресс пользователя
+            currentUserSolvedCount=1 if task.is_solved else 0,
+            
+            # Метаданные
+            createdAt=task.created_at,
+            updatedAt=task.updated_at
         )
 
 
@@ -122,20 +118,20 @@ class TasksListResponse(BaseModel):
 class TaskCategoryResponse(BaseModel):
     """Ответ с информацией о категории заданий"""
     name: str
-    subCategories: List[str]
+    subCategories: List[str] = []
     totalCount: int
-    contentBlockCount: int
-    theoryQuizCount: int
+    contentBlockCount: int = 0
+    theoryQuizCount: int = 0
     
     @classmethod
     def from_domain(cls, category: TaskCategory) -> 'TaskCategoryResponse':
         """Создание DTO из доменной модели"""
         return cls(
-            name=category.name,
-            subCategories=category.subCategories,
-            totalCount=category.totalCount,
-            contentBlockCount=category.contentBlockCount,
-            theoryQuizCount=category.theoryQuizCount
+            name=category.main_category,
+            subCategories=[category.sub_category] if category.sub_category else [],
+            totalCount=category.task_count,
+            contentBlockCount=category.task_count,  # Для простоты
+            theoryQuizCount=0  # Для простоты
         )
 
 
@@ -159,8 +155,8 @@ class TaskCompanyResponse(BaseModel):
     def from_domain(cls, company: TaskCompany) -> 'TaskCompanyResponse':
         """Создание DTO из доменной модели"""
         return cls(
-            name=company.name,
-            count=company.count
+            name=company.company,
+            count=company.task_count
         )
 
 
