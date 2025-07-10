@@ -5,20 +5,21 @@
 import json
 import logging
 import os
+import platform
 import tempfile
 import time
 import uuid
 from typing import Any, Dict, List, Optional
-import platform
 
 import docker
-from docker.errors import APIError, ContainerError, ImageNotFound
+from docker.errors import ContainerError, ImageNotFound
 
-from ...domain.entities.code_editor_types import SupportedLanguage, CodeExecution
-from ...domain.entities.enums import CodeLanguage, ExecutionStatus
-from ...domain.repositories.code_editor_repository import CodeEditorRepository
+from app.domain.entities.code_editor_types import CodeExecution, SupportedLanguage
+from app.domain.entities.enums import CodeLanguage, ExecutionStatus
+from app.domain.repositories.code_editor_repository import CodeEditorRepository
 
 logger = logging.getLogger(__name__)
+
 
 # Кроссплатформенный путь к общей директории для выполнения кода
 def get_shared_exec_dir():
@@ -29,15 +30,17 @@ def get_shared_exec_dir():
     else:
         # В Unix-подобных системах используем /tmp/nareshka-executions
         base_dir = "/tmp/nareshka-executions"
-    
+
     os.makedirs(base_dir, exist_ok=True)
     return base_dir
+
 
 SHARED_EXEC_DIR = get_shared_exec_dir()
 
 
 class CodeExecutionError(Exception):
     """Кастомное исключение для ошибок выполнения кода"""
+
     pass
 
 
@@ -57,8 +60,12 @@ class CodeExecutorService:
                 self.docker_client = docker.from_env()
             except Exception as e:
                 # Временно возвращаем заглушку вместо ошибки
-                logger.warning(f"Cannot connect to Docker: {str(e)}. Code execution will be disabled.")
-                raise CodeExecutionError("Docker service is not available. Please ensure Docker Desktop is running.")
+                logger.warning(
+                    f"Cannot connect to Docker: {str(e)}. Code execution will be disabled."
+                )
+                raise CodeExecutionError(
+                    "Docker service is not available. Please ensure Docker Desktop is running."
+                )
         return self.docker_client
 
     async def execute_code(
@@ -67,25 +74,27 @@ class CodeExecutorService:
         language: SupportedLanguage,
         stdin: Optional[str] = None,
         user_id: Optional[int] = None,
-        block_id: Optional[str] = None
+        block_id: Optional[str] = None,
     ) -> CodeExecution:
         """
         Выполняет код в изолированном Docker контейнере
-        
+
         Args:
             source_code: Исходный код для выполнения
             language: Объект поддерживаемого языка
             stdin: Входные данные для программы
             user_id: ID пользователя (опционально)
             block_id: ID блока (опционально)
-            
+
         Returns:
             CodeExecution объект с результатами выполнения
         """
         execution_id = str(uuid.uuid4())
         start_time = time.time()
 
-        logger.info(f"Starting code execution {execution_id} for language {language.language}")
+        logger.info(
+            f"Starting code execution {execution_id} for language {language.language}"
+        )
 
         # Создаем объект CodeExecution
         execution = CodeExecution(
@@ -104,7 +113,7 @@ class CodeExecutorService:
             containerLogs=None,
             errorMessage=None,
             createdAt=time.time(),
-            completedAt=None
+            completedAt=None,
         )
 
         try:
@@ -157,7 +166,9 @@ class CodeExecutorService:
                 execution.errorMessage = result.get("errorMessage")
                 execution.completedAt = time.time()
 
-                logger.info(f"Code execution {execution_id} completed in {execution.executionTimeMs}ms")
+                logger.info(
+                    f"Code execution {execution_id} completed in {execution.executionTimeMs}ms"
+                )
 
         except Exception as e:
             logger.error(f"Code execution {execution_id} failed: {str(e)}")
@@ -175,7 +186,7 @@ class CodeExecutorService:
         temp_dir: str,
         language: SupportedLanguage,
         execution_id: str,
-        stdin_file: Optional[str] = None
+        stdin_file: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Запускает код в Docker контейнере"""
 
@@ -201,10 +212,12 @@ class CodeExecutorService:
                 "remove": True,  # Удаляем контейнер после выполнения
                 "detach": False,
                 "stdout": True,
-                "stderr": True
+                "stderr": True,
             }
 
-            logger.info(f"Running container with config: {json.dumps(container_config, indent=2)}")
+            logger.info(
+                f"Running container with config: {json.dumps(container_config, indent=2)}"
+            )
 
             # Запускаем контейнер
             start_time = time.time()
@@ -212,7 +225,11 @@ class CodeExecutorService:
             container = docker_client.containers.run(**container_config)
 
             # Получаем результат
-            logs = container.decode("utf-8") if isinstance(container, bytes) else str(container)
+            logs = (
+                container.decode("utf-8")
+                if isinstance(container, bytes)
+                else str(container)
+            )
 
             execution_time = int((time.time() - start_time) * 1000)
 
@@ -222,7 +239,7 @@ class CodeExecutorService:
                 "stderr": None,
                 "exitCode": 0,
                 "executionTimeMs": execution_time,
-                "containerLogs": f"Container executed successfully in {execution_time}ms"
+                "containerLogs": f"Container executed successfully in {execution_time}ms",
             }
 
         except ContainerError as e:
@@ -236,116 +253,125 @@ class CodeExecutorService:
                 "stderr": stderr,
                 "exitCode": e.exit_status,
                 "errorMessage": f"Runtime error (exit code {e.exit_status})",
-                "containerLogs": f"Container error: {str(e)}"
+                "containerLogs": f"Container error: {str(e)}",
             }
 
         except ImageNotFound:
             return {
                 "status": ExecutionStatus.ERROR,
                 "errorMessage": f"Docker image {language.docker_image} not found",
-                "containerLogs": "Docker image not available"
+                "containerLogs": "Docker image not available",
             }
 
         except Exception as e:
             return {
                 "status": ExecutionStatus.ERROR,
                 "errorMessage": f"Container execution failed: {str(e)}",
-                "containerLogs": f"Unexpected error: {str(e)}"
+                "containerLogs": f"Unexpected error: {str(e)}",
             }
 
-    def _prepare_command(self, language: SupportedLanguage, stdin_file: Optional[str]) -> str:
+    def _prepare_command(
+        self, language: SupportedLanguage, stdin_file: Optional[str]
+    ) -> str:
         """Подготавливает команду для выполнения в контейнере"""
-        
-        base_command = language.run_command.replace("{file}", f"main{language.file_extension}")
-        
+
+        base_command = language.run_command.replace(
+            "{file}", f"main{language.file_extension}"
+        )
+
         # Если есть компиляция
         if language.compile_command:
-            compile_cmd = language.compile_command.replace("{file}", f"main{language.file_extension}")
+            compile_cmd = language.compile_command.replace(
+                "{file}", f"main{language.file_extension}"
+            )
             if stdin_file:
                 return f"bash -c '{compile_cmd} && {base_command} < input.txt'"
             else:
                 return f"bash -c '{compile_cmd} && {base_command}'"
+        # Только выполнение
+        elif stdin_file:
+            return f"bash -c '{base_command} < input.txt'"
         else:
-            # Только выполнение
-            if stdin_file:
-                return f"bash -c '{base_command} < input.txt'"
-            else:
-                return base_command
+            return base_command
 
     def validate_code_safety(self, source_code: str, language: CodeLanguage) -> bool:
         """
         Проверяет безопасность кода перед выполнением
-        
+
         Args:
             source_code: Исходный код для проверки
             language: Язык программирования
-            
+
         Returns:
             True если код безопасен, False - если содержит опасные конструкции
         """
-        
+
         # Общие опасные паттерны
         dangerous_patterns = [
             # Файловые операции
-            r'\bopen\s*\(',
-            r'\bfile\s*\(',
-            r'\bwith\s+open',
-            r'\.write\s*\(',
-            r'\.read\s*\(',
-            
+            r"\bopen\s*\(",
+            r"\bfile\s*\(",
+            r"\bwith\s+open",
+            r"\.write\s*\(",
+            r"\.read\s*\(",
             # Системные вызовы
-            r'\bos\.',
-            r'\bsystem\s*\(',
-            r'\bsubprocess\.',
-            r'\beval\s*\(',
-            r'\bexec\s*\(',
-            
+            r"\bos\.",
+            r"\bsystem\s*\(",
+            r"\bsubprocess\.",
+            r"\beval\s*\(",
+            r"\bexec\s*\(",
             # Сеть
-            r'\bsocket\.',
-            r'\brequests\.',
-            r'\burllib\.',
-            r'\bhttplib\.',
-            
+            r"\bsocket\.",
+            r"\brequests\.",
+            r"\burllib\.",
+            r"\bhttplib\.",
             # Импорты опасных модулей
-            r'import\s+os',
-            r'import\s+sys',
-            r'import\s+subprocess',
-            r'import\s+socket',
-            r'from\s+os\s+import',
-            r'from\s+sys\s+import',
+            r"import\s+os",
+            r"import\s+sys",
+            r"import\s+subprocess",
+            r"import\s+socket",
+            r"from\s+os\s+import",
+            r"from\s+sys\s+import",
         ]
-        
+
         # Языко-специфичные проверки
         if language == CodeLanguage.PYTHON:
-            dangerous_patterns.extend([
-                r'__import__\s*\(',
-                r'globals\s*\(',
-                r'locals\s*\(',
-                r'vars\s*\(',
-                r'dir\s*\(',
-            ])
+            dangerous_patterns.extend(
+                [
+                    r"__import__\s*\(",
+                    r"globals\s*\(",
+                    r"locals\s*\(",
+                    r"vars\s*\(",
+                    r"dir\s*\(",
+                ]
+            )
         elif language == CodeLanguage.JAVASCRIPT:
-            dangerous_patterns.extend([
-                r'require\s*\(',
-                r'fs\.',
-                r'process\.',
-                r'child_process',
-            ])
+            dangerous_patterns.extend(
+                [
+                    r"require\s*\(",
+                    r"fs\.",
+                    r"process\.",
+                    r"child_process",
+                ]
+            )
         elif language in [CodeLanguage.CPP, CodeLanguage.C]:
-            dangerous_patterns.extend([
-                r'#include\s*<fstream>',
-                r'#include\s*<cstdlib>',
-                r'system\s*\(',
-                r'popen\s*\(',
-            ])
-        
+            dangerous_patterns.extend(
+                [
+                    r"#include\s*<fstream>",
+                    r"#include\s*<cstdlib>",
+                    r"system\s*\(",
+                    r"popen\s*\(",
+                ]
+            )
+
         # Проверяем код на наличие опасных паттернов
         import re
+
         for pattern in dangerous_patterns:
             if re.search(pattern, source_code, re.IGNORECASE):
                 logger.warning(f"Dangerous pattern detected: {pattern}")
                 return False
-        
+
         return True
 
     async def get_supported_languages(self) -> List[SupportedLanguage]:
@@ -357,13 +383,13 @@ class CodeExecutorService:
         return await self.code_editor_repository.get_execution_by_id(execution_id)
 
     async def get_user_executions(
-        self, 
-        user_id: int, 
+        self,
+        user_id: int,
         block_id: Optional[str] = None,
         limit: int = 20,
-        offset: int = 0
+        offset: int = 0,
     ) -> List[CodeExecution]:
         """Получает историю выполнений пользователя"""
         return await self.code_editor_repository.get_user_executions(
             user_id, block_id, limit, offset
-        ) 
+        )

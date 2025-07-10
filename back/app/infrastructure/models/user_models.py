@@ -1,4 +1,3 @@
-from typing import List, Any
 from sqlalchemy import (
     Column,
     DateTime,
@@ -9,7 +8,8 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
-from ..database.connection import Base
+from app.infrastructure.database.connection import Base
+
 from .enums import UserRole
 
 
@@ -21,7 +21,9 @@ class User(Base):
     password = Column(String(255), nullable=False)
     role: SQLEnum = Column(SQLEnum(UserRole), default=UserRole.USER, nullable=False)
     createdAt = Column(DateTime, default=func.now(), nullable=False)
-    updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
+    updatedAt = Column(
+        DateTime, default=func.now(), onupdate=func.now(), nullable=False
+    )
 
     totalTasksSolved = Column(Integer, default=0, server_default="0", nullable=False)
     lastActivityDate = Column(DateTime, nullable=True)
@@ -32,6 +34,6 @@ class User(Base):
     taskAttempts = relationship("TaskAttempt", back_populates="user")
     taskSolutions = relationship("TaskSolution", back_populates="user")
     pathProgress = relationship("UserPathProgress", back_populates="user")
-    
+
     class Config:
-        from_attributes = True 
+        from_attributes = True

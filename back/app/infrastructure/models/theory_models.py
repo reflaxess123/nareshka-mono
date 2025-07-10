@@ -1,5 +1,6 @@
-from typing import List
 from decimal import Decimal
+from typing import List
+
 from sqlalchemy import (
     ARRAY,
     DECIMAL,
@@ -15,7 +16,8 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
-from ..database.connection import Base
+from app.infrastructure.database.connection import Base
+
 from .enums import CardState
 
 
@@ -34,7 +36,9 @@ class TheoryCard(Base):
     orderIndex = Column(Integer, default=0, nullable=False)
 
     createdAt = Column(DateTime, default=func.now(), nullable=False)
-    updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
+    updatedAt = Column(
+        DateTime, default=func.now(), onupdate=func.now(), nullable=False
+    )
 
     progressEntries = relationship("UserTheoryProgress", back_populates="card")
 
@@ -49,7 +53,9 @@ class UserTheoryProgress(Base):
 
     id = Column(String, primary_key=True)
     userId = Column(Integer, ForeignKey("User.id", ondelete="CASCADE"), nullable=False)
-    cardId = Column(String, ForeignKey("TheoryCard.id", ondelete="CASCADE"), nullable=False)
+    cardId = Column(
+        String, ForeignKey("TheoryCard.id", ondelete="CASCADE"), nullable=False
+    )
 
     solvedCount = Column(Integer, default=0, nullable=False)
 
@@ -58,12 +64,16 @@ class UserTheoryProgress(Base):
     dueDate = Column(DateTime)
     reviewCount = Column(Integer, default=0, nullable=False)
     lapseCount = Column(Integer, default=0, nullable=False)
-    cardState: SQLEnum = Column(SQLEnum(CardState), default=CardState.NEW, nullable=False)
+    cardState: SQLEnum = Column(
+        SQLEnum(CardState), default=CardState.NEW, nullable=False
+    )
     learningStep = Column(Integer, default=0, nullable=False)
     lastReviewDate = Column(DateTime)
 
     createdAt = Column(DateTime, default=func.now(), nullable=False)
-    updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
+    updatedAt = Column(
+        DateTime, default=func.now(), onupdate=func.now(), nullable=False
+    )
 
     user = relationship("User", back_populates="theoryProgress")
     card = relationship("TheoryCard", back_populates="progressEntries")
@@ -73,4 +83,4 @@ class UserTheoryProgress(Base):
         Index("idx_usertheoryprogress_duedate", "dueDate"),
         Index("idx_usertheoryprogress_cardstate", "cardState"),
         Index("idx_usertheoryprogress_userid_cardid", "userId", "cardId", unique=True),
-    ) 
+    )

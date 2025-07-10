@@ -1,11 +1,13 @@
 """Mindmap types для внутреннего использования в services и repositories."""
 
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
+
 from pydantic import BaseModel
 
 
 class TechnologyCenter(BaseModel):
     """Центральный узел технологии"""
+
     technology: str
     display_name: str
     description: Optional[str] = None
@@ -17,6 +19,7 @@ class TechnologyCenter(BaseModel):
 
 class Topic(BaseModel):
     """Топик в mind map"""
+
     key: str
     title: str
     description: Optional[str] = None
@@ -34,6 +37,7 @@ class Topic(BaseModel):
 
 class TaskDetail(BaseModel):
     """Детали задачи"""
+
     id: str
     title: str
     description: Optional[str] = None
@@ -51,6 +55,7 @@ class TaskDetail(BaseModel):
 
 class TopicStats(BaseModel):
     """Статистика по топику"""
+
     topic_key: str
     total_tasks: int
     completed_tasks: int
@@ -61,6 +66,7 @@ class TopicStats(BaseModel):
 
 class TopicWithTasks(BaseModel):
     """Топик с задачами"""
+
     topic: Topic
     tasks: List[TaskDetail]
     stats: Optional[TopicStats] = None
@@ -68,6 +74,7 @@ class TopicWithTasks(BaseModel):
 
 class MindMapNode(BaseModel):
     """Узел mind map"""
+
     id: str
     type: str
     data: Dict[str, Any]
@@ -76,6 +83,7 @@ class MindMapNode(BaseModel):
 
 class MindMapEdge(BaseModel):
     """Связь в mind map"""
+
     id: str
     source: str
     target: str
@@ -87,6 +95,7 @@ class MindMapEdge(BaseModel):
 
 class MindMapResponse(BaseModel):
     """Ответ с данными mind map"""
+
     nodes: List[MindMapNode]
     edges: List[MindMapEdge]
     technology_center: Optional[TechnologyCenter] = None
@@ -96,4 +105,4 @@ class MindMapResponse(BaseModel):
     structure_type: str = "topics"
     active_topics: int = 0
     applied_filters: Dict[str, Any] = {}
-    overall_progress: Optional[Dict[str, Any]] = None 
+    overall_progress: Optional[Dict[str, Any]] = None

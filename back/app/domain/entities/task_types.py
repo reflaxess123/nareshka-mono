@@ -1,13 +1,16 @@
 """Task types для внутреннего использования в services и repositories."""
 
 from datetime import datetime
-from typing import Dict, List, Optional, Any
+from typing import List, Optional
+
 from pydantic import BaseModel
-from ..entities.enums import CodeLanguage
+
+from app.domain.entities.enums import CodeLanguage
 
 
 class TaskType(BaseModel):
     """Тип задачи"""
+
     name: str
     display_name: str
     description: Optional[str] = None
@@ -15,6 +18,7 @@ class TaskType(BaseModel):
 
 class TaskCategory(BaseModel):
     """Категория задач"""
+
     main_category: str
     sub_category: Optional[str] = None
     task_count: int = 0
@@ -22,12 +26,14 @@ class TaskCategory(BaseModel):
 
 class TaskCompany(BaseModel):
     """Компания из задач"""
+
     company: str
     task_count: int = 0
 
 
 class Task(BaseModel):
     """Задача/задание"""
+
     id: str
     title: str
     description: Optional[str] = None
@@ -44,37 +50,37 @@ class Task(BaseModel):
     order_in_file: int = 0
     created_at: datetime
     updated_at: datetime
-    
+
     @classmethod
     def from_content_block(cls, block, progress=None):
         """Создание Task из ContentBlock"""
         # Получаем данные из связи с файлом
         main_category = "Общее"
         sub_category = None
-        
-        if hasattr(block, 'file') and block.file:
+
+        if hasattr(block, "file") and block.file:
             main_category = block.file.mainCategory
             sub_category = block.file.subCategory
-        
+
         # Маппинг языков программирования
         language_mapping = {
-            'js': CodeLanguage.JAVASCRIPT,
-            'javascript': CodeLanguage.JAVASCRIPT,
-            'ts': CodeLanguage.TYPESCRIPT,
-            'typescript': CodeLanguage.TYPESCRIPT,
-            'py': CodeLanguage.PYTHON,
-            'python': CodeLanguage.PYTHON,
-            'java': CodeLanguage.JAVA,
-            'cpp': CodeLanguage.CPP,
-            'c++': CodeLanguage.CPP,
-            'c': CodeLanguage.C,
-            'go': CodeLanguage.GO,
-            'rust': CodeLanguage.RUST,
-            'php': CodeLanguage.PHP,
-            'ruby': CodeLanguage.RUBY,
-            'rb': CodeLanguage.RUBY,
+            "js": CodeLanguage.JAVASCRIPT,
+            "javascript": CodeLanguage.JAVASCRIPT,
+            "ts": CodeLanguage.TYPESCRIPT,
+            "typescript": CodeLanguage.TYPESCRIPT,
+            "py": CodeLanguage.PYTHON,
+            "python": CodeLanguage.PYTHON,
+            "java": CodeLanguage.JAVA,
+            "cpp": CodeLanguage.CPP,
+            "c++": CodeLanguage.CPP,
+            "c": CodeLanguage.C,
+            "go": CodeLanguage.GO,
+            "rust": CodeLanguage.RUST,
+            "php": CodeLanguage.PHP,
+            "ruby": CodeLanguage.RUBY,
+            "rb": CodeLanguage.RUBY,
         }
-        
+
         code_language = None
         if block.codeLanguage:
             code_language = language_mapping.get(block.codeLanguage.lower())
@@ -83,7 +89,7 @@ class Task(BaseModel):
                     code_language = CodeLanguage(block.codeLanguage.upper())
                 except ValueError:
                     code_language = None
-        
+
         return cls(
             id=block.id,
             title=block.blockTitle or "Без названия",
@@ -97,12 +103,14 @@ class Task(BaseModel):
             code_content=block.codeContent,
             code_language=code_language,
             is_solved=progress.solvedCount > 0 if progress else False,
-            progress_percentage=min(progress.solvedCount * 100.0, 100.0) if progress else 0.0,
+            progress_percentage=min(progress.solvedCount * 100.0, 100.0)
+            if progress
+            else 0.0,
             order_in_file=block.orderInFile,
             created_at=block.createdAt,
-            updated_at=block.updatedAt
+            updated_at=block.updatedAt,
         )
-    
+
     @classmethod
     def from_theory_card(cls, card, progress=None):
         """Создание Task из TheoryCard"""
@@ -119,8 +127,10 @@ class Task(BaseModel):
             code_content=None,
             code_language=None,
             is_solved=progress.solvedCount > 0 if progress else False,
-            progress_percentage=min(progress.solvedCount * 100.0, 100.0) if progress else 0.0,
-            order_in_file=card.orderIndex if hasattr(card, 'orderIndex') else 0,
+            progress_percentage=min(progress.solvedCount * 100.0, 100.0)
+            if progress
+            else 0.0,
+            order_in_file=card.orderIndex if hasattr(card, "orderIndex") else 0,
             created_at=card.createdAt,
-            updated_at=card.updatedAt
-        ) 
+            updated_at=card.updatedAt,
+        )

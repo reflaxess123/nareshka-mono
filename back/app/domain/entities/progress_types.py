@@ -1,13 +1,16 @@
 """Progress types для внутреннего использования в services и repositories."""
 
 from datetime import datetime
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
+
 from pydantic import BaseModel
-from ..entities.enums import CodeLanguage
+
+from app.domain.entities.enums import CodeLanguage
 
 
 class TaskAttempt(BaseModel):
     """Попытка решения задачи пользователем"""
+
     id: str
     user_id: int
     block_id: str
@@ -22,6 +25,7 @@ class TaskAttempt(BaseModel):
 
 class TaskSolution(BaseModel):
     """Финальное решение задачи пользователем"""
+
     id: str
     user_id: int
     block_id: str
@@ -37,6 +41,7 @@ class TaskSolution(BaseModel):
 
 class UserCategoryProgress(BaseModel):
     """Прогресс пользователя по категории"""
+
     id: str
     user_id: int
     main_category: str
@@ -51,6 +56,7 @@ class UserCategoryProgress(BaseModel):
 
 class LearningPath(BaseModel):
     """Путь обучения"""
+
     id: str
     name: str
     description: Optional[str] = None
@@ -62,6 +68,7 @@ class LearningPath(BaseModel):
 
 class UserPathProgress(BaseModel):
     """Прогресс пользователя по пути обучения"""
+
     id: str
     user_id: int
     path_id: str
@@ -74,6 +81,7 @@ class UserPathProgress(BaseModel):
 
 class TestCase(BaseModel):
     """Тест-кейс для проверки кода"""
+
     id: str
     block_id: str
     test_name: str
@@ -88,6 +96,7 @@ class TestCase(BaseModel):
 
 class TestValidationResult(BaseModel):
     """Результат выполнения тест-кейса"""
+
     id: str
     attempt_id: str
     test_case_id: str
@@ -95,4 +104,4 @@ class TestValidationResult(BaseModel):
     is_passed: bool
     execution_time_ms: Optional[int] = None
     error_message: Optional[str] = None
-    created_at: datetime 
+    created_at: datetime

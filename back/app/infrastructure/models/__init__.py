@@ -1,23 +1,24 @@
 # Infrastructure models - SQLAlchemy модели
-from .user_models import User
-from .content_models import ContentFile, ContentBlock, UserContentProgress
-from .theory_models import TheoryCard, UserTheoryProgress
-from .code_execution_models import SupportedLanguage, CodeExecution, UserCodeSolution
+from app.infrastructure.database.connection import Base
+
+from .code_execution_models import CodeExecution, SupportedLanguage, UserCodeSolution
+from .content_models import ContentBlock, ContentFile, UserContentProgress
+from .enums import CardState, CodeLanguage, ExecutionStatus, ProgressStatus, UserRole
+from .learning_path_models import LearningPath, UserPathProgress
 from .progress_models import UserCategoryProgress
 from .task_models import TaskAttempt, TaskSolution
-from .learning_path_models import LearningPath, UserPathProgress
 from .test_case_models import TestCase, TestValidationResult
-from .enums import UserRole, CardState, ProgressStatus, CodeLanguage, ExecutionStatus
-from ..database.connection import Base
+from .theory_models import TheoryCard, UserTheoryProgress
+from .user_models import User
 
 __all__ = [
     "Base",
     "User",
-    "ContentFile", 
+    "ContentFile",
     "ContentBlock",
     "UserContentProgress",
     "TheoryCard",
-    "UserTheoryProgress", 
+    "UserTheoryProgress",
     "SupportedLanguage",
     "CodeExecution",
     "UserCodeSolution",
@@ -29,8 +30,8 @@ __all__ = [
     "TestCase",
     "TestValidationResult",
     "UserRole",
-    "CardState", 
+    "CardState",
     "ProgressStatus",
     "CodeLanguage",
     "ExecutionStatus",
-] 
+]

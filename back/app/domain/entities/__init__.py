@@ -1,17 +1,5 @@
 """Domain entities exports"""
 
-from .enums import (
-    UserRole,
-    CardState,
-    ProgressStatus,
-    CodeLanguage,
-    ExecutionStatus
-)
+from .enums import CardState, CodeLanguage, ExecutionStatus, ProgressStatus, UserRole
 
-__all__ = [
-    "UserRole",
-    "CardState", 
-    "ProgressStatus",
-    "CodeLanguage",
-    "ExecutionStatus"
-] 
+__all__ = ["UserRole", "CardState", "ProgressStatus", "CodeLanguage", "ExecutionStatus"]

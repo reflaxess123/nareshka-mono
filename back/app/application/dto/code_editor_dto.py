@@ -1,10 +1,10 @@
 from datetime import datetime
-from decimal import Decimal
-from typing import Optional, List, Dict, Any
+from typing import Any, Dict, List, Optional
+
 from pydantic import BaseModel
 
-from app.domain.entities.enums import CodeLanguage, ExecutionStatus
 from app.domain.entities.code_editor_types import TestCaseExecution
+from app.domain.entities.enums import CodeLanguage, ExecutionStatus
 
 
 # SupportedLanguage DTOs
@@ -169,4 +169,4 @@ class TestCasesResponseDTO(BaseModel):
     totalTests: int
     publicTests: int
     hiddenTests: int
-    lastGenerated: Optional[datetime] = None 
+    lastGenerated: Optional[datetime] = None

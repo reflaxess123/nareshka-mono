@@ -1,39 +1,39 @@
 #!/usr/bin/env python3
 """FastAPI приложение nareshka"""
 
+from contextlib import asynccontextmanager
+
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse, JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
-from contextlib import asynccontextmanager
-import json
-import os
-from pathlib import Path
+
+from app.core.error_handlers import register_exception_handlers
 
 # Инициализация логирования перед импортом других модулей
-from app.core.logging import init_default_logging, get_logger
-from app.core.error_handlers import register_exception_handlers
+from app.core.logging import get_logger, init_default_logging
 
 # Инициализируем логирование
 init_default_logging()
 logger = get_logger(__name__)
 
 from app.config import new_settings
-from app.presentation.api.health import router as health_router
-from app.presentation.api.auth_v2 import router as auth_v2_router
-from app.presentation.api.content_v2 import router as content_v2_router
-from app.presentation.api.theory_v2 import router as theory_v2_router
-from app.presentation.api.task_v2 import router as task_v2_router
-from app.presentation.api.progress_v2 import router as progress_v2_router
-from app.presentation.api.code_editor_v2 import router as code_editor_v2_router
-from app.presentation.api.stats_v2 import router as stats_v2_router
-from app.presentation.api.mindmap_v2 import router as mindmap_v2_router
 from app.presentation.api.admin_v2 import router as admin_v2_router
+from app.presentation.api.auth_v2 import router as auth_v2_router
+from app.presentation.api.code_editor_v2 import router as code_editor_v2_router
+from app.presentation.api.content_v2 import router as content_v2_router
+from app.presentation.api.health import router as health_router
+from app.presentation.api.mindmap_v2 import router as mindmap_v2_router
+from app.presentation.api.progress_v2 import router as progress_v2_router
+from app.presentation.api.stats_v2 import router as stats_v2_router
+from app.presentation.api.task_v2 import router as task_v2_router
+from app.presentation.api.theory_v2 import router as theory_v2_router
 
 # Импорты для алиасов совместимости удалены
 
 # Старые роутеры удалены для полного перехода на новую архитектуру
+
 
 # Событие startup - выполняется один раз при запуске приложения
 @asynccontextmanager
@@ -47,7 +47,7 @@ app = FastAPI(
     title=new_settings.app_name,
     description=new_settings.description,
     version=new_settings.version,
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 # Регистрация обработчиков исключений
@@ -81,6 +81,7 @@ app.include_router(admin_v2_router, prefix="/api/v2/admin")
 
 # Алиасы для обратной совместимости с фронтендом удалены
 
+
 # OpenAPI генерация
 @app.get("/openapi.json", include_in_schema=False)
 async def get_openapi():
@@ -88,24 +89,32 @@ async def get_openapi():
     openapi_schema = app.openapi()
     return JSONResponse(content=openapi_schema)
 
+
 # Корневые endpoints
 @app.get("/")
 async def root():
-    return {"message": f"Hello World! {new_settings.app_name} {new_settings.version} (NEW ARCHITECTURE)"}
+    return {
+        "message": f"Hello World! {new_settings.app_name} {new_settings.version} (NEW ARCHITECTURE)"
+    }
+
 
 @app.get("/api/")
 async def api_root():
-    return {"message": f"Hello World! {new_settings.app_name} {new_settings.version} (NEW ARCHITECTURE)"}
+    return {
+        "message": f"Hello World! {new_settings.app_name} {new_settings.version} (NEW ARCHITECTURE)"
+    }
+
 
 # Редирект на главную страницу
 @app.get("/redirect")
 async def redirect():
     return RedirectResponse(url="/")
 
+
 if __name__ == "__main__":
     uvicorn.run(
-        "main:app", 
-        host=new_settings.server.host, 
-        port=new_settings.server.port, 
-        reload=new_settings.server.debug
-    ) 
+        "main:app",
+        host=new_settings.server.host,
+        port=new_settings.server.port,
+        reload=new_settings.server.debug,
+    )

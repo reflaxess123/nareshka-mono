@@ -38,6 +38,8 @@
   "python.analysis.useLibraryCodeForTypes": true,
   "python.analysis.extraPaths": ["./app"],
   "python.pythonPath": "/home/refla/.cache/pypoetry/virtualenvs/nsbn-backend-AY1hDNMA-py3.13/bin/python",
+  "pyright.disableLanguageServices": false,
+  "pyright.disableOrganizeImports": false,
   "pylsp.plugins.ruff.enabled": true,
   "pylsp.plugins.ruff.format": ["--line-length=88"],
   "pylsp.plugins.ruff.lineLength": 88,
