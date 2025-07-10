@@ -1,4 +1,5 @@
 from typing import List
+
 from sqlalchemy import (
     ARRAY,
     JSON,
@@ -14,7 +15,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
-from ..database.connection import Base
+from app.infrastructure.database.connection import Base
 
 
 class ContentFile(Base):
@@ -26,10 +27,12 @@ class ContentFile(Base):
     subCategory = Column(String, nullable=False)
     lastFileHash = Column(String)
     createdAt = Column(DateTime, default=func.now(), nullable=False)
-    updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
+    updatedAt = Column(
+        DateTime, default=func.now(), onupdate=func.now(), nullable=False
+    )
 
     blocks = relationship("ContentBlock", back_populates="file")
-    
+
     class Config:
         from_attributes = True
 
@@ -38,7 +41,9 @@ class ContentBlock(Base):
     __tablename__ = "ContentBlock"
 
     id = Column(String, primary_key=True)
-    fileId = Column(String, ForeignKey("ContentFile.id", ondelete="CASCADE"), nullable=False)
+    fileId = Column(
+        String, ForeignKey("ContentFile.id", ondelete="CASCADE"), nullable=False
+    )
     pathTitles = Column(JSON, nullable=False)
     blockTitle = Column(String, nullable=False)
     blockLevel = Column(Integer, nullable=False)
@@ -55,7 +60,9 @@ class ContentBlock(Base):
     rawBlockContentHash = Column(String)
 
     createdAt = Column(DateTime, default=func.now(), nullable=False)
-    updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
+    updatedAt = Column(
+        DateTime, default=func.now(), onupdate=func.now(), nullable=False
+    )
 
     file = relationship("ContentFile", back_populates="blocks")
     progressEntries = relationship("UserContentProgress", back_populates="block")
@@ -64,7 +71,7 @@ class ContentBlock(Base):
     testCases = relationship("TestCase", back_populates="block")
 
     __table_args__ = (Index("idx_contentblock_fileid", "fileId"),)
-    
+
     class Config:
         from_attributes = True
 
@@ -74,19 +81,25 @@ class UserContentProgress(Base):
 
     id = Column(String, primary_key=True)
     userId = Column(Integer, ForeignKey("User.id", ondelete="CASCADE"), nullable=False)
-    blockId = Column(String, ForeignKey("ContentBlock.id", ondelete="CASCADE"), nullable=False)
+    blockId = Column(
+        String, ForeignKey("ContentBlock.id", ondelete="CASCADE"), nullable=False
+    )
     solvedCount = Column(Integer, default=0, nullable=False)
 
     createdAt = Column(DateTime, default=func.now(), nullable=False)
-    updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
+    updatedAt = Column(
+        DateTime, default=func.now(), onupdate=func.now(), nullable=False
+    )
 
     user = relationship("User", back_populates="progress")
     block = relationship("ContentBlock", back_populates="progressEntries")
 
     __table_args__ = (
         Index("idx_usercontentprogress_blockid", "blockId"),
-        Index("idx_usercontentprogress_userid_blockid", "userId", "blockId", unique=True),
+        Index(
+            "idx_usercontentprogress_userid_blockid", "userId", "blockId", unique=True
+        ),
     )
-    
+
     class Config:
-        from_attributes = True 
+        from_attributes = True

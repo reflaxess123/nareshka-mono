@@ -1,4 +1,5 @@
-from typing import Dict, List, Any
+from typing import Any, Dict, List
+
 from pydantic import BaseModel
 
 
@@ -108,4 +109,4 @@ class CategoryRoadmapDTO(BaseModel):
     overallProgress: int
     contentStats: ItemStatsDTO
     theoryStats: ItemStatsDTO
-    subCategories: List[SubCategoryRoadmapDTO] 
+    subCategories: List[SubCategoryRoadmapDTO]

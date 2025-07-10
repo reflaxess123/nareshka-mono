@@ -2,14 +2,16 @@
 
 from datetime import datetime
 from decimal import Decimal
-from typing import List, Optional, Dict, Any
+from typing import Any, Dict, List, Optional
+
 from pydantic import BaseModel
 
-from ...domain.entities.enums import CardState
+from app.domain.entities.enums import CardState
 
 
 class TheoryCardResponse(BaseModel):
     """Ответ с информацией о теоретической карточке"""
+
     id: str
     ankiGuid: str
     cardType: str
@@ -22,13 +24,14 @@ class TheoryCardResponse(BaseModel):
     orderIndex: int = 0
     createdAt: datetime
     updatedAt: datetime
-    
+
     class Config:
         from_attributes = True
 
 
 class UserTheoryProgressResponse(BaseModel):
     """Ответ с информацией о прогрессе изучения карточки"""
+
     id: str
     userId: int
     cardId: str
@@ -43,31 +46,35 @@ class UserTheoryProgressResponse(BaseModel):
     lastReviewDate: Optional[datetime] = None
     createdAt: datetime
     updatedAt: datetime
-    
+
     class Config:
         from_attributes = True
 
 
 class TheoryCardWithProgressResponse(TheoryCardResponse):
     """Ответ с информацией о теоретической карточке и прогрессе пользователя"""
+
     progress: Optional[UserTheoryProgressResponse] = None
 
 
 class ProgressAction(BaseModel):
     """Действие для обновления прогресса"""
+
     action: str  # "increment" или "decrement"
 
 
 class ReviewRating(BaseModel):
     """Оценка повторения карточки"""
+
     rating: str  # "again", "hard", "good", "easy"
 
 
 class TheoryCardsListResponse(BaseModel):
     """Ответ со списком теоретических карточек"""
+
     cards: List[TheoryCardResponse]
     pagination: Dict[str, Any]
-    
+
     @classmethod
     def create(cls, cards: List[TheoryCardResponse], total: int, page: int, limit: int):
         """Создание ответа со списком карточек"""
@@ -80,13 +87,14 @@ class TheoryCardsListResponse(BaseModel):
                 "totalCount": total,
                 "totalPages": total_pages,
                 "hasNextPage": page < total_pages,
-                "hasPrevPage": page > 1
-            }
+                "hasPrevPage": page > 1,
+            },
         )
 
 
 class TheoryCategoryResponse(BaseModel):
     """Ответ с информацией о категории"""
+
     name: str
     subCategories: List[Dict[str, Any]] = []
     totalCards: int = 0
@@ -94,16 +102,19 @@ class TheoryCategoryResponse(BaseModel):
 
 class TheoryCategoriesResponse(BaseModel):
     """Ответ со списком категорий"""
+
     categories: List[Dict[str, Any]]
 
 
 class TheorySubcategoriesResponse(BaseModel):
     """Ответ со списком подкатегорий"""
+
     subcategories: List[str]
 
 
 class TheoryStatsResponse(BaseModel):
     """Ответ со статистикой изучения теории"""
+
     totalCards: int
     studiedCards: int
     dueCards: int
@@ -113,6 +124,7 @@ class TheoryStatsResponse(BaseModel):
 
 class CardStatsResponse(BaseModel):
     """Ответ со статистикой по конкретной карточке"""
+
     cardId: str
     totalReviews: int
     correctReviews: int
@@ -125,11 +137,13 @@ class CardStatsResponse(BaseModel):
 
 class CardIntervalsResponse(BaseModel):
     """Ответ с интервалами повторения карточки"""
+
     cardId: str
     intervals: List[Dict[str, Any]]
 
 
 class DueCardsResponse(BaseModel):
     """Ответ с карточками для повторения"""
+
     cards: List[TheoryCardResponse]
-    total: int 
+    total: int

@@ -1,42 +1,44 @@
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Request, status, BackgroundTasks
 
-from app.application.services.code_editor_service import CodeEditorService
-from app.application.dto.code_editor_dto import (
-    SupportedLanguageResponseDTO,
-    CodeExecutionRequestDTO,
-    CodeExecutionResponseDTO,
-    UserCodeSolutionCreateDTO,
-    UserCodeSolutionUpdateDTO,
-    UserCodeSolutionResponseDTO,
-    ExecutionStatsDTO,
-    TestCaseResponseDTO,
-    TestCasesResponseDTO,
-    ValidationRequestDTO,
-    ValidationResultDTO
-)
-from ...shared.dependencies import get_current_user_optional, get_current_user_required
-from app.shared.dependencies import get_code_editor_service
-from app.infrastructure.database.connection import get_db
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
+from app.application.dto.code_editor_dto import (
+    CodeExecutionRequestDTO,
+    CodeExecutionResponseDTO,
+    ExecutionStatsDTO,
+    SupportedLanguageResponseDTO,
+    TestCasesResponseDTO,
+    UserCodeSolutionCreateDTO,
+    UserCodeSolutionResponseDTO,
+    UserCodeSolutionUpdateDTO,
+    ValidationRequestDTO,
+    ValidationResultDTO,
+)
+from app.application.services.code_editor_service import CodeEditorService
+from app.infrastructure.database.connection import get_db
+from app.shared.dependencies import (
+    get_code_editor_service,
+    get_current_user_optional,
+    get_current_user_required,
+)
 
 router = APIRouter()
 
 
 @router.get("/languages", response_model=List[SupportedLanguageResponseDTO])
 async def get_supported_languages(
-    code_editor_service: CodeEditorService = Depends(get_code_editor_service)
+    code_editor_service: CodeEditorService = Depends(get_code_editor_service),
 ):
     """Получение списка поддерживаемых языков программирования"""
-    
+
     try:
         languages = await code_editor_service.get_supported_languages()
         return languages
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get supported languages: {str(e)}"
+            detail=f"Failed to get supported languages: {str(e)}",
         )
 
 
@@ -47,29 +49,26 @@ async def execute_code(
     user_request: Request,
     db: Session = Depends(get_db),
     code_editor_service: CodeEditorService = Depends(get_code_editor_service),
-    user = Depends(get_current_user_optional)
+    user=Depends(get_current_user_optional),
 ):
     """Выполнение кода в изолированной среде"""
-    
+
     # Пользователь получен через DI (может быть None для анонимных)
     user_id = user.id if user else None
-    
+
     try:
         result = await code_editor_service.execute_code(request, user_id)
-        
+
         # TODO: Добавить фоновую задачу для выполнения кода
         # background_tasks.add_task(_execute_code_background, result.id)
-        
+
         return result
     except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to execute code: {str(e)}"
+            detail=f"Failed to execute code: {str(e)}",
         )
 
 
@@ -79,25 +78,22 @@ async def get_execution_result(
     user_request: Request,
     db: Session = Depends(get_db),
     code_editor_service: CodeEditorService = Depends(get_code_editor_service),
-    user = Depends(get_current_user_optional)
+    user=Depends(get_current_user_optional),
 ):
     """Получение результата выполнения кода"""
-    
+
     # Пользователь получен через DI (может быть None для анонимных)
     user_id = user.id if user else None
-    
+
     try:
         result = await code_editor_service.get_execution_result(execution_id, user_id)
         return result
     except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get execution result: {str(e)}"
+            detail=f"Failed to get execution result: {str(e)}",
         )
 
 
@@ -109,19 +105,21 @@ async def get_user_executions(
     blockId: Optional[str] = None,
     limit: int = 20,
     offset: int = 0,
-    user = Depends(get_current_user_required)
+    user=Depends(get_current_user_required),
 ):
     """Получение истории выполнений пользователя"""
-    
+
     # Пользователь получен через DI (обязательно авторизован)
-    
+
     try:
-        executions = await code_editor_service.get_user_executions(user.id, blockId, limit, offset)
+        executions = await code_editor_service.get_user_executions(
+            user.id, blockId, limit, offset
+        )
         return executions
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get user executions: {str(e)}"
+            detail=f"Failed to get user executions: {str(e)}",
         )
 
 
@@ -131,24 +129,21 @@ async def save_solution(
     user_request: Request,
     db: Session = Depends(get_db),
     code_editor_service: CodeEditorService = Depends(get_code_editor_service),
-    user = Depends(get_current_user_required)
+    user=Depends(get_current_user_required),
 ):
     """Сохранение решения пользователя"""
-    
+
     # Пользователь получен через DI (обязательно авторизован)
-    
+
     try:
         result = await code_editor_service.save_solution(solution, user.id)
         return result
     except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to save solution: {str(e)}"
+            detail=f"Failed to save solution: {str(e)}",
         )
 
 
@@ -158,19 +153,19 @@ async def get_block_solutions(
     user_request: Request,
     db: Session = Depends(get_db),
     code_editor_service: CodeEditorService = Depends(get_code_editor_service),
-    user = Depends(get_current_user_required)
+    user=Depends(get_current_user_required),
 ):
     """Получение решений пользователя для конкретного блока"""
-    
+
     # Пользователь получен через DI (обязательно авторизован)
-    
+
     try:
         solutions = await code_editor_service.get_block_solutions(user.id, block_id)
         return solutions
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get block solutions: {str(e)}"
+            detail=f"Failed to get block solutions: {str(e)}",
         )
 
 
@@ -181,24 +176,23 @@ async def update_solution(
     user_request: Request,
     db: Session = Depends(get_db),
     code_editor_service: CodeEditorService = Depends(get_code_editor_service),
-    user = Depends(get_current_user_required)
+    user=Depends(get_current_user_required),
 ):
     """Обновление решения пользователя"""
-    
+
     # Пользователь получен через DI (обязательно авторизован)
-    
+
     try:
-        result = await code_editor_service.update_solution(solution_id, user.id, solution_update)
+        result = await code_editor_service.update_solution(
+            solution_id, user.id, solution_update
+        )
         return result
     except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to update solution: {str(e)}"
+            detail=f"Failed to update solution: {str(e)}",
         )
 
 
@@ -207,19 +201,19 @@ async def get_execution_stats(
     user_request: Request,
     db: Session = Depends(get_db),
     code_editor_service: CodeEditorService = Depends(get_code_editor_service),
-    user = Depends(get_current_user_required)
+    user=Depends(get_current_user_required),
 ):
     """Получение статистики выполнения кода пользователя"""
-    
+
     # Пользователь получен через DI (обязательно авторизован)
-    
+
     try:
         stats = await code_editor_service.get_execution_stats(user.id)
         return stats
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get execution stats: {str(e)}"
+            detail=f"Failed to get execution stats: {str(e)}",
         )
 
 
@@ -229,31 +223,31 @@ async def get_test_cases(
     user_request: Request,
     db: Session = Depends(get_db),
     code_editor_service: CodeEditorService = Depends(get_code_editor_service),
-    user = Depends(get_current_user_optional)
+    user=Depends(get_current_user_optional),
 ):
     """Получение тест-кейсов для блока"""
-    
+
     # Пользователь получен через DI (может быть None)
     user_id = user.id if user else None
-    
+
     try:
         test_cases = await code_editor_service.get_test_cases(block_id, user_id)
-        
+
         total_tests = len(test_cases)
         public_tests = sum(1 for tc in test_cases if tc.isPublic)
         hidden_tests = total_tests - public_tests
-        
+
         return TestCasesResponseDTO(
             blockId=block_id,
             testCases=test_cases,
             totalTests=total_tests,
             publicTests=public_tests,
-            hiddenTests=hidden_tests
+            hiddenTests=hidden_tests,
         )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get test cases: {str(e)}"
+            detail=f"Failed to get test cases: {str(e)}",
         )
 
 
@@ -265,32 +259,31 @@ async def validate_solution(
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     code_editor_service: CodeEditorService = Depends(get_code_editor_service),
-    user = Depends(get_current_user_required)
+    user=Depends(get_current_user_required),
 ):
     """Валидация решения против тест-кейсов"""
-    
+
     # Пользователь получен через DI (обязательно авторизован)
-    
+
     try:
-        result = await code_editor_service.validate_solution(block_id, validation_request, user.id)
-        
+        result = await code_editor_service.validate_solution(
+            block_id, validation_request, user.id
+        )
+
         # TODO: Записать результаты валидации в прогресс пользователя
         # background_tasks.add_task(_record_validation_progress, user.id, block_id, result)
-        
+
         return result
     except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to validate solution: {str(e)}"
+            detail=f"Failed to validate solution: {str(e)}",
         )
 
 
 @router.get("/health")
 async def health_check():
     """Проверка работоспособности Code Editor API"""
-    return {"status": "healthy", "module": "code_editor"} 
+    return {"status": "healthy", "module": "code_editor"}

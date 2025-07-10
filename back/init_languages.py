@@ -9,8 +9,8 @@ import uuid
 from sqlalchemy.orm import Session
 
 from app.infrastructure.database.connection import engine
-from app.infrastructure.models.enums import CodeLanguage
 from app.infrastructure.models.code_execution_models import SupportedLanguage
+from app.infrastructure.models.enums import CodeLanguage
 
 # Конфигурация поддерживаемых языков
 SUPPORTED_LANGUAGES = [
@@ -25,7 +25,7 @@ SUPPORTED_LANGUAGES = [
         "runCommand": "python main.py",
         "timeoutSeconds": 10,
         "memoryLimitMB": 128,
-        "isEnabled": True
+        "isEnabled": True,
     },
     {
         "id": str(uuid.uuid4()),
@@ -38,7 +38,7 @@ SUPPORTED_LANGUAGES = [
         "runCommand": "node main.js",
         "timeoutSeconds": 10,
         "memoryLimitMB": 128,
-        "isEnabled": True
+        "isEnabled": True,
     },
     {
         "id": str(uuid.uuid4()),
@@ -51,7 +51,7 @@ SUPPORTED_LANGUAGES = [
         "runCommand": "node main.js",
         "timeoutSeconds": 15,
         "memoryLimitMB": 256,
-        "isEnabled": True
+        "isEnabled": True,
     },
     {
         "id": str(uuid.uuid4()),
@@ -64,7 +64,7 @@ SUPPORTED_LANGUAGES = [
         "runCommand": "java Main",
         "timeoutSeconds": 15,
         "memoryLimitMB": 256,
-        "isEnabled": True
+        "isEnabled": True,
     },
     {
         "id": str(uuid.uuid4()),
@@ -77,7 +77,7 @@ SUPPORTED_LANGUAGES = [
         "runCommand": "./main",
         "timeoutSeconds": 10,
         "memoryLimitMB": 128,
-        "isEnabled": True
+        "isEnabled": True,
     },
     {
         "id": str(uuid.uuid4()),
@@ -90,7 +90,7 @@ SUPPORTED_LANGUAGES = [
         "runCommand": "./main",
         "timeoutSeconds": 10,
         "memoryLimitMB": 128,
-        "isEnabled": True
+        "isEnabled": True,
     },
     {
         "id": str(uuid.uuid4()),
@@ -103,7 +103,7 @@ SUPPORTED_LANGUAGES = [
         "runCommand": "go run main.go",
         "timeoutSeconds": 10,
         "memoryLimitMB": 128,
-        "isEnabled": True
+        "isEnabled": True,
     },
     {
         "id": str(uuid.uuid4()),
@@ -116,7 +116,7 @@ SUPPORTED_LANGUAGES = [
         "runCommand": "./main",
         "timeoutSeconds": 15,
         "memoryLimitMB": 256,
-        "isEnabled": True
+        "isEnabled": True,
     },
     {
         "id": str(uuid.uuid4()),
@@ -129,7 +129,7 @@ SUPPORTED_LANGUAGES = [
         "runCommand": "php main.php",
         "timeoutSeconds": 10,
         "memoryLimitMB": 128,
-        "isEnabled": True
+        "isEnabled": True,
     },
     {
         "id": str(uuid.uuid4()),
@@ -142,8 +142,8 @@ SUPPORTED_LANGUAGES = [
         "runCommand": "ruby main.rb",
         "timeoutSeconds": 10,
         "memoryLimitMB": 128,
-        "isEnabled": True
-    }
+        "isEnabled": True,
+    },
 ]
 
 
@@ -158,10 +158,14 @@ def init_languages():
             # Проверяем, есть ли уже языки в БД
             existing_languages = db.query(SupportedLanguage).all()
             if existing_languages:
-                print(f"ℹ️  Найдено {len(existing_languages)} существующих языков в базе данных")
+                print(
+                    f"ℹ️  Найдено {len(existing_languages)} существующих языков в базе данных"
+                )
 
                 # Спрашиваем пользователя, нужно ли перезаписать
-                response = input("Хотите перезаписать существующие данные? (y/N): ").lower()
+                response = input(
+                    "Хотите перезаписать существующие данные? (y/N): "
+                ).lower()
                 if response != "y":
                     print("❌ Операция отменена")
                     return
@@ -181,7 +185,9 @@ def init_languages():
             # Сохраняем изменения
             db.commit()
 
-            print(f"\n✅ Успешно инициализировано {languages_added} языков программирования!")
+            print(
+                f"\n✅ Успешно инициализировано {languages_added} языков программирования!"
+            )
             print("\n📋 Добавленные языки:")
 
             # Выводим список добавленных языков
@@ -189,10 +195,14 @@ def init_languages():
                 status = "🟢" if lang["isEnabled"] else "🔴"
                 print(f"  {status} {lang['name']} v{lang['version']}")
                 print(f"     Docker: {lang['dockerImage']}")
-                print(f"     Timeout: {lang['timeoutSeconds']}s, Memory: {lang['memoryLimitMB']}MB")
+                print(
+                    f"     Timeout: {lang['timeoutSeconds']}s, Memory: {lang['memoryLimitMB']}MB"
+                )
                 print()
 
-            print("🎉 Инициализация завершена! Теперь можно использовать редактор кода.")
+            print(
+                "🎉 Инициализация завершена! Теперь можно использовать редактор кода."
+            )
 
         except Exception as e:
             print(f"❌ Ошибка при инициализации языков: {e}")
@@ -205,9 +215,11 @@ def update_language_config(language_name: str, **updates):
 
     with Session(engine) as db:
         try:
-            language = db.query(SupportedLanguage).filter(
-                SupportedLanguage.name == language_name
-            ).first()
+            language = (
+                db.query(SupportedLanguage)
+                .filter(SupportedLanguage.name == language_name)
+                .first()
+            )
 
             if not language:
                 print(f"❌ Язык '{language_name}' не найден")
@@ -260,9 +272,11 @@ def toggle_language(language_name: str):
     """Включение/выключение языка"""
 
     with Session(engine) as db:
-        language = db.query(SupportedLanguage).filter(
-            SupportedLanguage.name == language_name
-        ).first()
+        language = (
+            db.query(SupportedLanguage)
+            .filter(SupportedLanguage.name == language_name)
+            .first()
+        )
 
         if not language:
             print(f"❌ Язык '{language_name}' не найден")
@@ -279,10 +293,16 @@ def toggle_language(language_name: str):
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("📖 Использование:")
-        print("  python init_languages.py init                    # Инициализация языков")
+        print(
+            "  python init_languages.py init                    # Инициализация языков"
+        )
         print("  python init_languages.py list                    # Список языков")
-        print("  python init_languages.py toggle <name>           # Включить/выключить язык")
-        print("  python init_languages.py update <name> key=value # Обновить конфигурацию")
+        print(
+            "  python init_languages.py toggle <name>           # Включить/выключить язык"
+        )
+        print(
+            "  python init_languages.py update <name> key=value # Обновить конфигурацию"
+        )
         sys.exit(1)
 
     command = sys.argv[1]

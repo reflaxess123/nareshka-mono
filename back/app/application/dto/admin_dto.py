@@ -1,17 +1,17 @@
 """DTO для административных операций"""
 
-from datetime import datetime
-from typing import List, Optional, Dict
-from pydantic import BaseModel, EmailStr
+from typing import Dict, List, Optional
+
+from pydantic import EmailStr
 
 from .base_dto import (
-    IdentifiedResponse, 
-    CreateRequest, 
-    UpdateRequest, 
-    BulkActionRequest, 
+    BaseResponse,
+    BulkActionRequest,
     BulkActionResponse,
+    CreateRequest,
+    IdentifiedResponse,
     PaginatedResponse,
-    BaseResponse
+    UpdateRequest,
 )
 
 
@@ -172,4 +172,4 @@ PaginatedTheoryCardsResponse = PaginatedResponse[AdminTheoryCardResponse]
 
 class HealthResponse(BaseResponse):
     status: str
-    module: str 
+    module: str

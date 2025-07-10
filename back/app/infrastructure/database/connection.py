@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-from ...config import new_settings
+from app.config import new_settings
 
 # Создание engine с новой конфигурацией
 engine = create_engine(
@@ -13,7 +13,7 @@ engine = create_engine(
     pool_size=new_settings.database.pool_size,
     max_overflow=new_settings.database.max_overflow,
     pool_pre_ping=True,
-    pool_recycle=3600
+    pool_recycle=3600,
 )
 
 # Создание сессии
@@ -22,6 +22,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 # Базовая модель
 Base = declarative_base()
 
+
 # Зависимость для получения сессии базы данных
 def get_db():
     """Получение сессии базы данных"""
@@ -29,4 +30,4 @@ def get_db():
     try:
         yield db
     finally:
-        db.close() 
+        db.close()

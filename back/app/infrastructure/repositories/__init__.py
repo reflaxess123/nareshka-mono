@@ -11,13 +11,13 @@ from .sqlalchemy_theory_repository import SQLAlchemyTheoryRepository
 from .sqlalchemy_user_repository import SQLAlchemyUserRepository
 
 __all__ = [
-    'SQLAlchemyAdminRepository',
-    'SQLAlchemyCodeEditorRepository',
-    'SQLAlchemyContentRepository',
-    'SqlAlchemyMindMapRepository',
-    'SQLAlchemyProgressRepository',
-    'SQLAlchemyStatsRepository',
-    'SQLAlchemyTaskRepository',
-    'SQLAlchemyTheoryRepository',
-    'SQLAlchemyUserRepository'
-] 
+    "SQLAlchemyAdminRepository",
+    "SQLAlchemyCodeEditorRepository",
+    "SQLAlchemyContentRepository",
+    "SqlAlchemyMindMapRepository",
+    "SQLAlchemyProgressRepository",
+    "SQLAlchemyStatsRepository",
+    "SQLAlchemyTaskRepository",
+    "SQLAlchemyTheoryRepository",
+    "SQLAlchemyUserRepository",
+]

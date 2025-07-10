@@ -9,6 +9,7 @@ from app.config.new_settings import legacy_settings as settings
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 def check_database_connection():
     """Проверка подключения к базе данных и просмотр таблиц"""
 
@@ -28,8 +29,8 @@ def check_database_connection():
 
         # Получаем список всех схем
         cursor.execute("""
-            SELECT schema_name 
-            FROM information_schema.schemata 
+            SELECT schema_name
+            FROM information_schema.schemata
             WHERE schema_name NOT IN ('information_schema', 'pg_catalog', 'pg_toast')
             ORDER BY schema_name;
         """)
@@ -39,8 +40,8 @@ def check_database_connection():
 
         # Проверяем все таблицы во всех схемах
         cursor.execute("""
-            SELECT table_schema, table_name 
-            FROM information_schema.tables 
+            SELECT table_schema, table_name
+            FROM information_schema.tables
             WHERE table_schema NOT IN ('information_schema', 'pg_catalog', 'pg_toast')
             ORDER BY table_schema, table_name;
         """)
@@ -61,7 +62,9 @@ def check_database_connection():
                 cursor.execute(query)
                 count = cursor.fetchone()[0]
 
-                full_name = f"{schema}.{table_name}" if schema != "public" else table_name
+                full_name = (
+                    f"{schema}.{table_name}" if schema != "public" else table_name
+                )
                 logger.info(f"  📄 {full_name} - {count} записей")
 
                 if count > 0:
@@ -70,29 +73,38 @@ def check_database_connection():
                     # Если в таблице есть данные, покажем примеры
                     if "user" in table_name.lower():
                         try:
-                            cursor.execute(f'{query.replace("COUNT(*)", "id, email")} LIMIT 3')
+                            cursor.execute(
+                                f'{query.replace("COUNT(*)", "id, email")} LIMIT 3'
+                            )
                             users = cursor.fetchall()
                             logger.info(f"    👥 Пользователи: {users}")
                         except:
                             try:
-                                cursor.execute(f'{query.replace("COUNT(*)", "*")} LIMIT 1')
+                                cursor.execute(
+                                    f'{query.replace("COUNT(*)", "*")} LIMIT 1'
+                                )
                                 sample = cursor.fetchall()
                                 logger.info(f"    📝 Пример данных: {sample}")
                             except:
                                 pass
 
                     # Покажем структуру таблицы
-                    cursor.execute("""
-                        SELECT column_name, data_type 
-                        FROM information_schema.columns 
-                        WHERE table_schema = %s AND table_name = %s 
+                    cursor.execute(
+                        """
+                        SELECT column_name, data_type
+                        FROM information_schema.columns
+                        WHERE table_schema = %s AND table_name = %s
                         ORDER BY ordinal_position
-                    """, (schema, table_name))
+                    """,
+                        (schema, table_name),
+                    )
                     columns = cursor.fetchall()
                     logger.info(f"    📝 Колонки: {[col[0] for col in columns[:10]]}")
 
             except Exception as e:
-                logger.warning(f"    ❌ Ошибка при работе с таблицей {schema}.{table_name}: {e}")
+                logger.warning(
+                    f"    ❌ Ошибка при работе с таблицей {schema}.{table_name}: {e}"
+                )
 
         logger.info(f"\n🎯 Таблицы с данными: {len(tables_with_data)}")
         for table_name, count in tables_with_data:
@@ -103,11 +115,17 @@ def check_database_connection():
         for schema, table_name in all_tables:
             if "user" in table_name.lower():
                 try:
-                    full_table = f'"{schema}"."{table_name}"' if schema != "public" else f'"{table_name}"'
+                    full_table = (
+                        f'"{schema}"."{table_name}"'
+                        if schema != "public"
+                        else f'"{table_name}"'
+                    )
                     cursor.execute(f"SELECT COUNT(*) FROM {full_table}")
                     count = cursor.fetchone()[0]
                     if count > 0:
-                        logger.info(f"  🔥 НАЙДЕНЫ ПОЛЬЗОВАТЕЛИ в {schema}.{table_name}: {count} записей!")
+                        logger.info(
+                            f"  🔥 НАЙДЕНЫ ПОЛЬЗОВАТЕЛИ в {schema}.{table_name}: {count} записей!"
+                        )
                         cursor.execute(f"SELECT * FROM {full_table} LIMIT 2")
                         users = cursor.fetchall()
                         logger.info(f"    Примеры: {users}")
@@ -119,6 +137,7 @@ def check_database_connection():
 
     except Exception as e:
         logger.error(f"❌ Ошибка подключения к базе данных: {e}")
+
 
 if __name__ == "__main__":
     check_database_connection()

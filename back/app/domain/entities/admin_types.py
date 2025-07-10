@@ -2,11 +2,13 @@
 
 from datetime import datetime
 from typing import Dict, List, Optional
+
 from pydantic import BaseModel
 
 
 class SystemStats(BaseModel):
     """Статистика системы"""
+
     users: Dict[str, int]
     content: Dict[str, int]
     progress: Dict[str, int]
@@ -14,6 +16,7 @@ class SystemStats(BaseModel):
 
 class UserStats(BaseModel):
     """Статистика пользователя"""
+
     id: int
     email: str
     role: str
@@ -25,6 +28,7 @@ class UserStats(BaseModel):
 
 class ContentStats(BaseModel):
     """Статистика контента"""
+
     total_files: int
     total_blocks: int
     files_by_category: Dict[str, int]
@@ -33,6 +37,7 @@ class ContentStats(BaseModel):
 
 class TheoryStats(BaseModel):
     """Статистика теории"""
+
     total_cards: int
     cards_by_category: Dict[str, int]
     cards_by_deck: Dict[str, int]
@@ -40,6 +45,7 @@ class TheoryStats(BaseModel):
 
 class AdminUser(BaseModel):
     """Admin представление пользователя"""
+
     id: int
     email: str
     role: str
@@ -49,6 +55,7 @@ class AdminUser(BaseModel):
 
 class AdminContentFile(BaseModel):
     """Admin представление файла контента"""
+
     id: str
     webdav_path: str
     main_category: str
@@ -60,6 +67,7 @@ class AdminContentFile(BaseModel):
 
 class AdminContentBlock(BaseModel):
     """Admin представление блока контента"""
+
     id: str
     file_id: str
     path_titles: List[str]
@@ -78,6 +86,7 @@ class AdminContentBlock(BaseModel):
 
 class AdminTheoryCard(BaseModel):
     """Admin представление карточки теории"""
+
     id: str
     anki_guid: Optional[str] = None
     card_type: str
@@ -94,6 +103,7 @@ class AdminTheoryCard(BaseModel):
 
 class BulkDeleteResult(BaseModel):
     """Результат массового удаления"""
+
     deleted_count: int
     error_count: int
-    errors: List[str] = [] 
+    errors: List[str] = []
