@@ -10,8 +10,13 @@ from typing import Optional, List, Dict, Any
 from datetime import datetime
 
 from .robust_client import get_robust_client
+from tqdm import tqdm  # Добавляем отображение прогресса
 
 logger = logging.getLogger(__name__)
+
+# Увеличиваем количество соединений и размер чанка для радикального ускорения
+MAX_WORKERS = 32  # Было 8
+PART_SIZE = 4 * 1024 * 1024  # 4 МБ вместо 512 КБ
 
 class SimpleVideoDownloader:
     """Упрощенный класс для скачивания видео"""
@@ -48,14 +53,79 @@ class SimpleVideoDownloader:
                 # Определяем путь для сохранения
                 if custom_path:
                     save_path = Path(custom_path)
+                    display_name = Path(custom_path).name
                 else:
                     filename = self._generate_filename(message)
                     save_path = self.download_path / filename
-                
-                # Скачиваем файл
+                    display_name = filename
+
+                # Скачиваем файл с прогресс-баром
                 logger.info(f"Скачивание медиа файла: {save_path}")
+
+                # Используем message_id для распределения строк прогресса, чтобы не мешать друг другу
+                bar_position = message.id % 10  # до 10 одновременных строк
+
+                with tqdm(
+                    total=0,
+                    unit="B",
+                    unit_scale=True,
+                    unit_divisor=1024,
+                    desc=display_name,
+                    leave=False,
+                    position=bar_position,
+                ) as progress_bar:
+
+                    def _progress(current: int, total: int):  # noqa: ANN001
+                        # Устанавливаем общий размер, когда станет известен
+                        if total and progress_bar.total == 0:
+                            progress_bar.total = total
+                        # Обновляем дельту, а не абсолютное значение
+                        progress_bar.update(current - progress_bar.n)
+
+                    # Формируем kwargs только если параметры поддерживаются текущей версией Telethon
+                    import inspect
+
+                    dm_sig = inspect.signature(client._client.download_media)
+                    extra_kwargs = {}
+                    if 'part_size' in dm_sig.parameters:
+                        extra_kwargs['part_size'] = PART_SIZE
+                    if 'workers' in dm_sig.parameters:
+                        extra_kwargs['workers'] = MAX_WORKERS
+
+                    # Пытаемся использовать download_file с крупными блоками (1 МБ) — быстрее
+                    try:
+                        if hasattr(message.media, 'document') and message.media.document:
+                            # Собираем kwargs с учётом поддержки параметров текущей версии Telethon
+                            df_sig = inspect.signature(client._client.download_file)
+                            df_kwargs = {
+                                "file": save_path,
+                                "part_size_kb": 1024,  # мелкие чанки для частого прогресса
+                                "progress_callback": _progress,
+                            }
+                            if "threads" in df_sig.parameters:
+                                df_kwargs["threads"] = 16
+
+                            file_path = await client._client.download_file(
+                                message.media.document,
+                                **df_kwargs,
+                            )
+                        else:
+                            # Fallback для других типов медиа
+                            file_path = await client._client.download_media(
+                                message.media,
+                                file=save_path,
+                                progress_callback=_progress,
+                            )
+                    except Exception as dl_e:
+                        # При ошибке пробуем стандартный способ
+                        logger.warning(f"download_file не удался ({dl_e}), пробую download_media")
+                        file_path = await client._client.download_media(
+                            message.media,
+                            file=save_path,
+                            progress_callback=_progress,
+                        )
                 
-                file_path = await client._client.download_media(message.media, file=save_path)
+                logger.info(f"Файл скачан: {file_path}")
                 
                 result = {
                     "success": True,
@@ -65,7 +135,6 @@ class SimpleVideoDownloader:
                     "media_type": str(type(message.media).__name__)
                 }
                 
-                logger.info(f"Файл скачан: {file_path}")
                 return result
                 
             except Exception as e:
