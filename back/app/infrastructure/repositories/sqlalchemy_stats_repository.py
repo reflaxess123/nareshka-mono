@@ -33,7 +33,9 @@ class SQLAlchemyStatsRepository(StatsRepository):
     def __init__(self, db_session: Session):
         self.db_session = db_session
 
-    async def get_user_stats_overview(self, user_id: int) -> UserStatsOverview:
+    async def get_user_stats_overview(  # noqa: PLR0912, PLR0915
+        self, user_id: int
+    ) -> UserStatsOverview:
         """Получение общей статистики пользователя"""
 
         # Получаем статистику по контенту
@@ -93,19 +95,14 @@ class SQLAlchemyStatsRepository(StatsRepository):
                 content_stats[category]["subCategories"][sub_category]["completed"] += 1
 
         # Вычисляем проценты для контента
-        for category in content_stats:
-            if content_stats[category]["total"] > 0:
-                content_stats[category]["percentage"] = round(
-                    (
-                        content_stats[category]["completed"]
-                        / content_stats[category]["total"]
-                    )
-                    * 100,
+        for category_data in content_stats.values():
+            if category_data["total"] > 0:
+                category_data["percentage"] = round(
+                    (category_data["completed"] / category_data["total"]) * 100,
                     2,
                 )
 
-            for sub_category in content_stats[category]["subCategories"]:
-                sub_cat = content_stats[category]["subCategories"][sub_category]
+            for sub_cat in category_data["subCategories"].values():
                 if sub_cat["total"] > 0:
                     sub_cat["percentage"] = round(
                         (sub_cat["completed"] / sub_cat["total"]) * 100, 2
@@ -166,19 +163,14 @@ class SQLAlchemyStatsRepository(StatsRepository):
                 theory_stats[category]["subCategories"][sub_category]["completed"] += 1
 
         # Вычисляем проценты для теории
-        for category in theory_stats:
-            if theory_stats[category]["total"] > 0:
-                theory_stats[category]["percentage"] = round(
-                    (
-                        theory_stats[category]["completed"]
-                        / theory_stats[category]["total"]
-                    )
-                    * 100,
+        for category_data in theory_stats.values():
+            if category_data["total"] > 0:
+                category_data["percentage"] = round(
+                    (category_data["completed"] / category_data["total"]) * 100,
                     2,
                 )
 
-            for sub_category in theory_stats[category]["subCategories"]:
-                sub_cat = theory_stats[category]["subCategories"][sub_category]
+            for sub_cat in category_data["subCategories"].values():
                 if sub_cat["total"] > 0:
                     sub_cat["percentage"] = round(
                         (sub_cat["completed"] / sub_cat["total"]) * 100, 2
@@ -291,8 +283,7 @@ class SQLAlchemyStatsRepository(StatsRepository):
             categories[category].subCategories[sub_category].blocks.append(block_stats)
 
         # Вычисляем проценты и средние значения
-        for category in categories:
-            cat_data = categories[category]
+        for cat_data in categories.values():
             if cat_data.total > 0:
                 cat_data.percentage = round((cat_data.solved / cat_data.total) * 100, 2)
 
@@ -305,8 +296,7 @@ class SQLAlchemyStatsRepository(StatsRepository):
                     category_solve_count / cat_data.total, 2
                 )
 
-            for sub_category in cat_data.subCategories:
-                sub_cat = cat_data.subCategories[sub_category]
+            for sub_cat in cat_data.subCategories.values():
                 if sub_cat.total > 0:
                     sub_cat.percentage = round(
                         (sub_cat.solved / sub_cat.total) * 100, 2
@@ -405,8 +395,7 @@ class SQLAlchemyStatsRepository(StatsRepository):
             categories[category].subCategories[sub_category].cards.append(card_stats)
 
         # Вычисляем проценты и средние значения
-        for category in categories:
-            cat_data = categories[category]
+        for cat_data in categories.values():
             if cat_data.total > 0:
                 cat_data.percentage = round(
                     (cat_data.reviewed / cat_data.total) * 100, 2
@@ -421,8 +410,7 @@ class SQLAlchemyStatsRepository(StatsRepository):
                     category_review_count / cat_data.total, 2
                 )
 
-            for sub_category in cat_data.subCategories:
-                sub_cat = cat_data.subCategories[sub_category]
+            for sub_cat in cat_data.subCategories.values():
                 if sub_cat.total > 0:
                     sub_cat.percentage = round(
                         (sub_cat.reviewed / sub_cat.total) * 100, 2

@@ -38,7 +38,7 @@ async def create_task_attempt(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to create task attempt: {str(e)}",
-        )
+        ) from e
 
 
 @router.get("/user/my/detailed", response_model=UserDetailedProgressResponseDTO)
@@ -58,7 +58,7 @@ async def get_my_detailed_progress(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to get user progress: {str(e)}",
-        )
+        ) from e
 
 
 @router.get("/user/{user_id}/detailed", response_model=UserDetailedProgressResponseDTO)
@@ -85,7 +85,7 @@ async def get_user_detailed_progress(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to get user progress: {str(e)}",
-        )
+        ) from e
 
 
 @router.get("/analytics", response_model=ProgressAnalyticsDTO)
@@ -112,7 +112,7 @@ async def get_progress_analytics(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to get progress analytics: {str(e)}",
-        )
+        ) from e
 
 
 @router.get("/health")

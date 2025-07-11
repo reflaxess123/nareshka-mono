@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 from app.config.new_settings import legacy_settings as settings
 
 # Добавляем импорт всех моделей чтобы alembic видел их
-from app.infrastructure.models import *
+from app.infrastructure.models import *  # noqa: F403
 from app.infrastructure.models import Base
 
 # this is the Alembic Config object, which provides

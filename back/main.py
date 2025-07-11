@@ -9,16 +9,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
-from app.core.error_handlers import register_exception_handlers
-
-# Инициализация логирования перед импортом других модулей
-from app.core.logging import get_logger, init_default_logging
-
-# Инициализируем логирование
-init_default_logging()
-logger = get_logger(__name__)
-
 from app.config import new_settings
+from app.core.error_handlers import register_exception_handlers
+from app.core.logging import get_logger, init_default_logging
 from app.presentation.api.admin_v2 import router as admin_v2_router
 from app.presentation.api.auth_v2 import router as auth_v2_router
 from app.presentation.api.code_editor_v2 import router as code_editor_v2_router
@@ -30,7 +23,10 @@ from app.presentation.api.stats_v2 import router as stats_v2_router
 from app.presentation.api.task_v2 import router as task_v2_router
 from app.presentation.api.theory_v2 import router as theory_v2_router
 
-# Импорты для алиасов совместимости удалены
+# Инициализируем логирование
+init_default_logging()
+logger = get_logger(__name__)
+
 
 # Старые роутеры удалены для полного перехода на новую архитектуру
 

@@ -130,6 +130,13 @@ async def get_current_user_optional(
         return None
 
 
+async def get_current_user_id_optional(
+    user: Optional[User] = Depends(get_current_user_optional),
+) -> Optional[int]:
+    """Получение ID текущего пользователя (опционально)"""
+    return user.id if user else None
+
+
 async def get_current_user_required(
     request: Request, auth_service: AuthService = Depends(get_auth_service)
 ) -> User:
@@ -152,7 +159,7 @@ async def get_current_user_jwt_optional(
     """Получение текущего пользователя из JWT токена (опционально)"""
     try:
         return await auth_service.get_user_by_token(token)
-    except:
+    except Exception:
         return None
 
 

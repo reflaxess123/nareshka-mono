@@ -26,7 +26,7 @@ class TheoryService:
     def __init__(self, theory_repository: TheoryRepository):
         self.theory_repository = theory_repository
 
-    def _calculate_next_review(
+    def _calculate_next_review(  # noqa: PLR0912, PLR0915
         self, progress: UserTheoryProgress, rating: str
     ) -> Tuple[int, Decimal, CardState, int]:
         """Алгоритм интервального повторения (SuperMemo SM-2)"""

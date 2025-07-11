@@ -31,8 +31,7 @@ from app.application.dto.admin_dto import (
 )
 from app.application.services.admin_service import AdminService
 from app.core.exceptions import NotFoundException
-from app.infrastructure.models.user_models import User
-from app.shared.dependencies import get_admin_service, get_current_admin_session
+from app.shared.dependencies import get_admin_service
 
 router = APIRouter(tags=["Admin"])
 
@@ -46,7 +45,6 @@ async def health_check():
 @router.get("/stats", response_model=SystemStatsResponse)
 async def get_system_stats(
     admin_service: AdminService = Depends(get_admin_service),
-    current_user: User = Depends(get_current_admin_session),
 ):
     """Получение системной статистики"""
     stats = await admin_service.get_system_stats()
@@ -64,7 +62,6 @@ async def get_users(
     role: Optional[str] = Query(None, description="Фильтр по роли"),
     search: Optional[str] = Query(None, description="Поиск по email"),
     admin_service: AdminService = Depends(get_admin_service),
-    current_user: User = Depends(get_current_admin_session),
 ):
     """Получение списка пользователей"""
     skip = (page - 1) * limit
@@ -96,7 +93,6 @@ async def get_users(
 async def create_user(
     user_data: CreateUserRequest,
     admin_service: AdminService = Depends(get_admin_service),
-    current_user: User = Depends(get_current_admin_session),
 ):
     """Создание нового пользователя"""
     user = await admin_service.create_user(
@@ -120,7 +116,6 @@ async def update_user(
     user_id: str,
     user_data: UpdateUserRequest,
     admin_service: AdminService = Depends(get_admin_service),
-    current_user: User = Depends(get_current_admin_session),
 ):
     """Обновление пользователя"""
     user = await admin_service.update_user(
@@ -150,7 +145,6 @@ async def update_user(
 async def delete_user(
     user_id: str,
     admin_service: AdminService = Depends(get_admin_service),
-    current_user: User = Depends(get_current_admin_session),
 ):
     """Удаление пользователя"""
     deleted = await admin_service.delete_user(user_id)
@@ -163,7 +157,6 @@ async def delete_user(
 @router.get("/content/stats", response_model=ContentStatsResponse)
 async def get_content_stats(
     admin_service: AdminService = Depends(get_admin_service),
-    current_user: User = Depends(get_current_admin_session),
 ):
     """Получение статистики контента"""
     stats = await admin_service.get_content_stats()
@@ -182,7 +175,6 @@ async def get_content_files(
     category: Optional[str] = Query(None),
     search: Optional[str] = Query(None),
     admin_service: AdminService = Depends(get_admin_service),
-    current_user: User = Depends(get_current_admin_session),
 ):
     """Получение списка файлов контента"""
     skip = (page - 1) * limit
@@ -214,7 +206,6 @@ async def get_content_files(
 async def create_content_file(
     file_data: CreateContentFileRequest,
     admin_service: AdminService = Depends(get_admin_service),
-    current_user: User = Depends(get_current_admin_session),
 ):
     """Создание нового файла контента"""
     try:
@@ -233,7 +224,7 @@ async def create_content_file(
             _count={"blocks": file.blocks_count},
         )
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
 @router.put("/content/files/{file_id}", response_model=AdminContentFileResponse)
@@ -241,7 +232,6 @@ async def update_content_file(
     file_id: str,
     file_data: UpdateContentFileRequest,
     admin_service: AdminService = Depends(get_admin_service),
-    current_user: User = Depends(get_current_admin_session),
 ):
     """Обновление файла контента"""
     try:
@@ -267,14 +257,13 @@ async def update_content_file(
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
 @router.delete("/content/files/{file_id}")
 async def delete_content_file(
     file_id: str,
     admin_service: AdminService = Depends(get_admin_service),
-    current_user: User = Depends(get_current_admin_session),
 ):
     """Удаление файла контента"""
     try:
@@ -286,7 +275,7 @@ async def delete_content_file(
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
 @router.get("/content/blocks", response_model=PaginatedContentBlocksResponse)
@@ -296,7 +285,6 @@ async def get_content_blocks(
     file_id: Optional[str] = Query(None),
     search: Optional[str] = Query(None),
     admin_service: AdminService = Depends(get_admin_service),
-    current_user: User = Depends(get_current_admin_session),
 ):
     """Получение списка блоков контента"""
     try:
@@ -327,14 +315,13 @@ async def get_content_blocks(
             totalPages=(total + limit - 1) // limit if limit > 0 else 0,
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @router.post("/content/blocks", response_model=AdminContentBlockResponse)
 async def create_content_block(
     block_data: CreateContentBlockRequest,
     admin_service: AdminService = Depends(get_admin_service),
-    current_user: User = Depends(get_current_admin_session),
 ):
     """Создание нового блока контента"""
     try:
@@ -361,7 +348,7 @@ async def create_content_block(
             _count={"testCases": block.test_cases_count},
         )
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
 @router.put("/content/blocks/{block_id}", response_model=AdminContentBlockResponse)
@@ -369,7 +356,6 @@ async def update_content_block(
     block_id: str,
     block_data: UpdateContentBlockRequest,
     admin_service: AdminService = Depends(get_admin_service),
-    current_user: User = Depends(get_current_admin_session),
 ):
     """Обновление блока контента"""
     try:
@@ -403,14 +389,13 @@ async def update_content_block(
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
 @router.delete("/content/blocks/{block_id}")
 async def delete_content_block(
     block_id: str,
     admin_service: AdminService = Depends(get_admin_service),
-    current_user: User = Depends(get_current_admin_session),
 ):
     """Удаление блока контента"""
     try:
@@ -422,7 +407,7 @@ async def delete_content_block(
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
 @router.get("/theory/cards", response_model=PaginatedTheoryCardsResponse)
@@ -432,7 +417,6 @@ async def get_theory_cards(
     category: Optional[str] = Query(None),
     search: Optional[str] = Query(None),
     admin_service: AdminService = Depends(get_admin_service),
-    current_user: User = Depends(get_current_admin_session),
 ):
     """Получение списка теоретических карточек"""
     try:
@@ -463,14 +447,13 @@ async def get_theory_cards(
             totalPages=(total + limit - 1) // limit if limit > 0 else 0,
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @router.post("/theory/cards", response_model=AdminTheoryCardResponse)
 async def create_theory_card(
     card_data: CreateTheoryCardRequest,
     admin_service: AdminService = Depends(get_admin_service),
-    current_user: User = Depends(get_current_admin_session),
 ):
     """Создание новой теоретической карточки"""
     try:
@@ -498,7 +481,7 @@ async def create_theory_card(
             order_index=card.order_index,
         )
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
 @router.put("/theory/cards/{card_id}", response_model=AdminTheoryCardResponse)
@@ -506,7 +489,6 @@ async def update_theory_card(
     card_id: str,
     card_data: UpdateTheoryCardRequest,
     admin_service: AdminService = Depends(get_admin_service),
-    current_user: User = Depends(get_current_admin_session),
 ):
     """Обновление теоретической карточки"""
     try:
@@ -543,14 +525,13 @@ async def update_theory_card(
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
 @router.delete("/theory/cards/{card_id}")
 async def delete_theory_card(
     card_id: str,
     admin_service: AdminService = Depends(get_admin_service),
-    current_user: User = Depends(get_current_admin_session),
 ):
     """Удаление теоретической карточки"""
     try:
@@ -564,14 +545,13 @@ async def delete_theory_card(
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
 @router.delete("/content/bulk-delete", response_model=BulkDeleteResponse)
 async def bulk_delete_content(
     delete_data: BulkDeleteRequest,
     admin_service: AdminService = Depends(get_admin_service),
-    current_user: User = Depends(get_current_admin_session),
 ):
     """Массовое удаление контента"""
     try:
@@ -580,14 +560,13 @@ async def bulk_delete_content(
             deleted_count=result.deleted_count, failed_count=result.failed_count
         )
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
 @router.delete("/theory/bulk-delete", response_model=BulkDeleteResponse)
 async def bulk_delete_theory(
     delete_data: BulkDeleteRequest,
     admin_service: AdminService = Depends(get_admin_service),
-    current_user: User = Depends(get_current_admin_session),
 ):
     """Массовое удаление теоретических карточек"""
     try:
@@ -596,4 +575,4 @@ async def bulk_delete_theory(
             deleted_count=result.deleted_count, failed_count=result.failed_count
         )
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e

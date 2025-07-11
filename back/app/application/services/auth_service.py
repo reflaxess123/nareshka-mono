@@ -84,8 +84,8 @@ class AuthService:
             if email is None:
                 raise credentials_exception
             return TokenData(email=email, user_id=user_id)
-        except JWTError:
-            raise credentials_exception
+        except JWTError as e:
+            raise credentials_exception from e
 
     async def authenticate_user(self, email: str, password: str) -> Optional[User]:
         """Аутентификация пользователя"""

@@ -183,12 +183,12 @@ async def list_forum_topics(
                 offset_date=0,
                 offset_id=0,
                 offset_topic=0,
-                limit=args.limit
+                limit=args.limit,
             ))
-            
-            if hasattr(result, 'topics'):
+
+            if hasattr(result, "topics"):
                 for topic in result.topics:
-                    if hasattr(topic, 'title') and hasattr(topic, 'id'):
+                    if hasattr(topic, "title") and hasattr(topic, "id"):
                         msg = (
                             f"topic_id={topic.id} title='{topic.title}' "
                             f"unread={getattr(topic, 'unread_count', 0)} "
@@ -200,7 +200,7 @@ async def list_forum_topics(
 
         except Exception as e:
             logger.error(f"Error getting forum topics: {e}")
-            response.append(TextContent(type="text", text=f"Error: {str(e)}"))
+            response.append(TextContent(type="text", text=f"Error: {e!s}"))
 
     return response
 
@@ -235,7 +235,7 @@ async def list_topic_messages(
             async for message in client.iter_messages(
                 entity=args.dialog_id,
                 limit=args.limit,
-                reply_to=args.topic_id  # Ключевой параметр для фильтрации по теме
+                reply_to=args.topic_id,  # Ключевой параметр для фильтрации по теме
             ):
                 if isinstance(message, custom.Message):
                     if message.text:
@@ -246,13 +246,13 @@ async def list_topic_messages(
                             f"text='{message.text[:200]}{'...' if len(message.text) > 200 else ''}'"
                         )
                         response.append(TextContent(type="text", text=msg_info))
-                        
+
             if not response:
                 response.append(TextContent(type="text", text=f"No messages found in topic {args.topic_id}"))
 
         except Exception as e:
             logger.error(f"Error getting topic messages: {e}")
-            response.append(TextContent(type="text", text=f"Error: {str(e)}"))
+            response.append(TextContent(type="text", text=f"Error: {e!s}"))
 
     return response
 
@@ -283,22 +283,22 @@ async def find_topic_by_name(
                 offset_date=0,
                 offset_id=0,
                 offset_topic=0,
-                limit=100
+                limit=100,
             ))
-            
+
             found_topics = []
-            if hasattr(result, 'topics'):
+            if hasattr(result, "topics"):
                 for topic in result.topics:
-                    if hasattr(topic, 'title') and hasattr(topic, 'id'):
+                    if hasattr(topic, "title") and hasattr(topic, "id"):
                         # Ищем по названию (регистронезависимо)
                         if args.topic_name.lower() in topic.title.lower():
                             found_topics.append({
-                                'id': topic.id,
-                                'title': topic.title,
-                                'unread_count': getattr(topic, 'unread_count', 0),
-                                'top_message': getattr(topic, 'top_message', 0)
+                                "id": topic.id,
+                                "title": topic.title,
+                                "unread_count": getattr(topic, "unread_count", 0),
+                                "top_message": getattr(topic, "top_message", 0),
                             })
-            
+
             if found_topics:
                 for topic in found_topics:
                     msg = (
@@ -311,6 +311,6 @@ async def find_topic_by_name(
 
         except Exception as e:
             logger.error(f"Error finding topic: {e}")
-            response.append(TextContent(type="text", text=f"Error: {str(e)}"))
+            response.append(TextContent(type="text", text=f"Error: {e!s}"))
 
     return response

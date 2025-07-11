@@ -14,8 +14,8 @@ ENV_FILE_PATH = BASE_DIR / ".env"
 # Читаем .env файл
 if ENV_FILE_PATH.exists():
     with open(ENV_FILE_PATH, encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
+        for original_line in f:
+            line = original_line.strip()
             if line and not line.startswith("#") and "=" in line:
                 key, value = line.split("=", 1)
                 os.environ[key] = value
