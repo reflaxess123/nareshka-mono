@@ -52,7 +52,7 @@ class SQLAlchemyContentRepository(ContentRepository):
 
         return files, total
 
-    async def get_content_blocks(
+    async def get_content_blocks(  # noqa: PLR0912
         self,
         page: int = 1,
         limit: int = 10,

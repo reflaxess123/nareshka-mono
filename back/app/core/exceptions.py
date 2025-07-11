@@ -3,6 +3,9 @@
 from enum import Enum
 from typing import Any, Dict, Optional
 
+import redis
+from sqlalchemy.exc import IntegrityError, NoResultFound, SQLAlchemyError
+
 from .logging import get_logger
 
 logger = get_logger(__name__)
@@ -227,7 +230,6 @@ class GracefulDegradation:
 
 def map_sqlalchemy_error(error: Exception) -> BaseApplicationException:
     """Маппинг SQLAlchemy ошибок в специфические исключения"""
-    from sqlalchemy.exc import IntegrityError, NoResultFound, SQLAlchemyError
 
     if isinstance(error, IntegrityError):
         # Парсим constraint нарушения
@@ -248,20 +250,16 @@ def map_sqlalchemy_error(error: Exception) -> BaseApplicationException:
     elif isinstance(error, SQLAlchemyError):
         return DatabaseException(message=str(error), operation="database_operation")
 
-    else:
-        return BaseApplicationException(
-            message=f"Unexpected database error: {str(error)}",
-            error_code=ErrorCode.DATABASE_ERROR,
-            http_status=500,
-        )
+    # Fallback
+    return DatabaseException(message="An unexpected database error occurred")
 
 
 def map_redis_error(error: Exception) -> RedisException:
     """Маппинг Redis ошибок"""
-    import redis
 
     if isinstance(error, redis.ConnectionError):
-        return RedisException("Connection failed", "redis_connection")
+        return RedisException(message="Could not connect to Redis", operation="connect")
+
     elif isinstance(error, redis.TimeoutError):
         return RedisException("Operation timeout", "redis_timeout")
     elif isinstance(error, redis.RedisError):

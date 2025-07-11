@@ -54,8 +54,8 @@ class CodeEditorService:
         # Проверяем, что язык поддерживается
         try:
             language_enum = CodeLanguage(request.language)
-        except ValueError:
-            raise ValueError(f"Language {request.language} is not supported")
+        except ValueError as e:
+            raise ValueError(f"Language {request.language} is not supported") from e
 
         # Проверяем безопасность кода
         if not await self.code_editor_repository.validate_code_safety(

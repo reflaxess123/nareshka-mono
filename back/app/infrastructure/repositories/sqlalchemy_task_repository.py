@@ -3,11 +3,15 @@
 from typing import List, Optional, Tuple
 
 from sqlalchemy import asc, func, or_
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.domain.entities.task_types import Task, TaskCategory, TaskCompany
 from app.domain.repositories.task_repository import TaskRepository
-from app.infrastructure.models.content_models import ContentBlock, UserContentProgress
+from app.infrastructure.models.content_models import (
+    ContentBlock,
+    ContentFile,
+    UserContentProgress,
+)
 from app.infrastructure.models.theory_models import TheoryCard, UserTheoryProgress
 
 
@@ -29,20 +33,20 @@ class SQLAlchemyTaskRepository(TaskRepository):
         """Сортировка списка заданий"""
 
         def get_sort_key(task: Task):
+            sort_key = task.order_in_file or 0
             if sort_by in ("orderInFile", "orderIndex"):
-                return task.order_in_file or 0
+                sort_key = task.order_in_file or 0
             elif sort_by == "createdAt":
-                return task.created_at
+                sort_key = task.created_at
             elif sort_by == "updatedAt":
-                return task.updated_at
+                sort_key = task.updated_at
             elif sort_by == "title":
-                return task.title.lower()
+                sort_key = task.title.lower()
             elif sort_by == "category":
-                return task.main_category.lower()
+                sort_key = task.main_category.lower()
             elif sort_by == "subCategory":
-                return (task.sub_category or "").lower()
-            else:
-                return task.order_in_file or 0
+                sort_key = (task.sub_category or "").lower()
+            return sort_key
 
         reverse = sort_order == "desc"
         return sorted(tasks, key=get_sort_key, reverse=reverse)
@@ -77,16 +81,15 @@ class SQLAlchemyTaskRepository(TaskRepository):
             all_tasks.extend(content_tasks)
 
         # Получаем theory quizzes (только если нет фильтра по компаниям)
-        if not item_type or item_type in ["theory_quiz", "all"]:
-            if not companies:
-                theory_tasks = await self.get_theory_quizzes(
-                    main_categories=main_categories,
-                    sub_categories=sub_categories,
-                    search_query=search_query,
-                    only_unsolved=only_unsolved,
-                    user_id=user_id,
-                )
-                all_tasks.extend(theory_tasks)
+        if (not item_type or item_type in ["theory_quiz", "all"]) and not companies:
+            theory_tasks = await self.get_theory_quizzes(
+                main_categories=main_categories,
+                sub_categories=sub_categories,
+                search_query=search_query,
+                only_unsolved=only_unsolved,
+                user_id=user_id,
+            )
+            all_tasks.extend(theory_tasks)
 
         # Сортировка
         all_tasks = self._sort_tasks(all_tasks, sort_by, sort_order)
@@ -108,10 +111,6 @@ class SQLAlchemyTaskRepository(TaskRepository):
         user_id: Optional[int] = None,
     ) -> List[Task]:
         """Получение заданий типа content_block"""
-        from sqlalchemy.orm import joinedload
-
-        from app.infrastructure.models.content_models import ContentFile
-
         query = (
             self.session.query(ContentBlock)
             .join(ContentFile)
@@ -252,10 +251,8 @@ class SQLAlchemyTaskRepository(TaskRepository):
 
     async def get_task_categories(self) -> List[TaskCategory]:
         """Получение списка категорий заданий с подкатегориями и статистикой"""
-        from app.infrastructure.models.content_models import ContentFile
-
         # Получаем статистику по content blocks
-        content_stats = (
+        content_stats_query = (
             self.session.query(
                 ContentFile.mainCategory,
                 ContentFile.subCategory,
@@ -281,7 +278,7 @@ class SQLAlchemyTaskRepository(TaskRepository):
         # Объединяем статистику
         categories_map = {}
 
-        for category, sub_category, count in content_stats:
+        for category, sub_category, count in content_stats_query:
             if category not in categories_map:
                 categories_map[category] = {
                     "name": category,
@@ -325,23 +322,15 @@ class SQLAlchemyTaskRepository(TaskRepository):
         sub_categories: Optional[List[str]] = None,
     ) -> List[TaskCompany]:
         """Получение списка компаний из заданий с количеством"""
-        from app.infrastructure.models.content_models import ContentFile
-
         # Получаем все content blocks с компаниями
-        query = (
-            self.session.query(ContentBlock)
-            .join(ContentFile)
-            .filter(ContentBlock.companies.isnot(None))
-        )
+        query = self.session.query(ContentBlock.companies).join(ContentFile)
 
-        # Фильтры
         if main_categories:
             query = query.filter(
                 func.lower(ContentFile.mainCategory).in_(
                     [cat.lower() for cat in main_categories]
                 )
             )
-
         if sub_categories:
             query = query.filter(
                 func.lower(ContentFile.subCategory).in_(
@@ -349,19 +338,18 @@ class SQLAlchemyTaskRepository(TaskRepository):
                 )
             )
 
-        blocks = query.all()
-
-        # Подсчет компаний
-        company_counts = {}
-        for block in blocks:
-            if block.companies:
-                for company in block.companies:
-                    company_counts[company] = company_counts.get(company, 0) + 1
-
-        # Преобразование в TaskCompany
-        companies = [
-            TaskCompany(company=name, task_count=count)
-            for name, count in company_counts.items()
+        all_companies_lists = [
+            item[0] for item in query.filter(ContentBlock.companies.isnot(None)).all()
         ]
 
-        return sorted(companies, key=lambda x: (-x.task_count, x.company))
+        # Разворачиваем списки и считаем
+        company_counts = {}
+        for company_list in all_companies_lists:
+            for company in company_list:
+                company_counts[company] = company_counts.get(company, 0) + 1
+
+        # Преобразуем в список TaskCompany
+        return [
+            TaskCompany(name=name, taskCount=count)
+            for name, count in company_counts.items()
+        ]

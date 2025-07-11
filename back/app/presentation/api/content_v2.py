@@ -2,7 +2,7 @@
 
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, Depends, Query
 
 from app.application.dto.content_dto import (
     ContentBlockResponse,
@@ -33,7 +33,6 @@ def unescape_text_content(text: Optional[str]) -> Optional[str]:
 
 @router.get("/blocks", response_model=ContentBlocksListResponse)
 async def get_content_blocks(
-    request: Request,
     page: int = Query(1, ge=1, description="Номер страницы"),
     limit: int = Query(10, ge=1, le=100, description="Количество блоков на странице"),
     webdavPath: Optional[str] = Query(None, description="Часть пути к файлу WebDAV"),

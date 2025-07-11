@@ -6,6 +6,7 @@ import json
 import logging
 import os
 import platform
+import re
 import tempfile
 import time
 import uuid
@@ -65,7 +66,7 @@ class CodeExecutorService:
                 )
                 raise CodeExecutionError(
                     "Docker service is not available. Please ensure Docker Desktop is running."
-                )
+                ) from e
         return self.docker_client
 
     async def execute_code(
@@ -365,11 +366,11 @@ class CodeExecutorService:
             )
 
         # Проверяем код на наличие опасных паттернов
-        import re
-
         for pattern in dangerous_patterns:
             if re.search(pattern, source_code, re.IGNORECASE):
-                logger.warning(f"Dangerous pattern detected: {pattern}")
+                logger.warning(
+                    f"Dangerous code pattern found in user code: '{pattern}'"
+                )
                 return False
 
         return True

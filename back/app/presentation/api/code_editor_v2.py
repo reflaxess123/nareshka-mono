@@ -1,7 +1,6 @@
 from typing import List, Optional
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.application.dto.code_editor_dto import (
     CodeExecutionRequestDTO,
@@ -16,7 +15,6 @@ from app.application.dto.code_editor_dto import (
     ValidationResultDTO,
 )
 from app.application.services.code_editor_service import CodeEditorService
-from app.infrastructure.database.connection import get_db
 from app.shared.dependencies import (
     get_code_editor_service,
     get_current_user_optional,
@@ -39,15 +37,12 @@ async def get_supported_languages(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to get supported languages: {str(e)}",
-        )
+        ) from e
 
 
 @router.post("/execute", response_model=CodeExecutionResponseDTO)
 async def execute_code(
     request: CodeExecutionRequestDTO,
-    background_tasks: BackgroundTasks,
-    user_request: Request,
-    db: Session = Depends(get_db),
     code_editor_service: CodeEditorService = Depends(get_code_editor_service),
     user=Depends(get_current_user_optional),
 ):
@@ -64,19 +59,17 @@ async def execute_code(
 
         return result
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to execute code: {str(e)}",
-        )
+        ) from e
 
 
 @router.get("/executions/{execution_id}", response_model=CodeExecutionResponseDTO)
 async def get_execution_result(
     execution_id: str,
-    user_request: Request,
-    db: Session = Depends(get_db),
     code_editor_service: CodeEditorService = Depends(get_code_editor_service),
     user=Depends(get_current_user_optional),
 ):
@@ -89,45 +82,38 @@ async def get_execution_result(
         result = await code_editor_service.get_execution_result(execution_id, user_id)
         return result
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to get execution result: {str(e)}",
-        )
+        ) from e
 
 
 @router.get("/executions", response_model=List[CodeExecutionResponseDTO])
 async def get_user_executions(
-    user_request: Request,
-    db: Session = Depends(get_db),
     code_editor_service: CodeEditorService = Depends(get_code_editor_service),
     blockId: Optional[str] = None,
-    limit: int = 20,
-    offset: int = 0,
-    user=Depends(get_current_user_required),
+    user=Depends(get_current_user_optional),
 ):
     """Получение истории выполнений пользователя"""
 
     # Пользователь получен через DI (обязательно авторизован)
+    user_id = user.id if user else None
 
     try:
-        executions = await code_editor_service.get_user_executions(
-            user.id, blockId, limit, offset
-        )
+        executions = await code_editor_service.get_user_executions(user_id, blockId)
         return executions
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to get user executions: {str(e)}",
-        )
+        ) from e
 
 
 @router.post("/solutions", response_model=UserCodeSolutionResponseDTO)
 async def save_solution(
     solution: UserCodeSolutionCreateDTO,
-    user_request: Request,
-    db: Session = Depends(get_db),
     code_editor_service: CodeEditorService = Depends(get_code_editor_service),
     user=Depends(get_current_user_required),
 ):
@@ -139,19 +125,17 @@ async def save_solution(
         result = await code_editor_service.save_solution(solution, user.id)
         return result
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to save solution: {str(e)}",
-        )
+        ) from e
 
 
 @router.get("/solutions/{block_id}", response_model=List[UserCodeSolutionResponseDTO])
 async def get_block_solutions(
     block_id: str,
-    user_request: Request,
-    db: Session = Depends(get_db),
     code_editor_service: CodeEditorService = Depends(get_code_editor_service),
     user=Depends(get_current_user_required),
 ):
@@ -160,21 +144,19 @@ async def get_block_solutions(
     # Пользователь получен через DI (обязательно авторизован)
 
     try:
-        solutions = await code_editor_service.get_block_solutions(user.id, block_id)
+        solutions = await code_editor_service.get_block_solutions(block_id, user.id)
         return solutions
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to get block solutions: {str(e)}",
-        )
+        ) from e
 
 
 @router.put("/solutions/{solution_id}", response_model=UserCodeSolutionResponseDTO)
 async def update_solution(
     solution_id: str,
     solution_update: UserCodeSolutionUpdateDTO,
-    user_request: Request,
-    db: Session = Depends(get_db),
     code_editor_service: CodeEditorService = Depends(get_code_editor_service),
     user=Depends(get_current_user_required),
 ):
@@ -188,18 +170,16 @@ async def update_solution(
         )
         return result
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to update solution: {str(e)}",
-        )
+        ) from e
 
 
 @router.get("/stats", response_model=ExecutionStatsDTO)
 async def get_execution_stats(
-    user_request: Request,
-    db: Session = Depends(get_db),
     code_editor_service: CodeEditorService = Depends(get_code_editor_service),
     user=Depends(get_current_user_required),
 ):
@@ -214,14 +194,12 @@ async def get_execution_stats(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to get execution stats: {str(e)}",
-        )
+        ) from e
 
 
-@router.get("/test-cases/{block_id}", response_model=TestCasesResponseDTO)
+@router.get("/test_cases/{block_id}", response_model=TestCasesResponseDTO)
 async def get_test_cases(
     block_id: str,
-    user_request: Request,
-    db: Session = Depends(get_db),
     code_editor_service: CodeEditorService = Depends(get_code_editor_service),
     user=Depends(get_current_user_optional),
 ):
@@ -248,16 +226,13 @@ async def get_test_cases(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to get test cases: {str(e)}",
-        )
+        ) from e
 
 
 @router.post("/validate/{block_id}", response_model=ValidationResultDTO)
 async def validate_solution(
     block_id: str,
     validation_request: ValidationRequestDTO,
-    user_request: Request,
-    background_tasks: BackgroundTasks,
-    db: Session = Depends(get_db),
     code_editor_service: CodeEditorService = Depends(get_code_editor_service),
     user=Depends(get_current_user_required),
 ):
@@ -275,12 +250,12 @@ async def validate_solution(
 
         return result
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to validate solution: {str(e)}",
-        )
+        ) from e
 
 
 @router.get("/health")

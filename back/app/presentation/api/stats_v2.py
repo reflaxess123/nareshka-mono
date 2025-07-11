@@ -34,7 +34,7 @@ async def get_user_stats_overview(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to get user stats overview: {str(e)}",
-        )
+        ) from e
 
 
 @router.get("/content", response_model=ContentStatsDTO)
@@ -54,7 +54,7 @@ async def get_content_stats(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to get content stats: {str(e)}",
-        )
+        ) from e
 
 
 @router.get("/theory", response_model=TheoryStatsDTO)
@@ -74,7 +74,7 @@ async def get_theory_stats(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to get theory stats: {str(e)}",
-        )
+        ) from e
 
 
 @router.get("/roadmap", response_model=RoadmapStatsDTO)
@@ -94,7 +94,7 @@ async def get_roadmap_stats(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to get roadmap stats: {str(e)}",
-        )
+        ) from e
 
 
 @router.get("/health")

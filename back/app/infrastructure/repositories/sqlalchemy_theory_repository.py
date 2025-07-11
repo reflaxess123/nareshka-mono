@@ -8,7 +8,6 @@ from sqlalchemy import and_, asc, desc, func, or_
 from sqlalchemy.orm import Session
 
 from app.domain.entities.enums import CardState
-# Domain entities импорты удалены - используем SQLAlchemy модели напрямую
 from app.domain.repositories.theory_repository import TheoryRepository
 from app.infrastructure.models.theory_models import (
     TheoryCard as SQLTheoryCard,

@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def check_database_connection():
+def check_database_connection():  # noqa: PLR0912, PLR0915
     """Проверка подключения к базе данных и просмотр таблиц"""
 
     # Парсим URL базы данных
@@ -78,14 +78,14 @@ def check_database_connection():
                             )
                             users = cursor.fetchall()
                             logger.info(f"    👥 Пользователи: {users}")
-                        except:
+                        except Exception:
                             try:
                                 cursor.execute(
                                     f'{query.replace("COUNT(*)", "*")} LIMIT 1'
                                 )
                                 sample = cursor.fetchall()
                                 logger.info(f"    📝 Пример данных: {sample}")
-                            except:
+                            except Exception:
                                 pass
 
                     # Покажем структуру таблицы
@@ -129,7 +129,7 @@ def check_database_connection():
                         cursor.execute(f"SELECT * FROM {full_table} LIMIT 2")
                         users = cursor.fetchall()
                         logger.info(f"    Примеры: {users}")
-                except:
+                except Exception:
                     pass
 
         cursor.close()
