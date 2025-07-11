@@ -85,6 +85,7 @@ class ApplicationSettings(BaseModel):
     app_name: str = "Nareshka API"
     version: str = "2.0.0"
     description: str = "Nareshka Learning Platform API"
+    log_level: str = "INFO"
 
     # Подразделы конфигурации
     database: DatabaseSettings
@@ -162,6 +163,10 @@ class LegacySettingsAdapter:
     def webdav_password(self) -> str:
         return os.getenv("WEBDAV_PASSWORD", "")
 
+    @property
+    def log_level(self) -> str:
+        return self._new_settings.log_level
+
 
 # Создаем настройки на основе переменных окружения
 def create_new_settings() -> ApplicationSettings:
@@ -173,6 +178,7 @@ def create_new_settings() -> ApplicationSettings:
         cors_origins = [origin.strip() for origin in cors_origins_str.split(",")]
 
     return ApplicationSettings(
+        log_level=os.getenv("LOG_LEVEL", "INFO"),
         database=DatabaseSettings(
             url=os.getenv("DATABASE_URL", ""),
             echo=os.getenv("DEBUG", "False").lower() == "true",

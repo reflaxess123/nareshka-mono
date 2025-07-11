@@ -1,6 +1,7 @@
 """Централизованная система логирования"""
 
 import logging
+import os
 import sys
 from pathlib import Path
 from typing import Optional
@@ -73,9 +74,17 @@ def setup_logging(
 
     # Настройка логирования для внешних библиотек
     logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
-    logging.getLogger("uvicorn").setLevel(logging.INFO)
+    
+    # Uvicorn logging level can be controlled via environment variable
+    uvicorn_log_level = os.getenv("UVICORN_LOG_LEVEL", "INFO").upper()
+    logging.getLogger("uvicorn").setLevel(getattr(logging, uvicorn_log_level))
+    
     logging.getLogger("fastapi").setLevel(logging.INFO)
     logging.getLogger("httpx").setLevel(logging.WARNING)
+    
+    # Watchfiles logging level can be controlled via environment variable
+    watchfiles_log_level = os.getenv("WATCHFILES_LOG_LEVEL", "WARNING").upper()
+    logging.getLogger("watchfiles").setLevel(getattr(logging, watchfiles_log_level))
 
     # Логгер для нашего приложения
     app_logger = logging.getLogger("nareshka")
