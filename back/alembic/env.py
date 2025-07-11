@@ -10,10 +10,10 @@ from alembic import context
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 from app.config.new_settings import legacy_settings as settings
-from app.infrastructure.models import Base
 
 # Добавляем импорт всех моделей чтобы alembic видел их
-from app.infrastructure.models import *
+from app.infrastructure.models import *  # noqa: F403
+from app.infrastructure.models import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -78,9 +78,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

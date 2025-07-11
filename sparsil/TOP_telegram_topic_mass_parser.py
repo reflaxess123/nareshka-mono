@@ -20,8 +20,6 @@ sys.path.insert(0, str(Path("mcp-telegram-main/src").resolve()))
 
 from mcp_telegram.tools import (
     FindTopicByName, 
-    ListTopicMessages, 
-    ListForumTopics,
     tool_runner
 )
 from mcp_telegram.telegram import create_client

@@ -1,13 +1,16 @@
 """Code editor types для внутреннего использования в services и repositories."""
 
 from datetime import datetime
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
+
 from pydantic import BaseModel
-from ..entities.enums import CodeLanguage, ExecutionStatus
+
+from app.domain.entities.enums import CodeLanguage, ExecutionStatus
 
 
 class SupportedLanguage(BaseModel):
     """Поддерживаемый язык программирования"""
+
     id: str
     name: str
     language: CodeLanguage
@@ -25,6 +28,7 @@ class SupportedLanguage(BaseModel):
 
 class CodeExecution(BaseModel):
     """Выполнение кода"""
+
     id: str
     user_id: Optional[int] = None
     block_id: Optional[str] = None
@@ -43,6 +47,7 @@ class CodeExecution(BaseModel):
 
 class UserCodeSolution(BaseModel):
     """Пользовательское решение задачи"""
+
     id: str
     user_id: int
     block_id: str
@@ -58,6 +63,7 @@ class UserCodeSolution(BaseModel):
 
 class TestCaseExecution(BaseModel):
     """Результат выполнения тест-кейса"""
+
     test_name: str
     input_data: str
     expected_output: str
@@ -70,6 +76,7 @@ class TestCaseExecution(BaseModel):
 
 class ValidationResult(BaseModel):
     """Результат валидации кода"""
+
     is_valid: bool
     issues: List[str] = []
     warnings: List[str] = []
@@ -78,8 +85,9 @@ class ValidationResult(BaseModel):
 
 class ExecutionStats(BaseModel):
     """Статистика выполнения кода пользователем"""
+
     total_executions: int
     successful_executions: int
     average_execution_time_ms: float
     languages_used: List[str]
-    success_rate: float 
+    success_rate: float

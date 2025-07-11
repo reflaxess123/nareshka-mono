@@ -5,26 +5,27 @@
 
 import asyncio
 import json
-import os
-from pathlib import Path
 from datetime import datetime
-from typing import List, Dict, Any
+from pathlib import Path
+from typing import Any
 
-from src.mcp_telegram.simple_video_downloader import simple_download_media
 from src.mcp_telegram.robust_client import get_robust_client
+from src.mcp_telegram.simple_video_downloader import simple_download_media
+
 
 class FrontendVideoDownloader:
     """Загрузчик видео из топика Frontend"""
-    
+
     def __init__(self):
         self.dialog_id = -1002208833410  # ОМ: паравозик собеседований
         self.topic_id = 31  # Frontend топик
         self.output_dir = Path("./frontend_videos")
         self.output_dir.mkdir(exist_ok=True)
-        
+
         # Файл для связки поста и видео
         self.metadata_file = self.output_dir / "posts_and_videos.json"
         self.posts_data = []
+<<<<<<< HEAD
         # ID сообщений, уже обработанных (скачаны или пропущены по тегу)
         self.processed_ids = set()
         self._load_existing_metadata()
@@ -57,9 +58,13 @@ class FrontendVideoDownloader:
             self.processed_ids = set()
     
     async def get_all_topic_messages(self, limit: int = 1000) -> List[Any]:
+=======
+
+    async def get_all_topic_messages(self, limit: int = 1000) -> list[Any]:
+>>>>>>> 05a40047f43b38854814fce3ae26b69ba4fb7c32
         """Получает все сообщения из топика Frontend"""
         print(f"📥 Получение сообщений из топика Frontend (лимит: {limit})...")
-        
+
         async with get_robust_client() as client:
             try:
                 # Используем метод robust_client для получения сообщений из топика
@@ -69,47 +74,48 @@ class FrontendVideoDownloader:
                         entity=dialog_id,
                         limit=limit,
                         reply_to=topic_id,
-                        reverse=False  # От новых к старым
+                        reverse=False,  # От новых к старым
                     ):
                         messages.append(message)
                         # Искусственная пауза убрана ради ускорения
                     return messages
-                
+
                 messages = await client._execute_with_retry(_get_topic_messages, self.dialog_id, self.topic_id, limit)
-                
+
                 print(f"✅ Получено {len(messages)} сообщений из топика Frontend")
                 return messages
-                
+
             except Exception as e:
                 print(f"❌ Ошибка получения сообщений: {e}")
                 return []
-    
+
     def save_post_data(self, message, video_path: str = None, error: str = None):
         """Сохраняет данные поста с привязкой к видео"""
         post_data = {
             "message_id": message.id,
             "date": message.date.isoformat() if message.date else None,
             "text": message.text or "",
-            "sender_id": getattr(message.sender, 'id', None) if message.sender else None,
-            "sender_username": getattr(message.sender, 'username', None) if message.sender else None,
-            "sender_first_name": getattr(message.sender, 'first_name', None) if message.sender else None,
+            "sender_id": getattr(message.sender, "id", None) if message.sender else None,
+            "sender_username": getattr(message.sender, "username", None) if message.sender else None,
+            "sender_first_name": getattr(message.sender, "first_name", None) if message.sender else None,
             "has_media": bool(message.media),
             "media_type": str(type(message.media).__name__) if message.media else None,
             "video_path": video_path,
             "download_error": error,
-            "download_timestamp": datetime.now().isoformat()
+            "download_timestamp": datetime.now().isoformat(),
         }
-        
+
         self.posts_data.append(post_data)
-        
+
         # Сохраняем данные в файл
-        with open(self.metadata_file, 'w', encoding='utf-8') as f:
+        with open(self.metadata_file, "w", encoding="utf-8") as f:
             json.dump(self.posts_data, f, ensure_ascii=False, indent=2)
-    
+
     def generate_video_filename(self, message, index: int) -> str:
         """Генерирует имя файла для видео"""
         timestamp = message.date.strftime("%Y%m%d_%H%M%S") if message.date else "unknown"
         return f"frontend_{index:04d}_{timestamp}_{message.id}.mp4"
+<<<<<<< HEAD
     
     async def download_videos_from_messages(self, messages: List[Any]):
         """Скачивает видео из сообщений параллельно с ограничением по семафору"""
@@ -161,6 +167,28 @@ class FrontendVideoDownloader:
                 async with counter_lock:
                     stats["media"] += 1
 
+=======
+
+    async def download_videos_from_messages(self, messages: list[Any]):
+        """Скачивает видео из сообщений"""
+        print(f"\n🎬 Начинаю скачивание видео из {len(messages)} сообщений...")
+
+        downloaded_count = 0
+        media_count = 0
+        error_count = 0
+
+        for index, message in enumerate(messages, 1):
+            print(f"\n📝 Обрабатываю сообщение {index}/{len(messages)} (ID: {message.id})")
+
+            # Показываем текст сообщения
+            if message.text:
+                preview_text = message.text[:100] + "..." if len(message.text) > 100 else message.text
+                print(f"📄 Текст: {preview_text}")
+
+            # Проверяем наличие медиа
+            if message.media:
+                media_count += 1
+>>>>>>> 05a40047f43b38854814fce3ae26b69ba4fb7c32
                 media_type = str(type(message.media).__name__)
                 print(f"🎯 Найдено медиа: {media_type}")
 
@@ -168,7 +196,16 @@ class FrontendVideoDownloader:
                     filename = self.generate_video_filename(message, index)
                     file_path = self.output_dir / filename
 
+<<<<<<< HEAD
                     result = await simple_download_media(self.dialog_id, message.id, str(file_path))
+=======
+                    # Скачиваем медиа
+                    result = await simple_download_media(
+                        self.dialog_id,
+                        message.id,
+                        str(file_path),
+                    )
+>>>>>>> 05a40047f43b38854814fce3ae26b69ba4fb7c32
 
                     if result.get("success"):
                         async with counter_lock:
@@ -176,22 +213,40 @@ class FrontendVideoDownloader:
                         print(f"✅ Скачано: {filename}")
                         self.save_post_data(message, str(file_path))
                     else:
+<<<<<<< HEAD
                         async with counter_lock:
                             stats["errors"] += 1
                         err = result.get("error", "Неизвестная ошибка")
                         print(f"❌ Ошибка скачивания: {err}")
                         self.save_post_data(message, error=err)
+=======
+                        error_count += 1
+                        error_msg = result.get("error", "Неизвестная ошибка")
+                        print(f"❌ Ошибка скачивания: {error_msg}")
+                        self.save_post_data(message, error=error_msg)
+
+                    # Пауза между скачиваниями для защиты от блокировки
+                    await asyncio.sleep(2)
+
+>>>>>>> 05a40047f43b38854814fce3ae26b69ba4fb7c32
                 except Exception as e:
                     async with counter_lock:
                         stats["errors"] += 1
                     print(f"❌ Исключение при скачивании: {e}")
                     self.save_post_data(message, error=str(e))
+<<<<<<< HEAD
 
         # Собираем задачи и запускаем параллельно
         tasks = [process_message(idx, msg) for idx, msg in enumerate(messages, 1)]
         await asyncio.gather(*tasks)
 
         # Выводим итоговую статистику
+=======
+            else:
+                print("📝 Нет медиа файлов")
+                self.save_post_data(message)
+
+>>>>>>> 05a40047f43b38854814fce3ae26b69ba4fb7c32
         print("\n📊 ИТОГОВАЯ СТАТИСТИКА:")
         print(f"  📝 Всего сообщений: {len(messages)}")
         print(f"  🎬 С медиа файлами: {stats['media']}")
@@ -201,34 +256,34 @@ class FrontendVideoDownloader:
         print(f"  ❌ Ошибок: {stats['errors']}")
         print(f"  📁 Папка: {self.output_dir.absolute()}")
         print(f"  📋 Метаданные: {self.metadata_file.absolute()}")
-    
+
     async def start_download(self, limit: int = 1000):
         """Запускает процесс скачивания"""
         print("🚀 МАССОВОЕ СКАЧИВАНИЕ ВИДЕО ИЗ ТОПИКА FRONTEND")
         print("=" * 60)
-        
+
         # Получаем все сообщения
         messages = await self.get_all_topic_messages(limit)
         if not messages:
             print("❌ Не удалось получить сообщения")
             return
-        
+
         # Скачиваем видео
         await self.download_videos_from_messages(messages)
-        
+
         print("\n🏁 СКАЧИВАНИЕ ЗАВЕРШЕНО!")
 
 async def main():
     """Основная функция"""
     downloader = FrontendVideoDownloader()
-    
+
     # Спрашиваем лимит сообщений
     try:
         limit = int(input("Введите лимит сообщений для обработки (по умолчанию 100): ") or "100")
     except ValueError:
         limit = 100
-    
+
     await downloader.start_download(limit)
 
 if __name__ == "__main__":
-    asyncio.run(main()) 
+    asyncio.run(main())

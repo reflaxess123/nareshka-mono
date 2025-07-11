@@ -134,6 +134,10 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# Pyright
+pyrightconfig.json
+.pyright*
+
 # IDE
 .idea/
 *.swp
@@ -192,3 +196,16 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Video files
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.wmv
+*.flv
+*.webm
+frontend_videos/
+frontend_videos_optimized/
+frontend_videos_parallel/
+mcp-telegram-main/frontend_videos/

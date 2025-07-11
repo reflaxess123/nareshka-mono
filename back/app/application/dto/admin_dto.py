@@ -1,17 +1,18 @@
 """DTO для административных операций"""
 
-from datetime import datetime
-from typing import List, Optional, Dict
-from pydantic import BaseModel, EmailStr
+from typing import Dict, List, Optional
+
+from pydantic import EmailStr
 
 from .base_dto import (
-    IdentifiedResponse, 
-    CreateRequest, 
-    UpdateRequest, 
-    BulkActionRequest, 
+    BaseResponse,
+    BulkActionRequest,
     BulkActionResponse,
+    CreateRequest,
+    IdentifiedResponse,
     PaginatedResponse,
-    BaseResponse
+    StringIdentifiedResponse,
+    UpdateRequest,
 )
 
 
@@ -116,16 +117,14 @@ class ContentStatsResponse(BaseResponse):
     blocks_by_category: Dict[str, int]
 
 
-class AdminContentFileResponse(IdentifiedResponse):
-    id: str  # ContentFile ID - string
+class AdminContentFileResponse(StringIdentifiedResponse):
     webdav_path: str
     main_category: str
     sub_category: str
     _count: Dict[str, int] = {}
 
 
-class AdminContentBlockResponse(IdentifiedResponse):
-    id: str  # ContentBlock ID - string
+class AdminContentBlockResponse(StringIdentifiedResponse):
     file_id: str
     path_titles: List[str]
     block_title: str
@@ -139,8 +138,7 @@ class AdminContentBlockResponse(IdentifiedResponse):
     extracted_urls: List[str] = []
 
 
-class AdminTheoryCardResponse(IdentifiedResponse):
-    id: str  # TheoryCard ID - string
+class AdminTheoryCardResponse(StringIdentifiedResponse):
     anki_guid: Optional[str] = None
     card_type: str
     deck: str
@@ -172,4 +170,4 @@ PaginatedTheoryCardsResponse = PaginatedResponse[AdminTheoryCardResponse]
 
 class HealthResponse(BaseResponse):
     status: str
-    module: str 
+    module: str

@@ -1,11 +1,13 @@
 """Stats types для внутреннего использования в services и repositories."""
 
-from typing import Dict, List, Any
+from typing import Any, Dict, List
+
 from pydantic import BaseModel
 
 
 class UserStatsOverview(BaseModel):
     """Общая статистика пользователя"""
+
     total_content_blocks: int
     completed_content_blocks: int
     content_progress_percentage: float
@@ -21,6 +23,7 @@ class UserStatsOverview(BaseModel):
 
 class ContentStats(BaseModel):
     """Детальная статистика по контенту"""
+
     total_blocks: int
     completed_blocks: int
     in_progress_blocks: int
@@ -33,6 +36,7 @@ class ContentStats(BaseModel):
 
 class TheoryStats(BaseModel):
     """Детальная статистика по теории"""
+
     total_cards: int
     completed_cards: int
     in_progress_cards: int
@@ -45,8 +49,9 @@ class TheoryStats(BaseModel):
 
 class RoadmapStats(BaseModel):
     """Roadmap статистика по категориям"""
+
     categories: List[Dict[str, Any]]
     total_categories: int
     completed_categories: int
     in_progress_categories: int
-    overall_progress_percentage: float 
+    overall_progress_percentage: float

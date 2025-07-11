@@ -75,11 +75,11 @@ export const useMindMap = (
 
   const refetch = useCallback(() => {
     query.refetch();
-  }, [query.refetch]);
+  }, [query]);
 
   useEffect(() => {
     query.refetch();
-  }, [query.refetch]);
+  }, [query]);
 
   return {
     data: query.data || null,

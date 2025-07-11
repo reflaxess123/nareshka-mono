@@ -146,7 +146,7 @@ export const useProgressTracking = (
         },
       });
     },
-    [validateSolutionMutation.mutate, showToasts]
+    [validateSolutionMutation, showToasts]
   );
 
   const getTestCasesMutation = useMutation({
@@ -174,7 +174,7 @@ export const useProgressTracking = (
     (blockId: string) => {
       getTestCasesMutation.mutate(blockId);
     },
-    [getTestCasesMutation.mutate]
+    [getTestCasesMutation]
   );
 
   const showInfoMessage = useCallback(

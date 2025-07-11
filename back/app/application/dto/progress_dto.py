@@ -1,6 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
-from typing import Optional, List, Dict, Any
+from typing import Any, Dict, List, Optional
+
 from pydantic import BaseModel
 
 
@@ -104,7 +105,7 @@ class UserDetailedProgressResponseDTO(BaseModel):
 
 class ProgressAnalyticsDTO(BaseModel):
     totalUsers: int
-    activeUsers: int  
+    activeUsers: int
     totalTasksSolved: int
     averageTasksPerUser: float
     mostPopularCategories: List[Dict[str, Any]]
@@ -193,4 +194,4 @@ class TestValidationResultResponseDTO(BaseModel):
     errorMessage: Optional[str] = None
     outputMatch: bool = False
     outputSimilarity: float = 0.0
-    createdAt: datetime 
+    createdAt: datetime

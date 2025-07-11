@@ -14,4 +14,4 @@ async def health_check():
 @router.get("/")
 async def root():
     """Базовый endpoint"""
-    return {"message": "Hello World! Nareshka API v2.0 (NEW ARCHITECTURE)"} 
+    return {"message": "Hello World! Nareshka API v2.0 (NEW ARCHITECTURE)"}

@@ -2,11 +2,13 @@
 
 from datetime import datetime
 from typing import List, Optional
+
 from pydantic import BaseModel
 
 
 class TheoryCard(BaseModel):
     """Карточка теории"""
+
     id: str
     anki_guid: Optional[str] = None
     card_type: str
@@ -23,6 +25,7 @@ class TheoryCard(BaseModel):
 
 class UserTheoryProgress(BaseModel):
     """Прогресс пользователя по карточке теории"""
+
     id: str
     user_id: int
     card_id: str
@@ -33,4 +36,4 @@ class UserTheoryProgress(BaseModel):
     interval_days: int = 1
     due_date: Optional[datetime] = None
     created_at: datetime
-    updated_at: datetime 
+    updated_at: datetime

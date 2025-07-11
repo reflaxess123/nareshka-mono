@@ -1,11 +1,13 @@
 """DTO для работы с тест-кейсами"""
 
+from typing import List, Optional
+
 from pydantic import BaseModel
-from typing import Optional, List
 
 
 class TestCaseAIGenerate(BaseModel):
     """DTO для генерации тест-кейсов через AI"""
+
     blockId: str
     count: int = 5
     difficulty: str = "BASIC"
@@ -15,6 +17,7 @@ class TestCaseAIGenerate(BaseModel):
 
 class TestCaseResponse(BaseModel):
     """DTO для ответа с тест-кейсом"""
+
     id: str
     blockId: str
     name: str
@@ -34,6 +37,7 @@ class TestCaseResponse(BaseModel):
 
 class TestCaseCreateRequest(BaseModel):
     """DTO для создания тест-кейса"""
+
     blockId: str
     name: str
     description: Optional[str] = None
@@ -47,14 +51,16 @@ class TestCaseCreateRequest(BaseModel):
 
 class ValidationRequestDTO(BaseModel):
     """DTO для запроса валидации"""
+
     sourceCode: str
     language: str
 
 
 class ValidationResultDTO(BaseModel):
     """DTO для результата валидации"""
+
     passed: bool
     totalTests: int
     passedTests: int
     failedTests: int
-    results: List[dict] 
+    results: List[dict]

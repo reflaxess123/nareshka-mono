@@ -12,7 +12,8 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
-from ..database.connection import Base
+from app.infrastructure.database.connection import Base
+
 from .enums import CodeLanguage, ExecutionStatus
 
 
@@ -32,7 +33,9 @@ class SupportedLanguage(Base):
     isEnabled = Column(Boolean, default=True, nullable=False)
 
     createdAt = Column(DateTime, default=func.now(), nullable=False)
-    updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
+    updatedAt = Column(
+        DateTime, default=func.now(), onupdate=func.now(), nullable=False
+    )
 
     executions = relationship("CodeExecution", back_populates="language")
     solutions = relationship("UserCodeSolution", back_populates="language")
@@ -43,12 +46,18 @@ class CodeExecution(Base):
 
     id = Column(String, primary_key=True)
     userId = Column(Integer, ForeignKey("User.id", ondelete="CASCADE"), nullable=True)
-    blockId = Column(String, ForeignKey("ContentBlock.id", ondelete="CASCADE"), nullable=True)
-    languageId = Column(String, ForeignKey("SupportedLanguage.id", ondelete="CASCADE"), nullable=False)
+    blockId = Column(
+        String, ForeignKey("ContentBlock.id", ondelete="CASCADE"), nullable=True
+    )
+    languageId = Column(
+        String, ForeignKey("SupportedLanguage.id", ondelete="CASCADE"), nullable=False
+    )
     sourceCode = Column(Text, nullable=False)
     stdin = Column(Text)
 
-    status: SQLEnum = Column(SQLEnum(ExecutionStatus), default=ExecutionStatus.PENDING, nullable=False)
+    status: SQLEnum = Column(
+        SQLEnum(ExecutionStatus), default=ExecutionStatus.PENDING, nullable=False
+    )
     stdout = Column(Text)
     stderr = Column(Text)
     exitCode = Column(Integer)
@@ -76,8 +85,12 @@ class UserCodeSolution(Base):
 
     id = Column(String, primary_key=True)
     userId = Column(Integer, ForeignKey("User.id", ondelete="CASCADE"), nullable=False)
-    blockId = Column(String, ForeignKey("ContentBlock.id", ondelete="CASCADE"), nullable=False)
-    languageId = Column(String, ForeignKey("SupportedLanguage.id", ondelete="CASCADE"), nullable=False)
+    blockId = Column(
+        String, ForeignKey("ContentBlock.id", ondelete="CASCADE"), nullable=False
+    )
+    languageId = Column(
+        String, ForeignKey("SupportedLanguage.id", ondelete="CASCADE"), nullable=False
+    )
     sourceCode = Column(Text, nullable=False)
     isCompleted = Column(Boolean, default=False, nullable=False)
 
@@ -86,7 +99,9 @@ class UserCodeSolution(Base):
     lastExecutionId = Column(String)
 
     createdAt = Column(DateTime, default=func.now(), nullable=False)
-    updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
+    updatedAt = Column(
+        DateTime, default=func.now(), onupdate=func.now(), nullable=False
+    )
 
     user = relationship("User")
     block = relationship("ContentBlock")
@@ -96,4 +111,4 @@ class UserCodeSolution(Base):
         Index("idx_usercodesolution_userid", "userId"),
         Index("idx_usercodesolution_blockid", "blockId"),
         Index("idx_usercodesolution_userid_blockid", "userId", "blockId", unique=True),
-    ) 
+    )

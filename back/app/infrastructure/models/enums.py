@@ -40,4 +40,4 @@ class ExecutionStatus(str, Enum):
     SUCCESS = "SUCCESS"
     ERROR = "ERROR"
     TIMEOUT = "TIMEOUT"
-    MEMORY_LIMIT = "MEMORY_LIMIT" 
+    MEMORY_LIMIT = "MEMORY_LIMIT"

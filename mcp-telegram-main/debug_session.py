@@ -1,7 +1,8 @@
 import os
-from pathlib import Path
+
 from xdg_base_dirs import xdg_state_home
-from src.mcp_telegram.telegram import create_client, TelegramSettings
+
+from src.mcp_telegram.telegram import TelegramSettings, create_client
 
 # Проверяем путь к сессии
 state_home = xdg_state_home() / "mcp-telegram"
@@ -34,4 +35,4 @@ try:
     print(f"Client created: {client}")
     print(f"Client session: {client.session}")
 except Exception as e:
-    print(f"Client creation error: {e}") 
+    print(f"Client creation error: {e}")

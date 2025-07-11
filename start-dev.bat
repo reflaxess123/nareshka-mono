@@ -197,9 +197,9 @@ echo ==========================================
 
 REM Start backend with error checking
 echo -> Starting Python backend server (NEW ARCHITECTURE)...
-echo   Command: poetry run uvicorn main:app --host 0.0.0.0 --port 4000 --reload
+echo   Command: poetry run uvicorn main:app --host 0.0.0.0 --port 4000 --reload --reload-exclude logs/* --reload-exclude *.log
 echo   Architecture: Clean Architecture with DI, UnitOfWork, v2 APIs
-start "Nareshka Backend NEW ARCH (Port 4000)" cmd /k "cd /d %~dp0back && echo Starting NEW ARCHITECTURE backend... && echo Available endpoints: /api/v2/auth, /api/v2/content, /api/v2/theory, etc. && poetry run uvicorn main:app --host 0.0.0.0 --port 4000 --reload || (echo NEW ARCHITECTURE backend failed to start! && pause)"
+start "Nareshka Backend NEW ARCH (Port 4000)" cmd /k "cd /d %~dp0back && echo Starting NEW ARCHITECTURE backend... && echo Available endpoints: /api/v2/auth, /api/v2/content, /api/v2/theory, etc. && poetry run uvicorn main:app --host 0.0.0.0 --port 4000 --reload --reload-exclude logs/* --reload-exclude *.log || (echo NEW ARCHITECTURE backend failed to start! && pause)"
 
 REM Wait and check if backend started
 echo Waiting for NEW ARCHITECTURE backend to initialize...
