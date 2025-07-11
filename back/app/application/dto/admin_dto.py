@@ -11,6 +11,7 @@ from .base_dto import (
     CreateRequest,
     IdentifiedResponse,
     PaginatedResponse,
+    StringIdentifiedResponse,
     UpdateRequest,
 )
 
@@ -116,16 +117,14 @@ class ContentStatsResponse(BaseResponse):
     blocks_by_category: Dict[str, int]
 
 
-class AdminContentFileResponse(IdentifiedResponse):
-    id: str  # ContentFile ID - string
+class AdminContentFileResponse(StringIdentifiedResponse):
     webdav_path: str
     main_category: str
     sub_category: str
     _count: Dict[str, int] = {}
 
 
-class AdminContentBlockResponse(IdentifiedResponse):
-    id: str  # ContentBlock ID - string
+class AdminContentBlockResponse(StringIdentifiedResponse):
     file_id: str
     path_titles: List[str]
     block_title: str
@@ -139,8 +138,7 @@ class AdminContentBlockResponse(IdentifiedResponse):
     extracted_urls: List[str] = []
 
 
-class AdminTheoryCardResponse(IdentifiedResponse):
-    id: str  # TheoryCard ID - string
+class AdminTheoryCardResponse(StringIdentifiedResponse):
     anki_guid: Optional[str] = None
     card_type: str
     deck: str

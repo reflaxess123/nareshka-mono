@@ -2,6 +2,17 @@ from typing import Any, Dict, List
 
 from sqlalchemy.orm import Session
 
+from app.application.dto.stats_dto import (
+    CategoryContentDTO as CategoryContentStats,
+    CategoryRoadmapDTO as CategoryRoadmapStats,
+    CategoryTheoryDTO as CategoryTheoryStats,
+    ContentBlockDTO as ContentBlockStats,
+    ItemStatsDTO as ItemStats,
+    OverallProgressDTO as OverallProgressStats,
+    SubCategoryContentDTO as SubCategoryContentStats,
+    SubCategoryTheoryDTO as SubCategoryTheoryStats,
+    TheoryCardDTO as TheoryCardStats,
+)
 from app.domain.entities.stats_types import (
     ContentStats,
     RoadmapStats,

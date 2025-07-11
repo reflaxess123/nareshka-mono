@@ -25,7 +25,6 @@ sys.path.append(str(Path(__file__).parent))
 
 try:
     from sqlalchemy import and_
-    from sqlalchemy.orm import Session
 
     from app.infrastructure.database.connection import get_db
     from app.infrastructure.models.content_models import ContentBlock

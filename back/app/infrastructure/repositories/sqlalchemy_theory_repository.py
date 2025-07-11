@@ -8,10 +8,7 @@ from sqlalchemy import and_, asc, desc, func, or_
 from sqlalchemy.orm import Session
 
 from app.domain.entities.enums import CardState
-from app.domain.entities.theory_types import (
-    TheoryCard as DomainTheoryCard,
-    UserTheoryProgress as DomainUserTheoryProgress,
-)
+# Domain entities импорты удалены - используем SQLAlchemy модели напрямую
 from app.domain.repositories.theory_repository import TheoryRepository
 from app.infrastructure.models.theory_models import (
     TheoryCard as SQLTheoryCard,
@@ -37,7 +34,7 @@ class SQLAlchemyTheoryRepository(TheoryRepository):
         sort_order: str = "asc",
         only_unstudied: bool = False,
         user_id: Optional[int] = None,
-    ) -> Tuple[List[DomainTheoryCard], int]:
+    ) -> Tuple[List[SQLTheoryCard], int]:
         """Получение теоретических карточек с пагинацией и фильтрацией"""
         offset = (page - 1) * limit
 
@@ -103,19 +100,17 @@ class SQLAlchemyTheoryRepository(TheoryRepository):
         total = query.count()
         infra_cards = query.offset(offset).limit(limit).all()
 
-        # Конвертируем Infrastructure модели в Domain entities
-        domain_cards = TheoryMapper.theory_card_list_to_domain(infra_cards)
+        # Возвращаем SQLAlchemy модели напрямую (мапперы удалены)
+        return infra_cards, total
 
-        return domain_cards, total
-
-    async def get_theory_card_by_id(self, card_id: str) -> Optional[DomainTheoryCard]:
+    async def get_theory_card_by_id(self, card_id: str) -> Optional[SQLTheoryCard]:
         """Получение теоретической карточки по ID"""
         infra_card = (
             self.session.query(SQLTheoryCard)
             .filter(SQLTheoryCard.id == card_id)
             .first()
         )
-        return TheoryMapper.theory_card_to_domain(infra_card) if infra_card else None
+        return infra_card
 
     async def get_theory_categories(self) -> List[Dict[str, Any]]:
         """Получение списка категорий с подкатегориями и количеством карточек"""
@@ -178,7 +173,7 @@ class SQLAlchemyTheoryRepository(TheoryRepository):
 
     async def get_user_theory_progress(
         self, user_id: int, card_id: str
-    ) -> Optional[DomainUserTheoryProgress]:
+    ) -> Optional[SQLUserTheoryProgress]:
         """Получение прогресса пользователя по карточке"""
         infra_progress = (
             self.session.query(SQLUserTheoryProgress)
@@ -190,15 +185,11 @@ class SQLAlchemyTheoryRepository(TheoryRepository):
             )
             .first()
         )
-        return (
-            TheoryMapper.user_theory_progress_to_domain(infra_progress)
-            if infra_progress
-            else None
-        )
+        return infra_progress
 
     async def create_or_update_user_progress(
         self, user_id: int, card_id: str, **progress_data
-    ) -> DomainUserTheoryProgress:
+    ) -> SQLUserTheoryProgress:
         """Создание или обновление прогресса пользователя"""
         infra_progress = (
             self.session.query(SQLUserTheoryProgress)
@@ -229,11 +220,11 @@ class SQLAlchemyTheoryRepository(TheoryRepository):
             )
             self.session.add(infra_progress)
 
-        return TheoryMapper.user_theory_progress_to_domain(infra_progress)
+        return infra_progress
 
     async def get_due_theory_cards(
         self, user_id: int, limit: int = 10
-    ) -> List[DomainTheoryCard]:
+    ) -> List[SQLTheoryCard]:
         """Получение карточек для повторения"""
         now = datetime.utcnow()
 
@@ -272,7 +263,7 @@ class SQLAlchemyTheoryRepository(TheoryRepository):
 
             due_infra_cards.extend(new_infra_cards)
 
-        return TheoryMapper.theory_card_list_to_domain(due_infra_cards)
+        return due_infra_cards
 
     async def get_theory_stats(self, user_id: int) -> Dict[str, Any]:
         """Получение статистики изучения теории пользователя"""
