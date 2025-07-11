@@ -113,4 +113,5 @@ if __name__ == "__main__":
         host=new_settings.server.host,
         port=new_settings.server.port,
         reload=new_settings.server.debug,
+        reload_excludes=["logs/*", "*.log"],
     )
