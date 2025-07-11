@@ -2,8 +2,14 @@ import { Handle, Position } from '@xyflow/react';
 import React from 'react';
 import './TaskNode.scss';
 
+interface TaskNodeData {
+  title?: string;
+  full_title?: string;
+  color?: string;
+}
+
 interface TaskNodeProps {
-  data: any;
+  data: TaskNodeData;
   selected?: boolean;
 }
 

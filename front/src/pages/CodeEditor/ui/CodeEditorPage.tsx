@@ -9,7 +9,7 @@ import { useProgressTracking } from '@/shared/hooks/useProgressTracking';
 import { CodeTemplateGenerator } from '@/shared/utils/codeTemplateGenerator';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Code, Code2, Eye } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import './CodeEditorPage.scss';
 
@@ -64,7 +64,7 @@ export const CodeEditorPage = () => {
       // Тихо загружаем тест-кейсы в фоне без уведомлений
       getTestCases(blockId);
     }
-  }, [blockId, block?.id, getTestCases]); // ✅ УБРАЛИ showInfoMessage из зависимостей
+  }, [blockId, block?.id, getTestCases, block]); // ✅ УБРАЛИ showInfoMessage из зависимостей
 
   const determineLanguageFromBlock = (block: {
     codeLanguage?: string | null;
@@ -214,14 +214,17 @@ for (let i = 0; i < 10; i++) {
     e.preventDefault();
   };
 
-  const handleMouseMove = (e: MouseEvent) => {
-    if (!isResizing) return;
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (!isResizing) return;
 
-    const newWidth = (e.clientX / window.innerWidth) * 100;
-    if (newWidth >= 25 && newWidth <= 75) {
-      setLeftPanelWidth(newWidth);
-    }
-  };
+      const newWidth = (e.clientX / window.innerWidth) * 100;
+      if (newWidth >= 25 && newWidth <= 75) {
+        setLeftPanelWidth(newWidth);
+      }
+    },
+    [isResizing]
+  );
 
   const handleMouseUp = () => {
     setIsResizing(false);
@@ -236,7 +239,7 @@ for (let i = 0; i < 10; i++) {
         document.removeEventListener('mouseup', handleMouseUp);
       };
     }
-  }, [isResizing]);
+  }, [isResizing, handleMouseMove]);
 
   const isTaskMode = !!blockId;
   const isJSTask = block
