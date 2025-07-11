@@ -25,43 +25,8 @@ class FrontendVideoDownloader:
         # Файл для связки поста и видео
         self.metadata_file = self.output_dir / "posts_and_videos.json"
         self.posts_data = []
-<<<<<<< HEAD
-        # ID сообщений, уже обработанных (скачаны или пропущены по тегу)
-        self.processed_ids = set()
-        self._load_existing_metadata()
-
-    def _load_existing_metadata(self):
-        """Загружает существующий файл метаданных, чтобы возобновлять скачивание"""
-        if not self.metadata_file.exists():
-            return
-
-        try:
-            with open(self.metadata_file, 'r', encoding='utf-8') as f:
-                self.posts_data = json.load(f)
-
-            for item in self.posts_data:
-                msg_id = item.get("message_id")
-                if msg_id is None:
-                    continue
-                # Уже скачано и файл присутствует
-                video_path = item.get("video_path")
-                if video_path and os.path.exists(video_path):
-                    self.processed_ids.add(msg_id)
-                    continue
-                # Было пропущено по тегам
-                err = str(item.get("download_error", ""))
-                if "Skipped" in err:
-                    self.processed_ids.add(msg_id)
-        except Exception:
-            # Если файл повреждён – начинаем заново
-            self.posts_data = []
-            self.processed_ids = set()
-    
-    async def get_all_topic_messages(self, limit: int = 1000) -> List[Any]:
-=======
 
     async def get_all_topic_messages(self, limit: int = 1000) -> list[Any]:
->>>>>>> 05a40047f43b38854814fce3ae26b69ba4fb7c32
         """Получает все сообщения из топика Frontend"""
         print(f"📥 Получение сообщений из топика Frontend (лимит: {limit})...")
 
@@ -77,7 +42,7 @@ class FrontendVideoDownloader:
                         reverse=False,  # От новых к старым
                     ):
                         messages.append(message)
-                        # Искусственная пауза убрана ради ускорения
+                        await asyncio.sleep(0.1)  # Микро-пауза для защиты от блокировки
                     return messages
 
                 messages = await client._execute_with_retry(_get_topic_messages, self.dialog_id, self.topic_id, limit)
@@ -115,59 +80,6 @@ class FrontendVideoDownloader:
         """Генерирует имя файла для видео"""
         timestamp = message.date.strftime("%Y%m%d_%H%M%S") if message.date else "unknown"
         return f"frontend_{index:04d}_{timestamp}_{message.id}.mp4"
-<<<<<<< HEAD
-    
-    async def download_videos_from_messages(self, messages: List[Any]):
-        """Скачивает видео из сообщений параллельно с ограничением по семафору"""
-        print(f"\n🎬 Начинаю скачивание видео из {len(messages)} сообщений (параллельно)...")
-
-        # Ограничиваем количество одновременных загрузок
-        sem = asyncio.Semaphore(12)
-
-        # Потокобезопасные счётчики статистики
-        stats = {
-            "downloaded": 0,
-            "media": 0,
-            "skipped": 0,
-            "already": 0,
-            "errors": 0,
-        }
-        counter_lock = asyncio.Lock()
-
-        async def process_message(index: int, message):
-            async with sem:
-                print(f"\n📝 Обрабатываю сообщение {index}/{len(messages)} (ID: {message.id})")
-
-                # Пропуск, если уже обработано
-                if message.id in self.processed_ids:
-                    print("⏭️ Уже обработано ранее, пропуск")
-                    async with counter_lock:
-                        stats["already"] += 1
-                    return
-
-                # Предпросмотр текста
-                if message.text:
-                    preview_text = message.text[:100] + "..." if len(message.text) > 100 else message.text
-                    print(f"📄 Текст: {preview_text}")
-
-                # Фильтр по тегам
-                if message.text and any(tag in message.text.lower() for tag in ("#vue", "#angular")):
-                    print("⏭️ Пропуск: содержит теги #vue/#angular")
-                    async with counter_lock:
-                        stats["skipped"] += 1
-                    self.save_post_data(message, error="Skipped due to Vue/Angular tag")
-                    return
-
-                # Нет медиа
-                if not message.media:
-                    print("📝 Нет медиа файлов")
-                    self.save_post_data(message)
-                    return
-
-                async with counter_lock:
-                    stats["media"] += 1
-
-=======
 
     async def download_videos_from_messages(self, messages: list[Any]):
         """Скачивает видео из сообщений"""
@@ -188,38 +100,26 @@ class FrontendVideoDownloader:
             # Проверяем наличие медиа
             if message.media:
                 media_count += 1
->>>>>>> 05a40047f43b38854814fce3ae26b69ba4fb7c32
                 media_type = str(type(message.media).__name__)
                 print(f"🎯 Найдено медиа: {media_type}")
 
                 try:
+                    # Генерируем имя файла
                     filename = self.generate_video_filename(message, index)
                     file_path = self.output_dir / filename
 
-<<<<<<< HEAD
-                    result = await simple_download_media(self.dialog_id, message.id, str(file_path))
-=======
                     # Скачиваем медиа
                     result = await simple_download_media(
                         self.dialog_id,
                         message.id,
                         str(file_path),
                     )
->>>>>>> 05a40047f43b38854814fce3ae26b69ba4fb7c32
 
                     if result.get("success"):
-                        async with counter_lock:
-                            stats["downloaded"] += 1
+                        downloaded_count += 1
                         print(f"✅ Скачано: {filename}")
                         self.save_post_data(message, str(file_path))
                     else:
-<<<<<<< HEAD
-                        async with counter_lock:
-                            stats["errors"] += 1
-                        err = result.get("error", "Неизвестная ошибка")
-                        print(f"❌ Ошибка скачивания: {err}")
-                        self.save_post_data(message, error=err)
-=======
                         error_count += 1
                         error_msg = result.get("error", "Неизвестная ошибка")
                         print(f"❌ Ошибка скачивания: {error_msg}")
@@ -228,32 +128,19 @@ class FrontendVideoDownloader:
                     # Пауза между скачиваниями для защиты от блокировки
                     await asyncio.sleep(2)
 
->>>>>>> 05a40047f43b38854814fce3ae26b69ba4fb7c32
                 except Exception as e:
-                    async with counter_lock:
-                        stats["errors"] += 1
+                    error_count += 1
                     print(f"❌ Исключение при скачивании: {e}")
                     self.save_post_data(message, error=str(e))
-<<<<<<< HEAD
-
-        # Собираем задачи и запускаем параллельно
-        tasks = [process_message(idx, msg) for idx, msg in enumerate(messages, 1)]
-        await asyncio.gather(*tasks)
-
-        # Выводим итоговую статистику
-=======
             else:
                 print("📝 Нет медиа файлов")
                 self.save_post_data(message)
 
->>>>>>> 05a40047f43b38854814fce3ae26b69ba4fb7c32
         print("\n📊 ИТОГОВАЯ СТАТИСТИКА:")
         print(f"  📝 Всего сообщений: {len(messages)}")
-        print(f"  🎬 С медиа файлами: {stats['media']}")
-        print(f"  ⏭️ Пропущено (Vue/Angular): {stats['skipped']}")
-        print(f"  🛑 Уже обработано ранее: {stats['already']}")
-        print(f"  ✅ Успешно скачано: {stats['downloaded']}")
-        print(f"  ❌ Ошибок: {stats['errors']}")
+        print(f"  🎬 С медиа файлами: {media_count}")
+        print(f"  ✅ Успешно скачано: {downloaded_count}")
+        print(f"  ❌ Ошибок: {error_count}")
         print(f"  📁 Папка: {self.output_dir.absolute()}")
         print(f"  📋 Метаданные: {self.metadata_file.absolute()}")
 
