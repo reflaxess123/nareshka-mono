@@ -2,8 +2,13 @@ import { Handle, Position } from '@xyflow/react';
 import React from 'react';
 import './MoreNode.scss';
 
+interface MoreNodeData {
+  title?: string;
+  color?: string;
+}
+
 interface MoreNodeProps {
-  data: any;
+  data: MoreNodeData;
   selected?: boolean;
 }
 

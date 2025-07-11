@@ -326,7 +326,7 @@ export const CodeEditor = ({
       setCode(initialCode);
       setCodeOverridden(true);
     }
-  }, [initialCode]);
+  }, [initialCode, code]);
 
   useEffect(() => {
     if (solutions && solutions.length > 0 && !codeOverridden) {
