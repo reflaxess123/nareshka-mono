@@ -31,6 +31,12 @@ class IdentifiedResponse(TimestampedResponse):
     id: int
 
 
+class StringIdentifiedResponse(TimestampedResponse):
+    """Response DTO с строковым ID и временными метками"""
+
+    id: str
+
+
 class PaginationInfo(BaseModel):
     """Информация о пагинации"""
 

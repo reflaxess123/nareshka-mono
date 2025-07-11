@@ -4,23 +4,21 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
-from .base_dto import IdentifiedResponse, PaginatedResponse
+from .base_dto import PaginatedResponse, StringIdentifiedResponse
 
 
-class ContentFileResponse(IdentifiedResponse):
+class ContentFileResponse(StringIdentifiedResponse):
     """Ответ с информацией о файле контента"""
 
-    id: str  # Переопределяем тип ID для ContentFile
     webdavPath: str
     mainCategory: str
     subCategory: str
     lastFileHash: Optional[str] = None
 
 
-class ContentBlockResponse(IdentifiedResponse):
+class ContentBlockResponse(StringIdentifiedResponse):
     """Ответ с информацией о блоке контента"""
 
-    id: str  # Переопределяем тип ID для ContentBlock
     fileId: str
     pathTitles: List[str]
     blockTitle: str
@@ -47,10 +45,9 @@ class ContentBlockWithProgressResponse(ContentBlockResponse):
     userProgress: int = 0
 
 
-class UserContentProgressResponse(IdentifiedResponse):
+class UserContentProgressResponse(StringIdentifiedResponse):
     """Ответ с информацией о прогрессе пользователя"""
 
-    id: str  # Переопределяем тип ID для UserContentProgress
     userId: int
     blockId: str
     solvedCount: int
