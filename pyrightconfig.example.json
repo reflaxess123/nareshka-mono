@@ -1,0 +1,26 @@
+{
+  "include": [
+    "**/*.py"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/__pycache__"
+  ],
+  "venvPath": "/home/crock/.cache/pypoetry/virtualenvs",
+  "venv": "nsbn-backend-7OJkxQy_-py3.13",
+  "typeCheckingMode": "basic",
+  "reportMissingImports": true,
+  "reportMissingTypeStubs": false,
+  "reportGeneralTypeIssues": true,
+  "reportUntypedFunctionDecorator": false,
+  "reportUnusedImport": true,
+  "reportUnusedVariable": true,
+  "reportDuplicateImport": true,
+  "reportWildcardImportFromLibrary": true,
+  "strictListInference": true,
+  "strictSetInference": true,
+  "strictDictionaryInference": true,
+  "strictParameterNoneValue": true,
+  "pythonVersion": "3.13",
+  "pythonPlatform": "Linux"
+}
