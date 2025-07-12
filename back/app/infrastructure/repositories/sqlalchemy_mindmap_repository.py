@@ -11,7 +11,7 @@ from app.domain.entities.mindmap_types import (
 )
 from app.domain.repositories.mindmap_repository import MindMapRepository
 from app.infrastructure.models import ContentBlock, ContentFile, UserContentProgress
-from app.mindmap_config import (
+from app.config.mindmap_config import (
     get_available_technologies,
     get_technology_center,
     get_technology_topics,

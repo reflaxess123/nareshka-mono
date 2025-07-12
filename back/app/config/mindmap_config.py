@@ -195,4 +195,4 @@ def get_all_topics(technology: str = "javascript"):
 
 def get_available_technologies():
     """Получить список доступных технологий"""
-    return list(TECHNOLOGY_CENTERS.keys())
+    return list(TECHNOLOGY_CENTERS.keys()) 
