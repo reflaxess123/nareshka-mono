@@ -579,3 +579,4 @@ def downgrade() -> None:
     op.drop_index('idx_learningpath_difficulty', table_name='LearningPath')
     op.drop_table('LearningPath')
     # ### end Alembic commands ### 
+
