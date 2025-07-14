@@ -1,123 +1,242 @@
-"""Централизованная система логирования"""
+"""Структурированное логирование с JSON форматом и correlation ID"""
 
-import logging
-import os
 import sys
-from pathlib import Path
-from typing import Optional
+import uuid
+import logging
+from typing import Optional, Dict, Any
+from contextvars import ContextVar
+import structlog
+from pythonjsonlogger import jsonlogger
 
-from app.config import new_settings
+from app.core.settings import settings
+
+# Context variable для correlation ID
+correlation_id_ctx: ContextVar[str] = ContextVar('correlation_id', default='')
+user_id_ctx: ContextVar[str] = ContextVar('user_id', default='')
+request_id_ctx: ContextVar[str] = ContextVar('request_id', default='')
 
 
-class ColoredFormatter(logging.Formatter):
-    """Цветной форматтер для консольного вывода"""
+def set_correlation_id(correlation_id: str) -> None:
+    """Установить correlation ID для текущего контекста"""
+    correlation_id_ctx.set(correlation_id)
 
-    COLORS = {
-        "DEBUG": "\033[94m",  # Синий
-        "INFO": "\033[92m",  # Зеленый
-        "WARNING": "\033[93m",  # Желтый
-        "ERROR": "\033[91m",  # Красный
-        "CRITICAL": "\033[95m",  # Пурпурный
-        "ENDC": "\033[0m",  # Сброс цвета
+
+def get_correlation_id() -> str:
+    """Получить correlation ID из контекста"""
+    return correlation_id_ctx.get()
+
+
+def set_user_id(user_id: str) -> None:
+    """Установить user ID для текущего контекста"""
+    user_id_ctx.set(user_id)
+
+
+def get_user_id() -> str:
+    """Получить user ID из контекста"""
+    return user_id_ctx.get()
+
+
+def set_request_id(request_id: str) -> None:
+    """Установить request ID для текущего контекста"""
+    request_id_ctx.set(request_id)
+
+
+def get_request_id() -> str:
+    """Получить request ID из контекста"""
+    return request_id_ctx.get()
+
+
+def add_correlation_id(_, __, event_dict: Dict[str, Any]) -> Dict[str, Any]:
+    """Добавить correlation ID в лог"""
+    if correlation_id := get_correlation_id():
+        event_dict['correlation_id'] = correlation_id
+    if user_id := get_user_id():
+        event_dict['user_id'] = user_id
+    if request_id := get_request_id():
+        event_dict['request_id'] = request_id
+    return event_dict
+
+
+def add_service_info(_, __, event_dict: Dict[str, Any]) -> Dict[str, Any]:
+    """Добавить информацию о сервисе"""
+    event_dict.update({
+        'service': settings.app.name,
+        'version': settings.app.version,
+        'environment': settings.app.environment,
+    })
+    return event_dict
+
+
+def filter_sensitive_data(_, __, event_dict: Dict[str, Any]) -> Dict[str, Any]:
+    """Фильтровать чувствительные данные"""
+    sensitive_keys = {
+        'password', 'secret', 'token', 'key', 'authorization', 
+        'secret_key', 'access_token', 'refresh_token', 'api_key'
     }
-
-    def format(self, record):
-        # Добавляем цвет для уровня логирования
-        if record.levelname in self.COLORS:
-            record.levelname = f"{self.COLORS[record.levelname]}{record.levelname}{self.COLORS['ENDC']}"
-
-        return super().format(record)
-
-
-def setup_logging(
-    log_level: str = "INFO", log_file: Optional[str] = None, enable_console: bool = True
-) -> None:
-    """
-    Настройка централизованного логирования
-
-    Args:
-        log_level: Уровень логирования (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-        log_file: Путь к файлу логов (опционально)
-        enable_console: Включить консольный вывод
-    """
-
-    # Получаем корневой логгер
-    root_logger = logging.getLogger()
-    root_logger.setLevel(getattr(logging, log_level.upper()))
-
-    # Очищаем существующие обработчики
-    root_logger.handlers.clear()
-
-    # Формат логов
-    log_format = "%(asctime)s | %(name)-20s | %(levelname)-8s | %(message)s"
-    date_format = "%Y-%m-%d %H:%M:%S"
-
-    # Консольный обработчик с цветами
-    if enable_console:
-        console_handler = logging.StreamHandler(sys.stdout)
-        console_handler.setLevel(getattr(logging, log_level.upper()))
-        console_formatter = ColoredFormatter(log_format, date_format)
-        console_handler.setFormatter(console_formatter)
-        root_logger.addHandler(console_handler)
-
-    # Файловый обработчик
-    if log_file:
-        # Создаем директорию для логов если не существует
-        log_path = Path(log_file)
-        log_path.parent.mkdir(parents=True, exist_ok=True)
-
-        file_handler = logging.FileHandler(log_file, encoding="utf-8")
-        file_handler.setLevel(logging.DEBUG)  # В файл пишем все
-        file_formatter = logging.Formatter(log_format, date_format)
-        file_handler.setFormatter(file_formatter)
-        root_logger.addHandler(file_handler)
-
-    # Настройка логирования для внешних библиотек
-    logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
     
-    # Uvicorn logging level can be controlled via environment variable
-    uvicorn_log_level = os.getenv("UVICORN_LOG_LEVEL", "INFO").upper()
-    logging.getLogger("uvicorn").setLevel(getattr(logging, uvicorn_log_level))
+    for key in list(event_dict.keys()):
+        if any(sensitive in key.lower() for sensitive in sensitive_keys):
+            event_dict[key] = '[FILTERED]'
     
-    logging.getLogger("fastapi").setLevel(logging.INFO)
-    logging.getLogger("httpx").setLevel(logging.WARNING)
+    return event_dict
+
+
+class CustomJSONFormatter(jsonlogger.JsonFormatter):
+    """Кастомный JSON форматер"""
     
-    # Watchfiles logging level can be controlled via environment variable
-    watchfiles_log_level = os.getenv("WATCHFILES_LOG_LEVEL", "WARNING").upper()
-    logging.getLogger("watchfiles").setLevel(getattr(logging, watchfiles_log_level))
+    def add_fields(self, log_record: Dict[str, Any], record: logging.LogRecord, message_dict: Dict[str, Any]) -> None:
+        super().add_fields(log_record, record, message_dict)
+        
+        # Добавляем стандартные поля
+        log_record['timestamp'] = record.created
+        log_record['level'] = record.levelname
+        log_record['logger'] = record.name
+        log_record['module'] = record.module
+        log_record['function'] = record.funcName
+        log_record['line'] = record.lineno
+        
+        # Добавляем контекстные поля
+        if correlation_id := get_correlation_id():
+            log_record['correlation_id'] = correlation_id
+        if user_id := get_user_id():
+            log_record['user_id'] = user_id
+        if request_id := get_request_id():
+            log_record['request_id'] = request_id
+        
+        # Добавляем информацию о сервисе
+        log_record['service'] = settings.app.name
+        log_record['version'] = settings.app.version
+        log_record['environment'] = settings.app.environment
 
-    # Логгер для нашего приложения
-    app_logger = logging.getLogger("nareshka")
-    app_logger.info("Система логирования инициализирована")
 
-
-def get_logger(name: str) -> logging.Logger:
-    """
-    Получить логгер для модуля
-
-    Args:
-        name: Имя модуля (обычно __name__)
-
-    Returns:
-        Настроенный логгер
-    """
-    return logging.getLogger(f"nareshka.{name}")
-
-
-# Инициализация по умолчанию
-def init_default_logging():
-    """Инициализация логирования с настройками по умолчанию"""
-    log_level = getattr(new_settings, "log_level", "INFO")
-
-    # В development режиме логи в консоль и файл
-    if getattr(new_settings, "environment", "development") == "development":
-        setup_logging(
-            log_level=log_level, log_file="logs/nareshka.log", enable_console=True
+def setup_logging() -> None:
+    """Настройка системы логирования"""
+    
+    # Настройка уровня логирования
+    log_level = getattr(logging, settings.log_level.upper(), logging.INFO)
+    
+    # Очистка существующих handlers
+    logging.root.handlers = []
+    
+    if settings.logging.format == 'json':
+        # JSON формат для продакшен
+        formatter = CustomJSONFormatter(
+            fmt='%(timestamp)s %(level)s %(logger)s %(module)s %(function)s %(line)d %(message)s'
         )
+        
+        # Настройка structlog для JSON
+        structlog.configure(
+            processors=[
+                structlog.stdlib.add_logger_name,
+                structlog.stdlib.add_log_level,
+                structlog.stdlib.PositionalArgumentsFormatter(),
+                structlog.processors.TimeStamper(fmt="iso"),
+                structlog.processors.StackInfoRenderer(),
+                structlog.processors.format_exc_info,
+                add_correlation_id,
+                add_service_info,
+                filter_sensitive_data,
+                structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
+            ],
+            context_class=dict,
+            logger_factory=structlog.stdlib.LoggerFactory(),
+            wrapper_class=structlog.stdlib.BoundLogger,
+            cache_logger_on_first_use=True,
+        )
+        
     else:
-        # В production только в файл
-        setup_logging(
-            log_level=log_level,
-            log_file="/var/log/nareshka/app.log",
-            enable_console=False,
+        # Текстовый формат для разработки
+        formatter = logging.Formatter(
+            fmt='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+            datefmt='%Y-%m-%d %H:%M:%S'
         )
+        
+        # Настройка structlog для текста
+        structlog.configure(
+            processors=[
+                structlog.stdlib.add_logger_name,
+                structlog.stdlib.add_log_level,
+                structlog.stdlib.PositionalArgumentsFormatter(),
+                structlog.processors.TimeStamper(fmt="%Y-%m-%d %H:%M:%S"),
+                add_correlation_id,
+                add_service_info,
+                filter_sensitive_data,
+                structlog.dev.ConsoleRenderer()
+            ],
+            context_class=dict,
+            logger_factory=structlog.stdlib.LoggerFactory(),
+            wrapper_class=structlog.stdlib.BoundLogger,
+            cache_logger_on_first_use=True,
+        )
+    
+    # Настройка console handler
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setFormatter(formatter)
+    console_handler.setLevel(log_level)
+    
+    # Настройка root logger
+    root_logger = logging.getLogger()
+    root_logger.setLevel(log_level)
+    root_logger.addHandler(console_handler)
+    
+    # Настройка логгеров для библиотек
+    logging.getLogger('uvicorn').setLevel(getattr(logging, settings.uvicorn_log_level.upper(), logging.INFO))
+    logging.getLogger('uvicorn.access').setLevel(logging.WARNING)
+    logging.getLogger('watchfiles').setLevel(getattr(logging, settings.watchfiles_log_level.upper(), logging.WARNING))
+    logging.getLogger('sqlalchemy.engine').setLevel(logging.WARNING)
+    logging.getLogger('sqlalchemy.pool').setLevel(logging.WARNING)
+    
+    # Отключаем избыточные логи
+    logging.getLogger('multipart').setLevel(logging.WARNING)
+    logging.getLogger('urllib3').setLevel(logging.WARNING)
+
+
+def get_logger(name: str) -> structlog.stdlib.BoundLogger:
+    """Получить структурированный логгер"""
+    return structlog.get_logger(name)
+
+
+def create_correlation_id() -> str:
+    """Создать новый correlation ID"""
+    return str(uuid.uuid4())
+
+
+# Middleware для установки correlation ID
+class CorrelationIdMiddleware:
+    """Middleware для установки correlation ID для каждого запроса"""
+    
+    def __init__(self, app):
+        self.app = app
+    
+    async def __call__(self, scope, receive, send):
+        if scope["type"] == "http":
+            # Создаем correlation ID для запроса
+            correlation_id = create_correlation_id()
+            set_correlation_id(correlation_id)
+            
+            # Устанавливаем request ID
+            request_id = scope.get("headers", {}).get("x-request-id", correlation_id)
+            set_request_id(request_id)
+            
+            # Логируем начало запроса
+            logger = get_logger("request")
+            logger.info(
+                "Request started",
+                method=scope["method"],
+                path=scope["path"],
+                query_string=scope.get("query_string", b"").decode(),
+            )
+        
+        await self.app(scope, receive, send)
+
+
+# Инициализация логирования при импорте
+setup_logging()
+
+# Экспорт для обратной совместимости
+def init_default_logging():
+    """Для обратной совместимости"""
+    setup_logging()
+
+
+

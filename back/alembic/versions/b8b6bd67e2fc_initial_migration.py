@@ -316,3 +316,4 @@ def downgrade() -> None:
     sa.PrimaryKeyConstraint('id', name=op.f('_prisma_migrations_pkey'))
     )
     # ### end Alembic commands ### 
+

@@ -12,16 +12,16 @@ from fastapi.staticfiles import StaticFiles
 from app.config import new_settings
 from app.core.error_handlers import register_exception_handlers
 from app.core.logging import get_logger, init_default_logging
-from app.presentation.api.admin_v2 import router as admin_v2_router
-from app.presentation.api.auth_v2 import router as auth_v2_router
-from app.presentation.api.code_editor_v2 import router as code_editor_v2_router
-from app.presentation.api.content_v2 import router as content_v2_router
-from app.presentation.api.health import router as health_router
-from app.presentation.api.mindmap_v2 import router as mindmap_v2_router
-from app.presentation.api.progress_v2 import router as progress_v2_router
-from app.presentation.api.stats_v2 import router as stats_v2_router
-from app.presentation.api.task_v2 import router as task_v2_router
-from app.presentation.api.theory_v2 import router as theory_v2_router
+from app.features.admin.api.admin_router import router as admin_router
+from app.features.auth.api.auth_router import router as auth_router
+from app.features.code_editor.api import router as code_editor_router
+from app.features.content.api import router as content_router
+from app.core.health import router as health_router
+from app.features.mindmap.api import router as mindmap_router
+from app.features.progress.api import router as progress_router
+from app.features.stats.api import router as stats_router
+from app.features.task.api import router as task_router
+from app.features.theory.api import router as theory_router
 
 # Инициализируем логирование
 init_default_logging()
@@ -41,8 +41,8 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title=new_settings.app_name,
-    description=new_settings.description,
-    version=new_settings.version,
+    description=new_settings.app_description,
+    version=new_settings.app_version,
     lifespan=lifespan,
 )
 
@@ -63,15 +63,15 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 # Подключение роутеров новой архитектуры
 app.include_router(health_router, prefix="/api")
-app.include_router(auth_v2_router, prefix="/api/v2")
-app.include_router(content_v2_router, prefix="/api/v2")
-app.include_router(theory_v2_router, prefix="/api/v2")
-app.include_router(task_v2_router, prefix="/api/v2")
-app.include_router(progress_v2_router, prefix="/api/v2")
-app.include_router(code_editor_v2_router, prefix="/api/v2/code-editor")
-app.include_router(stats_v2_router, prefix="/api/v2/stats")
-app.include_router(mindmap_v2_router, prefix="/api/v2/mindmap")
-app.include_router(admin_v2_router, prefix="/api/v2/admin")
+app.include_router(auth_router, prefix="/api/v2")
+app.include_router(content_router, prefix="/api/v2")
+app.include_router(theory_router, prefix="/api/v2")
+app.include_router(task_router, prefix="/api/v2")
+app.include_router(progress_router, prefix="/api/v2")
+app.include_router(code_editor_router, prefix="/api/v2/code-editor")
+app.include_router(stats_router, prefix="/api/v2/stats")
+app.include_router(mindmap_router, prefix="/api/v2/mindmap")
+app.include_router(admin_router, prefix="/api/v2/admin")
 
 # Старые роутеры удалены - используется только новая архитектура v2
 
@@ -90,14 +90,14 @@ async def get_openapi():
 @app.get("/")
 async def root():
     return {
-        "message": f"Hello World! {new_settings.app_name} {new_settings.version} (NEW ARCHITECTURE)"
+        "message": f"Hello World! {new_settings.app_name} {new_settings.app_version} (NEW ARCHITECTURE)"
     }
 
 
 @app.get("/api/")
 async def api_root():
     return {
-        "message": f"Hello World! {new_settings.app_name} {new_settings.version} (NEW ARCHITECTURE)"
+        "message": f"Hello World! {new_settings.app_name} {new_settings.app_version} (NEW ARCHITECTURE)"
     }
 
 
