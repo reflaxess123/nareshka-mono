@@ -1,17 +1,21 @@
 """Исключения для работы с теоретическими карточками"""
 
-from app.core.exceptions import BaseApplicationException, NotFoundException
+from app.shared.exceptions.base import BaseAppException, ResourceNotFoundException
 
 
-class TheoryError(BaseApplicationException):
+class TheoryError(BaseAppException):
     """Базовое исключение для работы с теорией"""
     
-    def __init__(self, message: str = "Ошибка при работе с теорией", details: str = None):
-        from app.core.exceptions import ErrorCode
-        super().__init__(message, ErrorCode.INTERNAL_ERROR, details, 500)
+    def __init__(self, message: str = "Ошибка при работе с теорией", details: dict = None):
+        super().__init__(
+            message=message,
+            error_code="THEORY_ERROR",
+            status_code=500,
+            details=details
+        )
 
 
-class TheoryCardNotFoundError(NotFoundException):
+class TheoryCardNotFoundError(ResourceNotFoundException):
     """Исключение при отсутствии теоретической карточки"""
     
     def __init__(self, card_id: str):

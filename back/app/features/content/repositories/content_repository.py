@@ -103,9 +103,9 @@ class ContentRepository:
             search_term = f"%{search_query.strip()}%"
             query = query.filter(
                 or_(
-                    ContentBlock.block_title.ilike(search_term),
+                    ContentBlock.blockTitle.ilike(search_term),
                     ContentBlock.textContent.ilike(search_term),
-                    ContentBlock.code_fold_title.ilike(search_term),
+                    ContentBlock.codeFoldTitle.ilike(search_term),
                 )
             )
 
@@ -117,7 +117,7 @@ class ContentRepository:
         elif sort_by == "orderInFile":
             order_field = ContentBlock.orderInFile
         elif sort_by == "blockLevel":
-            order_field = ContentBlock.block_level
+            order_field = ContentBlock.blockLevel
         elif sort_by == "file.webdavPath":
             order_field = ContentFile.webdavPath
         else:
@@ -230,6 +230,10 @@ class ContentRepository:
                 updatedAt=datetime.utcnow(),
             )
             self.session.add(progress)
+
+        # ✅ ИСПРАВЛЕНИЕ: Коммитим изменения в базу данных
+        self.session.commit()
+        self.session.refresh(progress)
 
         return progress
 

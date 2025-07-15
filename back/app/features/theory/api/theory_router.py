@@ -87,6 +87,16 @@ async def get_theory_subcategories(
     return TheorySubcategoriesResponse(subcategories=subcategories)
 
 
+@router.get("/cards/due", response_model=DueCardsResponse)
+async def get_due_theory_cards(
+    limit: int = Query(10, ge=1, le=100, description="Количество карточек"),
+    current_user=Depends(get_current_user_required),
+    theory_service: TheoryService = Depends(get_theory_service),
+):
+    """Получение карточек для повторения"""
+    return await theory_service.get_due_theory_cards(current_user.id, limit)
+
+
 @router.get("/cards/{card_id}", response_model=TheoryCardResponse)
 async def get_theory_card(
     card_id: str,
@@ -136,16 +146,6 @@ async def review_theory_card(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Ошибка повторения карточки: {str(e)}",
         )
-
-
-@router.get("/cards/due", response_model=DueCardsResponse)
-async def get_due_theory_cards(
-    limit: int = Query(10, ge=1, le=100, description="Количество карточек"),
-    current_user=Depends(get_current_user_required),
-    theory_service: TheoryService = Depends(get_theory_service),
-):
-    """Получение карточек для повторения"""
-    return await theory_service.get_due_theory_cards(current_user.id, limit)
 
 
 @router.get("/stats", response_model=TheoryStatsResponse)

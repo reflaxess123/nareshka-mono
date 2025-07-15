@@ -22,6 +22,10 @@ from app.features.task.exceptions.task_exceptions import (
     TaskSolutionError,
 )
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class TaskRepository:
     """Репозиторий для работы с заданиями"""
@@ -165,15 +169,24 @@ class TaskRepository:
 
         blocks = query.order_by(ContentFile.webdavPath, ContentBlock.orderInFile).all()
 
-        # Получаем прогресс пользователя
+        # Получаем прогресс пользователя ОДНИМ запросом
         user_progress = {}
         if user_id:
-            progress_records = (
-                self.session.query(UserContentProgress)
-                .filter(UserContentProgress.userId == user_id)
-                .all()
-            )
-            user_progress = {p.blockId: p.solvedCount for p in progress_records}
+            block_ids = [block.id for block in blocks]
+            logger.info(f"🔍 DEBUG: Loading progress for user_id={user_id}, blocks={len(block_ids)}")
+            if block_ids:
+                progress_records = (
+                    self.session.query(UserContentProgress)
+                    .filter(
+                        UserContentProgress.userId == user_id,
+                        UserContentProgress.blockId.in_(block_ids)
+                    )
+                    .all()
+                )
+                user_progress = {p.blockId: p.solvedCount for p in progress_records}
+                logger.info(f"🔍 DEBUG: Found progress records: {len(progress_records)}, progress_dict: {user_progress}")
+        else:
+            logger.info(f"🔍 DEBUG: user_id is None, skipping progress loading")
 
         # Преобразуем в Task
         tasks = []

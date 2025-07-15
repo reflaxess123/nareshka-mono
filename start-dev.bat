@@ -1,10 +1,10 @@
 @echo off
 setlocal enabledelayedexpansion
-title Nareshka Development Servers (NEW ARCHITECTURE)
+title Nareshka Development Servers
 
 echo ==========================================
 echo NARESHKA DEVELOPMENT SERVERS STARTUP
-echo *** NEW ARCHITECTURE v2.0 ***
+echo *** FEATURE-BASED ARCHITECTURE ***
 echo ==========================================
 echo.
 
@@ -71,35 +71,23 @@ if not exist "front" (
     exit /b 1
 )
 
-REM Check NEW ARCHITECTURE FILES
-echo -> Checking NEW ARCHITECTURE files...
+REM Check backend files
+echo -> Checking backend files...
 if not exist "back/main.py" (
     echo ❌ ERROR: 'back/main.py' not found.
-    echo    NEW ARCHITECTURE requires main.py file.
+    echo    Backend requires main.py file.
     pause
     exit /b 1
-)
-
-if not exist "back/main_old.py" (
-    echo ⚠️  WARNING: 'back/main_old.py' not found.
-    echo    No rollback file available.
 )
 
 if not exist "back/app/config/new_settings.py" (
     echo ❌ ERROR: 'back/app/config/new_settings.py' not found.
-    echo    NEW ARCHITECTURE requires new_settings.py file.
+    echo    Backend requires new_settings.py file.
     pause
     exit /b 1
 )
 
-if not exist "back/app/presentation/api" (
-    echo ❌ ERROR: 'back/app/presentation/api' directory not found.
-    echo    NEW ARCHITECTURE requires presentation layer.
-    pause
-    exit /b 1
-)
-
-echo ✓ NEW ARCHITECTURE files verified
+echo ✓ Backend files verified
 
 REM Check Poetry availability
 echo -> Checking Poetry installation...
@@ -129,17 +117,17 @@ if !errorlevel! neq 0 (
     echo ✓ Poetry environment ready
 )
 
-REM Verify NEW ARCHITECTURE can be imported
-echo -> Testing NEW ARCHITECTURE import...
-poetry run python -c "import main; print('NEW ARCHITECTURE verified')" >nul 2>&1
+REM Verify backend can be imported
+echo -> Testing backend import...
+poetry run python -c "import main; print('Backend verified')" >nul 2>&1
 if !errorlevel! neq 0 (
-    echo ❌ ERROR: NEW ARCHITECTURE import failed.
+    echo ❌ ERROR: Backend import failed.
     echo    Please check main.py and dependencies.
     cd..
     pause
     exit /b 1
 ) else (
-    echo ✓ NEW ARCHITECTURE import successful
+    echo ✓ Backend import successful
 )
 
 cd..
@@ -192,29 +180,29 @@ powershell -Command "(Get-Content back/.env) -replace '^REDIS_URL=.*', '%NEW_RED
 
 echo.
 echo ==========================================
-echo STARTING SERVERS (NEW ARCHITECTURE)
+echo STARTING SERVERS
 echo ==========================================
 
 REM Start backend with error checking
-echo -> Starting Python backend server (NEW ARCHITECTURE)...
+echo -> Starting Python backend server...
 echo   Command: poetry run uvicorn main:app --host 0.0.0.0 --port 4000 --reload --reload-exclude logs/* --reload-exclude *.log
-echo   Architecture: Clean Architecture with DI, UnitOfWork, v2 APIs
-start "Nareshka Backend NEW ARCH (Port 4000)" cmd /k "cd /d %~dp0back && echo Starting NEW ARCHITECTURE backend... && echo Available endpoints: /api/v2/auth, /api/v2/content, /api/v2/theory, etc. && poetry run uvicorn main:app --host 0.0.0.0 --port 4000 --reload --reload-exclude logs/* --reload-exclude *.log || (echo NEW ARCHITECTURE backend failed to start! && pause)"
+echo   Architecture: Feature-based with v2 APIs
+start "Nareshka Backend (Port 4000)" cmd /k "cd /d %~dp0back && echo Starting backend... && echo Available endpoints: /api/v2/auth, /api/v2/content, /api/v2/theory, etc. && poetry run uvicorn main:app --host 0.0.0.0 --port 4000 --reload --reload-exclude logs/* --reload-exclude *.log || (echo Backend failed to start! && pause)"
 
 REM Wait and check if backend started
-echo Waiting for NEW ARCHITECTURE backend to initialize...
+echo Waiting for backend to initialize...
 timeout /t 5 /nobreak >nul
 
 REM Quick backend health check
 for /L %%i in (1,1,15) do (
     curl -s http://localhost:4000/api/health >nul 2>&1
     if !errorlevel! equ 0 (
-        echo ✓ NEW ARCHITECTURE backend is responding
+        echo ✓ Backend is responding
         goto backend_ready
     )
     timeout /t 1 /nobreak >nul
 )
-echo ⚠️  NEW ARCHITECTURE backend might not be ready yet (will continue anyway)
+echo ⚠️  Backend might not be ready yet (will continue anyway)
 
 :backend_ready
 
@@ -222,12 +210,12 @@ REM Start frontend
 echo.
 echo -> Starting Node.js frontend server...
 echo   Command: npm run dev
-echo   Note: Frontend will connect to NEW ARCHITECTURE endpoints /api/v2/*
-start "Nareshka Frontend (Port 5173)" cmd /k "cd /d %~dp0front && echo Starting frontend for NEW ARCHITECTURE... && echo Backend endpoints: /api/v2/auth, /api/v2/content, etc. && npm run dev || (echo Frontend failed to start! && pause)"
+echo   Note: Frontend will connect to backend endpoints /api/v2/*
+start "Nareshka Frontend (Port 5173)" cmd /k "cd /d %~dp0front && echo Starting frontend... && echo Backend endpoints: /api/v2/auth, /api/v2/content, etc. && npm run dev || (echo Frontend failed to start! && pause)"
 
 echo.
 echo ==========================================
-echo NEW ARCHITECTURE SERVERS STARTUP COMPLETED
+echo SERVERS STARTUP COMPLETED
 echo ==========================================
 echo.
 echo 🌐 Backend:     http://localhost:4000
@@ -241,7 +229,7 @@ echo 📝 Tasks v2:    http://localhost:4000/api/v2/tasks
 echo 📊 Progress v2: http://localhost:4000/api/v2/progress
 echo 🛠️  Admin v2:    http://localhost:4000/api/v2/admin
 echo.
-echo 🏗️  Architecture: Clean Architecture with DI, UnitOfWork, Services
+echo 🏗️  Architecture: Feature-based Architecture with Services
 echo 🔧 Features: JWT Auth, Redis Sessions, Async Operations
 echo.
 echo Check the separate windows for server logs and status.
@@ -249,8 +237,7 @@ echo.
 echo 💡 To stop servers: Close the backend and frontend windows
 echo    or use Ctrl+C in each window
 echo.
-echo 🔄 To rollback to OLD ARCHITECTURE: run start-dev.bat
-echo    (requires main_old.py to be present)
+echo 🔄 To restart servers: close windows and run this script again
 echo.
 
 REM Ask user if they want to open browser
@@ -264,13 +251,13 @@ if /i "!open_browser!"=="y" (
 )
 
 echo.
-echo 🚀 NEW ARCHITECTURE development environment is ready!
+echo 🚀 Development environment is ready!
 echo This window can be safely closed.
 echo.
 echo Architecture Details:
-echo - Domain Layer: Entities, Repositories, Services
-echo - Application Layer: DTOs, Services, Use Cases  
-echo - Infrastructure Layer: Database, External APIs
-echo - Presentation Layer: API Controllers (v2)
+echo - Features Layer: Auth, Content, Theory, Tasks, etc.
+echo - Services Layer: Business Logic, Data Processing
+echo - Repositories Layer: Database Access
+echo - API Layer: REST Controllers (v2)
 echo.
 pause 
