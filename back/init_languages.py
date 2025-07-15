@@ -8,9 +8,9 @@ import uuid
 
 from sqlalchemy.orm import Session
 
-from app.infrastructure.database.connection import engine
-from app.infrastructure.models.code_execution_models import SupportedLanguage
-from app.infrastructure.models.enums import CodeLanguage
+from app.shared.database.connection import engine
+from app.features.code_editor.models.code_execution_models import SupportedLanguage
+from app.shared.models.enums import CodeLanguage
 
 # Конфигурация поддерживаемых языков
 SUPPORTED_LANGUAGES = [
@@ -335,3 +335,4 @@ if __name__ == "__main__":
     else:
         print("❌ Неизвестная команда")
         sys.exit(1)
+

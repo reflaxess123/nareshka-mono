@@ -54,3 +54,4 @@ def downgrade() -> None:
     op.drop_index('idx_learningpath_orderindex', table_name='LearningPath')
     op.create_index(op.f('idx_codeexecution_createdat'), 'CodeExecution', ['createdAt'], unique=False)
     # ### end Alembic commands ### 
+
