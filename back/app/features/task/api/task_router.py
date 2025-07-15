@@ -1,5 +1,6 @@
 """API роутер для работы с заданиями"""
 
+import logging
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -19,6 +20,8 @@ from app.shared.dependencies import (
     get_current_user_optional,
     get_current_user_required,
 )
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
@@ -58,6 +61,14 @@ async def get_task_items(
 ):
     """Получение объединенного списка задач (content blocks + quiz карточки)"""
     user_id = current_user.id if current_user else None
+    
+    # 🔍 DEBUG LOGGING
+    logger.info(f"🔍 DEBUG: get_task_items called", extra={
+        "current_user": current_user is not None,
+        "user_id": user_id,
+        "page": page,
+        "limit": limit
+    })
 
     # Объединяем companies и companiesList
     final_companies = list(companiesList) if companiesList else []

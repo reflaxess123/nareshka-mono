@@ -46,6 +46,7 @@ class SQLAlchemyUserRepository(UserRepository):
                 session.add(entity)
                 session.flush()  # Получаем ID без commit
                 session.commit()  # Коммитим изменения
+                session.refresh(entity)  # Обновляем объект после коммита для избежания DetachedInstanceError
                 return entity
         session.add(entity)
         session.flush()  # Получаем ID без commit

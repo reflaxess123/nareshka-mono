@@ -66,10 +66,10 @@ class ContentService:
                 id=file.id,
                 createdAt=file.createdAt,
                 updatedAt=file.updatedAt,
-                webdavPath=file.webdav_path,
-                mainCategory=file.main_category,
-                subCategory=file.sub_category,
-                lastFileHash=file.last_file_hash,
+                webdavPath=file.webdavPath,
+                mainCategory=file.mainCategory,
+                subCategory=file.subCategory,
+                lastFileHash=file.lastFileHash,
             )
             for file in files
         ]
@@ -134,12 +134,12 @@ class ContentService:
                     orderInFile=block.orderInFile,
                     textContent=block.textContent,
                     codeContent=block.codeContent,
-                    codeLanguage=block.code_language,
-                    isCodeFoldable=block.is_code_foldable,
-                    codeFoldTitle=block.code_fold_title,
-                    extractedUrls=block.extracted_urls,
+                    codeLanguage=block.codeLanguage,
+                    isCodeFoldable=block.isCodeFoldable,
+                    codeFoldTitle=block.codeFoldTitle,
+                    extractedUrls=block.extractedUrls,
                     companies=block.companies,
-                    rawBlockContentHash=block.raw_block_content_hash,
+                    rawBlockContentHash=block.rawBlockContentHash,
                     userProgress=progress.solvedCount if progress else 0,
                 )
                 
@@ -225,12 +225,12 @@ class ContentService:
                 orderInFile=block.orderInFile,
                 textContent=block.textContent,
                 codeContent=block.codeContent,
-                codeLanguage=block.code_language,
-                isCodeFoldable=block.is_code_foldable,
-                codeFoldTitle=block.code_fold_title,
-                extractedUrls=block.extracted_urls,
+                codeLanguage=block.codeLanguage,
+                isCodeFoldable=block.isCodeFoldable,
+                codeFoldTitle=block.codeFoldTitle,
+                extractedUrls=block.extractedUrls,
                 companies=block.companies,
-                rawBlockContentHash=block.raw_block_content_hash,
+                rawBlockContentHash=block.rawBlockContentHash,
                 userProgress=progress.solvedCount if progress else 0,
             )
         else:
@@ -245,12 +245,12 @@ class ContentService:
                 orderInFile=block.orderInFile,
                 textContent=block.textContent,
                 codeContent=block.codeContent,
-                codeLanguage=block.code_language,
-                isCodeFoldable=block.is_code_foldable,
-                codeFoldTitle=block.code_fold_title,
-                extractedUrls=block.extracted_urls,
+                codeLanguage=block.codeLanguage,
+                isCodeFoldable=block.isCodeFoldable,
+                codeFoldTitle=block.codeFoldTitle,
+                extractedUrls=block.extractedUrls,
                 companies=block.companies,
-                rawBlockContentHash=block.raw_block_content_hash,
+                rawBlockContentHash=block.rawBlockContentHash,
             )
 
         # Добавляем информацию о файле
