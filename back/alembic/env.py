@@ -12,8 +12,10 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 from app.config.new_settings import legacy_settings as settings
 
 # Добавляем импорт всех моделей чтобы alembic видел их
-from app.infrastructure.models import *  # noqa: F403
-from app.infrastructure.models import Base
+# Используем новые shared модели
+from app.shared.database import Base
+from app.shared.entities import *  # noqa: F403
+from app.shared.models import *  # noqa: F403 # Оставляем для совместимости
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -88,3 +90,5 @@ if context.is_offline_mode():
     run_migrations_offline()
 else:
     run_migrations_online()
+
+

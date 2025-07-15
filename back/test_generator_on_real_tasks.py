@@ -26,8 +26,8 @@ sys.path.append(str(Path(__file__).parent))
 try:
     from sqlalchemy import and_
 
-    from app.infrastructure.database.connection import get_db
-    from app.infrastructure.models.content_models import ContentBlock
+    from app.shared.database.connection import get_db
+    from app.shared.models.content_models import ContentBlock
 except ImportError as e:
     print(f"❌ Ошибка импорта: {e}")
     print("Убедитесь, что вы запускаете скрипт из папки back/")
@@ -436,3 +436,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

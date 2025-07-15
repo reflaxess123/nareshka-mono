@@ -266,3 +266,6 @@ def map_redis_error(error: Exception) -> RedisException:
         return RedisException(str(error), "redis_operation")
     else:
         return RedisException(f"Unexpected Redis error: {str(error)}", "redis_unknown")
+
+
+

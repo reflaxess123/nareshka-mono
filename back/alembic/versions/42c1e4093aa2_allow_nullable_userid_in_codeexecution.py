@@ -32,3 +32,4 @@ def downgrade() -> None:
                existing_type=sa.INTEGER(),
                nullable=False)
     # ### end Alembic commands ### 
+

@@ -122,3 +122,4 @@ def downgrade() -> None:
     op.drop_index('idx_testcase_active', table_name='TestCase')
     op.drop_table('TestCase')
     # ### end Alembic commands ### 
+

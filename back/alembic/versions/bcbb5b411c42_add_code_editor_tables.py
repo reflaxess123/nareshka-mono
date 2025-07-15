@@ -117,3 +117,4 @@ def downgrade() -> None:
     op.drop_table('CodeExecution')
     op.drop_table('SupportedLanguage')
     # ### end Alembic commands ### 
+

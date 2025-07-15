@@ -1,8 +1,8 @@
 import { authApi } from '@/shared/api/auth';
 import {
-  useGetContentStatsApiV2StatsContentGet,
-  useGetTheoryStatsApiV2StatsTheoryGet,
-  useGetUserStatsOverviewApiV2StatsOverviewGet,
+  useGetContentStatsApiV2StatsStatsContentGet,
+  useGetTheoryStatsApiV2StatsStatsTheoryGet,
+  useGetUserStatsOverviewApiV2StatsStatsOverviewGet,
 } from '@/shared/api/generated/api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
@@ -99,7 +99,7 @@ export const useDetailedStats = () => {
 
 // Хук для получения статистики обзора
 export const useOverviewStats = () => {
-  return useGetUserStatsOverviewApiV2StatsOverviewGet({
+  return useGetUserStatsOverviewApiV2StatsStatsOverviewGet({
     query: {
       staleTime: 5 * 60 * 1000, // 5 минут
       retry: 3,
@@ -114,7 +114,7 @@ export const useContentStats = (
     includeBlocks?: boolean;
   } = {}
 ) => {
-  return useGetContentStatsApiV2StatsContentGet({
+  return useGetContentStatsApiV2StatsStatsContentGet({
     query: {
       enabled: Object.keys(params).length > 0,
       staleTime: 5 * 60 * 1000, // 5 минут
@@ -130,7 +130,7 @@ export const useTheoryStats = (
     includeCards?: boolean;
   } = {}
 ) => {
-  return useGetTheoryStatsApiV2StatsTheoryGet({
+  return useGetTheoryStatsApiV2StatsStatsTheoryGet({
     query: {
       enabled: Object.keys(params).length > 0,
       staleTime: 5 * 60 * 1000, // 5 минут

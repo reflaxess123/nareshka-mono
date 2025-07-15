@@ -1,6 +1,7 @@
 """Core модули приложения"""
 
-from .error_handlers import register_exception_handlers
+# Убираем импорт error_handlers для избежания circular import
+# from .error_handlers import register_exception_handlers
 from .exceptions import (
     AuthenticationException,
     AuthorizationException,
@@ -34,3 +35,6 @@ __all__ = [
     "GracefulDegradation",
     "ErrorCode",
 ]
+
+
+

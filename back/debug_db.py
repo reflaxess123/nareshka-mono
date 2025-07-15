@@ -141,3 +141,4 @@ def check_database_connection():  # noqa: PLR0912, PLR0915
 
 if __name__ == "__main__":
     check_database_connection()
+
