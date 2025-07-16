@@ -16,6 +16,9 @@ from app.core.logging import get_logger
 from app.core.rate_limiter import get_rate_limiter
 from app.shared.utils import RequestContext
 
+# Get logger instance
+logger = get_logger(__name__)
+
 # Backward compatibility imports (for gradual migration)
 # Оставляем старый admin - не мигрируем (временно отключен)
 
@@ -159,8 +162,31 @@ async def get_current_user_optional(
 ) -> Optional[User]:
     """Получение текущего пользователя (опционально)"""
     try:
-        return await auth_service.get_user_by_session(request)
-    except HTTPException:
+        session_id = request.cookies.get("session_id")
+        logger.info(f"🔍 DEBUG: get_current_user_optional called", extra={
+            "has_session_cookie": session_id is not None,
+            "session_id_prefix": session_id[:10] + "..." if session_id else None,
+            "url": str(request.url),
+            "method": request.method
+        })
+        
+        user = await auth_service.get_user_by_session(request)
+        
+        if user:
+            logger.info(f"🔍 DEBUG: User found from session", extra={
+                "user_id": user.id,
+                "user_email": user.email,
+                "session_id_prefix": session_id[:10] + "..." if session_id else None
+            })
+        else:
+            logger.info(f"🔍 DEBUG: No user found from session")
+            
+        return user
+    except HTTPException as e:
+        logger.info(f"🔍 DEBUG: Auth failed in get_current_user_optional", extra={
+            "error": str(e),
+            "status_code": e.status_code
+        })
         return None
 
 

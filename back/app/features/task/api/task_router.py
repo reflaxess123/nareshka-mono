@@ -3,7 +3,7 @@
 import logging
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status, Request
 from sqlalchemy.orm import Session
 
 from app.features.task.services.task_service import TaskService
@@ -35,6 +35,7 @@ def get_task_service(db: Session = Depends(get_session)) -> TaskService:
 
 @router.get("/items", response_model=TasksListResponse)
 async def get_task_items(
+    request: Request,  # Добавляем request для отладки
     page: int = Query(1, ge=1, description="Номер страницы"),
     limit: int = Query(
         10, ge=1, le=100, description="Количество элементов на странице"
@@ -62,10 +63,14 @@ async def get_task_items(
     """Получение объединенного списка задач (content blocks + quiz карточки)"""
     user_id = current_user.id if current_user else None
     
-    # 🔍 DEBUG LOGGING
+    # 🔍 ENHANCED DEBUG LOGGING
+    session_id = request.cookies.get("session_id")
     logger.info(f"🔍 DEBUG: get_task_items called", extra={
         "current_user": current_user is not None,
         "user_id": user_id,
+        "user_email": current_user.email if current_user else None,
+        "session_id": session_id[:10] + "..." if session_id else None,
+        "cookies": dict(request.cookies),
         "page": page,
         "limit": limit
     })
@@ -78,7 +83,7 @@ async def get_task_items(
             if company not in final_companies:
                 final_companies.append(company)
 
-    return await task_service.get_tasks(
+    result = await task_service.get_tasks(
         page=page,
         limit=limit,
         main_categories=mainCategories if mainCategories else None,
@@ -91,6 +96,23 @@ async def get_task_items(
         companies=final_companies if final_companies else None,
         user_id=user_id,
     )
+    
+    # 🔍 DEBUG: Log result details
+    if result.data:
+        sample_tasks = result.data[:3]  # First 3 tasks
+        logger.info(f"🔍 DEBUG: Returning {len(result.data)} tasks", extra={
+            "user_id": user_id,
+            "sample_progress": [
+                {
+                    "task_id": task.id[:10] + "...",
+                    "title": task.title[:20] + "...",
+                    "currentUserSolvedCount": task.currentUserSolvedCount
+                }
+                for task in sample_tasks
+            ]
+        })
+    
+    return result
 
 
 @router.get("/categories", response_model=TaskCategoriesResponse)

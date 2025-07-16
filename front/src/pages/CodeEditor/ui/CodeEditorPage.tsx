@@ -31,7 +31,7 @@ export const CodeEditorPage = () => {
   const [leftPanelWidth, setLeftPanelWidth] = useState(50);
   const [templateKey, setTemplateKey] = useState(0);
 
-  const { getTestCases } = useProgressTracking({
+  const { getTestCases, isLoadingTests } = useProgressTracking({
     showToasts: true,
   });
 
@@ -54,7 +54,7 @@ export const CodeEditorPage = () => {
   });
 
   useEffect(() => {
-    if (blockId && block && block.codeContent) {
+    if (blockId && block && block.codeContent && !isLoadingTests) {
       console.log(
         '🤖 Автоматически запускаем генерацию тест-кейсов для задачи:',
         blockId
@@ -64,7 +64,8 @@ export const CodeEditorPage = () => {
       // Тихо загружаем тест-кейсы в фоне без уведомлений
       getTestCases(blockId);
     }
-  }, [blockId, block?.id, getTestCases, block]); // ✅ УБРАЛИ showInfoMessage из зависимостей
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [blockId, block?.id]); // Убрали getTestCases и isLoadingTests из зависимостей
 
   const determineLanguageFromBlock = (block: {
     codeLanguage?: string | null;

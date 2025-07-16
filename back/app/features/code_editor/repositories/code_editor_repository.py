@@ -75,7 +75,12 @@ class CodeEditorRepository(CodeEditorRepositoryInterface):
 
     def __init__(self, session: Session):
         self.session = session
-        self.docker_client = docker.from_env()
+        try:
+            self.docker_client = docker.from_env()
+            logger.info("Docker client успешно инициализирован")
+        except Exception as e:
+            logger.warning(f"Не удалось подключиться к Docker: {e}")
+            self.docker_client = None
 
     async def get_supported_languages(self) -> List[SupportedLanguage]:
         """Получение списка поддерживаемых языков"""
@@ -266,6 +271,10 @@ class CodeEditorRepository(CodeEditorRepositoryInterface):
     async def execute_code_with_language(self, source_code: str, language: SupportedLanguage, stdin: Optional[str] = None) -> Dict[str, Any]:
         """Выполнение кода в Docker контейнере"""
         logger.info(f"Выполнение кода на языке {language.name}")
+        
+        if self.docker_client is None:
+            logger.error("Docker клиент недоступен. Убедитесь, что Docker запущен.")
+            raise CodeExecutionError("", "Docker недоступен. Убедитесь, что Docker Desktop запущен.")
         
         try:
             # Подготовка контейнера
