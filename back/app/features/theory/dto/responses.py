@@ -13,21 +13,25 @@ class TheoryCardResponse(BaseModel):
     """Ответ с информацией о теоретической карточке"""
 
     id: str
-    ankiGuid: str = Field(alias="anki_guid")
-    cardType: str = Field(alias="card_type")
+    ankiGuid: str
+    cardType: str
     deck: str
     category: str
-    subCategory: Optional[str] = Field(alias="sub_category", default=None)
-    questionBlock: str = Field(alias="question_block")
-    answerBlock: str = Field(alias="answer_block")
+    subCategory: Optional[str] = None
+    questionBlock: str
+    answerBlock: str
     tags: List[str] = []
-    orderIndex: int = Field(alias="order_index", default=0)
-    createdAt: datetime = Field(alias="created_at")
-    updatedAt: datetime = Field(alias="updated_at")
+    orderIndex: int = 0
+    createdAt: datetime
+    updatedAt: datetime
 
     class Config:
         from_attributes = True
         populate_by_name = True
+        
+    def model_dump(self, **kwargs):
+        """Переопределяем model_dump для возврата camelCase"""
+        return super().model_dump(**kwargs)
 
 
 class UserTheoryProgressResponse(BaseModel):

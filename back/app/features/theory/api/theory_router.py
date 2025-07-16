@@ -177,6 +177,29 @@ async def reset_theory_card_progress(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Ошибка сброса прогресса: {str(e)}",
-        ) 
+        )
+
+
+@router.get("/test-camel-case", response_model=TheoryCardResponse)
+async def test_camel_case():
+    """Тестовый endpoint для проверки camelCase"""
+    from datetime import datetime
+    
+    test_data = {
+        'id': 'test-id',
+        'ankiGuid': 'test-anki-guid',
+        'cardType': 'test-card-type',
+        'deck': 'test-deck',
+        'category': 'test-category',
+        'subCategory': 'test-sub-category',
+        'questionBlock': 'test-question-block',
+        'answerBlock': 'test-answer-block',
+        'tags': ['tag1', 'tag2'],
+        'orderIndex': 1,
+        'createdAt': datetime.now(),
+        'updatedAt': datetime.now()
+    }
+    
+    return TheoryCardResponse(**test_data) 
 
 
