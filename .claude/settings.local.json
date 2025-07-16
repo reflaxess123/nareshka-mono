@@ -7,7 +7,12 @@
       "Bash(npm run dev:*)",
       "Bash(grep:*)",
       "Bash(python:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(cp:*)",
+      "Bash(ren:*)",
+      "Bash(mv:*)",
+      "Bash(powershell:*)",
+      "Bash(mkdir:*)"
     ],
     "deny": []
   }

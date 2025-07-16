@@ -1,0 +1,68 @@
+[
+  {
+    "message_id": 3579,
+    "date": "unknown",
+    "text": "Video file: Sminex_React_Frontend_2025-06-23_3579.mp4",
+    "has_media": true,
+    "media_type": "MessageMediaDocument",
+    "video_path": "frontend_media\\Sminex_React_Frontend_2025-06-23_3579.mp4",
+    "filename": "Sminex_React_Frontend_2025-06-23_3579.mp4",
+    "download_error": null,
+    "download_timestamp": "unknown"
+  },
+  {
+    "message_id": 3568,
+    "date": "unknown",
+    "text": "Video file: Spotware_React_Frontend_2025-06-23_3568.mp4",
+    "has_media": true,
+    "media_type": "MessageMediaDocument",
+    "video_path": "frontend_media\\Spotware_React_Frontend_2025-06-23_3568.mp4",
+    "filename": "Spotware_React_Frontend_2025-06-23_3568.mp4",
+    "download_error": null,
+    "download_timestamp": "unknown"
+  },
+  {
+    "message_id": 3612,
+    "date": "unknown",
+    "text": "Video file: VK_React_Typescript_Frontend_2025-06-25_3612.mp4",
+    "has_media": true,
+    "media_type": "MessageMediaDocument",
+    "video_path": "frontend_media\\VK_React_Typescript_Frontend_2025-06-25_3612.mp4",
+    "filename": "VK_React_Typescript_Frontend_2025-06-25_3612.mp4",
+    "download_error": null,
+    "download_timestamp": "unknown"
+  },
+  {
+    "message_id": 3488,
+    "date": "unknown",
+    "text": "Video file: Yandex_Javascript_Java_Frontend_2025-06-18_3488.mp4",
+    "has_media": true,
+    "media_type": "MessageMediaDocument",
+    "video_path": "frontend_media\\Yandex_Javascript_Java_Frontend_2025-06-18_3488.mp4",
+    "filename": "Yandex_Javascript_Java_Frontend_2025-06-18_3488.mp4",
+    "download_error": null,
+    "download_timestamp": "unknown"
+  },
+  {
+    "message_id": 3177,
+    "date": "unknown",
+    "text": "Video file: Frontend_React_Frontend_2025-05-30_3177.mp4",
+    "has_media": true,
+    "media_type": "MessageMediaDocument",
+    "video_path": "frontend_media\\Frontend_React_Frontend_2025-05-30_3177.mp4",
+    "filename": "Frontend_React_Frontend_2025-05-30_3177.mp4",
+    "download_error": null,
+    "download_timestamp": "unknown"
+  },
+  {
+    "message_id": 3611,
+    "date": "unknown",
+    "text": "Video file: МТГ_Бизнес_реше_React_Frontend_2025-06-25_3611.mp4",
+    "has_media": true,
+    "media_type": "MessageMediaDocument",
+    "video_path": "frontend_media\\МТГ_Бизнес_реше_React_Frontend_2025-06-25_3611.mp4",
+    "filename": "МТГ_Бизнес_реше_React_Frontend_2025-06-25_3611.mp4",
+    "download_error": null,
+    "download_timestamp": "unknown"
+  }
+]
