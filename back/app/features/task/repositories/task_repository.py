@@ -173,7 +173,6 @@ class TaskRepository:
         user_progress = {}
         if user_id:
             block_ids = [block.id for block in blocks]
-            logger.info(f"🔍 DEBUG: Loading progress for user_id={user_id}, blocks={len(block_ids)}")
             if block_ids:
                 progress_records = (
                     self.session.query(UserContentProgress)
@@ -185,6 +184,30 @@ class TaskRepository:
                 )
                 user_progress = {p.blockId: p.solvedCount for p in progress_records}
                 logger.info(f"🔍 DEBUG: Found progress records: {len(progress_records)}, progress_dict: {user_progress}")
+                
+                # Дополнительное логирование для отладки
+                if progress_records:
+                    sample_progress = progress_records[:3]
+                    logger.info(f"🔍 DEBUG: Sample progress records", extra={
+                        "user_id": user_id,
+                        "sample_records": [
+                            {
+                                "userId": p.userId,
+                                "blockId": p.blockId[:10] + "...",
+                                "solvedCount": p.solvedCount,
+                                "createdAt": str(p.createdAt)
+                            }
+                            for p in sample_progress
+                        ]
+                    })
+                else:
+                    # Проверим, есть ли вообще записи для этого пользователя
+                    total_user_progress = (
+                        self.session.query(UserContentProgress)
+                        .filter(UserContentProgress.userId == user_id)
+                        .count()
+                    )
+                    logger.info(f"🔍 DEBUG: No progress found for current blocks, but user has {total_user_progress} total progress records")
         else:
             logger.info(f"🔍 DEBUG: user_id is None, skipping progress loading")
 
@@ -221,6 +244,8 @@ class TaskRepository:
                     except ValueError:
                         code_language = None
             
+            solved_count = user_progress.get(block.id, 0)
+            
             task = Task(
                 id=block.id,
                 item_type="content_block",
@@ -240,7 +265,7 @@ class TaskRepository:
                 code_fold_title=block.codeFoldTitle,
                 extracted_urls=block.extractedUrls or [],
                 companies=block.companies or [],
-                current_user_solved_count=user_progress.get(block.id, 0),
+                current_user_solved_count=solved_count,
                 created_at=block.createdAt,
                 updated_at=block.updatedAt,
             )

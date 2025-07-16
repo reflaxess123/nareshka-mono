@@ -155,7 +155,7 @@ export const useProgressTracking = (
         throw new Error('User not authenticated');
       }
 
-      return fetch(`/api/v2/code-editor/test-cases/${blockId}`, {
+      return fetch(`/api/v2/code-editor/test_cases/${blockId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -174,7 +174,7 @@ export const useProgressTracking = (
     (blockId: string) => {
       getTestCasesMutation.mutate(blockId);
     },
-    [getTestCasesMutation]
+    [] // useMutation.mutate стабилен, зависимости не нужны
   );
 
   const showInfoMessage = useCallback(

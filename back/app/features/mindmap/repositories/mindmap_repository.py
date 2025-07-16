@@ -131,6 +131,7 @@ class MindMapRepository(MindMapRepositoryInterface):
         logger.info(f"Получение конфигурации топика: {topic_key} для {technology}")
         
         config = get_topic_config(topic_key, technology)
+        
         if not config:
             logger.warning(f"Конфигурация топика не найдена: {topic_key}")
             return None
@@ -284,7 +285,7 @@ class MindMapRepository(MindMapRepositoryInterface):
                 .all()
             )
             
-            logger.info(f"Запрос вернул {len(results)} результатов")
+            logger.info(f"Найдено {len(results)} блоков для топика {topic_key}")
             
             tasks = []
             for content_block in results:
@@ -302,15 +303,15 @@ class MindMapRepository(MindMapRepositoryInterface):
                         
                         if user_progress:
                             progress = {
-                                "solvedCount": user_progress.solved_count,
-                                "isCompleted": user_progress.solved_count > 0,
+                                "solvedCount": user_progress.solvedCount,
+                                "isCompleted": user_progress.solvedCount > 0,
                             }
 
                     task = {
                         "id": str(content_block.id),
-                        "title": content_block.block_title or f"Задача {content_block.id}",
-                        "description": content_block.text_content or "",
-                        "hasCode": bool(content_block.code_content),
+                        "title": content_block.blockTitle or f"Задача {content_block.id}",
+                        "description": content_block.textContent or "",
+                        "hasCode": bool(content_block.codeContent),
                         "progress": progress,
                     }
                     tasks.append(task)

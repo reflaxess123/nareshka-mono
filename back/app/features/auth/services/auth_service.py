@@ -187,22 +187,42 @@ class AuthService:
     async def get_user_by_session(self, request) -> User:
         """Получение пользователя по сессии"""
         session_id = request.cookies.get("session_id")
+        logger.info(f"🔍 DEBUG: get_user_by_session called", extra={
+            "has_session_id": session_id is not None,
+            "session_id_prefix": session_id[:10] + "..." if session_id else None
+        })
+        
         if not session_id:
+            logger.info(f"🔍 DEBUG: No session_id cookie found")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated"
             )
 
         user_id = self.get_session_user_id(session_id)
+        logger.info(f"🔍 DEBUG: Session lookup result", extra={
+            "session_id_prefix": session_id[:10] + "...",
+            "user_id": user_id
+        })
+        
         if not user_id:
+            logger.info(f"🔍 DEBUG: Session expired or not found in Redis")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail="Session expired"
             )
 
         user = await self.user_repository.get_by_id(user_id)
         if not user:
+            logger.info(f"🔍 DEBUG: User not found in database", extra={
+                "user_id": user_id
+            })
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
             )
+            
+        logger.info(f"🔍 DEBUG: User successfully retrieved from session", extra={
+            "user_id": user.id,
+            "user_email": user.email
+        })
         return user 
 
 
