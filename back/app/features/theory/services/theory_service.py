@@ -148,7 +148,8 @@ class TheoryService:
             # Преобразование в DTO
             card_responses = []
             for card in cards:
-                card_response = TheoryCardResponse.from_orm(card)
+                card_response = TheoryCardResponse.model_validate(card)
+                logger.info(f"Card response dump: {card_response.model_dump()}")
                 card_responses.append(card_response)
 
             logger.info(f"Найдено {total} карточек, возвращено {len(card_responses)}")
@@ -174,10 +175,10 @@ class TheoryService:
             if progress:
                 return TheoryCardWithProgressResponse(
                     **card.__dict__,
-                    progress=UserTheoryProgressResponse.from_orm(progress)
+                    progress=UserTheoryProgressResponse.model_validate(progress)
                 )
 
-        return TheoryCardResponse.from_orm(card)
+        return TheoryCardResponse.model_validate(card)
 
     async def get_theory_categories(self) -> TheoryCategoriesResponse:
         """Получение списка категорий"""
@@ -227,7 +228,7 @@ class TheoryService:
             )
 
         logger.info(f"Прогресс обновлён: solvedCount={progress.solvedCount}")
-        return UserTheoryProgressResponse.from_orm(progress)
+        return UserTheoryProgressResponse.model_validate(progress)
 
     async def review_theory_card(
         self, card_id: str, user_id: int, review: ReviewRating
@@ -280,7 +281,7 @@ class TheoryService:
         )
 
         logger.info(f"Карточка {card_id} повторена: state={new_state}, interval={new_interval}")
-        return UserTheoryProgressResponse.from_orm(progress)
+        return UserTheoryProgressResponse.model_validate(progress)
 
     async def get_due_theory_cards(
         self, user_id: int, limit: int = 10
@@ -289,7 +290,7 @@ class TheoryService:
         logger.info(f"Получение карточек для повторения пользователя {user_id}")
         
         cards = await self.theory_repository.get_due_theory_cards(user_id, limit)
-        card_responses = [TheoryCardResponse.from_orm(card) for card in cards]
+        card_responses = [TheoryCardResponse.model_validate(card) for card in cards]
         
         logger.info(f"Найдено {len(card_responses)} карточек для повторения")
         return DueCardsResponse(cards=card_responses, total=len(card_responses))

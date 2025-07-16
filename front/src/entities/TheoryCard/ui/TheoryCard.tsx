@@ -26,6 +26,7 @@ export const TheoryCard = ({ card }: TheoryCardProps) => {
   const updateProgressMutation = useUpdateProgress();
   const { isGuest, isAdmin } = useRole();
 
+
   // Состояние формы редактирования
   const [editData, setEditData] = useState({
     questionBlock: card.questionBlock,
