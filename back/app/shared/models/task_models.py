@@ -37,8 +37,8 @@ class TaskAttempt(Base):
     durationMinutes = Column(Integer)
     createdAt = Column(DateTime, default=func.now(), nullable=False)
 
-    user = relationship("User", back_populates="taskAttempts")
-    block = relationship("ContentBlock", back_populates="taskAttempts")
+    user = relationship("User")
+    block = relationship("ContentBlock")
     validationResults = relationship("TestValidationResult", back_populates="attempt")
 
     __table_args__ = (
@@ -73,7 +73,7 @@ class TaskSolution(Base):
     )
 
     user = relationship("User", back_populates="taskSolutions")
-    block = relationship("ContentBlock", back_populates="taskSolutions")
+    block = relationship("ContentBlock")
 
     __table_args__ = (
         Index("idx_tasksolution_userid", "userId"),

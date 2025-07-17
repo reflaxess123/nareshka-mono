@@ -4,7 +4,7 @@ import logging
 
 import psycopg2
 
-from app.config.new_settings import legacy_settings as settings
+from app.config.settings import settings
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

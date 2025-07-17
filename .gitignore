@@ -209,3 +209,10 @@ frontend_videos/
 frontend_videos_optimized/
 frontend_videos_parallel/
 mcp-telegram-main/frontend_videos/
+
+# Исключить все содержимое папки с медиафайлами Telegram
+mcp-telegram-main/frontend_media/
+Checking
+Cleaning
+Starting
+back/Testing

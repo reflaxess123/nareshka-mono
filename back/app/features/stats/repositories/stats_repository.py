@@ -7,10 +7,7 @@ from datetime import datetime
 from sqlalchemy import func, or_
 from sqlalchemy.orm import Session, joinedload
 
-from app.shared.models.content_models import (
-    ContentBlock,
-    ContentFile,
-)
+from app.shared.entities.content import ContentBlock, ContentFile
 from app.shared.models.content_models import UserContentProgress
 from app.shared.models.theory_models import (
     TheoryCard, 

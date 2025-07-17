@@ -9,14 +9,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
-from app.config import new_settings
+from app.config.settings import settings
 from app.core.error_handlers import register_exception_handlers
 from app.core.logging import get_logger, init_default_logging
+from app.shared.di import setup_di_container
 from app.features.admin.api.admin_router import router as admin_router
 from app.features.auth.api.auth_router import router as auth_router
 from app.features.code_editor.api import router as code_editor_router
 from app.features.content.api import router as content_router
-from app.core.health import router as health_router
 from app.features.mindmap.api import router as mindmap_router
 from app.features.progress.api import router as progress_router
 from app.features.stats.api import router as stats_router
@@ -34,15 +34,17 @@ logger = get_logger(__name__)
 # Событие startup - выполняется один раз при запуске приложения
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Инициализация DI Container
+    setup_di_container()
     logger.info("🚀 Приложение запущено", extra={"event": "startup"})
     yield
     logger.info("🔒 Приложение остановлено", extra={"event": "shutdown"})
 
 
 app = FastAPI(
-    title=new_settings.app_name,
-    description=new_settings.app_description,
-    version=new_settings.app_version,
+    title=settings.app_name,
+    description=settings.app_description,
+    version=settings.app_version,
     lifespan=lifespan,
 )
 
@@ -52,7 +54,7 @@ register_exception_handlers(app)
 # Настройка CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=new_settings.server.cors_origins,
+    allow_origins=settings.allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -62,7 +64,6 @@ app.add_middleware(
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 # Подключение роутеров новой архитектуры
-app.include_router(health_router, prefix="/api")
 app.include_router(auth_router, prefix="/api/v2")
 app.include_router(content_router, prefix="/api/v2")
 app.include_router(theory_router, prefix="/api/v2")
@@ -90,14 +91,14 @@ async def get_openapi():
 @app.get("/")
 async def root():
     return {
-        "message": f"Hello World! {new_settings.app_name} {new_settings.app_version} (NEW ARCHITECTURE)"
+        "message": f"Hello World! {settings.app_name} {settings.app_version} (NEW ARCHITECTURE)"
     }
 
 
 @app.get("/api/")
 async def api_root():
     return {
-        "message": f"Hello World! {new_settings.app_name} {new_settings.app_version} (NEW ARCHITECTURE)"
+        "message": f"Hello World! {settings.app_name} {settings.app_version} (NEW ARCHITECTURE)"
     }
 
 
@@ -110,8 +111,8 @@ async def redirect():
 if __name__ == "__main__":
     uvicorn.run(
         "main:app",
-        host=new_settings.server.host,
-        port=new_settings.server.port,
-        reload=new_settings.server.debug,
+        host=settings.host,
+        port=settings.port,
+        reload=settings.debug,
         reload_excludes=["logs/*", "*.log"],
     )

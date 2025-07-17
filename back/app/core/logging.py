@@ -60,9 +60,9 @@ def add_correlation_id(_, __, event_dict: Dict[str, Any]) -> Dict[str, Any]:
 def add_service_info(_, __, event_dict: Dict[str, Any]) -> Dict[str, Any]:
     """Добавить информацию о сервисе"""
     event_dict.update({
-        'service': settings.app.name,
-        'version': settings.app.version,
-        'environment': settings.app.environment,
+        'service': settings.app_name,
+        'version': settings.app_version,
+        'environment': settings.app_environment,
     })
     return event_dict
 
@@ -104,9 +104,9 @@ class CustomJSONFormatter(jsonlogger.JsonFormatter):
             log_record['request_id'] = request_id
         
         # Добавляем информацию о сервисе
-        log_record['service'] = settings.app.name
-        log_record['version'] = settings.app.version
-        log_record['environment'] = settings.app.environment
+        log_record['service'] = settings.app_name
+        log_record['version'] = settings.app_version
+        log_record['environment'] = settings.app_environment
 
 
 def setup_logging() -> None:
@@ -118,7 +118,7 @@ def setup_logging() -> None:
     # Очистка существующих handlers
     logging.root.handlers = []
     
-    if settings.logging.format == 'json':
+    if settings.log_format == 'json':
         # JSON формат для продакшен
         formatter = CustomJSONFormatter(
             fmt='%(timestamp)s %(level)s %(logger)s %(module)s %(function)s %(line)d %(message)s'

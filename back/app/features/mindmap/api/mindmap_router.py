@@ -21,6 +21,7 @@ from app.features.mindmap.exceptions.mindmap_exceptions import (
     TaskNotFoundError,
 )
 from app.shared.dependencies import get_current_user_id_optional
+from app.shared.entities.content import ContentBlock, ContentFile
 
 logger = logging.getLogger(__name__)
 
@@ -176,7 +177,6 @@ async def debug_classes_tasks(
     session: Session = Depends(get_session),
 ):
     """Debug endpoint для проверки задач по классам"""
-    from app.shared.models.content_models import ContentBlock, ContentFile
     from sqlalchemy import and_
     
     try:
@@ -223,7 +223,6 @@ async def debug_classes_tasks(
 @router.get("/test-db")
 async def test_db(session: Session = Depends(get_session)):
     """Тестовый endpoint для проверки запросов к БД"""
-    from app.shared.models.content_models import ContentBlock, ContentFile
     
     try:
         # Простой запрос к ContentFile

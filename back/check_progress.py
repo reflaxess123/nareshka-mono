@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import psycopg2
-from app.config.new_settings import legacy_settings as settings
+from app.config.settings import settings
 
 
 def check_users_and_progress():

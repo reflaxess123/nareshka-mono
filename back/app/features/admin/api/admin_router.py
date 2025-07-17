@@ -18,7 +18,7 @@ async def get_admin_stats(session: Session = Depends(get_session)):
         guest_users = session.query(User).filter(User.role == 'GUEST').count()
         
         # Подсчет контента
-        from app.shared.models.content_models import ContentFile, ContentBlock
+        from app.shared.entities.content import ContentFile, ContentBlock
         from app.shared.models.theory_models import TheoryCard
         total_files = session.query(ContentFile).count()
         total_blocks = session.query(ContentBlock).count()

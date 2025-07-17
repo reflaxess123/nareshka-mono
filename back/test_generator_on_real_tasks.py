@@ -27,7 +27,7 @@ try:
     from sqlalchemy import and_
 
     from app.shared.database.connection import get_db
-    from app.shared.models.content_models import ContentBlock
+    from app.shared.entities.content import ContentBlock
 except ImportError as e:
     print(f"❌ Ошибка импорта: {e}")
     print("Убедитесь, что вы запускаете скрипт из папки back/")

@@ -11,11 +11,13 @@ from sqlalchemy import (
     JSON,
     Boolean,
     Column,
+    DateTime,
     ForeignKey,
     Index,
     Integer,
     String,
     Text,
+    func,
 )
 from sqlalchemy.orm import relationship
 
@@ -36,6 +38,8 @@ class ContentFile(Base, AuditMixin):
     mainCategory = Column(String, nullable=False, comment="Основная категория (например, JavaScript)")
     subCategory = Column(String, nullable=False, comment="Подкатегория (например, Arrays)")
     lastFileHash = Column(String, comment="Хэш последней версии файла для отслеживания изменений")
+    createdAt = Column(DateTime, default=func.now(), nullable=False)
+    updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
 
     # Internal content feature relationship is allowed
     blocks = relationship("ContentBlock", back_populates="file", cascade="all, delete-orphan")
@@ -66,6 +70,8 @@ class ContentBlock(Base, AuditMixin):
     blockTitle = Column(String, nullable=False, comment="Заголовок блока")
     blockLevel = Column(Integer, nullable=False, comment="Уровень вложенности блока")
     orderInFile = Column(Integer, nullable=False, comment="Порядок блока в файле")
+    createdAt = Column(DateTime, default=func.now(), nullable=False)
+    updatedAt = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
 
     # Content data
     textContent = Column(Text, comment="Текстовое содержимое блока")

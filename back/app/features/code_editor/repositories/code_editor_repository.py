@@ -16,7 +16,7 @@ from app.shared.models.code_execution_models import (
     CodeExecution,
     UserCodeSolution,
 )
-from app.shared.models.content_models import ContentBlock
+from app.shared.entities.content import ContentBlock
 from app.shared.models.test_case_models import TestCase
 from app.shared.entities.enums import CodeLanguage, ExecutionStatus
 from app.features.code_editor.exceptions.code_editor_exceptions import (

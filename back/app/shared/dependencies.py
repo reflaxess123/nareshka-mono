@@ -1,6 +1,6 @@
 """
 Dependencies for Dependency Injection.
-Updated for Feature-First architecture with backward compatibility.
+Updated for Feature-First architecture with DI Container.
 """
 
 from typing import Optional
@@ -16,35 +16,24 @@ from app.core.logging import get_logger
 from app.core.rate_limiter import get_rate_limiter
 from app.shared.utils import RequestContext
 
-# Get logger instance
-logger = get_logger(__name__)
+# DI Container
+from app.shared.di import ServiceFactory, create_service_dependency
 
-# Backward compatibility imports (for gradual migration)
-# Оставляем старый admin - не мигрируем (временно отключен)
-
-
-from app.features.code_editor.services.ai_test_generator_service import AITestGeneratorService
+# Service types for DI
 from app.features.auth.services.auth_service import AuthService
-from app.features.code_editor.services.code_editor_service import CodeEditorService
-from app.features.code_editor.services.code_executor_service import CodeExecutorService
 from app.features.content.services.content_service import ContentService
-from app.features.mindmap.services.mindmap_service import MindMapService
-from app.features.mindmap.repositories.mindmap_repository import MindMapRepository
-from app.features.progress.services.progress_service import ProgressService
-from app.features.stats.services.stats_service import StatsService
 from app.features.task.services.task_service import TaskService
 from app.features.theory.services.theory_service import TheoryService
+from app.features.progress.services.progress_service import ProgressService
+from app.features.stats.services.stats_service import StatsService
+from app.features.code_editor.services.code_editor_service import CodeEditorService
+from app.features.code_editor.services.code_executor_service import CodeExecutorService
+from app.features.code_editor.services.ai_test_generator_service import AITestGeneratorService
+from app.features.mindmap.services.mindmap_service import MindMapService
+
+# Legacy imports for backward compatibility
 from app.shared.database.connection import get_db
 from app.shared.models.user_models import User
-from app.features.code_editor.repositories.code_editor_repository import CodeEditorRepository
-from app.features.content.repositories.content_repository import ContentRepository
-from app.features.mindmap.repositories.mindmap_repository import MindMapRepository
-from app.features.progress.repositories.progress_repository import ProgressRepository
-from app.features.stats.repositories.stats_repository import StatsRepository
-from app.features.task.repositories.task_repository import TaskRepository
-from app.features.theory.repositories.theory_repository import TheoryRepository
-from app.features.auth.repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
-
 from .auth_schemes import oauth2_scheme
 
 logger = get_logger(__name__)
@@ -78,55 +67,75 @@ def get_rate_limiter_service():
     return get_rate_limiter()
 
 
-# ===== COMPATIBILITY LAYER =====
+# ===== NEW DI CONTAINER BASED DEPENDENCIES =====
+
+# Service dependencies using DI container
+get_content_service = create_service_dependency(ContentService)
+get_theory_service = create_service_dependency(TheoryService)
+get_task_service = create_service_dependency(TaskService)
+get_progress_service = create_service_dependency(ProgressService)
+get_code_editor_service = create_service_dependency(CodeEditorService)
+get_stats_service = create_service_dependency(StatsService)
+get_mindmap_service = create_service_dependency(MindMapService)
+get_auth_service = create_service_dependency(AuthService)
+get_code_executor_service = create_service_dependency(CodeExecutorService)
+get_ai_test_generator_service = create_service_dependency(AITestGeneratorService)
 
 
-def get_content_service(db: Session = Depends(get_db)) -> ContentService:
-    """Получение сервиса для работы с контентом"""
+# ===== LEGACY COMPATIBILITY LAYER =====
+
+def get_content_service_legacy(db: Session = Depends(get_db)) -> ContentService:
+    """LEGACY: Получение сервиса для работы с контентом"""
+    from app.features.content.repositories.content_repository import ContentRepository
     content_repository = ContentRepository(db)
     return ContentService(content_repository)
 
 
-def get_theory_service(db: Session = Depends(get_db)) -> TheoryService:
-    """Получение сервиса для работы с теоретическими карточками"""
+def get_theory_service_legacy(db: Session = Depends(get_db)) -> TheoryService:
+    """LEGACY: Получение сервиса для работы с теоретическими карточками"""
+    from app.features.theory.repositories.theory_repository import TheoryRepository
     theory_repository = TheoryRepository(db)
     return TheoryService(theory_repository)
 
 
-def get_task_service(db: Session = Depends(get_db)) -> TaskService:
-    """Получение сервиса для работы с заданиями"""
+def get_task_service_legacy(db: Session = Depends(get_db)) -> TaskService:
+    """LEGACY: Получение сервиса для работы с заданиями"""
+    from app.features.task.repositories.task_repository import TaskRepository
     task_repository = TaskRepository(db)
     return TaskService(task_repository)
 
 
-def get_progress_service(db: Session = Depends(get_db)) -> ProgressService:
-    """Получение сервиса для работы с прогрессом"""
+def get_progress_service_legacy(db: Session = Depends(get_db)) -> ProgressService:
+    """LEGACY: Получение сервиса для работы с прогрессом"""
+    from app.features.progress.repositories.progress_repository import ProgressRepository
     progress_repository = ProgressRepository(db)
     return ProgressService(progress_repository)
 
 
-def get_code_editor_service(db: Session = Depends(get_db)) -> CodeEditorService:
-    """Возвращает экземпляр CodeEditorService с зависимостями"""
-    from app.features.code_editor.services.code_editor_service import CodeEditorService
-    
+def get_code_editor_service_legacy(db: Session = Depends(get_db)) -> CodeEditorService:
+    """LEGACY: Возвращает экземпляр CodeEditorService с зависимостями"""
+    from app.features.code_editor.repositories.code_editor_repository import CodeEditorRepository
     code_editor_repository = CodeEditorRepository()
     return CodeEditorService(code_editor_repository)
 
 
-def get_stats_service(db: Session = Depends(get_db)) -> StatsService:
-    """Получение сервиса для работы со статистикой"""
+def get_stats_service_legacy(db: Session = Depends(get_db)) -> StatsService:
+    """LEGACY: Получение сервиса для работы со статистикой"""
+    from app.features.stats.repositories.stats_repository import StatsRepository
     stats_repository = StatsRepository(db)
     return StatsService(stats_repository)
 
 
-def get_mindmap_service(db: Session = Depends(get_db)) -> MindMapService:
-    """Получение сервиса для работы с mindmap"""
+def get_mindmap_service_legacy(db: Session = Depends(get_db)) -> MindMapService:
+    """LEGACY: Получение сервиса для работы с mindmap"""
+    from app.features.mindmap.repositories.mindmap_repository import MindMapRepository
     mindmap_repository = MindMapRepository(db)
     return MindMapService(mindmap_repository)
 
 
-def get_auth_service() -> AuthService:
-    """Получение сервиса авторизации"""
+def get_auth_service_legacy() -> AuthService:
+    """LEGACY: Получение сервиса авторизации"""
+    from app.features.auth.repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
     user_repository = SQLAlchemyUserRepository()
     return AuthService(user_repository)
 
@@ -140,19 +149,21 @@ def get_auth_service() -> AuthService:
 # Admin временно отключен - не мигрируем
 
 
-def get_ai_test_generator_service(
+# Legacy - Remove after full migration
+def get_ai_test_generator_service_legacy(
     db: Session = Depends(get_db),
 ) -> AITestGeneratorService:
-    """Получение сервиса генерации тест-кейсов через AI"""
+    """LEGACY: Получение сервиса генерации тест-кейсов через AI"""
+    from app.features.content.repositories.content_repository import ContentRepository
+    from app.features.task.repositories.task_repository import TaskRepository
     content_repository = ContentRepository(db)
     task_repository = TaskRepository(db)
     return AITestGeneratorService(content_repository, task_repository)
 
 
-def get_code_executor_service(db: Session = Depends(get_db)) -> CodeExecutorService:
-    """Возвращает экземпляр CodeExecutorService с зависимостями"""
-    from app.features.code_editor.services.code_executor_service import CodeExecutorService
-    
+def get_code_executor_service_legacy(db: Session = Depends(get_db)) -> CodeExecutorService:
+    """LEGACY: Возвращает экземпляр CodeExecutorService с зависимостями"""
+    from app.features.code_editor.repositories.code_editor_repository import CodeEditorRepository
     code_editor_repository = CodeEditorRepository()
     return CodeExecutorService(code_editor_repository)
 
