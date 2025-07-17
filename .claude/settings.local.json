@@ -12,7 +12,13 @@
       "Bash(ren:*)",
       "Bash(mv:*)",
       "Bash(powershell:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(rg:*)",
+      "Bash(echo:*)",
+      "Bash(echo \"code_editor -> task:\")",
+      "Bash(wc:*)",
+      "Bash(sed:*)"
     ],
     "deny": []
   }

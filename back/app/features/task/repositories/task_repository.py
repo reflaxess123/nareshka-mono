@@ -1,4 +1,4 @@
-"""Репозиторий для работы с заданиями"""
+"""Репозиторий для работы с заданиями - DEPRECATED - используйте TaskAggregatorService"""
 
 from typing import List, Optional, Tuple
 from uuid import uuid4
@@ -8,60 +8,117 @@ from sqlalchemy import asc, func, or_
 from sqlalchemy.orm import Session, joinedload
 
 from app.shared.entities.task_types import Task
+from app.shared.entities.progress_types import TaskAttempt, TaskSolution
 from app.features.task.dto.responses import TaskCategoryResponse as TaskCategory, TaskCompanyResponse as TaskCompany
-from app.shared.models.content_models import (
-    ContentBlock,
-    ContentFile,
-)
-from app.shared.models.content_models import UserContentProgress
+from app.features.task.services.task_aggregator_service import TaskAggregatorService
+from app.features.task.repositories.task_attempt_repository import TaskAttemptRepository
+from app.shared.entities.content import ContentBlock, ContentFile
 from app.shared.models.theory_models import TheoryCard, UserTheoryProgress
-from app.shared.models.task_models import TaskAttempt, TaskSolution
-from app.features.task.exceptions.task_exceptions import (
-    TaskNotFoundError,
-    TaskAttemptError,
-    TaskSolutionError,
-)
+from app.shared.models.content_models import UserContentProgress
 
 import logging
+import html
 
 logger = logging.getLogger(__name__)
 
 
 class TaskRepository:
-    """Репозиторий для работы с заданиями"""
+    """
+    DEPRECATED: Этот класс больше не используется.
+    Используйте TaskAggregatorService для получения задач.
+    Используйте TaskAttemptRepository для работы с попытками и решениями.
+    """
 
     def __init__(self, session: Session):
         self.session = session
+        # Создаем экземпляры новых сервисов для обратной совместимости
+        self._aggregator = TaskAggregatorService(session)
+        self._attempt_repo = TaskAttemptRepository(session)
 
-    def _unescape_text_content(self, text: Optional[str]) -> Optional[str]:
-        """Заменяет экранированные символы на настоящие переносы строк"""
-        if not text:
-            return text
-        return text.replace("\\n", "\n").replace("\\t", "\t")
-
-    def _sort_tasks(
-        self, tasks: List[Task], sort_by: str, sort_order: str
-    ) -> List[Task]:
-        """Сортировка списка заданий"""
-
-        def get_sort_key(task: Task):
-            sort_key = task.order_in_file or 0
-            if sort_by in ("orderInFile", "orderIndex"):
-                sort_key = task.order_in_file or 0
-            elif sort_by == "createdAt":
-                sort_key = task.createdAt
-            elif sort_by == "updatedAt":
-                sort_key = task.updatedAt
-            elif sort_by == "title":
-                sort_key = task.title.lower()
-            elif sort_by == "category":
-                sort_key = task.main_category.lower()
-            elif sort_by == "subCategory":
-                sort_key = (task.sub_category or "").lower()
-            return sort_key
-
-        reverse = sort_order == "desc"
-        return sorted(tasks, key=get_sort_key, reverse=reverse)
+    # Методы делегируются к новым сервисам для обратной совместимости
+    
+    def get_tasks(
+        self,
+        user_id: Optional[int] = None,
+        category: Optional[str] = None,
+        search: Optional[str] = None,
+        company: Optional[str] = None,
+        task_type: Optional[str] = None,
+        sort_by: str = "orderInFile",
+        sort_order: str = "asc",
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+    ) -> Tuple[List[Task], int]:
+        """DEPRECATED: Используйте TaskAggregatorService.get_tasks()"""
+        return self._aggregator.get_tasks(
+            user_id=user_id,
+            category=category,
+            search=search,
+            company=company,
+            task_type=task_type,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            limit=limit,
+            offset=offset,
+        )
+    
+    def get_task_categories(self) -> List[TaskCategory]:
+        """DEPRECATED: Используйте TaskAggregatorService.get_task_categories()"""
+        return self._aggregator.get_task_categories()
+    
+    def get_task_companies(self) -> List[TaskCompany]:
+        """DEPRECATED: Используйте TaskAggregatorService.get_task_companies()"""
+        return self._aggregator.get_task_companies()
+    
+    async def create_task_attempt(self, user_id: int, **attempt_data) -> TaskAttempt:
+        """DEPRECATED: Используйте TaskAttemptRepository.create_task_attempt()"""
+        # Извлекаем нужные параметры из attempt_data
+        task_id = attempt_data.get('task_id') or attempt_data.get('blockId')
+        task_type = attempt_data.get('task_type', 'content_block')
+        code = attempt_data.get('code', '')
+        language = attempt_data.get('language', '')
+        
+        return self._attempt_repo.create_task_attempt(
+            user_id=user_id,
+            task_id=task_id,
+            task_type=task_type,
+            code=code,
+            language=language,
+        )
+    
+    async def create_task_solution(self, user_id: int, **solution_data) -> TaskSolution:
+        """DEPRECATED: Используйте TaskAttemptRepository.create_task_solution()"""
+        # Извлекаем нужные параметры из solution_data
+        task_id = solution_data.get('task_id') or solution_data.get('blockId')
+        task_type = solution_data.get('task_type', 'content_block')
+        code = solution_data.get('code', '')
+        language = solution_data.get('language', '')
+        is_correct = solution_data.get('is_correct', False)
+        execution_time = solution_data.get('execution_time')
+        memory_usage = solution_data.get('memory_usage')
+        test_results = solution_data.get('test_results')
+        
+        return self._attempt_repo.create_task_solution(
+            user_id=user_id,
+            task_id=task_id,
+            task_type=task_type,
+            code=code,
+            language=language,
+            is_correct=is_correct,
+            execution_time=execution_time,
+            memory_usage=memory_usage,
+            test_results=test_results,
+        )
+    
+    async def get_user_task_attempts(self, user_id: int, block_id: Optional[str] = None) -> List[TaskAttempt]:
+        """DEPRECATED: Используйте TaskAttemptRepository.get_user_task_attempts()"""
+        task_id = int(block_id) if block_id and block_id.isdigit() else None
+        return self._attempt_repo.get_user_task_attempts(user_id=user_id, task_id=task_id)
+    
+    async def get_user_task_solutions(self, user_id: int, block_id: Optional[str] = None) -> List[TaskSolution]:
+        """DEPRECATED: Используйте TaskAttemptRepository.get_user_task_solutions()"""
+        task_id = int(block_id) if block_id and block_id.isdigit() else None
+        return self._attempt_repo.get_user_task_solutions(user_id=user_id, task_id=task_id)
 
     async def get_tasks(
         self,
@@ -341,6 +398,18 @@ class TaskRepository:
                 description=card.questionBlock,
                 main_category=card.category,
                 sub_category=card.subCategory,
+                file_id=None,
+                file_path=None,
+                path_titles=[],
+                block_level=None,
+                order_in_file=card.orderIndex,
+                text_content=None,
+                code_content=None,
+                code_language=None,
+                is_code_foldable=None,
+                code_fold_title=None,
+                extracted_urls=[],
+                companies=[],
                 question_block=card.questionBlock,
                 answer_block=card.answerBlock,
                 tags=card.tags or [],
@@ -530,6 +599,18 @@ class TaskRepository:
             query = query.filter(TaskSolution.blockId == block_id)
             
         return query.order_by(TaskSolution.solvedAt.desc()).all() 
+
+    def _unescape_text_content(self, text):
+        if text is None:
+            return None
+        return html.unescape(text)
+
+    def _sort_tasks(self, tasks, sort_by, sort_order):
+        reverse = sort_order.lower() == "desc"
+        def sort_key(t):
+            value = t.get(sort_by) if isinstance(t, dict) else getattr(t, sort_by, None)
+            return (value is None, value)
+        return sorted(tasks, key=sort_key, reverse=reverse)
 
 
 

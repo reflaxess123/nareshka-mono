@@ -68,9 +68,9 @@ class DatabaseManager:
         
         self.engine = create_engine(
             database_url,
-            echo=settings.database.echo,
-            pool_size=settings.database.pool_size,
-            max_overflow=settings.database.max_overflow,
+            echo=settings.database_echo,
+            pool_size=settings.database_pool_size,
+            max_overflow=settings.database_max_overflow,
             pool_pre_ping=True,
             pool_recycle=3600,
         )
@@ -128,7 +128,7 @@ class DatabaseManager:
 
 
 # Глобальный менеджер БД
-db_manager = DatabaseManager(settings.database.url)
+db_manager = DatabaseManager(settings.database_url)
 
 
 def transactional(func: Callable) -> Callable:
@@ -199,70 +199,6 @@ def get_db_transaction() -> Session:
     with db_manager.get_transaction() as session:
         yield session
 
-
-# Базовый репозиторий
-class BaseRepository(Generic[T]):
-    """Базовый репозиторий для работы с моделями"""
-    
-    def __init__(self, model: Type[T]):
-        self.model = model
-    
-    def get_by_id(self, session: Session, id: int) -> Optional[T]:
-        """Получить запись по ID"""
-        return session.query(self.model).filter(
-            self.model.id == id,
-            self.model.is_deleted == False
-        ).first()
-    
-    def get_all(self, session: Session, skip: int = 0, limit: int = 100) -> List[T]:
-        """Получить все записи"""
-        return session.query(self.model).filter(
-            self.model.is_deleted == False
-        ).offset(skip).limit(limit).all()
-    
-    def create(self, session: Session, obj_in: Dict[str, Any]) -> T:
-        """Создать запись"""
-        db_obj = self.model(**obj_in)
-        session.add(db_obj)
-        session.flush()
-        logger.info(f"Created {self.model.__name__}", record_id=db_obj.id)
-        return db_obj
-    
-    def update(self, session: Session, id: int, obj_in: Dict[str, Any]) -> Optional[T]:
-        """Обновить запись"""
-        db_obj = self.get_by_id(session, id)
-        if db_obj:
-            for field, value in obj_in.items():
-                setattr(db_obj, field, value)
-            db_obj.updated_at = datetime.utcnow()
-            session.flush()
-            logger.info(f"Updated {self.model.__name__}", record_id=db_obj.id)
-        return db_obj
-    
-    def delete(self, session: Session, id: int) -> bool:
-        """Мягкое удаление записи"""
-        db_obj = self.get_by_id(session, id)
-        if db_obj:
-            db_obj.soft_delete()
-            session.flush()
-            return True
-        return False
-    
-    def hard_delete(self, session: Session, id: int) -> bool:
-        """Жесткое удаление записи"""
-        db_obj = self.get_by_id(session, id)
-        if db_obj:
-            session.delete(db_obj)
-            session.flush()
-            logger.info(f"Hard deleted {self.model.__name__}", record_id=id)
-            return True
-        return False
-    
-    def count(self, session: Session) -> int:
-        """Подсчитать количество записей"""
-        return session.query(self.model).filter(
-            self.model.is_deleted == False
-        ).count()
 
 
 # Экспорт для обратной совместимости

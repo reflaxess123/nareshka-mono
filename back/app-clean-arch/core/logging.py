@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-from app.config import new_settings
+from app.config.settings import settings
 
 
 class ColoredFormatter(logging.Formatter):
@@ -107,10 +107,10 @@ def get_logger(name: str) -> logging.Logger:
 # Инициализация по умолчанию
 def init_default_logging():
     """Инициализация логирования с настройками по умолчанию"""
-    log_level = getattr(new_settings, "log_level", "INFO")
+    log_level = getattr(settings, "log_level", "INFO")
 
     # В development режиме логи в консоль и файл
-    if getattr(new_settings, "environment", "development") == "development":
+    if getattr(settings, "environment", "development") == "development":
         setup_logging(
             log_level=log_level, log_file="logs/nareshka.log", enable_console=True
         )

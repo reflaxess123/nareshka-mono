@@ -17,7 +17,7 @@ from app.application.dto.auth_dto import (
     TokenData,
     UserResponse,
 )
-from app.config import new_settings
+from app.config.settings import settings
 from app.core.exceptions import GracefulDegradation
 from app.core.logging import get_logger
 from app.domain.repositories.user_repository import UserRepository
@@ -34,7 +34,7 @@ class AuthService:
         self.user_repository = user_repository
         self.pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
         self.redis_client = redis.from_url(
-            new_settings.redis.url, decode_responses=True
+            settings.redis_url, decode_responses=True
         )
 
     def verify_password(self, plain_password: str, hashed_password: str) -> bool:
@@ -54,14 +54,14 @@ class AuthService:
             expire = datetime.utcnow() + expires_delta
         else:
             expire = datetime.utcnow() + timedelta(
-                minutes=new_settings.auth.access_token_expire_minutes
+                minutes=settings.access_token_expire_minutes
             )
 
         to_encode.update({"exp": expire})
         encoded_jwt = jwt.encode(
             to_encode,
-            new_settings.auth.secret_key,
-            algorithm=new_settings.auth.algorithm,
+            settings.secret_key,
+            algorithm=settings.algorithm,
         )
         return encoded_jwt
 
@@ -76,8 +76,8 @@ class AuthService:
         try:
             payload = jwt.decode(
                 token,
-                new_settings.auth.secret_key,
-                algorithms=[new_settings.auth.algorithm],
+                settings.secret_key,
+                algorithms=[settings.algorithm],
             )
             email: str = payload.get("sub")
             user_id: int = payload.get("user_id")
@@ -147,7 +147,7 @@ class AuthService:
             session_key = f"session:{session_id}"
             self.redis_client.setex(
                 session_key,
-                timedelta(days=new_settings.auth.session_expire_days),
+                timedelta(days=settings.refresh_token_expire_days),
                 str(user_id),
             )
         except Exception as e:

@@ -76,7 +76,7 @@ class UserTheoryProgress(Base):
     )
 
     user = relationship("User", back_populates="theoryProgress")
-    card = relationship("TheoryCard", back_populates="progressEntries")
+    card = relationship("TheoryCard")
 
     __table_args__ = (
         Index("idx_usertheoryprogress_cardid", "cardId"),

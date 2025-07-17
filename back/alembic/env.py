@@ -9,7 +9,7 @@ from alembic import context
 # Добавляем корневую директорию в путь
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
-from app.config.new_settings import legacy_settings as settings
+from app.config.settings import settings
 
 # Добавляем импорт всех моделей чтобы alembic видел их
 # Используем новые shared модели

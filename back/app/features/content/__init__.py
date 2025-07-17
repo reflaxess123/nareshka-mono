@@ -7,10 +7,7 @@ Content Feature - образовательный контент платформ
 - Прогресс пользователя по контенту (UserContentProgress)
 """
 
-from app.shared.models.content_models import (
-    ContentFile,
-    ContentBlock,
-)
+from app.shared.entities.content import ContentFile, ContentBlock
 from app.features.content.services.content_service import ContentService
 from app.features.content.repositories.content_repository import ContentRepository
 __all__ = [

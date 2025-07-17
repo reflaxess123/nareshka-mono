@@ -20,7 +20,7 @@ from app.core.logging import get_logger
 from app.shared.entities.progress_types import TestCase
 from app.features.content.repositories.content_repository import ContentRepository
 from app.features.task.repositories.task_repository import TaskRepository
-from app.shared.models.content_models import ContentBlock
+from app.shared.entities.content import ContentBlock
 
 logger = get_logger(__name__)
 

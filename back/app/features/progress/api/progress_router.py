@@ -312,6 +312,19 @@ async def get_user_detailed_progress(
     return await progress_service.get_user_detailed_progress(current_user.id)
 
 @router.get(
+    "/user/my/detailed",
+    response_model=UserDetailedProgressResponse,
+    summary="Детальный прогресс пользователя (альтернативный путь)",
+    description="Получение детального прогресса текущего пользователя"
+)
+async def get_my_detailed_progress(
+    current_user: User = Depends(get_current_user_required),
+    progress_service: ProgressService = Depends(get_progress_service)
+) -> UserDetailedProgressResponse:
+    """Получение детального прогресса пользователя (альтернативный путь)"""
+    return await progress_service.get_user_detailed_progress(current_user.id)
+
+@router.get(
     "/stats",
     response_model=ProgressStatsResponse,
     summary="Статистика прогресса",

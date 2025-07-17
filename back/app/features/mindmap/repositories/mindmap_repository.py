@@ -7,12 +7,9 @@ from abc import ABC, abstractmethod
 from sqlalchemy import and_, func
 from sqlalchemy.orm import Session
 
-from app.shared.models.content_models import (
-    ContentBlock,
-    ContentFile,
-)
+from app.shared.entities.content import ContentBlock, ContentFile
 from app.shared.models.content_models import UserContentProgress
-from app.config.mindmap_config import (
+from app.features.mindmap.config import (
     get_available_technologies,
     get_technology_center,
     get_technology_topics,

@@ -10,7 +10,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from app.config import new_settings
+from app.config.settings import settings
 
 from .exceptions import (
     BaseApplicationException,
@@ -168,7 +168,7 @@ async def general_exception_handler(request: Request, exc: Exception) -> JSONRes
     )
 
     # В production не показываем детали ошибки
-    if new_settings.server.debug:
+    if settings.server.debug:
         error_details = {
             "exception_type": type(exc).__name__,
             "traceback": traceback.format_exc(),

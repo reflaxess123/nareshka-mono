@@ -2,7 +2,7 @@
 from app.shared.database.connection import Base
 
 from .code_execution_models import CodeExecution, SupportedLanguage, UserCodeSolution
-from .content_models import ContentBlock, ContentFile, UserContentProgress
+from app.shared.entities.content import ContentBlock, ContentFile
 from .enums import CardState, CodeLanguage, ExecutionStatus, ProgressStatus, UserRole
 from .learning_path_models import LearningPath, UserPathProgress
 from .progress_models import UserCategoryProgress

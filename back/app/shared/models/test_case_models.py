@@ -57,7 +57,7 @@ class TestCase(Base):
     )
 
     # Связи
-    block = relationship("ContentBlock", back_populates="testCases")
+    block = relationship("ContentBlock")
     validationResults = relationship("TestValidationResult", back_populates="testCase")
 
     __table_args__ = (

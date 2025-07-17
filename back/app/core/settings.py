@@ -30,22 +30,6 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = Field(default=1440, description="Время жизни access токена в минутах")
     refresh_token_expire_days: int = Field(default=30, description="Время жизни refresh токена в днях")
     
-    # Compatibility properties для старого стиля именования
-    @property
-    def SECRET_KEY(self) -> str:
-        return self.secret_key
-    
-    @property
-    def ALGORITHM(self) -> str:
-        return self.algorithm
-    
-    @property
-    def ACCESS_TOKEN_EXPIRE_MINUTES(self) -> int:
-        return self.access_token_expire_minutes
-    
-    @property
-    def REFRESH_TOKEN_EXPIRE_DAYS(self) -> int:
-        return self.refresh_token_expire_days
     
     # Server settings
     host: str = Field(default="0.0.0.0", description="Host для запуска сервера")
@@ -71,10 +55,11 @@ class Settings(BaseSettings):
         env_file = ".env"
         env_file_encoding = "utf-8"
         case_sensitive = False
+        extra = "ignore"  # Ignore extra fields from .env
         
     @validator('secret_key')
     def validate_secret_key(cls, v):
-        if len(v) < 16:  # Смягчаю требования для dev
+        if len(v) < 16:
             raise ValueError('Secret key должен быть не менее 16 символов')
         return v
         
@@ -111,75 +96,9 @@ class Settings(BaseSettings):
         """Парсинг CORS origins"""
         return self.allowed_origins.split(',') if self.allowed_origins else ['*']
 
-    # Compatibility properties для старого кода
-    @property
-    def app(self):
-        """Compatibility wrapper для app настроек"""
-        class AppWrapper:
-            def __init__(self, settings):
-                self.name = settings.app_name
-                self.version = settings.app_version
-                self.description = settings.app_description
-                self.environment = settings.app_environment
-        return AppWrapper(self)
-
-    @property
-    def database(self):
-        """Compatibility wrapper для database настроек"""
-        class DatabaseWrapper:
-            def __init__(self, settings):
-                self.url = settings.database_url
-                self.echo = settings.database_echo
-                self.pool_size = settings.database_pool_size
-                self.max_overflow = settings.database_max_overflow
-        return DatabaseWrapper(self)
-
-    @property
-    def redis(self):
-        """Compatibility wrapper для redis настроек"""
-        class RedisWrapper:
-            def __init__(self, settings):
-                self.url = settings.redis_url
-                self.max_connections = settings.redis_max_connections
-        return RedisWrapper(self)
-
-    @property
-    def auth(self):
-        """Compatibility wrapper для auth настроек"""
-        class AuthWrapper:
-            def __init__(self, settings):
-                self.secret_key = settings.secret_key
-                self.algorithm = settings.algorithm
-                self.access_token_expire_minutes = settings.access_token_expire_minutes
-                self.session_expire_days = settings.refresh_token_expire_days  # Используем refresh_token_expire_days для сессий
-        return AuthWrapper(self)
-
-    @property
-    def server(self):
-        """Compatibility wrapper для server настроек"""
-        class ServerWrapper:
-            def __init__(self, settings):
-                self.host = settings.host
-                self.port = settings.port
-                self.debug = settings.debug
-                self.cors_origins = settings.cors_origins
-        return ServerWrapper(self)
-
-    @property
-    def logging(self):
-        """Compatibility wrapper для logging настроек"""
-        class LoggingWrapper:
-            def __init__(self, settings):
-                self.level = settings.log_level
-                self.format = settings.log_format
-        return LoggingWrapper(self)
 
 
-# Создание глобального экземпляра настроек
-settings = Settings()
 
-# Для обратной совместимости
-new_settings = settings
-legacy_settings = settings 
+settings = Settings() 
 
 

@@ -77,8 +77,9 @@ if !errorlevel! neq 0 (
 
 echo.
 echo ==========================================
-echo STARTING SERVERS
+echo STARTING SERVERS (Hot Reload ENABLED)
 echo ==========================================
+echo Backend will auto-restart on code changes (Uvicorn --reload)
 
 REM Start backend
 echo -> Starting Python backend server...

@@ -31,7 +31,6 @@ class User(Base):
     progress = relationship("UserContentProgress", back_populates="user")
     theoryProgress = relationship("UserTheoryProgress", back_populates="user")
     categoryProgress = relationship("UserCategoryProgress", back_populates="user")
-    taskAttempts = relationship("TaskAttempt", back_populates="user")
     taskSolutions = relationship("TaskSolution", back_populates="user")
     pathProgress = relationship("UserPathProgress", back_populates="user")
 

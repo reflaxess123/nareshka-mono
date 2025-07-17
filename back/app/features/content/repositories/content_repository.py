@@ -11,12 +11,8 @@ from uuid import uuid4
 from sqlalchemy import and_, asc, desc, func, or_
 from sqlalchemy.orm import Session, joinedload
 
-from app.shared.models.content_models import (
-    ContentBlock,
-    ContentFile,
-    UserContentProgress,
-    UserContentProgress as ContentBlockProgress,
-)
+from app.shared.entities.content import ContentBlock, ContentFile
+from app.shared.models.content_models import UserContentProgress
 from app.features.content.exceptions.content_exceptions import (
     ContentBlockNotFoundError,
     ContentFileNotFoundError,
@@ -189,14 +185,14 @@ class ContentRepository:
 
     async def get_user_content_progress(
         self, user_id: int, block_id: str
-    ) -> Optional[ContentBlockProgress]:
+    ) -> Optional[UserContentProgress]:
         """Получение прогресса пользователя по конкретному блоку"""
         return (
-            self.session.query(ContentBlockProgress)
+            self.session.query(UserContentProgress)
             .filter(
                 and_(
-                    ContentBlockProgress.userId == user_id,
-                    ContentBlockProgress.blockId == block_id,
+                    UserContentProgress.userId == user_id,
+                    UserContentProgress.blockId == block_id,
                 )
             )
             .first()
@@ -204,14 +200,14 @@ class ContentRepository:
 
     async def create_or_update_user_progress(
         self, user_id: int, block_id: str, solved_count: int
-    ) -> ContentBlockProgress:
+    ) -> UserContentProgress:
         """Создание или обновление прогресса пользователя по блоку"""
         progress = (
-            self.session.query(ContentBlockProgress)
+            self.session.query(UserContentProgress)
             .filter(
                 and_(
-                    ContentBlockProgress.userId == user_id,
-                    ContentBlockProgress.blockId == block_id,
+                    UserContentProgress.userId == user_id,
+                    UserContentProgress.blockId == block_id,
                 )
             )
             .first()
@@ -221,7 +217,7 @@ class ContentRepository:
             progress.solvedCount = solved_count
             progress.updatedAt = datetime.utcnow()
         else:
-            progress = ContentBlockProgress(
+            progress = UserContentProgress(
                 id=str(uuid4()),
                 userId=user_id,
                 blockId=block_id,
@@ -240,11 +236,11 @@ class ContentRepository:
     async def get_user_total_solved_count(self, user_id: int) -> int:
         """Получение общего количества решенных блоков пользователем (исключая тестовые)"""
         return (
-            self.session.query(func.count(ContentBlockProgress.id))
+            self.session.query(func.count(UserContentProgress.id))
             .filter(
                 and_(
-                    ContentBlockProgress.userId == user_id,
-                    ContentBlockProgress.solvedCount > 0,
+                    UserContentProgress.userId == user_id,
+                    UserContentProgress.solvedCount > 0,
                 )
             )
             .join(ContentBlock)
