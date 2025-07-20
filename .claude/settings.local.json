@@ -18,7 +18,21 @@
       "Bash(echo:*)",
       "Bash(echo \"code_editor -> task:\")",
       "Bash(wc:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(go mod init:*)",
+      "Bash(go mod:*)",
+      "Bash(chmod:*)",
+      "Bash(make:*)",
+      "Bash(./test_basic.sh:*)",
+      "Bash(brew install:*)",
+      "Bash(./test_server.sh:*)",
+      "Bash(pkill:*)",
+      "Bash(go run:*)",
+      "Bash(psql:*)",
+      "Bash(docker:*)",
+      "Bash(go build:*)",
+      "mcp__postgres__list_schemas",
+      "Bash(PGPASSWORD=postgres psql -h localhost -U postgres -d nareshka -c \"ALTER TABLE theory_cards ALTER COLUMN tags TYPE jsonb USING to_jsonb(tags);\")"
     ],
     "deny": []
   }
