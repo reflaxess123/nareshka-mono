@@ -34,7 +34,7 @@ class AuthService:
         self.user_repository = user_repository
         self.pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
         self.redis_client = redis.from_url(
-            settings.redis_url, decode_responses=True
+            "redis://127.0.0.1:6379/0", decode_responses=True
         )
 
     def verify_password(self, plain_password: str, hashed_password: str) -> bool:
@@ -89,16 +89,35 @@ class AuthService:
 
     async def authenticate_user(self, email: str, password: str) -> Optional[User]:
         """Аутентификация пользователя"""
+        import time
+        
+        start_db = time.time()
         user = await self.user_repository.get_by_email(email)
+        db_time = time.time() - start_db
+        logger.info(f"🔍 GET_BY_EMAIL took {db_time:.3f}s")
+        
         if not user:
             return None
-        if not self.verify_password(password, user.password):
+            
+        start_pwd = time.time()
+        pwd_valid = self.verify_password(password, user.password)
+        pwd_time = time.time() - start_pwd
+        logger.info(f"🔍 VERIFY_PASSWORD took {pwd_time:.3f}s")
+        
+        if not pwd_valid:
             return None
         return user
 
     async def login(self, login_request: LoginRequest) -> LoginResponse:
         """Авторизация пользователя"""
+        import time
+        logger.info(f"🔍 LOGIN START for {login_request.email}")
+        
+        start_time = time.time()
         user = await self.authenticate_user(login_request.email, login_request.password)
+        auth_time = time.time() - start_time
+        logger.info(f"🔍 AUTHENTICATE_USER took {auth_time:.3f}s")
+        
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -107,14 +126,24 @@ class AuthService:
 
         # Создаем сессию вместо JWT токена
         session_id = str(uuid.uuid4())
+        
+        start_session = time.time()
         self.create_session(user.id, session_id)
-
-        return LoginResponse(
+        session_time = time.time() - start_session
+        logger.info(f"🔍 CREATE_SESSION took {session_time:.3f}s")
+        
+        start_response = time.time()
+        response = LoginResponse(
             access_token="session_based",  # Совместимость с DTO
             token_type="session",
             user=UserResponse.model_validate(user),
             session_id=session_id,  # Добавляем session_id для установки cookie
         )
+        response_time = time.time() - start_response
+        logger.info(f"🔍 CREATE_RESPONSE took {response_time:.3f}s")
+        
+        logger.info(f"🔍 LOGIN COMPLETE for {login_request.email}")
+        return response
 
     async def register(self, register_request: RegisterRequest) -> RegisterResponse:
         """Регистрация пользователя"""

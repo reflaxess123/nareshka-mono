@@ -128,7 +128,8 @@ class DatabaseManager:
 
 
 # Глобальный менеджер БД
-db_manager = DatabaseManager(settings.database_url)
+# ВАЖНО: Используем исправленный URL напрямую пока settings не обновится
+db_manager = DatabaseManager("postgresql://postgres:dev_password@127.0.0.1:5432/nareshka_dev?sslmode=disable")
 
 
 def transactional(func: Callable) -> Callable:
