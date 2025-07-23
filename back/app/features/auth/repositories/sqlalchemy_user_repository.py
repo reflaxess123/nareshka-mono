@@ -25,9 +25,13 @@ class SQLAlchemyUserRepository(UserRepository):
     async def get_by_email(self, email: str, session: Session = None) -> Optional[User]:
         """Получить пользователя по email"""
         if session is None:
-            from app.shared.database.base import db_manager
-            with db_manager.get_session() as session:
+            from app.shared.database.connection import get_db
+            db_gen = get_db()
+            session = next(db_gen)
+            try:
                 return session.query(User).filter(User.email == email).first()
+            finally:
+                db_gen.close()
         return session.query(User).filter(User.email == email).first()
 
     async def get_all(self, limit: int = 100, offset: int = 0, session: Session = None) -> List[User]:
