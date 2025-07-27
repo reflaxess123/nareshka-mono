@@ -42,7 +42,10 @@
       "Bash(python -c \"\nimport sys\nsys.path.append(''C:/Users/refla/nareshka-mono/back'')\n\nfrom passlib.context import CryptContext\nimport time\n\npwd_context = CryptContext(schemes=[''bcrypt''], deprecated=''auto'')\n\n# Получаем хеш из базы\nimport psycopg2\nconn = psycopg2.connect(''postgresql://postgres:dev_password@127.0.0.1:5432/nareshka_dev?sslmode=disable'')\ncursor = conn.cursor()\ncursor.execute(''SELECT password FROM \"\"User\"\" WHERE email = %s'', (''asd@asd.ru'',))\nhash_from_db = cursor.fetchone()[0]\nconn.close()\n\n# Тестируем bcrypt verify\nprint(''Testing bcrypt password verification...'')\nstart = time.time()\nresult = pwd_context.verify(''123123'', hash_from_db)\nduration = time.time() - start\n\nprint(f''Password verify result: {result}'')\nprint(f''Password verify time: {duration:.3f}s'')\n\")",
       "Bash(python -c \"\nimport requests\nimport time\nimport json\n\nprint(''Testing login API...'')\nstart = time.time()\n\ntry:\n    response = requests.post(\n        ''http://127.0.0.1:4000/api/v2/auth/login'',\n        json={''email'': ''asd@asd.ru'', ''password'': ''123123''},\n        timeout=30\n    )\n    duration = time.time() - start\n    \n    print(f''Login API time: {duration:.3f}s'')\n    print(f''Status code: {response.status_code}'')\n    print(f''Response: {response.text[:200]}...'')\n    \nexcept requests.exceptions.Timeout:\n    duration = time.time() - start\n    print(f''LOGIN TIMEOUT after {duration:.3f}s'')\nexcept Exception as e:\n    duration = time.time() - start\n    print(f''LOGIN ERROR after {duration:.3f}s: {e}'')\n\")",
       "Bash(jq:*)",
-      "Bash(pip install:*)"
+      "Bash(pip install:*)",
+      "Bash(del:*)",
+      "Bash(git restore:*)",
+      "Bash(ls:*)"
     ],
     "deny": []
   }
