@@ -46,7 +46,11 @@
       "Bash(del:*)",
       "Bash(git restore:*)",
       "Bash(ls:*)",
+<<<<<<< HEAD
       "mcp__ide__executeCode"
+=======
+      "Bash(poetry run:*)"
+>>>>>>> 52d07ec1bee6d32281a673d317f47d47b31305e6
     ],
     "deny": []
   }
