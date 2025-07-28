@@ -272,7 +272,13 @@ class InterviewExtractor:
     def _load_companies(self, file_path: str) -> List[str]:
         """Загружаем список компаний"""
         with open(file_path, 'r', encoding='utf-8') as f:
-            return json.load(f)
+            data = json.load(f)
+            if isinstance(data, list) and data and isinstance(data[0], dict):
+                # Если это массив объектов с полем company
+                return [item.get('company', '') for item in data if item.get('company')]
+            else:
+                # Если это обычный список строк
+                return data
     
     def _load_interviews(self, file_path: str) -> str:
         """Загружаем текст с записями собеседований"""
