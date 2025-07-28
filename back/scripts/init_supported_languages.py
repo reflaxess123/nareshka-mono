@@ -8,17 +8,17 @@ import os
 from pathlib import Path
 
 # Добавляем корневую директорию в PYTHONPATH
-sys.path.append(str(Path(__file__).parent))
-sys.path.append(str(Path(__file__).parent / "app-simplest-arch"))
+back_dir = Path(__file__).parent.parent
+sys.path.append(str(back_dir))
 
-# Импортируем напрямую из app-simplest-arch
-import os
-os.chdir(str(Path(__file__).parent / "app-simplest-arch"))
+# Переходим в back директорию для импортов
+os.chdir(str(back_dir))
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from config import settings
-from models import SupportedLanguage, Base
+from app.core.settings import settings
+from app.shared.models.code_execution_models import SupportedLanguage
+from app.shared.database.models import BaseModel
 
 # Создаем подключение к БД
 database_url = settings.database_url
@@ -32,7 +32,7 @@ def init_supported_languages():
     """Инициализация поддерживаемых языков программирования"""
     
     # Создаем таблицы если их нет
-    Base.metadata.create_all(bind=engine)
+    BaseModel.metadata.create_all(bind=engine)
     
     session = SessionLocal()
     
