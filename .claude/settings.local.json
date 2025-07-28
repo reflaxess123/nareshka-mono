@@ -45,7 +45,8 @@
       "Bash(pip install:*)",
       "Bash(del:*)",
       "Bash(git restore:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "mcp__ide__executeCode"
     ],
     "deny": []
   }
