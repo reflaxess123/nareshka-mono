@@ -1,8 +1,8 @@
+import { AuthProvider } from '@/app/providers/auth';
 import { ModalProvider } from '@/shared/components/Modal/model/context';
 import { ThemeProvider } from '@/shared/context';
 import type { ReactNode } from 'react';
 import { Provider } from 'react-redux';
-import { AuthProvider } from './auth/ui/AuthProvider';
 import { ModalRenderer } from './modal/ui/ModalProvider';
 import { NotificationProvider } from './notification';
 import { QueryProvider } from './query';
