@@ -15,6 +15,7 @@ from app.core.logging import get_logger, init_default_logging
 from app.shared.di import setup_di_container
 from app.features.admin.api.admin_router import router as admin_router
 from app.features.auth.api.auth_router import router as auth_router
+from app.features.browser_logs.api.browser_logs_router import router as browser_logs_router
 from app.features.code_editor.api import router as code_editor_router
 from app.features.content.api import router as content_router
 from app.features.mindmap.api import router as mindmap_router
@@ -65,6 +66,7 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 # Подключение роутеров новой архитектуры
 app.include_router(auth_router, prefix="/api/v2")
+app.include_router(browser_logs_router)  # Без префикса, так как уже есть в роутере
 app.include_router(content_router, prefix="/api/v2")
 app.include_router(theory_router, prefix="/api/v2")
 app.include_router(task_router, prefix="/api/v2")

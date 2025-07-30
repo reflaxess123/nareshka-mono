@@ -1,0 +1,65 @@
+{
+  "browser-tools": {
+    "server": {
+      "host": "localhost",
+      "port": 3001,
+      "autoStart": true,
+      "logLevel": "info"
+    },
+    "monitoring": {
+      "console": {
+        "enabled": true,
+        "levels": ["log", "warn", "error", "info", "debug"],
+        "saveToFile": true,
+        "logPath": "./logs/browser-console.log"
+      },
+      "network": {
+        "enabled": true,
+        "captureRequests": true,
+        "captureResponses": true,
+        "filterUrls": [
+          "http://localhost:4000/api/*",
+          "http://localhost:5173/*"
+        ]
+      },
+      "errors": {
+        "enabled": true,
+        "captureJavaScriptErrors": true,
+        "captureNetworkErrors": true,
+        "takeScreenshotOnError": true
+      },
+      "performance": {
+        "enabled": true,
+        "captureMetrics": true,
+        "monitorMemory": true
+      }
+    },
+    "integration": {
+      "database": {
+        "enabled": true,
+        "connectionString": "postgresql://postgres:dev_password@127.0.0.1:5432/nareshka_dev",
+        "logTable": "browser_logs"
+      },
+      "webhook": {
+        "enabled": true,
+        "url": "http://localhost:4000/api/browser-logs",
+        "headers": {
+          "Content-Type": "application/json",
+          "X-Source": "browser-tools-mcp"
+        }
+      }
+    },
+    "filters": {
+      "excludeUrls": [
+        "chrome-extension://*",
+        "moz-extension://*",
+        "*/_next/static/*",
+        "*/hot-update*"
+      ],
+      "includeOnlyDomains": [
+        "localhost:5173",
+        "localhost:4000"
+      ]
+    }
+  }
+}
