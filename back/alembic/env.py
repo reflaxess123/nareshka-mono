@@ -15,7 +15,17 @@ from app.config.settings import settings
 # Используем новые shared модели
 from app.shared.database import Base
 from app.shared.entities import *  # noqa: F403
-from app.shared.models import *  # noqa: F403 # Оставляем для совместимости
+from app.shared.entities.interview import InterviewRecord, InterviewAnalytics  # Новые модели
+
+# Импортируем существующие модели
+from app.shared.models.progress_models import UserCategoryProgress
+from app.shared.models.user_models import *  # noqa: F403
+from app.shared.models.task_models import *  # noqa: F403
+from app.shared.models.content_models import *  # noqa: F403
+from app.shared.models.theory_models import *  # noqa: F403
+from app.shared.models.learning_path_models import *  # noqa: F403
+from app.shared.models.code_execution_models import *  # noqa: F403
+from app.shared.models.test_case_models import *  # noqa: F403
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
