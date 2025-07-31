@@ -7,20 +7,6 @@ interface InterviewCardProps {
   interview: InterviewRecordResponseType;
 }
 
-const DIFFICULTY_LABELS = {
-  1: 'Легко',
-  2: 'Средне-',
-  3: 'Средне',
-  4: 'Средне+',
-  5: 'Сложно'
-};
-
-const STAGE_LABELS = {
-  1: 'Скрининг',
-  2: 'Техническое',
-  3: 'Системное',
-  4: 'Финальное'
-};
 
 export const InterviewCard: React.FC<InterviewCardProps> = ({ interview }) => {
   const formatDate = (dateString: string) => {
@@ -31,31 +17,6 @@ export const InterviewCard: React.FC<InterviewCardProps> = ({ interview }) => {
     });
   };
 
-  const renderDifficulty = (level: number | null) => {
-    if (!level) return null;
-    return (
-      <span className={`${styles.difficulty} ${styles[`difficulty-${level}`]}`}>
-        {'★'.repeat(level)}{'☆'.repeat(5 - level)} {DIFFICULTY_LABELS[level as keyof typeof DIFFICULTY_LABELS]}
-      </span>
-    );
-  };
-
-  const renderTechnologies = (technologies: string[]) => {
-    if (!technologies || technologies.length === 0) return null;
-    
-    return (
-      <div className={styles.technologies}>
-        {technologies.slice(0, 3).map((tech, index) => (
-          <span key={index} className={styles.tech}>
-            {tech}
-          </span>
-        ))}
-        {technologies.length > 3 && (
-          <span className={styles.techMore}>+{technologies.length - 3}</span>
-        )}
-      </div>
-    );
-  };
 
   return (
     <div className={styles.card}>
@@ -69,12 +30,6 @@ export const InterviewCard: React.FC<InterviewCardProps> = ({ interview }) => {
       )}
 
       <div className={styles.metadata}>
-        {interview.stage_number && (
-          <span className={styles.stage}>
-            Этап: {STAGE_LABELS[interview.stage_number as keyof typeof STAGE_LABELS] || interview.stage_number}
-          </span>
-        )}
-        
         {interview.duration_minutes && (
           <span className={styles.duration}>
             {interview.duration_minutes} мин
@@ -88,9 +43,6 @@ export const InterviewCard: React.FC<InterviewCardProps> = ({ interview }) => {
         )}
       </div>
 
-      {renderDifficulty(interview.difficulty_level)}
-      {renderTechnologies(interview.technologies)}
-
       <div className={styles.content}>
         <p>{interview.content.substring(0, 200)}...</p>
       </div>
@@ -100,9 +52,6 @@ export const InterviewCard: React.FC<InterviewCardProps> = ({ interview }) => {
           Читать полностью →
         </Link>
         
-        {interview.telegram_author && (
-          <span className={styles.author}>@{interview.telegram_author}</span>
-        )}
       </div>
     </div>
   );

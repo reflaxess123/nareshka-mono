@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  useGetCompaniesListApiV2InterviewsCompaniesListGet,
-  useGetTechnologiesListApiV2InterviewsTechnologiesListGet
+  useGetCompaniesListApiV2InterviewsCompaniesListGet
 } from '../../../shared/api/generated/api';
 import styles from './InterviewFilters.module.scss';
 
 export interface InterviewFiltersType {
   company?: string;
-  technology?: string;
-  difficulty?: number;
-  stage?: number;
   search?: string;
 }
 
@@ -19,20 +15,6 @@ interface InterviewFiltersProps {
   resultsCount?: number;
 }
 
-const DIFFICULTY_LABELS = {
-  1: 'Легко',
-  2: 'Средне-',
-  3: 'Средне',
-  4: 'Средне+',
-  5: 'Сложно'
-};
-
-const STAGE_LABELS = {
-  1: 'Скрининг',
-  2: 'Техническое',
-  3: 'Системное',
-  4: 'Финальное'
-};
 
 export const InterviewFilters: React.FC<InterviewFiltersProps> = ({
   filters,
@@ -43,7 +25,6 @@ export const InterviewFilters: React.FC<InterviewFiltersProps> = ({
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const { data: companiesData } = useGetCompaniesListApiV2InterviewsCompaniesListGet();
-  const { data: technologiesData } = useGetTechnologiesListApiV2InterviewsTechnologiesListGet();
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -117,56 +98,8 @@ export const InterviewFilters: React.FC<InterviewFiltersProps> = ({
               </select>
             </div>
 
-            <div className={styles.field}>
-              <label className={styles.label}>Технология</label>
-              <select
-                className={styles.select}
-                value={localFilters.technology || ''}
-                onChange={(e) => handleFilterChange('technology', e.target.value)}
-              >
-                <option value="">Все технологии</option>
-                {technologiesData?.technologies?.map(tech => (
-                  <option key={tech} value={tech}>
-                    {tech}
-                  </option>
-                ))}
-              </select>
-            </div>
           </div>
 
-          <div className={styles.row}>
-            <div className={styles.field}>
-              <label className={styles.label}>Сложность</label>
-              <select
-                className={styles.select}
-                value={localFilters.difficulty || ''}
-                onChange={(e) => handleFilterChange('difficulty', e.target.value ? Number(e.target.value) : undefined)}
-              >
-                <option value="">Любая сложность</option>
-                {Object.entries(DIFFICULTY_LABELS).map(([level, label]) => (
-                  <option key={level} value={level}>
-                    {label} ({level}/5)
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className={styles.field}>
-              <label className={styles.label}>Этап</label>
-              <select
-                className={styles.select}
-                value={localFilters.stage || ''}
-                onChange={(e) => handleFilterChange('stage', e.target.value ? Number(e.target.value) : undefined)}
-              >
-                <option value="">Любой этап</option>
-                {Object.entries(STAGE_LABELS).map(([stage, label]) => (
-                  <option key={stage} value={stage}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
 
           {hasActiveFilters && (
             <div className={styles.actions}>

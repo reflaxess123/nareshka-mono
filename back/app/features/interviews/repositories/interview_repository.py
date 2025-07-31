@@ -27,14 +27,6 @@ class InterviewRepository:
             if filters.get("company"):
                 query = query.filter(InterviewRecord.company_name.ilike(f"%{filters['company']}%"))
             
-            if filters.get("technology"):
-                query = query.filter(InterviewRecord.technologies.contains([filters["technology"]]))
-            
-            if filters.get("difficulty"):
-                query = query.filter(InterviewRecord.difficulty_level == filters["difficulty"])
-            
-            if filters.get("stage"):
-                query = query.filter(InterviewRecord.stage_number == filters["stage"])
             
             if filters.get("search"):
                 search_term = f"%{filters['search']}%"
@@ -74,16 +66,6 @@ class InterviewRepository:
         )
         return [company[0] for company in companies]
 
-    def get_technologies_list(self) -> List[str]:
-        """Получение списка всех технологий"""
-        # Используем функцию unnest для извлечения элементов из массива
-        technologies = (
-            self.session.query(func.unnest(InterviewRecord.technologies).label('tech'))
-            .distinct()
-            .order_by('tech')
-            .all()
-        )
-        return [tech[0] for tech in technologies if tech[0]]
 
     def get_company_statistics(self, company_name: str) -> Optional[Dict[str, Any]]:
         """Получение статистики по компании"""
@@ -98,33 +80,14 @@ class InterviewRepository:
 
         # Подсчет статистики
         total_interviews = len(interviews)
-        difficulties = [i.difficulty_level for i in interviews if i.difficulty_level]
         durations = [i.duration_minutes for i in interviews if i.duration_minutes]
         
-        avg_difficulty = sum(difficulties) / len(difficulties) if difficulties else None
         avg_duration = sum(durations) / len(durations) if durations else None
-
-        # Популярные технологии
-        tech_count = {}
-        for interview in interviews:
-            for tech in interview.technologies:
-                tech_count[tech] = tech_count.get(tech, 0) + 1
-
-        popular_technologies = sorted(tech_count.items(), key=lambda x: x[1], reverse=True)[:5]
-
-        # Распределение по этапам
-        stages_count = {}
-        for interview in interviews:
-            stage = interview.stage_number or 0
-            stages_count[stage] = stages_count.get(stage, 0) + 1
 
         return {
             "company_name": company_name,
             "total_interviews": total_interviews,
-            "avg_difficulty": avg_difficulty,
-            "avg_duration": avg_duration,
-            "popular_technologies": [tech for tech, count in popular_technologies],
-            "stages_distribution": stages_count
+            "avg_duration": avg_duration
         }
 
     def get_analytics_overview(self) -> Dict[str, Any]:
@@ -136,8 +99,7 @@ class InterviewRepository:
         top_companies = (
             self.session.query(
                 InterviewRecord.company_name,
-                func.count(InterviewRecord.id).label('count'),
-                func.avg(InterviewRecord.difficulty_level).label('avg_diff')
+                func.count(InterviewRecord.id).label('count')
             )
             .group_by(InterviewRecord.company_name)
             .order_by(desc('count'))
@@ -148,48 +110,14 @@ class InterviewRepository:
         top_companies_list = [
             {
                 "company_name": company,
-                "total_interviews": count,
-                "avg_difficulty": float(avg_diff) if avg_diff else None,
-                "avg_duration": None,
-                "popular_technologies": [],
-                "stages_distribution": {}
+                "total_interviews": count
             }
-            for company, count, avg_diff in top_companies
+            for company, count in top_companies
         ]
-
-        # Популярные технологии
-        tech_subquery = self.session.query(func.unnest(InterviewRecord.technologies).label('tech')).subquery()
-        popular_technologies = (
-            self.session.query(
-                tech_subquery.c.tech,
-                func.count(tech_subquery.c.tech).label('count')
-            )
-            .group_by(tech_subquery.c.tech)
-            .order_by(desc('count'))
-            .limit(10)
-            .all()
-        )
-
-        popular_tech_list = [{"name": tech, "count": count} for tech, count in popular_technologies if tech]
-
-        # Распределение по сложности
-        difficulty_dist = (
-            self.session.query(
-                InterviewRecord.difficulty_level,
-                func.count(InterviewRecord.id).label('count')
-            )
-            .filter(InterviewRecord.difficulty_level.isnot(None))
-            .group_by(InterviewRecord.difficulty_level)
-            .all()
-        )
-
-        difficulty_distribution = {str(level): count for level, count in difficulty_dist}
 
         return {
             "total_interviews": total_interviews,
             "total_companies": total_companies,
             "top_companies": top_companies_list,
-            "popular_technologies": popular_tech_list,
-            "difficulty_distribution": difficulty_distribution,
             "monthly_stats": []  # TODO: добавить месячную статистику
         }

@@ -13,8 +13,7 @@ from app.features.interviews.dto.responses import (
     InterviewDetailResponse, 
     AnalyticsResponse,
     CompanyStatsResponse,
-    CompaniesListResponse,
-    TechnologiesListResponse
+    CompaniesListResponse
 )
 from app.shared.dependencies import get_current_user_optional
 from app.shared.database import get_session
@@ -30,15 +29,12 @@ router = APIRouter(
     "/", 
     response_model=InterviewsListResponse,
     summary="Получить список интервью",
-    description="Возвращает список интервью с поддержкой фильтрации по компании, технологиям, сложности и пагинации"
+    description="Возвращает список интервью с поддержкой фильтрации по компании и пагинации"
 )
 async def get_interviews(
     page: int = Query(1, ge=1, description="Номер страницы"),
     limit: int = Query(20, ge=1, le=100, description="Количество записей на странице"),
     company: Optional[str] = Query(None, description="Фильтр по названию компании"),
-    technology: Optional[str] = Query(None, description="Фильтр по технологии"),
-    difficulty: Optional[int] = Query(None, ge=1, le=5, description="Фильтр по сложности (1-5)"),
-    stage: Optional[int] = Query(None, ge=1, le=4, description="Фильтр по этапу собеседования (1-4)"),
     search: Optional[str] = Query(None, description="Поиск по содержимому интервью"),
     session: Session = Depends(get_session),
     current_user = Depends(get_current_user_optional)
@@ -48,18 +44,12 @@ async def get_interviews(
     - **page**: Номер страницы (начинается с 1)
     - **limit**: Количество записей на странице (максимум 100)
     - **company**: Название компании для фильтрации
-    - **technology**: Технология для фильтрации  
-    - **difficulty**: Уровень сложности от 1 до 5
-    - **stage**: Этап собеседования от 1 до 4
     - **search**: Поиск по тексту интервью
     """
     service = InterviewService(session)
     
     filters = {
         "company": company,
-        "technology": technology, 
-        "difficulty": difficulty,
-        "stage": stage,
         "search": search
     }
     
@@ -113,10 +103,7 @@ async def get_company_stats(
     
     Включает:
     - Общее количество интервью
-    - Средняя сложность
     - Средняя продолжительность
-    - Популярные технологии
-    - Распределение по этапам
     """
     service = InterviewService(session)
     stats = service.get_company_statistics(company_name)
@@ -142,8 +129,6 @@ async def get_analytics_overview(
     Включает:
     - Общее количество интервью и компаний
     - Топ компании по количеству интервью
-    - Популярные технологии
-    - Распределение по сложности
     - Статистика по месяцам
     """
     service = InterviewService(session)
@@ -168,19 +153,3 @@ async def get_companies_list(
     return {"companies": service.get_companies_list()}
 
 
-@router.get(
-    "/technologies/list",
-    response_model=TechnologiesListResponse,
-    summary="Список технологий", 
-    description="Возвращает список всех технологий для использования в фильтрах"
-)
-async def get_technologies_list(
-    session: Session = Depends(get_session),
-    current_user = Depends(get_current_user_optional)
-):
-    """Список всех технологий для фильтров
-    
-    Возвращает массив технологий, упоминаемых в интервью
-    """
-    service = InterviewService(session)
-    return {"technologies": service.get_technologies_list()}
