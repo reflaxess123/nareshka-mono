@@ -1,0 +1,245 @@
+    ]
+  },
+  {
+    "company": "Гк Авилон, Айтикит",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-12-03 13:26:15",
+        "content": "2024-12-03 13:26:15\n Aleks Vi -> 2071074234:\nНазвание компании: ГК Авилон, АйТиКит\nВакансия: https://hh.ru/vacancy/111948431?hhtmFrom=employer_vacancies\nТип собеседования: Устное интервью с тех лидом и hr\nЗП: 174 000 на руки\nУспех собеса: нет\nЧто спрашивали: \nПро опыт работы, почему ищешь новую, знаешь ли что-то про маркетинг. \nFSD, \nApp router, \nReact-Hook-Forms, \nКак реализовывали авторизацию (подробно по шагам, что происходит), \nДелал ли UI-KIT (показать примеры), \nSCSS - миксины, \nДелал ли N...",
+        "full_content": "2024-12-03 13:26:15\n Aleks Vi -> 2071074234:\nНазвание компании: ГК Авилон, АйТиКит\nВакансия: https://hh.ru/vacancy/111948431?hhtmFrom=employer_vacancies\nТип собеседования: Устное интервью с тех лидом и hr\nЗП: 174 000 на руки\nУспех собеса: нет\nЧто спрашивали: \nПро опыт работы, почему ищешь новую, знаешь ли что-то про маркетинг. \nFSD, \nApp router, \nReact-Hook-Forms, \nКак реализовывали авторизацию (подробно по шагам, что происходит), \nДелал ли UI-KIT (показать примеры), \nSCSS - миксины, \nДелал ли NPM-пакеты\nПодробно про SEO"
+      }
+    ]
+  },
+  {
+    "company": "Промышленные инновации",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-10-25 12:12:42",
+        "content": "2024-10-25 12:12:42\n Гасим Мурасов -> 2071074234:\n-компания: Промышленные инновации\n-зп: попросил  250к\n-вакансия: https://hh.ru/vacancy/83342652\n-задач не было просто общались о процессах\n\nкак была устроена разработка?\nкакой был процесс разработки, сколько членов в команде?\nЧто делал в последней компании на проекте?\nЧто делал в первой компании на проекте,как был устроен процесс разработки там(и сколько человек в команде)?\nКак себя вижу через несколько лет?\nГотов ли к офисному формату работы?",
+        "full_content": "2024-10-25 12:12:42\n Гасим Мурасов -> 2071074234:\n-компания: Промышленные инновации\n-зп: попросил  250к\n-вакансия: https://hh.ru/vacancy/83342652\n-задач не было просто общались о процессах\n\nкак была устроена разработка?\nкакой был процесс разработки, сколько членов в команде?\nЧто делал в последней компании на проекте?\nЧто делал в первой компании на проекте,как был устроен процесс разработки там(и сколько человек в команде)?\nКак себя вижу через несколько лет?\nГотов ли к офисному формату работы?"
+      }
+    ]
+  },
+  {
+    "company": "Эпик Дей",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-05-04 20:07:32",
+        "content": "2025-05-04 20:07:32\n Василий -> 2071074234:\nЭпик дей\nзп: 150\n\nКомпания из 3 человек. 1 собес задавали вопросы только по опыту, смогу ли работать один. \n\n2 собес скинули задачку на час времени. \nФильтрация и сортировка списка товаров (Product List)\n• Задача: реализовать компонент, отображающий список товаров и позволяющий фильтровать их по категории и сортировать по цене.\n\nФункциональность:\n• Отображение списка товаров (название, цена, категория).\n• Селект (dropdown) для выбора категории (фильтра...",
+        "full_content": "2025-05-04 20:07:32\n Василий -> 2071074234:\nЭпик дей\nзп: 150\n\nКомпания из 3 человек. 1 собес задавали вопросы только по опыту, смогу ли работать один. \n\n2 собес скинули задачку на час времени. \nФильтрация и сортировка списка товаров (Product List)\n• Задача: реализовать компонент, отображающий список товаров и позволяющий фильтровать их по категории и сортировать по цене.\n\nФункциональность:\n• Отображение списка товаров (название, цена, категория).\n• Селект (dropdown) для выбора категории (фильтрация).\n• Селект (dropdown) для выбора типа сортировки (по цене: возрастанию/убыванию).\n• Предоставить готовый массив товаров (JSON).\n\nТехнические требования:\n• React (функциональные компоненты, хуки).\n• TypeScript.\n• Использование useState для управления состоянием.\n• Правильная обработка событий onChange для селектов.\n• Эффективная фильтрация и сортировка данных.\n\nОжидаемый результат:\n• Рабочий список товаров с возможностью фильтрации по категории и сортировки по цене.\n• Чистый и понятный код. \nimport React, { useState } from 'react';\n\n// Определение интерфейса для структуры товара\ninterface Product {\n  id: number;\n  name: string;\n  price: number;\n  category: string;\n}\n\n// Готовый массив товаров\nconst initialProducts: Product[] = [\n  { id: 1, name: 'Книга \"React для начинающих\"', price: 29.99, category: 'Книги' },\n  { id: 2, name: 'Смартфон XYZ', price: 199.99, category: 'Электроника' },\n  { id: 3, name: 'Ноутбук ABC', price: 899.99, category: 'Электроника' },\n  { id: 4, name: 'Книга \"Углубленный React\"', price: 39.99, category: 'Книги' },\n  { id: 5, name: 'Наушники', price: 59.99, category: 'Аксессуары' }\n]; \nconst ProductList: React.FC = () => {\n  // Состояние выбранной категории. Начальное значение \"All\" (все категории)\n  const [selectedCategory, setSelectedCategory] = useState<string>('All');\n  // Состояние выбранного типа сортировки: \"asc\" (по возрастанию) или \"desc\" (по убыванию)\n  const [sortOption, setSortOption] = useState<'asc' | 'desc'>('asc');\n\n  // Получаем список уникальных категорий, включая вариант \"All\"\n  const categories = ['All', ...Array.from(new Set(initialProducts.map(product => product.category)))];\n\n  // Фильтрация товаров в зависимости от выбранной категории\n  const filteredProducts = initialProducts.filter(product =>\n    selectedCategory === 'All' ? true : product.category === selectedCategory\n  );\n\n  // Копируем отфильтрованный массив и сортируем по цене\n  const sortedProducts = [...filteredProducts].sort((a, b) => {\n    return sortOption === 'asc' ? a.price - b.price : b.price - a.price;\n  });\n\n  // Обработчики изменения значений селектов\n  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {\n    setSelectedCategory(e.target.value);\n  };\n\n  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {\n    const value = e.target.value as 'asc' | 'desc';\n    setSortOption(value);\n  };\n return (\n    <div>\n      <h2>Список товаров</h2>\n\n      {/* Селект для фильтрации по категории */}\n      <div>\n        <label htmlFor=\"categoryFilter\">Фильтр по категории: </label>\n        <select id=\"categoryFilter\" value={selectedCategory} onChange={handleCategoryChange}>\n          {categories.map((cat, idx) => (\n            <option key={idx} value={cat}>\n              {cat}\n            </option>\n          ))}\n        </select>\n      </div>\n\n      {/* Селект для выбора типа сортировки */}\n      <div>\n        <label htmlFor=\"sortOption\">Сортировка по цене: </label>\n        <select id=\"sortOption\" value={sortOption} onChange={handleSortChange}>\n          <option value=\"asc\">Возрастание</option>\n          <option value=\"desc\">Убывание</option>\n        </select>\n      </div>\n\n      {/* Отображение списка товаров */}\n      <ul>\n        {sortedProducts.map(product => (\n          <li key={product.id}>\n            <strong>{product.name}</strong> - ${product.price.toFixed(2)} - <em>{product.category}</em>\n          </li>\n        ))}\n      </ul>\n    </div>\n  );\n};"
+      }
+    ]
+  },
+  {
+    "company": "Eesee, Крипта",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-12-10 08:08:58",
+        "content": "2024-12-10 08:08:58\n Igor -> 2071074234:\nНазвание компании: Eesee, крипта\nСсылка на вакансию: сообщение от эйчара\nЗп: 3-5к usdt\nФидбек: оффер 4.5 на испыталку, 5к после\nЗапись: грузится\n\nВопросы:\n\n1. Event loop\n2. Написать свой PromiseAll\n3. Отличие типа от интерфейса\n4. Utility types\n5. Написать свой Exclude, Readonly\n6. Рефакторинг реакт компонента, вызок компонента как функцию\n7. Реакт как работает, батчинг, reconciliation\n8. Оптимизация реакт приложения\n9. Сервис воркеры\n\nЗадачи\n\n// Реализов...",
+        "full_content": "2024-12-10 08:08:58\n Igor -> 2071074234:\nНазвание компании: Eesee, крипта\nСсылка на вакансию: сообщение от эйчара\nЗп: 3-5к usdt\nФидбек: оффер 4.5 на испыталку, 5к после\nЗапись: грузится\n\nВопросы:\n\n1. Event loop\n2. Написать свой PromiseAll\n3. Отличие типа от интерфейса\n4. Utility types\n5. Написать свой Exclude, Readonly\n6. Рефакторинг реакт компонента, вызок компонента как функцию\n7. Реакт как работает, батчинг, reconciliation\n8. Оптимизация реакт приложения\n9. Сервис воркеры\n\nЗадачи\n\n// Реализовать собственный Promise.all\n\nasync function myPromiseAll(promises) {\n}\n\n/******************/\n// Test Cases\nmyPromiseAll(\n  [\n    Promise.resolve('1'),\n    Promise.resolve('2')\n  ]\n)\n  .then(console.log) // Output: ['1', '2']\n\nmyPromiseAll(\n  [\n    Promise.resolve('1'),\n    Promise.resolve('2'),\n    Promise.reject('error')\n  ]\n)\n  .catch(console.log) // Output: 'error'\n\n\n// 1. Exclude\ntype MyExclude<T, U> = T extends U ? never : T;\n\n// Test Case\ntype ExcludableValues = MyExclude<'a' | 'b' | 'c', 'a'> // -> 'b' | 'c'\n\n// ===========\n\n// 2. Readonly\ntype MyReadonly<T extends object> = {\n  readonly [P in keyof T]: T[P]\n}\n\ninterface Todo {\n  title: string\n  description: string\n  completed: boolean\n  author: string\n}\n// 1. Как перебрать ключи ?\n// Test Case\ntype ReadonlyTodo = MyReadonly<Todo>\n/* -> \n  {\n    readonly title: string;\n    readonly description: string;\n    readonly completed: boolean;\n    readonly author: string;\n  }\n*/\n\n// ===========\n\n// 3. Parameters\ntype MyParameters<T extends (...args: any[]) => any> = any\n\n// Test Case\nconst foo = (arg1: string, arg2: number): void => {}\n\ntype FooParameters = MyParameters<typeof foo> // -> [string, number]\n\n// App.tsx\nimport { useState } from 'react';\n\nconst MyCounter = () => {\n  const [count, setCount] = useState(0)\n\n  return (\n    \n    <div>\n       <button onClick={() => setCount(prev => prev - 1)}>decrement</button>\n     <span>{count}</span>\n       <button onClick={() => setCount(prev => prev + 1)}>increment</button>\n     </div>\n  )\n}\n\nexport const App = () => {\n  const [showCounter, setShowCounter] = useState(true)\n\n  if(showCounter) {\n    const [count, setCount] = useState(0)\n  }\n\n  return (\n    <div>\n      {showCounter && <MyCounter />}\n<!--       // vs -->\n       {showCounter && MyCounter()} \n      \n      <button onClick={() => setShowCounter((prev) => !prev)}>Toggle counter</button>\n    </div>\n  )\n}"
+      }
+    ]
+  },
+  {
+    "company": "Agima",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-03-17 14:28:33",
+        "content": "2025-03-17 14:28:33\n Vyacheslav -> 2071074234:\nAGIMA \nHR сама написала \nПроект сбера (беспилотное такси), гибрид\nЗП: сказал комфорт 250\nСначала задача, потом теория\nЗадача: отрисовать шахматную доску. Управлять королем. Может ходить только на соседние 8 клеток. Закрасить возможные ходы. \nРешение (удивлен что решил на самом деле)\nimport { useState } from 'react'\nimport './test.scss'\n\nconst arr = [[[],[],[],[],[],[],[],[]],\n            [[],[],[],[],[],[],[],[]],\n            [[],[],[],[],[],[],[],[...",
+        "full_content": "2025-03-17 14:28:33\n Vyacheslav -> 2071074234:\nAGIMA \nHR сама написала \nПроект сбера (беспилотное такси), гибрид\nЗП: сказал комфорт 250\nСначала задача, потом теория\nЗадача: отрисовать шахматную доску. Управлять королем. Может ходить только на соседние 8 клеток. Закрасить возможные ходы. \nРешение (удивлен что решил на самом деле)\nimport { useState } from 'react'\nimport './test.scss'\n\nconst arr = [[[],[],[],[],[],[],[],[]],\n            [[],[],[],[],[],[],[],[]],\n            [[],[],[],[],[],[],[],[]],\n            [[],[],[],[],[],[],[],[]],\n            [[],[],[],[],[],[],[],[]],\n            [[],[],[],[],[],[],[],[]],\n            [[],[],[],[],[],[],[],[]],\n            [[],[],[],[],[],[],[],[]],]\n\nexport default function Test(){\n    const [cell, setCell] = useState('K')\n    const [kRow, setKRow] = useState(2)\n    const [kColumn, setKColumn] = useState(2)\n    console.log(arr)\n    const handler =(row, column)=>{\n        console.log(row, column)\n        if (Math.abs(row-kRow)<=1 && Math.abs(column-kColumn)<=1){\n            setKRow(row)\n            setKColumn(column)\n        }\n\n    }\n    const nearK = (row, column)=>{\n        if (Math.abs(row-kRow)<=1 && Math.abs(column-kColumn)<=1) return true\n        return false \n    }\n    return (\n        <div>\n            {arr.map((item, index)=>{\n\n                return <div  key={index}  \n                            className='row'>\n                            {item.map((inItem, index2)=>\n                                <div onClick={()=>handler(index, index2)} className={`cell ${nearK(index, index2)?'kcellnear':''}`}>{(index2===kColumn && kRow===index)?'K':''}</div>\n                    )}</div>\n            })}\n        </div>\n    )\n}\n\nfunction Cell({})\n+css для него\n.row{\n    display: flex;\n    &:nth-child(2n) .cell:nth-child(2n){\n        background-color: green;\n    } \n    &:nth-child(2n+1) .cell:nth-child(2n+1){\n        background-color: green;\n    }      \n}\n\n.cell{\n    border: solid 1px; \n    width: 100px;\n    height: 100px;\n}\n\n.kcellnear{\n    background-color: bisque !important;\n}\nВопросы по теории были по чеклисту, вопрос-ответ\n- Как попал в айти и фронтенд\n- про задачи на текущей работе и продукт рассказать\n- React.memo, useCallback\n- Работал ли с Next.js\n- работал ли с 3d графикой в js (Three.js?)\n\nP.S. решение задачи может показаться странной местами, т.к. делалась поэтапно (отрисовать доску. А теперь добавь коня. итд)\nP.S.S. Можно было бы и без nth-child, сумма row+column%2 === 0 -> backgroundColor и пошло поехало"
+      }
+    ]
+  },
+  {
+    "company": "Dcloud",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-06-10 12:05:29",
+        "content": "2024-06-10 12:05:29\n Александр Птицын -> 2071074234:\n- #DCloud\n- Вакансия: https://novokuznetsk.hh.ru/vacancy/95431413\n- Задачи:\nhttps://stackblitz.com/edit/vitejs-vite-n3bjhj?file=src%2FApp.tsx\n- Вопросы: про хостинг, про ТС, про реакт, базовые вопросы\n- Успех: ?",
+        "full_content": "2024-06-10 12:05:29\n Александр Птицын -> 2071074234:\n- #DCloud\n- Вакансия: https://novokuznetsk.hh.ru/vacancy/95431413\n- Задачи:\nhttps://stackblitz.com/edit/vitejs-vite-n3bjhj?file=src%2FApp.tsx\n- Вопросы: про хостинг, про ТС, про реакт, базовые вопросы\n- Успех: ?"
+      }
+    ]
+  },
+  {
+    "company": "Сквад Squad Https:",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-12-13 14:28:42",
+        "content": "2024-12-13 14:28:42\n Tonidevs -> 2071074234:\nсквад squad https://squadsec.ru/\nЗП: 120-170к\nВакансия: https://kazan.hh.ru/vacancy/111854577\nСтартап \nУспех: нет\n\n\nвопросы:\n- про опыт (по каждой букве в резюме)\n- про асинхронность, ивент луп\nзадачи:\nреши задачу \nЧисла Фибоначчи\nF0 = 0\nF1 = 1\nFn = Fn-1 + Fn-2\n\n0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946, 17711\n\n\n\nданные приходят с БЭКА что будет если у нас 1 000 000 элементов в массиве (клонили в с...",
+        "full_content": "2024-12-13 14:28:42\n Tonidevs -> 2071074234:\nсквад squad https://squadsec.ru/\nЗП: 120-170к\nВакансия: https://kazan.hh.ru/vacancy/111854577\nСтартап \nУспех: нет\n\n\nвопросы:\n- про опыт (по каждой букве в резюме)\n- про асинхронность, ивент луп\nзадачи:\nреши задачу \nЧисла Фибоначчи\nF0 = 0\nF1 = 1\nFn = Fn-1 + Fn-2\n\n0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946, 17711\n\n\n\nданные приходят с БЭКА что будет если у нас 1 000 000 элементов в массиве (клонили в сторону эвент лупа и разбития на чанки)\nfunction response(data) {\n    res = res.concat(\n        data.map(function (val) {\n            return val * 2;\n        })\n    );\n}"
+      }
+    ]
+  },
+  {
+    "company": "Umnico Юмнико",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-07-18 17:36:24",
+        "content": "2025-07-18 17:36:24\n Ivan -> 2071074234:\nКомпания: Umnico Юмнико\nЗП: 160К\n\n1. Какую сложную задачу последнюю решал?\n2. Задача на контекст вызова\n3. Про строгий режим\n4. Глубокое копирование объектов. Копирование функций.\n5. Задача на рефакторинг функции. Убрать все лишнее, чтоб функция стала чистой. \n6. Задача на рефакторинг React компоеннта. (клинап функции, хуки в условиях, useEffect( async () => {} ),  try catch для запроса, завести состояние под ошибку, массив зависимостей)\n7. Задача на поря...",
+        "full_content": "2025-07-18 17:36:24\n Ivan -> 2071074234:\nКомпания: Umnico Юмнико\nЗП: 160К\n\n1. Какую сложную задачу последнюю решал?\n2. Задача на контекст вызова\n3. Про строгий режим\n4. Глубокое копирование объектов. Копирование функций.\n5. Задача на рефакторинг функции. Убрать все лишнее, чтоб функция стала чистой. \n6. Задача на рефакторинг React компоеннта. (клинап функции, хуки в условиях, useEffect( async () => {} ),  try catch для запроса, завести состояние под ошибку, массив зависимостей)\n7. Задача на порядок работы эффектов в реакт.\nimport {useState, useEffect, useLayoutEffect} from 'react'\n\nfunction App() {\n\n    const [count, setCount] = useState(0);\n\n    console.log(\"AP2\");\n\n    useEffect(() => {\n        console.log(\"useEffect 1\");\n        return () => console.log(\"cleanup useEffect 1\");\n    }, [count]);\n\n    useLayoutEffect(() => {\n        console.log(\"uselayoutEffect\");\n        return () => console.log(\"cleanup uselayoutEffect\");\n    }, [count]);\n\n    useEffect(() => {\n        console.log(\"useEffect 2\");\n        return () => console.log(\"cleanup useEffect 2\");\n    }, [count]);\n\n    return <button onClick={() => setCount((c) => c + 1)}>Click {count}</button>;\n\n}\n\nexport default App"
+      }
+    ]
+  },
+  {
+    "company": "Syntellect",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-05-29 08:58:38",
+        "content": "2025-05-29 08:58:38\n Ivan Kulyaev -> 2071074234:\nSyntellect\nВакансия — https://hh.ru/vacancy/120882639?query=frontend+developer&hhtmFrom=vacancy_search_list\nЗП — 270 000 ₽\n\nВопросы\n\n- Рассказать про опыт\n- Как искать по id в массиве объектов\n- Зачем нужен WeakMap и когда он лучше Map\n- Как связать состояние и URL-параметры\n- Как работают генераторы и где применяются\n- Как типизировать вложенные объекты в TS\n- structuredClone vs JSON.stringify\n- Как сделать бесконечный скролл\n- Как работать с зав...",
+        "full_content": "2025-05-29 08:58:38\n Ivan Kulyaev -> 2071074234:\nSyntellect\nВакансия — https://hh.ru/vacancy/120882639?query=frontend+developer&hhtmFrom=vacancy_search_list\nЗП — 270 000 ₽\n\nВопросы\n\n- Рассказать про опыт\n- Как искать по id в массиве объектов\n- Зачем нужен WeakMap и когда он лучше Map\n- Как связать состояние и URL-параметры\n- Как работают генераторы и где применяются\n- Как типизировать вложенные объекты в TS\n- structuredClone vs JSON.stringify\n- Как сделать бесконечный скролл\n- Как работать с зависимостями в useEffect, если передаётся массив\n- Как реализовать groupBy вручную (чисто словами описать идею)\n- Где применял WebSoket?\n- Как безопасно менять вложенное поле в объекте\n- git команды, merge, commit, rebase и тд\n- что такое докер\n- разница видов рендеринга в next.js\n- FSD на примерах\n- отличие Promise.all от Promise.race\n- все о хуках\n\n\n// про фибоначчи\n\nfunction fib(n, memo = {}) {\n  if (n <= 1) return n;\n  if (memo[n]) return memo[n];\n  memo[n] = fib(n - 1, memo) + fib(n - 2, memo);\n  return memo[n];\n}\nconsole.log(fib(10)); // ?\n\n// группировка по полю\n\nconst users = [\n  { id: 1, group: 'admin' },\n  { id: 2, group: 'guest' },\n  { id: 3, group: 'admin' },\n];\nconst grouped = users.reduce((acc, user) => {\n  acc[user.group] = acc[user.group] || [];\n  acc[user.group].push(user);\n  return acc;\n}, {});\nconsole.log(grouped); // ?\n\n// сортировка по id\n\nconst base = [\n  { id: 1, name: 'Alice' },\n  { id: 2, name: 'Bob' },\n];\nconst extra = [\n  { id: 1, age: 30 },\n  { id: 2, age: 25 },\n];\nconst merged = base.map((item) => ({\n  ...item,\n  ...extra.find((e) => e.id === item.id),\n}));\nconsole.log(merged); // ?"
+      }
+    ]
+  },
+  {
+    "company": "Исходный Код",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-03-10 14:43:46",
+        "content": "2025-03-10 14:43:46\n Максим Соломыкин -> 2071074234:\nКомпания: Исходный код\nВакансия: https://hh.ru/vacancy/117822377\nЗП: 220 на руки\n\nВопросы:\n\n1. Отличия HTML 4 от HTML 5\n2. Какой тег можно использовать для навигации страницы вместо nav\n3. Как создать боковую панель\n\nЗадача:\n.wrapper {\n  position: relative;\n}\n\n.red, .green, .blue {\n  position: absolute;\n  width: 120px;\n  height: 120px;\n}\n\n.green, .blue {\n  top: 40px;\n  left: 40px;\n}\n\n.red {\n  background-color: red;\n  z-index: 2;\n}\n\n.green {\n  ...",
+        "full_content": "2025-03-10 14:43:46\n Максим Соломыкин -> 2071074234:\nКомпания: Исходный код\nВакансия: https://hh.ru/vacancy/117822377\nЗП: 220 на руки\n\nВопросы:\n\n1. Отличия HTML 4 от HTML 5\n2. Какой тег можно использовать для навигации страницы вместо nav\n3. Как создать боковую панель\n\nЗадача:\n.wrapper {\n  position: relative;\n}\n\n.red, .green, .blue {\n  position: absolute;\n  width: 120px;\n  height: 120px;\n}\n\n.green, .blue {\n  top: 40px;\n  left: 40px;\n}\n\n.red {\n  background-color: red;\n  z-index: 2;\n}\n\n.green {\n  background-color: green;\n  z-index: 1;\n}\n\n.blue {\n  background-color: blue;\n  z-index: 3;\n}\n\n<div class=\"wrapper\">\n  <div class=\"red\"></div>\n  <div class=\"green\">\n    <div class=\"blue\"></div>\n  </div>\n</div>\n\nкак будут расположены квадраты\n\nРешение:\nКартинка 1\n\n5. Отличия var от let\n6. \nconsole.log(a); // ?\nvar a;\na = 5;\nconsole.log(a); // ?\nvar a;\nconsole.log(a); // ?\n\nРешение:\nundefined, 5, 5\n7.  Написать рекурсивную функцию counter\nfunction createCounter() {\n  let count = 0;  // Переменная count, которая будет сохранять состояние\n\n  return function() {  // Возвращаем функцию, которая является замыканием\n    count++;  // Увеличиваем count на 1\n    console.log(count);  // Выводим текущее значение count\n  };\n}\n\nconst increment = createCounter();  // Создаём инкрементатор\nincrement();  // 1\nincrement();  // 2\nincrement();  // 3\n8. Написать функцию debounce\nfunction debounce(func, delay) {\n  let timer;\n  \n  return function(...args) {\n    clearTimeout(timer);\n    timer = setTimeout(() => {\n      func.apply(this, args);\n    }, delay);\n  };\n}\n9. Прототипное наследование\n10. Что находиться вверху цепочки прототипов\n11. Тезисно что такое TS и зачем надо\n12. Что такое дженерики и зачем нужны\n13. Реализовать ObjectKeys\ntype RandomObject = {\n  a: number;\n  b: string;\n  c: boolean;\n}\n\n// type RandomObjectKeys = ObjectKeys<RandomObject>\ntype ObjectKeys \n\nРешение:\ntype ObjectKeys<T extends Object> = keyof T \n14. Как принудительно вызвать ререндер компонента\n15. Что будет в консоли и как исправить\nconst [counter, setCounter] = useState(0)\nconst handleClick = () => {\n  setCounter(counter++);\n  setCounter(++counter);\n  console.log(counter);\n};\n\n<button type=\"button\" onClick={handleClick}>increment</button>\n16. Сделать так, чтобы компонент был в фокусе \nconst headerRef = useRef();\n\n<h1 ref={headerRef}>3aronoBok</h1>\n\nРешение:\n\nconst headerRef = useRef();\nuseEffect(() => {\n  if (headerRef.current) {\n    headerRef.current.focus();\n  }\n});\n\n<h1 ref={headerRef} tabIndex='-1'>3aronoBok</h1>\n17. Сделай так чтобы работало корректно\nconst headerRef = useRef();\nuseEffect(() => {\n  if (headerRef.current) {\n    headerRef.current.focus();\n  }\n});\n\nif (isLoading) {\n  return <Loader />;\n}\n\n<h1 ref={headerRef} tabIndex='-1'>{article.header}</h1>\n\nРешение:\n\nconst headerRef = useRef();\nuseEffect(() => {\n  if (!article.header && headerRef.current) {\n    headerRef.current.focus();\n  }\n}, [isLoading]);\n\nif (isLoading) {\n  return <Loader />;\n}\n\n<h1 ref={headerRef} tabIndex='-1'>{article.header}</h1>"
+      }
+    ]
+  },
+  {
+    "company": "Hitch By Red_Mad_Robot",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-08-29 08:42:58",
+        "content": "2024-08-29 08:42:58\n Руслан -> 2071074234:\nhitch by red_mad_robot\n— зп: от 270к\n— вакансия: hr написала\n— Вопросы: \n1. Про solid\n2. Какие паттерны знаешь, использовал в проектах\n3. Как была устроена авторизация в проекте, про jwt\n4. FSD плюсы минусы. сравнение с модульной архитектурой\n4. Типы тестирования, для чего каждый\n5. гриды и флексы\n6. Как бы ты реализовывал страницу регистрации с логином и паролем, полем повторить пароль, вплоть до поверхностного описания кода. + страница авторизации есл...",
+        "full_content": "2024-08-29 08:42:58\n Руслан -> 2071074234:\nhitch by red_mad_robot\n— зп: от 270к\n— вакансия: hr написала\n— Вопросы: \n1. Про solid\n2. Какие паттерны знаешь, использовал в проектах\n3. Как была устроена авторизация в проекте, про jwt\n4. FSD плюсы минусы. сравнение с модульной архитектурой\n4. Типы тестирования, для чего каждый\n5. гриды и флексы\n6. Как бы ты реализовывал страницу регистрации с логином и паролем, полем повторить пароль, вплоть до поверхностного описания кода. + страница авторизации если юзер зарегистрирован. Без библиотек, на какие подзадачи разбивал бы, где хранил бы логин и пароль, как бы их отправлял.\n7. Описать базовые хуки.\n8. useTransition\n9. useDefferedValue\n10. функции в зависимостях useEffect, какие проблемы тут есть\n11. ленивы компоненты\n12. может ли useReducer заменить глобальный стор и почему\n13. функция shallow из редакса, вопрос про проблему бесконечных ререндеров приложения\n14. как поймать ошибки в реакт приложении, несколько вариантов накинуть\n15. про стрикт мод в реакте, особенности, для чего\n— задачи:\n1. отрефачить компонен"
+      }
+    ]
+  },
+  {
+    "company": "Ао Ниимэ",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-10-25 20:25:29",
+        "content": "2024-10-25 20:25:29\n Mike -> 2071074234:\nКомпания: АО НИИМЭ\nзп: до 250к\nВакансия:https://hh.ru/vacancy/108141209\n1. var/let/const \n2. Замыкание \n3. EventLoop \n4. Promise/async-await \n5. Class vs Function React \n6. Хуки \n7. useEffect \n8. Тесты юзал ли на проекте \n9. Docker  \n10. React profiler \n11. Написать счетчик  \n12. Сделать фильтрацию - платина \n13. На время написать кастомный хук для работы с localStorage",
+        "full_content": "2024-10-25 20:25:29\n Mike -> 2071074234:\nКомпания: АО НИИМЭ\nзп: до 250к\nВакансия:https://hh.ru/vacancy/108141209\n1. var/let/const \n2. Замыкание \n3. EventLoop \n4. Promise/async-await \n5. Class vs Function React \n6. Хуки \n7. useEffect \n8. Тесты юзал ли на проекте \n9. Docker  \n10. React profiler \n11. Написать счетчик  \n12. Сделать фильтрацию - платина \n13. На время написать кастомный хук для работы с localStorage"
+      }
+    ]
+  },
+  {
+    "company": "Infinet Wireless",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-03-24 08:28:47",
+        "content": "2024-03-24 08:28:47\n DenT -> 2071074234:\nНазвание компании: Infinet wireless\nВакансия:https://hh.ru/vacancy/94537327\nВилка:140-220\nБыл ознакомительный собес. На собесе был проджект, бек, фронт, hr. Поговорили за технологии, спрашивали про мой опыт, отличие фреймворков, ООП, протоколы, тесты, gRPC, линукс и какие команды часто использую. \nФидбек от hr: приятный парень, но не подходит по хардам. \nУ них три проекта, два это легаси на классах реакта, третий на хуках.",
+        "full_content": "2024-03-24 08:28:47\n DenT -> 2071074234:\nНазвание компании: Infinet wireless\nВакансия:https://hh.ru/vacancy/94537327\nВилка:140-220\nБыл ознакомительный собес. На собесе был проджект, бек, фронт, hr. Поговорили за технологии, спрашивали про мой опыт, отличие фреймворков, ООП, протоколы, тесты, gRPC, линукс и какие команды часто использую. \nФидбек от hr: приятный парень, но не подходит по хардам. \nУ них три проекта, два это легаси на классах реакта, третий на хуках."
+      }
+    ]
+  },
+  {
+    "company": "Major Ассистанс",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-02-13 11:36:22",
+        "content": "2025-02-13 11:36:22\n Александр Богданов -> 2071074234:\n1) Компания:  Major Ассистанс (HR сама написала в телегу..)\n2) Вопросы:\n- SSR, SSG, SSG + ISR – разница,отличия когда что использовать\n- вопросы про опыт,почему ушел,расскажи про последнее место работы,\n- расскажи про await что делает,почему код останавливается,как на промисах блокировать интерпретатор\n- если back выдачу данных поэтапно делает,как карточки поэтапно отрисовывать чтобы юзер видел их поэтапно — способы оптимизации, как хранить ...",
+        "full_content": "2025-02-13 11:36:22\n Александр Богданов -> 2071074234:\n1) Компания:  Major Ассистанс (HR сама написала в телегу..)\n2) Вопросы:\n- SSR, SSG, SSG + ISR – разница,отличия когда что использовать\n- вопросы про опыт,почему ушел,расскажи про последнее место работы,\n- расскажи про await что делает,почему код останавливается,как на промисах блокировать интерпретатор\n- если back выдачу данных поэтапно делает,как карточки поэтапно отрисовывать чтобы юзер видел их поэтапно — способы оптимизации, как хранить оптимально эти карточки на клиенте\n-  как реализовал бы чат общения + группу чатов для общения,какие библы нужны? Как кэшировать данные чатов,чата?\n- как взаимодеитсвие с дизаинерами было?\n- СЕО + метатэги расскажи в Реакт как делал\n- лайв-кодинга не было"
+      }
+    ]
+  },
+  {
+    "company": "Smartvisor",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-06-16 20:01:57",
+        "content": "2025-06-16 20:01:57\n Kamil -> 2071074234:\nКомпания \"Smartvisor\".\nСсылки на вакансию нет, т.к. сами со мной связались (@Smartvisor_itrend)\nЗП не обсуждали.\n\n\nВопросы были по резюме.\n1) много спрашивали про процесс авторизации и аутентификации ЛК:\naccess, refresh, какой код ответа приходит и какие статусы приходят(200, 201, 401);\n2) event loop;\n3) websocket;\n4) i18n.\n\nЗадача\nРасшарить весь экран и выполнить задачу на реакте:\nРеализовать компонент SmartList, который получает список строк и фильтруе...",
+        "full_content": "2025-06-16 20:01:57\n Kamil -> 2071074234:\nКомпания \"Smartvisor\".\nСсылки на вакансию нет, т.к. сами со мной связались (@Smartvisor_itrend)\nЗП не обсуждали.\n\n\nВопросы были по резюме.\n1) много спрашивали про процесс авторизации и аутентификации ЛК:\naccess, refresh, какой код ответа приходит и какие статусы приходят(200, 201, 401);\n2) event loop;\n3) websocket;\n4) i18n.\n\nЗадача\nРасшарить весь экран и выполнить задачу на реакте:\nРеализовать компонент SmartList, который получает список строк и фильтрует их по введённому пользователем поисковому запросу. Показывать только те элементы, что содержат подстроку."
+      }
+    ]
+  },
+  {
+    "company": "Belitsoft",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-05-16 21:34:47",
+        "content": "2025-05-16 21:34:47\n Kirill -> 2071074234:\nКомпания: BelitSoft\nЗп: не говорили\n\n1) расскажи про себя, про опыт\n2) рассказть про unit test, react-testing library\n3) работал ли с tailwind\n4) работал ли с react-hook-form\n5) что такое setValue, setError в  react-hook-form\n6) работал ли с zod\n7) приходилось ли написать валидатор на ункальность при помощи zod\n что такое refine в zod\n9) как сделать валидацию поля, чтобы оно зависило от друго поля \n10) что такое union в zod\n11 ) что такое shouldValidate...",
+        "full_content": "2025-05-16 21:34:47\n Kirill -> 2071074234:\nКомпания: BelitSoft\nЗп: не говорили\n\n1) расскажи про себя, про опыт\n2) рассказть про unit test, react-testing library\n3) работал ли с tailwind\n4) работал ли с react-hook-form\n5) что такое setValue, setError в  react-hook-form\n6) работал ли с zod\n7) приходилось ли написать валидатор на ункальность при помощи zod\n что такое refine в zod\n9) как сделать валидацию поля, чтобы оно зависило от друго поля \n10) что такое union в zod\n11 ) что такое shouldValidate и как он работает  в react-hook-form\n12)что такое react-query\n13) как засатвить рефечнуть данные, если мы добавили новый элемент в массив в redux-toolit или react-query\n14)какие хуки знаешь \n15)что такое virtual Dom\n16) useCallback и React.memo когда нужно использовать и когда можно его не использовать\n17) что такое key в реакт\n18) что произойдет, если key изменился\n19)что такое замыкание и зачем нам доступ к переменным из вышестоящего скоуп\n20)разница между примитивами и объектами\n21) Знаешь ли способ, чтобы нельзя было поменять свойства объекта\n22) что такое event loop\n23) как подгружаются скрипты в js, async, defer\n24) что знаешь про http кеширование \n25) как кешируется get запрос, как его инвалидировать и какие заголовки для этого есть \n26) что будет если мы поставили картинке кешируемость 1 день. Тут надо было рассказать про тег в виде строки \n27) Какие методы http методы знаешь и зачем они нужны"
+      }
+    ]
+  },
+  {
+    "company": "Wmt, Короткий Созвон С Командой Заказчика",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-07-10 14:41:32",
+        "content": "2024-07-10 14:41:32\n Artur -> 2071074234:\nWMT, короткий созвон с командой заказчика\n\n— Вакансия: написали в тг сами\n— ЗП: говорил 200к+\n\nВопросы:\n— расскажи про свой опыт, команду\n— что было прорывное у тебя, какие задачи сложные закрывал\n— как работал с картами\n— чем в свободное время занимаешься\n— как ui кит разрабатывал",
+        "full_content": "2024-07-10 14:41:32\n Artur -> 2071074234:\nWMT, короткий созвон с командой заказчика\n\n— Вакансия: написали в тг сами\n— ЗП: говорил 200к+\n\nВопросы:\n— расскажи про свой опыт, команду\n— что было прорывное у тебя, какие задачи сложные закрывал\n— как работал с картами\n— чем в свободное время занимаешься\n— как ui кит разрабатывал"
+      }
+    ]
+  },
+  {
+    "company": "Arbihunter",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-05-16 08:23:13",
+        "content": "2025-05-16 08:23:13\n Василий -> 2071074234:\nArbiHunter 2 этап\n\nОбсудили сайт\nРассказали про компанию\nРассказал о себя\n\nВпечатление: скам контора",
+        "full_content": "2025-05-16 08:23:13\n Василий -> 2071074234:\nArbiHunter 2 этап\n\nОбсудили сайт\nРассказали про компанию\nРассказал о себя\n\nВпечатление: скам контора"
+      }
+    ]
+  },
+  {
+    "company": "Топ Системы",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-01-11 19:40:19",
+        "content": "2025-01-11 19:40:19\n Артем -> 2071074234:\nКомпания: Топ Системы(Им нужен 3д Разработчик)\nЗП 220К\nВопросы:\nКак реализовывал UI виджиты в Three.js\nThree.js\nКак делала анимацияю\nКак создать шар\nКак создать Камеру\nкак направить камеру на шар\nтонкости в системе координат в браузере\nWebGL\nООП",
+        "full_content": "2025-01-11 19:40:19\n Артем -> 2071074234:\nКомпания: Топ Системы(Им нужен 3д Разработчик)\nЗП 220К\nВопросы:\nКак реализовывал UI виджиты в Three.js\nThree.js\nКак делала анимацияю\nКак создать шар\nКак создать Камеру\nкак направить камеру на шар\nтонкости в системе координат в браузере\nWebGL\nООП"
+      }
+    ]
+  },
+  {
+    "company": "Jsa-Group",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-12-11 12:07:07",
+        "content": "2024-12-11 12:07:07\n Mikhail Sorokin -> 2071074234:\nJSA-group\nВакансия — https://hh.ru/vacancy/110877207\nЗп — на тот момент не обсуждалось, я называл желаемую сумму от 300 000 на руки\n\n- что для меня значит \"хороший руоводитель\"?\n- критично ли для меня сейчас выполнять именно функции лида?\n- я хочу сейчас долгий или краткосрочный проект?\n- как занимаюсь самообразованием\n- сколько работал лидом, какие функции выполнял\n- работал ли по скраму\n- примеры, где я проявлял инициативу\n\n\n- Какие хуки есть...",
+        "full_content": "2024-12-11 12:07:07\n Mikhail Sorokin -> 2071074234:\nJSA-group\nВакансия — https://hh.ru/vacancy/110877207\nЗп — на тот момент не обсуждалось, я называл желаемую сумму от 300 000 на руки\n\n- что для меня значит \"хороший руоводитель\"?\n- критично ли для меня сейчас выполнять именно функции лида?\n- я хочу сейчас долгий или краткосрочный проект?\n- как занимаюсь самообразованием\n- сколько работал лидом, какие функции выполнял\n- работал ли по скраму\n- примеры, где я проявлял инициативу\n\n\n- Какие хуки есть в реакт, для чего нужны?\n- Зачем нужны стейт менеджеры, если есть контекст\n- Как работает React, reconcillation, зачем нужны ключи\n- что будет если поменяется key\n- какими инструментами отладки пользуюсь\n- как имитировать медленную работу интернета в инструментах разработчика?\n- брейкпойнты в дом дереве как использовать\n- как отслеживать утечки памяти\n- как работают замыкания, к чему они могут привести в функциональных компонентах\n- что такое промисы, что такое async/await, как работает?\n- рассказать про event loop\n- перечислить как можно больше способов\n- как создать отдельный поток\n- что такое мемоизация\n\nЗадача\n/*\nЧемпионат по шагам.\nНеобходимо определить userIds участников, которые прошли наибольшее количество шагов steps за все дни, не пропустив ни одного дня соревнований.\n\n# Пример 1\n# ввод\nstatistics = [\n        [{ userId: 1, steps: 1000 }, { userId: 2, steps: 1500 }],\n        [{ userId: 2, steps: 1000 }]\n]\n\n# вывод\nchampions = { userIds: [2], steps: 2500 }\n\n# Пример 2\nstatistics = [\n        [{ userId: 1, steps: 2000 }, { userId: 2, steps: 1500 }],\n        [{ userId: 2, steps: 4000 }, { userId: 1, steps: 3500 }]\n]\n\n# вывод\nchampions = { userIds: [1, 2], steps: 5500 }\n\nМое решение\nfunction countSteps(statistics) {\n  const statisticItems = statistics.flat();\n  const obj = {};\n  let max = 0;\n  const results = [];\n\n  statisticItems.forEach((item) => {\n    const steps = obj[item.userId];\n    if (!steps) {\n      obj[item.userId] = { steps: item.steps, days: 1 };\n    } else {\n      obj[item.userId] = {\n        steps: steps.steps + item.steps,\n        days: steps.days + 1,\n      };\n    }\n    if (obj[item.userId].steps >= max) {\n      max = obj[item.userId].steps;\n    }\n  });\n  for (let item in obj) {\n    if (obj[item].steps === max && obj[item].days === statistics.length) {\n      results.push({ userId: item, steps: obj[item] });\n    }\n  }\n  return results;\n}\n\nconst statistics = [\n  [\n    { userId: 1, steps: 2500 },\n    { userId: 2, steps: 1500 },\n  ],\n  [{ userId: 2, steps: 1000 }],\n];\n\nconsole.log(countSteps(statistics));"
+      }
+    ]
+  },
+  {
+    "company": "Lofty",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-06-07 10:04:57",
+        "content": "2024-06-07 10:04:57\n Данил Красный -> 2071074234:\n- Название компании: Lofty\n- Ссылка на вакансию: https://hh.ru/vacancy/101289845\n- зп: просил от 250\n\nВопросы и задача:\n1. Типы свойства display и их разница\n2. Специфичность и селектор с нулевой специфичностью\n3. Способы организации css в проекте\n4. Стандартные вопросы про асинхронность\n5. https://leetcode.com/problems/valid-parentheses\n6. requestanimationframe\n7. Критический путь рендеринга веб страницы\n8. Отличия vuex и pinia и что больше нрав...",
+        "full_content": "2024-06-07 10:04:57\n Данил Красный -> 2071074234:\n- Название компании: Lofty\n- Ссылка на вакансию: https://hh.ru/vacancy/101289845\n- зп: просил от 250\n\nВопросы и задача:\n1. Типы свойства display и их разница\n2. Специфичность и селектор с нулевой специфичностью\n3. Способы организации css в проекте\n4. Стандартные вопросы про асинхронность\n5. https://leetcode.com/problems/valid-parentheses\n6. requestanimationframe\n7. Критический путь рендеринга веб страницы\n8. Отличия vuex и pinia и что больше нравится"
+      }
+    ]
+  },
+  {
+    "company": "Igaming",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-07-01 18:45:59",
+        "content": "2025-07-01 18:45:59\n Sergio -> 2071074234:\nIgaming (Конкретное название под NDA) 01.07\nТехничка\nИщут ещё одного senior для команд из всех сеньоров\n1.Как внедрял FSD в Next, если Next.js не очень метчится с FSD архитектурой. Есть же атомарная которая больше подходит под некст\n2.Зачем использовался и React Query и Zustand, если они оба являются стейт-менеджерами (useQuery из react query для race condition запросов, чтобы не было множественных запросов. Также для решения проблем с перерендерами лиш...",
+        "full_content": "2025-07-01 18:45:59\n Sergio -> 2071074234:\nIgaming (Конкретное название под NDA) 01.07\nТехничка\nИщут ещё одного senior для команд из всех сеньоров\n1.Как внедрял FSD в Next, если Next.js не очень метчится с FSD архитектурой. Есть же атомарная которая больше подходит под некст\n2.Зачем использовался и React Query и Zustand, если они оба являются стейт-менеджерами (useQuery из react query для race condition запросов, чтобы не было множественных запросов. Также для решения проблем с перерендерами лишними, если меняется 1 ключ, чтобы не перерендеривались все компоненты которые на него подписаны).\n3. Зачем использовали headless UI и как правки вносили (делал npm link на локалке себе и после этого уже на стенд деплоили)\n4. Отличие next build --standalone от next build обычного (в первом случае генерится ещё папка ./next/standalone, встроенные зависимости - часть node_modules, автономная версия приложения, отдельная папка с ассетами - .next/static и также размер деплоя в 10-20 раз меньше, т.к. не требует node_modules на сервере, зависимости в билд встроены)\n5. С какими сталкивался проблемами при билде на турбопаке (next/image проблемы, \n6. Как делал offline-first PWA (service worker, workbox build, indexedDB)\n7. Разница между Object, Map, Set\n\n\nВ основном были вопросы конкретно по моему опыту, типичные вопросы а-ля (отличие http 1.1 от http 2.0) не спрашивали))\n\n— Задачи:\n1. Отсортировать список по словам, состоящим из одинаковых букв:\n ['ab', 'ac', 'ba', 'ca'] --> [['ab','ac'], ['ac', 'ca']]\n\n// Решение\nconst startArray = ['ab', 'ac', 'ba', 'ca'];\n\nconst groupWords = (words) => {\n    const groups = {}\n\n    words.forEach(word => {\n        const normalized = [...word].sort().join('');\n        if (!groups[normalized]) \n            groups[normalized] = []\n        \n        groups[normalized].push(word)\n    })\n    return Object.values(groups)\n}\n\ngroupWords(startArray)\n// Затипизировать Throttle чтобы убрать все ошибки TS\nconst throttle: Throttle = (func, delay) => {\n  let timer: NodeJS.Timeout | null = null;\n  return (...args) => {\n    if (!timer) {\n      func(...args);\n      timer = setTimeout(() => {\n        timer = null;\n      }, delay);\n    }\n  };\n};\n\n// usage example\nconst onMove = (x: number, y: number): void => {\n  console.log(x, y);\n};\n\n//const throttledOnMove: (...args: number[]) => void\nconst throttledOnMove = throttle(onMove, 50);\n\n\nРешение:\n \ntype Throttle<T extends (...args: []) => void> = (\nfunc: T,\ndelay: number\n) => (...args: Parameters<T>) => void;\n————————————————————\n//Реализуйте кнопку и таймер, которые будут начинаться с 10 и заканчиваться на 0, \n// также отслеживать счетчик до истечения времени таймера, \n// кнопка должна исчезать после истечения времени таймера.\n\nimport React, { useRef } from \"https://esm.sh/react@18\";\nimport ReactDOM from \"https://esm.sh/react-dom@18\";\n\nconst App = () => {\n  const [count, setCount] = React.useState(0)\n  const [timeLeft, setTimeLeft] = React.useState(10)\n  const id = React.useRef(null)\n  \n  return (\n    <div className=\"App\">\n      <h1>{count}</h1>\n      <h3>Time left: {timeLeft} seconds</h3>\n      {timeLeft === 0 ? null : \n        <button onClick={() => setCount((c) => c + 1)}>\n          +\n        </button>}\n    </div>\n  );\n}\n\nРешение:\nuseEffect(() => {\n    const timerID = setInterval(() => {\n    setTimeLeft((prev) => {\n        if (prev <= 1) {\n            clearInterval(timerID);\n            return 0;    \n        }\n        return prev - 1;\n        })\n    }, 1000)\nreturn () => clearInterval(timerID);\n}, [])"
+      }
+    ]
+  }
+]

@@ -1,0 +1,506 @@
+    ]
+  },
+  {
+    "company": "Alfabit",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-02-21 17:48:32",
+        "content": "2024-02-21 17:48:32\n DenT -> 2071074234:\n- Компания: Alfabit\n- ссылка на вакансию: hh.ru/vacancy/93338482\n- ЗП: У них две вакансии на фронта, на первой вилка 120-200, на второй 200-250, я сказал, что рассматриваю от 150\n- Был 1 этап собеса с HR, но в конце были вопросы от тим лида на которые нужно было ответить:\n\n- Вопросы:\n1. Какие способы оптимизации ты использовал в своём приложении.\n2. Тебе нужно выполнить объёмную операцию, которая займёт продолжительное время, что нужно сделать, чтобы брау...",
+        "full_content": "2024-02-21 17:48:32\n DenT -> 2071074234:\n- Компания: Alfabit\n- ссылка на вакансию: hh.ru/vacancy/93338482\n- ЗП: У них две вакансии на фронта, на первой вилка 120-200, на второй 200-250, я сказал, что рассматриваю от 150\n- Был 1 этап собеса с HR, но в конце были вопросы от тим лида на которые нужно было ответить:\n\n- Вопросы:\n1. Какие способы оптимизации ты использовал в своём приложении.\n2. Тебе нужно выполнить объёмную операцию, которая займёт продолжительное время, что нужно сделать, чтобы браузер не тормозил, не завис.\n3. Утечка памяти. Как ты с ней борешься и какие инструменты используешь.\n4. Бывает, что страница прыгает при отрисовке, как этого избежать.\n5. Какие методы защиты ты используешь для своего приложения.\n6. Синхронные и асинхронные функции.\n7. Есть сайт, где продают кроссовки. Что будет происходить при его запросе, если использовать SSR и SPA\n8. Способы оптимизации vue приложений\n9. Зачем использовать Pinia, если можно обойтись ref.\n\nФитбек пока не дали, все мои ответы hr записала на аудио, завтра отдаст лиду, он прослушает и скажет фитбек. Работют по ГПХ, удалёнка."
+      }
+    ]
+  },
+  {
+    "company": "Automated Communication Solutions",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-06-03 08:20:03",
+        "content": "2025-06-03 08:20:03\n Kamil -> 2071074234:\nКомпания: Automated Communication Solutions\nВакансия: https://hh.ru/vacancy/120802955\nЗП: 1800$\n\nВопросы:\n1. Готовы перейти на другой JS фреймворк?\n2. Какие задачи были за последний год и чем они отличались от задач других разработчиков?\n3. На сколько большой проект был на фронте: сколько было репозиторий на фронте?\n4. Какого рода были связи между репозиториями?\n5. Использовались ли какие-нибудь общие компоненты?\n6. На базе чего писали вёрстку?\n7. Почему...",
+        "full_content": "2025-06-03 08:20:03\n Kamil -> 2071074234:\nКомпания: Automated Communication Solutions\nВакансия: https://hh.ru/vacancy/120802955\nЗП: 1800$\n\nВопросы:\n1. Готовы перейти на другой JS фреймворк?\n2. Какие задачи были за последний год и чем они отличались от задач других разработчиков?\n3. На сколько большой проект был на фронте: сколько было репозиторий на фронте?\n4. Какого рода были связи между репозиториями?\n5. Использовались ли какие-нибудь общие компоненты?\n6. На базе чего писали вёрстку?\n7. Почему на проекте использовали RTK а не другие решения, как thunk?\n8. Рассказать про сокет в проекте.\n9. Какие методы использовались чтобы не было утечек памяти?\n10. Какие приёмы оптимизации использовались на проекте?\n11. Сколько весил проект под конец билда?\n12. Были ли компоненты, которые использовали ленивую загрузку?\n13. С кем больше приходилось взаимодействовать в команде, помимо фронтендеров?\n14.  Какие таски больше всего нравились, а какие меньше всего?\n15. Что означает i18n?\n16. Как у вас происходит ход мыслей, если стоит задача сделать визуально 5 сервисов одинаково, а вы представить одной из 5 команд и у вас у всех визуально разный фронт."
+      }
+    ]
+  },
+  {
+    "company": "Data World",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-11-12 20:52:29",
+        "content": "2024-11-12 20:52:29\n Camp -> 2071074234:\nНазвание компании: Data World\nСсылка на вакансию:https://hh.ru/vacancy/109746882?hhtmFrom=chat\nЗП: 170 - 220\nВопросы:\n1. Что происходит в браузере, когда мы пишем в адресной строке и нажимаем Enter\n2. Что происходит от этого момента до момента отрисовки на экране нашей страницы.\n3. Мы сделали какой-то запрос и получили на него ответ? а что это за протокол\nи вообще из чего он состоит, какие части этого протокола есть?\n4. У всех ли методов есть body\n5. Как ...",
+        "full_content": "2024-11-12 20:52:29\n Camp -> 2071074234:\nНазвание компании: Data World\nСсылка на вакансию:https://hh.ru/vacancy/109746882?hhtmFrom=chat\nЗП: 170 - 220\nВопросы:\n1. Что происходит в браузере, когда мы пишем в адресной строке и нажимаем Enter\n2. Что происходит от этого момента до момента отрисовки на экране нашей страницы.\n3. Мы сделали какой-то запрос и получили на него ответ? а что это за протокол\nи вообще из чего он состоит, какие части этого протокола есть?\n4. У всех ли методов есть body\n5. Как мы можем оптимизировать скорость загрузки страницы\n6. Расскажи, какие механизмы встроенные браузере есть для хранения данных\n7. var let const\n9. Что такое область видимости и какие есть\n10. Что такое замыкание\n11. Из чего состоит лексическое окружение\n12. Что такое this, какие бывают контексты исполнения. Как его менять\n13. Что такое Call, apply, bind\n14. Расскажи про Eventloop\n15. Что такое виртуальный дом?\n16. Что такое хуки, с какими приходилось работать \n17. Расскажи про useEffect\n\nЗадачи: \n\n1. Чему будет равен counter:\nlet counter = 0;\n\nfunction foo() {\n    const str = Current value is ${counter};\n\n    function inc() {\n        ++counter;\n    }\n\n    function log() {\n        console.log(str);\n    }\n\n    return[inc, log];\n}\n\nconst [inc, log] = foo();\n\ninc();\ninc();\ninc();\n\nlog();\n\n2. В каком порядке выведутся логи:\nconsole.log(1);\n\nfunction foo() {\n    console.log(2);\n\n    setTimeout(() => {\n        console.log(3);\n\n        new Promise((resolve) => {\n            console.log(4)\n            resolve();\n        })\n    }, 0);\n}\n\nfoo();\n\nconsole.log(5);\n3. Отрефакторить код:\nimport React, { useState, memo } from 'react';\n\n// Компонент для отображения отдельной задачи\n\nconst TodoItem = ({ task, onToggle, onDelete }) => {\n    console.log(`Rendering: ${task.text}`);\n    return (\n        <li>\n            <span\n                style={{textDecoration: task.completed ? `line-through` : `none` }}\n                onClick={onToggle}\n                >\n                    {task.text}\n                </span>\n                <button onClick={onDelete}>Delete</button>\n        </li>\n    );\n};\n\nconst TodoList = () => {\n    const [tasks, setTasks] = useState([]);\n    const [taskInput, setTaskInput] = useState(``);\n\n    const addTask = () => {\n        if (taskInput) {\n            setTasks([...tasks, { id: Date.now(), text: taskInput, completed: false }]);\n            setTaskInput(``);\n        }\n    };\n\n    const toggleTask = (id) => {\n        setTasks(tasks.map(task => task.id === id ? {...task, completed: !task.completed } : task));\n    };\n\n    const deleteTask = (id) => {\n        setTasks(tasks.filter(task => task.id !== id));\n    };\n\n    return (\n        <div>\n            <h1>Todo List</h1>\n\n            <input\n                value={taskInput}\n                onChange={(e) => setTaskInput(e.target.value)}\n                placeholder=\"Add new task\"\n            />\n\n            <button onClick={addTask}>Add</button>\n\n            <ul>\n                {tasks.map(task => (\n                    <TodoItem\n                    task={task}\n                    onToggle={() => toggleTask(task.id)}\n                    onDelete={() => deleteTask(task.id)}\n                    />\n                ))}\n            </ul>\n        </div>\n    );\n};\n\nexport default TodoList;"
+      }
+    ]
+  },
+  {
+    "company": "Lady & Gentalmens",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-12-02 12:30:40",
+        "content": "2024-12-02 12:30:40\n Артем -> 2071074234:\nКомпания lady & gentalmens\nзп 180\nВопросы\nочень странный собес \nспросил про опыт\nкак учусь\nчто изучаю\nкак рзвиваюсь \nдальше я поспрашивал \nи все",
+        "full_content": "2024-12-02 12:30:40\n Артем -> 2071074234:\nКомпания lady & gentalmens\nзп 180\nВопросы\nочень странный собес \nспросил про опыт\nкак учусь\nчто изучаю\nкак рзвиваюсь \nдальше я поспрашивал \nи все"
+      }
+    ]
+  },
+  {
+    "company": "Merlion Tech",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-04-24 16:59:12",
+        "content": "2025-04-24 16:59:12\n Артур Виноградов -> 2071074234:\nMerlion Tech\nВакансия: https://spb.hh.ru/vacancy/118989695\nЗП: 300\n\nВопросы:\nПро интересные задачи и проекты\nПодробно про мессенджер (челу лишь бы задать какие-то вопросы по ощущению)\nПодробно про опыт\nServer Side Rendering был ли опыт\nКакие есть ограничения в компонентах в SSR\nПро graphQL и Rest\nГде бы применял graphQL\nКак оценишь себя в TS от 0 до 10\nCookie vs localStorage\nЗамыкания, где применял на работе, использовал ли в React.\nПро Event ...",
+        "full_content": "2025-04-24 16:59:12\n Артур Виноградов -> 2071074234:\nMerlion Tech\nВакансия: https://spb.hh.ru/vacancy/118989695\nЗП: 300\n\nВопросы:\nПро интересные задачи и проекты\nПодробно про мессенджер (челу лишь бы задать какие-то вопросы по ощущению)\nПодробно про опыт\nServer Side Rendering был ли опыт\nКакие есть ограничения в компонентах в SSR\nПро graphQL и Rest\nГде бы применял graphQL\nКак оценишь себя в TS от 0 до 10\nCookie vs localStorage\nЗамыкания, где применял на работе, использовал ли в React.\nПро Event Loop.\nКак сделать настоящую асинхроность, можно ли стартовать новый поток?\nПро стейт менеджеры, какой бы выбрал на новом проекте?\nКакие ограничения на использование хуков в реакт?\nРазница между useState, useRef\nРазница между useEffect, useLayoutEffect\nМемоизация, зачем нужна, чек-лист когда использовать?\nПо каким признакам понять что не хватает мемоизации?\nБыли ли задачи по оптимизации?\nКак оценишь себя в работе с гитом от 0 до 10?\nКакой бы делал стек на новом проекте?\nКак саморазвиваешься?\nЧто ищешь на новом месте и почему уходишь со старого?\n\nЗадачи:\n// Выведет ли данный код что-то и почему\n// откуда toString\nclass Animal {}\nconst dog = new Animal();\nconsole.log(dog.toString()):\nОтвет: выведет \"[Object object]\"\ntoString из-за наследования от объекта\n\n// будет ли этот код работать\nclass A {}\nclass B {}\nclass Animal extends A, B {} \n\n// Как можно реализовать N чтобы\n// следующий код вывел в консоль \"3\"?\nconsole.log(new N(1) + new N(2));\n\nответ\nclass N {\n  constructor(val) {\n    this.val = val;\n  }\n\n  valueOf() {\n     return this.val;\n  }\n}\n\n// когда выведется hello\nsetTimeout(() => console.log(\"hello\"), 200):\nconst start = Date.now();\nwhile (Date.now() < start + 5000) {\n // что-то выполняем\n}\n\nОтвет: через 5 сек\n\n// в чем проблема кода? кейсы где можно применять?\ntype Item<T> = {\n id: string;\n value: T;\n};\n\nfunction arrayToKeyValue<T>(items: Item<T>[]): Record<string, T> {\n  return items.reduce((acc, it) => {\n    return Object.assign({}, acc, {\n      [it.id]: it.value,\n    });\n  }, {});\n}\n\nответ:  Каждый раз создаёт новый объект и засоряет память\nнадо переписать так\ntype Item<T> = {\n id: string;\n value: T;\n};\n\nfunction arrayToKeyValue<T>(items: Item<T>[]): Record<string, T> {\n  return items.reduce((acc, it) => {\n    acc[it.id] = it.value;\n    return acc;\n  }, {});\n}"
+      }
+    ]
+  },
+  {
+    "company": "Спринтерра",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-03-18 09:02:32",
+        "content": "2025-03-18 09:02:32\n Nikolai -> 2071074234:\nКомпания: Спринтерра\nЗП до 290 gross\n\nВопросы:\n1. Какая роль в команде?\n2. Команда 13 человек - прямо выделенная команда? Сколько митинги время занимали?\n3. Как часто релизы были?\n4. Бэкенд и фронтенд все вместе вшли в релизах?\n5. Кто знаимался CI/CD? Был ли опыт по настройке?\n6. Опыт тестов End-to-End, cypress, playwright, selenium, функциональных?\n7. Кто ими занимался? Как были устроены тесты?\n8. Плюсы JS и TS сравнение.\n9. Работал ли с accessability...",
+        "full_content": "2025-03-18 09:02:32\n Nikolai -> 2071074234:\nКомпания: Спринтерра\nЗП до 290 gross\n\nВопросы:\n1. Какая роль в команде?\n2. Команда 13 человек - прямо выделенная команда? Сколько митинги время занимали?\n3. Как часто релизы были?\n4. Бэкенд и фронтенд все вместе вшли в релизах?\n5. Кто знаимался CI/CD? Был ли опыт по настройке?\n6. Опыт тестов End-to-End, cypress, playwright, selenium, функциональных?\n7. Кто ими занимался? Как были устроены тесты?\n8. Плюсы JS и TS сравнение.\n9. Работал ли с accessability?\n10. По архитектуре приложение монолит?\n11. Какая организация организация структуры была? FSD или плоская структура или atomic?\n12. Опыта работы с мобильными приложениями не было?\n13. Как было организована работа с сокетами?\n14. На чем был бэк?\n15. На сколько высоконагруженная была система? Порядок юзеров.\n16. Приложение\n17. Приходилось ли сталкиваться с поддержкой продакшена? Приходили запросы от клинетов и приходилось с этими запросами работать?\n18. Опыт экстремального программирования? TDD? \n19. Задачи падали резжеванные, все прописано было?\n20. Аналитики ближе к айти были или из разряда по госту?\n\nЗадачи:\n// Требуется сказать что будет выведено в консоль и почему так и как поправить\n\nlet count = 0;\nfunction createCounter() {\n    return {\n        increment: () => {\n            count++;\n        },\n        getCount: () => {\n            return count;\n        },\n    };\n}\n\nconst counter1 = createCounter();\ncounter1.increment();\ncounter1.increment();\nconst counter2 = createCounter();\ncounter2.increment();\nconsole.log(counter1.getCount()); // ожидается 2\nconsole.log(counter2.getCount()); // ожидается 1\n\n________________________________________________________________\n\n/**\n * 1. Что будет в результате выполнения этого кода? /\n * 2. Как это исправить? */\nfunction fetchUserData(userId) {\n    return new Promise((resolve, reject) => {\n        setTimeout(() => {\n            if (userId > 0) {\n                resolve({ id: userId, name: `User ${userId}` });\n            } else {\n                reject(new Error(\"Invalid user ID\"));\n            }\n        }, 1000);\n    });\n}\n\nconst userIds = [1, 2, -3, 4];\nPromise.all(userIds.map(fetchUserData))\n    .then(users => {\n        console.log(\"All users:\", users);\n    })\n    .catch(error => {\n        console.error(\"Error fetching users:\", error.message);\n    });\n\n______________________________________________________________________\n\nКакие логи будут, и допущение что у нас промис может принимать не только строку, что будет и как поправить?\n\nfunction fetchData() {\n    return new Promise((resolve) => {\n        setTimeout(() => resolve(\"Data\"), 1000);\n    });\n}\n\nfetchData()\n    .then((data) => {\n        console.log(data);\n        return data.toUpperCase();\n    })\n    .then((uppercasedData) => {\n        console.log(uppercasedData);\n    })\n    .catch((error) => {\n        console.error(\"Error:\", error.message);\n    });\n\n______________________________________________________________\n\nкакая последовательность логов?\n\nconsole.log(\"Start\");\nsetTimeout(() => {\n    console.log(\"Timeout 1\");\n    Promise.resolve().then(() => {\n        console.log(\"Promise inside Timeout 1\");\n    });\n}, 0);\nPromise.resolve()\n    .then(() => {\n        console.log(\"Promise 1\");\n        setTimeout(() => {\n            console.log(\"Timeout inside Promise 1\");\n        }, 0);\n    })\n    .then(() => {\n        console.log(\"Promise 2\");\n    });\nsetTimeout(() => {\n    console.log(\"Timeout 2\");\n}, 0);\nconsole.log(\"End\");\n\n______________________________________________________________\n\nКакие ошибки здесь?\n\ntype ApiResponse<T> = {\n  data: T | null;\n  error: string | null;\n};\n\nfunction fetchData<T>(url: string): ApiResponse<T> {\n  try {\n    const response = fetch(url); // Предположим, что fetch возвращает данные\n    return { data: response.json(), error: null };\n  } catch (err) {\n    return { data: null, error: err.message };\n  }\n}\n\nconst result = fetchData<{ id: number; name: string }>(\n  \"https://api.example.com/user\"\n);\nconsole.log(result.data.id);"
+      }
+    ]
+  },
+  {
+    "company": "Издательство Национальное Образование",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-06-28 11:49:16",
+        "content": "2025-06-28 11:49:16\n Илья -> 2071074234:\nИздательство Национальное Образование\nReact native\nЗп 250к\n\nЛегкий собес был. Спрашивали за опыт, можно просто по легенде пройтись. Спрашивали по жизни, что тебе нравится. За математику разговаривали. Спрашивал объясни простому человеку, как работает стейт менеджер))) Он ничего не понял, потом в техническом плане спросил как работает. \nПотом спросил про паттерны проектирования(синглтон, observer, builder, decorator, фасад)\nИ про паттерны программирования ...",
+        "full_content": "2025-06-28 11:49:16\n Илья -> 2071074234:\nИздательство Национальное Образование\nReact native\nЗп 250к\n\nЛегкий собес был. Спрашивали за опыт, можно просто по легенде пройтись. Спрашивали по жизни, что тебе нравится. За математику разговаривали. Спрашивал объясни простому человеку, как работает стейт менеджер))) Он ничего не понял, потом в техническом плане спросил как работает. \nПотом спросил про паттерны проектирования(синглтон, observer, builder, decorator, фасад)\nИ про паттерны программирования (dry, kiss, yagni, solid)"
+      }
+    ]
+  },
+  {
+    "company": "Kamaz Digital",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-11-07 17:15:07",
+        "content": "2024-11-07 17:15:07\n Гасим Мурасов -> 2071074234:\nкомпания: kamaz digital\nзп: 320к просил\nвакансия: https://hh.ru/vacancy/108984552?hhtmFrom=vacancy_search_list\nвидео: https://www.youtube.com/watch?v=vw2h3lLCXl0\n\nтехсобес, но без лайвкодинг\nangular/cesium Js",
+        "full_content": "2024-11-07 17:15:07\n Гасим Мурасов -> 2071074234:\nкомпания: kamaz digital\nзп: 320к просил\nвакансия: https://hh.ru/vacancy/108984552?hhtmFrom=vacancy_search_list\nвидео: https://www.youtube.com/watch?v=vw2h3lLCXl0\n\nтехсобес, но без лайвкодинг\nangular/cesium Js"
+      }
+    ]
+  },
+  {
+    "company": "RTSoft",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-06-06 07:03:08",
+        "content": "2025-06-06 07:03:08\n Василий -> 2071074234:\nКомпания RTSoft(РТсофт)\n\n1)Что  в консоли\nfunction hoist() {\n  console.log(c)\n  a = 20\n  var b = 100\n  var c = 50\n}\n\nhoist()\nconsole.log(a)\nconsole.log(b)\n\n//Решение:\n//undefined 20 referenceError\nsetTimeout(function timeout() {\n  console.log(1);\n}, 0);\n\nlet p = new Promise(function(resolve, reject) {\n  console.log(2);\n  resolve();\n});\n\np.then(function() {\n  console.log(4);\n});\n\nqueueMicrotask(() => console.log(3));\n\nconsole.log(5);\n\n//Решение:\n//2 5 3...",
+        "full_content": "2025-06-06 07:03:08\n Василий -> 2071074234:\nКомпания RTSoft(РТсофт)\n\n1)Что  в консоли\nfunction hoist() {\n  console.log(c)\n  a = 20\n  var b = 100\n  var c = 50\n}\n\nhoist()\nconsole.log(a)\nconsole.log(b)\n\n//Решение:\n//undefined 20 referenceError\nsetTimeout(function timeout() {\n  console.log(1);\n}, 0);\n\nlet p = new Promise(function(resolve, reject) {\n  console.log(2);\n  resolve();\n});\n\np.then(function() {\n  console.log(4);\n});\n\nqueueMicrotask(() => console.log(3));\n\nconsole.log(5);\n\n//Решение:\n//2 5 3 4 1\nPromise.resolve(1)\n  .then(x => x + 1)\n  .then(x => {\n    throw x\n  })\n  .then(x => console.log(x))\n  .catch(err => {\n    console.log(err)\n  }) //тут 2\n  .then(x => Promise.resolve(1))\n  .catch(err => console.log(err))\n  .then(x => console.log(x)) //тут 1\n\n//Решение: 2, 1\n2) Методы all и allSettled в чем разница?\n3) Что происходит после введения url в адресную строку?\n4) Все способы оптимизации приложения\n5) Какие есть ограничения у WebWorkers\n6) Расскажи про объект Proxy\n7) Разница между for in и for of\n8) Отличие interfece от type\n9) Utility types – Pick, Omit, Exclude в чем разница\n10) Все TypeGuardes\n11) Как извлечь тип, который возвращает функция ReturnType\n\n12) Рефактор кода, это мой исправленный вариант\nimport { useEffect, useState, useMemo } from 'react';\nimport { createRoot } from 'react-dom/client';\nimport './style.css';\n\n// 1. Выносим все типы в отдельные интерфейсы ====================\ninterface Product {\n  description: string;\n  id: string;\n  info: string;\n  name: string;\n}\n\ninterface Shop {\n  coordinate: number[];\n  id: string;\n  name: string;\n  priceList: Record<string, string>;\n}\n\n// Конфигурация\nconst CONFIG = {\n  CURRENCY: '$',\n  API_URL: 'https://my-json-server.typicode.com/cyberwalrus/demo'\n};\n\n// Кастомный хук для получения данных\nconst useFetchData = <T,>(endpoint: string) => {\n  const [data, setData] = useState<T[]>([]);\n  const [loading, setLoading] = useState(true);\n  const [error, setError] = useState<Error | null>(null);\n\n  useEffect(() => {\n    const fetchData = async () => {\n      try {\n        const response = await fetch(`${CONFIG.API_URL}/${endpoint}`);\n        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);\n        const json = await response.json();\n        setData(json);\n      } catch (err) {\n        setError(err as Error);\n      } finally {\n        setLoading(false);\n      }\n    };\n\n    fetchData();\n  }, [endpoint]);\n\n  return { data, loading, error };\n};\n\ninterface TimerProps {\n  initial?: number;\n}\n\n// 2. Используем TimerProps для пропсов ============================\nconst Timer = ({ initial = 10 }: TimerProps) => {\n  const [time, setTime] = useState(initial);\n\n  useEffect(() => {\n    const interval = setInterval(() => {\n      setTime(prev => prev > 0 ? prev - 1 : 0);\n    }, 1000);\n    return () => clearInterval(interval);\n  }, []);\n\n  return <div className=\"Controls\">{time}</div>;\n};\n\ninterface ShopsItemsProps {\n  productId: string;\n}\n// 3. Используем ShopsItemsProps для пропсов =======================\nconst ShopsItems = ({ productId }: ShopsItemsProps) => {\n  const { data: shops, loading, error } = useFetchData<Shop>('shops');\n\n  const filteredShops = useMemo(() =>\n    shops.filter(shop => shop.priceList[productId]),\n    [shops, productId]\n  );\n\n  if (loading) return <div>Loading shops...</div>;\n  if (error) return <div>Error loading shops: {error.message}</div>;\n\n  return (\n    <ul className=\"postList\">\n      {filteredShops.map(({ name, priceList, id: shopId }) => (\n        <li className=\"post__header\" key={shopId}>\n          {name} - {priceList[productId]}{CONFIG.CURRENCY}\n        </li>\n      ))}\n    </ul>\n  );\n};\n\nconst ProductList = () => {\n  const { data: products, loading, error } = useFetchData<Product>('products');\n\n  if (loading) return <div>Loading products...</div>;\n  if (error) return <div>Error loading products: {error.message}</div>;"
+      }
+    ]
+  },
+  {
+    "company": "Gitverse",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-09-24 16:40:33",
+        "content": "2024-09-24 16:40:33\n Александр -> 2071074234:\nКомпания: GitVerse\nВакансия: HR сама написал \nЗП: 250к\nВопросы:\n- Расскажи про свой опыт\n- Расскажи про проекты \n- Расскажи про флоу который был\n- Собираюсь идти дальше в разработчики или собираюсь уходить в тимлиды \n- Расскажи был ли опыт работы с Next.Js\n\nСобес был очень коротки около получаса, на некст не позвали",
+        "full_content": "2024-09-24 16:40:33\n Александр -> 2071074234:\nКомпания: GitVerse\nВакансия: HR сама написал \nЗП: 250к\nВопросы:\n- Расскажи про свой опыт\n- Расскажи про проекты \n- Расскажи про флоу который был\n- Собираюсь идти дальше в разработчики или собираюсь уходить в тимлиды \n- Расскажи был ли опыт работы с Next.Js\n\nСобес был очень коротки около получаса, на некст не позвали"
+      }
+    ]
+  },
+  {
+    "company": "Ооо Мобайлдевелопмент",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-10-24 08:17:08",
+        "content": "2024-10-24 08:17:08\n Camp -> 2071074234:\n-Название компании: ООО МобайлДевелопмент (IceRock Development)\n-Ссылка на вакансию: https://hh.ru/vacancy/108309644?hhtmFrom=chat\n-ЗП: 170-220 Middle +  \nВопросы:\nВ чем разница между блочными и строчными элементами.\nКак можно задать элементу тип гибридный, чтобы он комбинировал свойства, блочных и строчных.\nКакие могут быть проблемы связанных с поддержкой разных браузеров\nКакие типы данных в js\nКакие нововведения в ES6 появились\nОтличие var, let const\nчт...",
+        "full_content": "2024-10-24 08:17:08\n Camp -> 2071074234:\n-Название компании: ООО МобайлДевелопмент (IceRock Development)\n-Ссылка на вакансию: https://hh.ru/vacancy/108309644?hhtmFrom=chat\n-ЗП: 170-220 Middle +  \nВопросы:\nВ чем разница между блочными и строчными элементами.\nКак можно задать элементу тип гибридный, чтобы он комбинировал свойства, блочных и строчных.\nКакие могут быть проблемы связанных с поддержкой разных браузеров\nКакие типы данных в js\nКакие нововведения в ES6 появились\nОтличие var, let const\nчто такое EventLoop\nпромисы,  как они работают, как с ними работают\nSet Map Автобоксинг\nкак реакт управляет состоянием\nчем отличаются функциональные отклассовых компонентов?\nкак работает useEffect\nкак пропсы в реакт работают\nмемоизация, какие способы\nкакие основные преимущества у TypeScript\nЧем интерфейсы отличаются от типов.\n\nЧто выведет в консоль:\n (2).plus(3).minus(1)\n \nОтрефакторить код:\n\nimport React, { useState, useEffect } from 'react';\n\nexport interface User {\n    id: number\n    email: string\n    first_name: string\n    last_name: string\n    avatar: string\n}\n\nexport interface Response {\n    page: number\n    per_page: number\n    total: number\n    total_pages: number\n    data: User[]\n}\n\nconst UserList: React.FC = () => {\n    const [users, setUsers] = useState < User[] > ([]);\n    const [loading, setLoading] = useState < boolean > (false);\n    const [filter, setFilter] = useState < string > ('');\n  const [search, setSearch] = useState<string> ('');\n  \n  useEffect (() => {\n    setLoading(true);\n    fetch('https: //reqres.in/api/users')\n      .then(response => response.json())\n      .then(data => {\n                setUsers(data.data);\n                setLoading(false);\n            })\n            .catch(() => {\n                console.error('Error fetching users');\n                setLoading(false);\n            });\n  }, []);\n      \n  const handleSearch = () => {\n    setFilter(search);\n  };\n  \n  const filteredUsers = users.filter(\n    user => user.first_name.includes(filter) || user.last_name.includes(filter)\n  );\n  \n  return (\n    <div>\n      <h1>User List</h1>\n      <input type = \"text\" value = {search} onChange = {(e) => setSearch(e.target.value)}/>\n      <button onClick={handleSearch}>Search</button>\n      {loading ? (\n        <p> Loading... </p>\n      ) : (\n        <ul>\n          {filteredUsers.length > 0 ? (\n            <ul>\n              {filteredUsers.map(user => (\n                <li>\n                  <p>{user.first_name} {user.last_name} ({user.email})</p>\n                </li>\n              ))}\n            </ul>\n          ) : (\n            <p>No users found</p> // Сообщение об отсутствии пользователей\n          )}\n        </ul>\n      )}\n    </div>\n  )\n};\n          \nexport default UserList;\n\n1. Написать счетчик, типизировать состояние счетчика с помощью TypeScript\n\n2. Переделать счетчик в таймер, начинать отсчет с 10\nКаждую секунду уменьшать на 1, в конце вывести сообщение \"Время вышло\" и остановить таймер"
+      }
+    ]
+  },
+  {
+    "company": "Loyalty Labs, Hr Созвон С Тех Вопросами",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-07-10 18:11:08",
+        "content": "2024-07-10 18:11:08\n Artur -> 2071074234:\nLoyalty labs, hr созвон с тех вопросами\n\n— Вакансия: https://hh.ru/vacancy/101880669?from=share_android\n— ЗП: сказал 200к+\n\nВопросы:\nстандартные для hr, лень перечислять)\n\nЗадачи:\n1) что выведет\n\nsetTimeout(function timeout() {\n    console.log('Таймаут');\n}, 0);\n\nlet p = new Promise(function(resolve, reject) {\n    console.log('Создание промиса');\n    resolve();\n});\n\np.then(function() {\n    console.log('Обработка промиса');\n});\n\nconsole.log('Конец скрипта...",
+        "full_content": "2024-07-10 18:11:08\n Artur -> 2071074234:\nLoyalty labs, hr созвон с тех вопросами\n\n— Вакансия: https://hh.ru/vacancy/101880669?from=share_android\n— ЗП: сказал 200к+\n\nВопросы:\nстандартные для hr, лень перечислять)\n\nЗадачи:\n1) что выведет\n\nsetTimeout(function timeout() {\n    console.log('Таймаут');\n}, 0);\n\nlet p = new Promise(function(resolve, reject) {\n    console.log('Создание промиса');\n    resolve();\n});\n\np.then(function() {\n    console.log('Обработка промиса');\n});\n\nconsole.log('Конец скрипта');\n\n\n2) что выведет\n\nfunction add(x: string, y: string): string;\nfunction add(x: number, y: number): number {\n    return x + y;\n}\n\nadd('1', '2');\n\n3) какой цвет будет\n<div class=\"App\">\n    <div id=\"box\" class=\"box\"></div>\n</div>\n\n<style>\n#box {\n    background-color: green;\n}\n\n.App .box {\n    background-color: blue;\n}\n\n.box {\n    width: 50px;\n    height: 50px;\n    background-color: red;\n}\n</style>\n\n\n4) Составь интерфейс X, наследующий интерфейс Y, но со всеми необязательными свойствами.\nДобавь в этот интерфейс свойство props в виде объекта, в котором ключом будет один из ключей интерфейса Y, а значением - boolean.\nСоздай дженерик Z, состоящий из динамического поля data. В изначальном интерфейсе должно быть поле с любым типом, использующее этот дженерик\n\ninterface Y {\n  optionalProperty?: number;\n}\n\ninterface X extends Partial<Y> {\n  props: { [K in keyof Y]?: boolean };\n}\n\ntype Z<T> {\n  data: T\n}\n\ninterface InitialInterface {\n  field: Z<any>\n}"
+      }
+    ]
+  },
+  {
+    "company": "Heropayments",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-11-20 15:06:03",
+        "content": "2024-11-20 15:06:03\n Timofei Syromiatnikov -> 2071074234:\n— Компания: Heropayments\n— Вакансия: написала hr\n— ЗП: 280к\n— Вопросы (очень много копающих вопросов было про контекст и область видимости, как это все работает в нативном JS):\n1) Значешь что такое bind? Для чего он нужен, что в себя принимает, первым и вторым третим и т.д. аргументами.\n2) Можем ли мы использовать bind на стрелочной функции и будет ли он работать? Если будет то какие особенности, как мы можем передать стрелочной функции н...",
+        "full_content": "2024-11-20 15:06:03\n Timofei Syromiatnikov -> 2071074234:\n— Компания: Heropayments\n— Вакансия: написала hr\n— ЗП: 280к\n— Вопросы (очень много копающих вопросов было про контекст и область видимости, как это все работает в нативном JS):\n1) Значешь что такое bind? Для чего он нужен, что в себя принимает, первым и вторым третим и т.д. аргументами.\n2) Можем ли мы использовать bind на стрелочной функции и будет ли он работать? Если будет то какие особенности, как мы можем передать стрелочной функции нужные данные через bind?\n3) Из чего состоит класс в нативном JS?\n4) Как объявить переменные в классе?\n5) Для чего нужен конструктор?\n6) Можем ли мы использовать асинхронный синтаксис в конструкторе? По типу перед конструктором написать async и внутри this.data = await getData()\n7) Назови все случаи перерендера компонента в React?\n8) Как работает замыкание в JS? И где мы можем его применить на практике?\n9) Что такое область видимости в JS?\n10) С помощью чего можно закешировать данные в React? И расскажи различие в каких случаях что использовать\n11) Как реакт понимает что что то изменилось и это надо перерендерить, как это работает под капотом?"
+      }
+    ]
+  },
+  {
+    "company": "Match",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-02-26 13:36:31",
+        "content": "2025-02-26 13:36:31\n Artem -> 2071074234:\nКомпания: Match\nВакансия: Написала hr\n\nВопросы:\n1) Много вопросов по опыту работы\n2) Что происходит когда человек в водит адрес в адресную строку\n3) Как оптимизировать приложение\n4) Что такое дженерики\n5) Отличие interface от Type\n6) async/defer\n7) В чем минус websocket \n8) Какие методы адаптивной верстки знаешь\n9) CORS\n\nБез лайвкодинга",
+        "full_content": "2025-02-26 13:36:31\n Artem -> 2071074234:\nКомпания: Match\nВакансия: Написала hr\n\nВопросы:\n1) Много вопросов по опыту работы\n2) Что происходит когда человек в водит адрес в адресную строку\n3) Как оптимизировать приложение\n4) Что такое дженерики\n5) Отличие interface от Type\n6) async/defer\n7) В чем минус websocket \n8) Какие методы адаптивной верстки знаешь\n9) CORS\n\nБез лайвкодинга"
+      }
+    ]
+  },
+  {
+    "company": "Bnd Llc",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-10-21 13:22:17",
+        "content": "2024-10-21 13:22:17\n Никита -> 2071074234:\nКомпания BND LLC\nВакансия https://hh.ru/vacancy/107854068?hhtmFrom=employer_vacancies\nзп: не говорили\nвопросы:\nочень много про опыт\n1 что такое react?\n2 подробнее про vdom\n3 что такое условный рендеринг\n4 как асинхронность реализуется в js\n5 какие хуки используешь\n6 подробнее про useRef, зачем он нужен?\n7 зачем нужен ts?\n8 \nconsole.log('start')\nconst promise1 = new Promise((res,rej)=>{\nconsole.log(1)\nres(2)\n})\n\npromise1.then(res=>{\nconsole.log(res)\n})\nc...",
+        "full_content": "2024-10-21 13:22:17\n Никита -> 2071074234:\nКомпания BND LLC\nВакансия https://hh.ru/vacancy/107854068?hhtmFrom=employer_vacancies\nзп: не говорили\nвопросы:\nочень много про опыт\n1 что такое react?\n2 подробнее про vdom\n3 что такое условный рендеринг\n4 как асинхронность реализуется в js\n5 какие хуки используешь\n6 подробнее про useRef, зачем он нужен?\n7 зачем нужен ts?\n8 \nconsole.log('start')\nconst promise1 = new Promise((res,rej)=>{\nconsole.log(1)\nres(2)\n})\n\npromise1.then(res=>{\nconsole.log(res)\n})\nconsole.log('end')"
+      }
+    ]
+  },
+  {
+    "company": "Онлайн Решения",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-05-22 10:15:11",
+        "content": "2025-05-22 10:15:11\n Иван Горюнов -> 2071074234:\nОнлайн Решения\nЗапросил 230к\nвакансия (https://penza.hh.ru/vacancy/120573024?hhtmFromLabel=employer_vacancy_tab&hhtmFrom=employer)\n- Про работу с сервером (HTTP/WebSocket)\n- Тело HTTP запроса\n- Авторизация/Аутентификация\n- CORS\n- ООП\n- Прототипное наследование\n- hasOwnProperty/in отличия\n- arrow function/ function declaration отличия\n- почему typeof Array === object/ Как проверить что это массив\n- Async/await как работает\n- Что такое Promise\n- Any...",
+        "full_content": "2025-05-22 10:15:11\n Иван Горюнов -> 2071074234:\nОнлайн Решения\nЗапросил 230к\nвакансия (https://penza.hh.ru/vacancy/120573024?hhtmFromLabel=employer_vacancy_tab&hhtmFrom=employer)\n- Про работу с сервером (HTTP/WebSocket)\n- Тело HTTP запроса\n- Авторизация/Аутентификация\n- CORS\n- ООП\n- Прототипное наследование\n- hasOwnProperty/in отличия\n- arrow function/ function declaration отличия\n- почему typeof Array === object/ Как проверить что это массив\n- Async/await как работает\n- Что такое Promise\n- Any/unknown отличия\n- Свойства display\n- Селекоры какие бывают\n- Специфичность селекторов\n- Зачем нужен Talwind\n- Какие бандлеры бывают, зачем они нужны\n- Зачем нужен key в React?\n- Что такое реляционная модель\n- Вопросы по Git\n(git reset, fit rebase, squash)\n- Работал ли с Node.js\n- Работал ли с Линуксом\n- Какая у тебя IDE?"
+      }
+    ]
+  },
+  {
+    "company": "Huntit",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-12-28 16:03:09",
+        "content": "2024-12-28 16:03:09\n Damir -> 2071074234:\nКомпания: HuntIT\nВакансия: hr написала\nЗп: 250k\n\nВопросы:\n- по резюме от и до, про все места работы \n- почему фронт, а не что-то другое\n- самая сложная интересная задача\n\n1) Критический путь рендера\n2) Как браузер понимает, что пришел именно html - Content type: text-html\n3) Блокирующие скрипты, неблокирующие\n4) Оптимизация фронта (не в контексте реакта)  (загружается сайт - белый экран, шо буишь делать)\n5) Блокирующий css, как оптимизировать\n6) Тесты - ...",
+        "full_content": "2024-12-28 16:03:09\n Damir -> 2071074234:\nКомпания: HuntIT\nВакансия: hr написала\nЗп: 250k\n\nВопросы:\n- по резюме от и до, про все места работы \n- почему фронт, а не что-то другое\n- самая сложная интересная задача\n\n1) Критический путь рендера\n2) Как браузер понимает, что пришел именно html - Content type: text-html\n3) Блокирующие скрипты, неблокирующие\n4) Оптимизация фронта (не в контексте реакта)  (загружается сайт - белый экран, шо буишь делать)\n5) Блокирующий css, как оптимизировать\n6) Тесты - какие писал, какие знаешь? \n7) Шрифты, иконки - как они грузятся \n\n- Чуть про ssr было, но это я туда загнул чисто поболтать \n\nЗадачки: \n\n\n// Вывести значения переменной i в консоль,\n// между выводами должна быть задержка в 1 секунду.\n// Вывод должен отображать значение переменной\n// на каждой итерации.\nfor (let i = []; i.length < 3; i.push(1)) {\n  setTimeout(\n    function (i) {\n      console.log(i);\n    },\n    i.length * 1000,\n    [...i]\n  );\n}\n\n\n\n\n\n\nconst mockRequestTimer = () => {\n  // console.log(\"outside promise\");\n  return new Promise((res) => {\n    // console.log(\"inside promise\");\n\n    setTimeout(() => {\n      // console.log(\"timer resolve\");\n\n      res(\"data without timer\");\n    }, 0);\n  });\n};\n\nconst asyncFunc = async () => {\n  // console.log(\"check 01\");\n\n  const timerResult = await mockRequestTimer();\n\n  // console.log(\"check 02\");\n  // console.log(\"timerResult\", timerResult);\n};\n\n// console.log(\"prepare\");\n\nasyncFunc();\n\n// console.log(\"after\");\n\n/*\n  \n*/"
+      }
+    ]
+  },
+  {
+    "company": "Центральный Банк Рф",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-05-31 14:44:56",
+        "content": "2024-05-31 14:44:56\n Artur -> 2071074234:\nКомпания: Центральный Банк РФ\nСсылка на вакансию: сами позвонили\nСсылка на собес: https://disk.yandex.ru/i/h6dSEmIpvJAWkQ\nЗП: неизвестно\nУровень: неизвестно\nУспех собеса: ?\n\nВопросы:\n— Как задачи разбивались, кто за что отвечал, как ревью происходил\n— Стейт и пропс, разница\n— Жизненные циклы компонента\n— При изменения стейта будет ли рендеринг\n— Как изменить пропс в родительском компоненте\n— Canvas и SVG, разница\n— DOM что это\n— Методы запросов, GET и PO...",
+        "full_content": "2024-05-31 14:44:56\n Artur -> 2071074234:\nКомпания: Центральный Банк РФ\nСсылка на вакансию: сами позвонили\nСсылка на собес: https://disk.yandex.ru/i/h6dSEmIpvJAWkQ\nЗП: неизвестно\nУровень: неизвестно\nУспех собеса: ?\n\nВопросы:\n— Как задачи разбивались, кто за что отвечал, как ревью происходил\n— Стейт и пропс, разница\n— Жизненные циклы компонента\n— При изменения стейта будет ли рендеринг\n— Как изменить пропс в родительском компоненте\n— Canvas и SVG, разница\n— DOM что это\n— Методы запросов, GET и POST, разница в виде формата, как в GET формируется строка запроса\n— Redux, что это, для чего он, как появился\n— Что нужно сделать, чтобы подключить стор\n— С какими БД работал\n— Препроцессоры, зачем и какие плюсы\n— npm, что это, какие у него проблемы\n— JSON, что это, какие правила \n— Что такое XML, XSD"
+      }
+    ]
+  },
+  {
+    "company": "Компэл",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-04-10 22:32:39",
+        "content": "2025-04-10 22:32:39\n Ostrov Ostrov -> 2071074234:\nКомпания: Компэл (1 этап)\nЗП - 250k\n📢 Вакансия - https://hh.ru/vacancy/118654791?hhtmFrom=employer_vacancies\n\n❓ Вопросы от hr:\n\n1)Что драйвит в своем деле? Чем нравится заниматься? \n2)Расскажи про последнее место работы?\n3)Почему уходишь с работы?\n4)Расскажи про первое место работы?\n5)А что вам не нравится делать в работе?\n6)Сколько человек в команде?\n7)Сложно ли переходить с работы по одной теме на работу в совершенно другое направление? (из маг...",
+        "full_content": "2025-04-10 22:32:39\n Ostrov Ostrov -> 2071074234:\nКомпания: Компэл (1 этап)\nЗП - 250k\n📢 Вакансия - https://hh.ru/vacancy/118654791?hhtmFrom=employer_vacancies\n\n❓ Вопросы от hr:\n\n1)Что драйвит в своем деле? Чем нравится заниматься? \n2)Расскажи про последнее место работы?\n3)Почему уходишь с работы?\n4)Расскажи про первое место работы?\n5)А что вам не нравится делать в работе?\n6)Сколько человек в команде?\n7)Сложно ли переходить с работы по одной теме на работу в совершенно другое направление? (из магазина в банковское приложение)\n8)Почему ушли с первого места работы на второе?\n9)Как выбираете компанию, в которой хотите работать? Что важно в работодателе?\n10)Какие предпочтения по технологиям? С чем бы не хотели работать?\n11)Если у нас с вами все хорошо сложится, в течении какого времени готовы выйти на работу?\n\n❓Тех вопросы:\n\n1)Расскажи про свой стек. Какие либы знаешь? Что нравится, что не нравится?\n2)Используете ли на проекте линтеры? Делал ли сам конфиги? Или использовал базовую настройку? Писали ли свои правила?\n3)Как следите за качеством кода? За его семантикой?\n4)Работал ли с классовыми компонентами в реакте?\n5)Как относишься к легаси коду?\n6)Расскажи про тайпскрипт? Насколько ты погружен в типизацию?\n7)Приходилось ли тебе работать с оптимизацией? Какие инструменты для этого использовал? (React profiler, API React Profiler)\n8)Как отловить ошибки? (console.log, errorBoundary, sentry)\n9)Знаешь ли ты как под капотом работает React? Приходилось анализировать как он устроен? Что такое react-fiber, reconcillation? Как работает обновление состояния?\nКак биндятся event’ы?\n10)Как принудительно перендерить компонет? (forceUpdate для классовых, для функциональных написать свой)\n11)Как конектить sentry c React?\n12)Ты добавлял ли в uikit компоненты?\n13)Использовал ли ты storybook?\n14)Как в uikit тестировал компоненты?\n15)Делал ли ты на проекте интернационализацию, если да, то как? Пользовались ли ICU форматом? \n16)Насколько ты погружен в moduleFederation? Что такое микрофронтенд?\n17)Каким образом происходит деплой на миркофронтах?"
+      }
+    ]
+  },
+  {
+    "company": "Сател",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-07-11 07:46:05",
+        "content": "2025-07-11 07:46:05\n Евгений Гусев -> 2071074234:\nКомпания: САТЕЛ, Группа компаний\nВакансия: https://sergiev-posad.hh.ru/vacancy/122467147?hhtmFrom=employer_vacancies\nВопросы:\n1. Рассказать про опыт работы, какие было сложные задачи.\n2. Рассказать про Redux какие у меня плюсы и минусы.\n3. Рассказать про RTK Query.\n4. Рассказать как бы написал код если протух токен (interception написать).\n5. Какие есть способы оптимизировать загрузку страницы, если она долго загружается.\n6. Способы общение бэка ...",
+        "full_content": "2025-07-11 07:46:05\n Евгений Гусев -> 2071074234:\nКомпания: САТЕЛ, Группа компаний\nВакансия: https://sergiev-posad.hh.ru/vacancy/122467147?hhtmFrom=employer_vacancies\nВопросы:\n1. Рассказать про опыт работы, какие было сложные задачи.\n2. Рассказать про Redux какие у меня плюсы и минусы.\n3. Рассказать про RTK Query.\n4. Рассказать как бы написал код если протух токен (interception написать).\n5. Какие есть способы оптимизировать загрузку страницы, если она долго загружается.\n6. Способы общение бэка с фронтом (Http, WebSocket,), хотел услышать про Polling.\n7. Рассказать для чего нужен WebSocket и как огранизаовать его работу."
+      }
+    ]
+  },
+  {
+    "company": "07 Точка Маркетплейсы",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-07-26 13:03:59",
+        "content": "2024-07-26 13:03:59\n Alehandro¯\\_(ツ)_/¯ -> 2071074234:\n26.07 Точка Маркетплейсы\n- зп: вилка до 250 к\n- вакансия: Hr написала сама",
+        "full_content": "2024-07-26 13:03:59\n Alehandro¯\\_(ツ)_/¯ -> 2071074234:\n26.07 Точка Маркетплейсы\n- зп: вилка до 250 к\n- вакансия: Hr написала сама"
+      }
+    ]
+  },
+  {
+    "company": "Kt.Team",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-06-29 06:40:56",
+        "content": "2025-06-29 06:40:56\n Кирилл Бутов -> 2071074234:\nКомпания kt.team\nЗапросил 200-250к\nПо рефералке на собес попал\nСобеседование проводил руководитель разработки, который код писал только на бэкенде, а фронт не знает\n\nВопросы:\n\n1. Рассказать о себе. О своих проектах. Какая команда была на последнем месте. Как происходило вливание ветки на проекте.  Как настраивал CI\n2. Что такое замыкание? Написать пример;\n3. Что такое всплытие и погружение;\n4. JS однопоточный, но как мы делаем тогда приложения? Хо...",
+        "full_content": "2025-06-29 06:40:56\n Кирилл Бутов -> 2071074234:\nКомпания kt.team\nЗапросил 200-250к\nПо рефералке на собес попал\nСобеседование проводил руководитель разработки, который код писал только на бэкенде, а фронт не знает\n\nВопросы:\n\n1. Рассказать о себе. О своих проектах. Какая команда была на последнем месте. Как происходило вливание ветки на проекте.  Как настраивал CI\n2. Что такое замыкание? Написать пример;\n3. Что такое всплытие и погружение;\n4. JS однопоточный, но как мы делаем тогда приложения? Хотел услышать про eventLoop, Service Workers, Web Workers;\n\n1 задача\nНаписать замыкание\n\nconst func = () => {\nlet num = 0;\nreturn () => {\nconsole.log(num)\n}\n}\n\nconst test = func()\ntest()\n\n2 задача\n\nconst arr = [1, 2, 3];\nconst func = (arr) => {\nconst sorted = [...arr].sort((a, b) => a - b)\n\nfor(let i = 0; i < sorted.length; i++) {\n    if(sorted[i + 1] !== sorted[i] + 1) {\n        return sorted[i] + 1\n    }\n}\n}\n\nconsole.log(func(arr))"
+      }
+    ]
+  },
+  {
+    "company": "Код Открытия",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-01-31 17:16:52",
+        "content": "2025-01-31 17:16:52\n Wanderer -> 2071074234:\nКомпания: Код Открытия\nСсылка на вакансию: Написала HR\nЗП: Вилка от 250   \nВопросы: \n- Про прошлый опыт в резюме. С чем работал?  \n- В чем преимущество тех технология которые использовали?\n- Почему FSD? Расскажи про паттерны FSD?\n- ООП основные принципы? Рассказать и пересечение паттернов FSD и ООП\n- Почему Zustand лучше подходит для FSD?\n\nЗадачи: Смотри ниже",
+        "full_content": "2025-01-31 17:16:52\n Wanderer -> 2071074234:\nКомпания: Код Открытия\nСсылка на вакансию: Написала HR\nЗП: Вилка от 250   \nВопросы: \n- Про прошлый опыт в резюме. С чем работал?  \n- В чем преимущество тех технология которые использовали?\n- Почему FSD? Расскажи про паттерны FSD?\n- ООП основные принципы? Рассказать и пересечение паттернов FSD и ООП\n- Почему Zustand лучше подходит для FSD?\n\nЗадачи: Смотри ниже"
+      }
+    ]
+  },
+  {
+    "company": "Caltat",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-11-12 14:24:24",
+        "content": "2024-11-12 14:24:24\n Егор -> 2071074234:\nКомпания : caltat\nВакансия: https://hh.ru/vacancy/110265247?hhtmFrom=favorite_vacancy_list\nЗП: 150к+\nВопросы:\n- Расскажи про свой опыт\n- Как была устроена авторизация\n- flex vs grid\n- var let const\n- === и ==\n- Как сравнить объекты\n - Хуки\n\n <style>\n  .outer {\n    position: relative;\n    height: 5em;\n    border: 1px solid blue;\n  }\n\n  .inner {\n    position: absolute;\n    top: 50%;\n    margin-top: -0.625em;\n    border: 1px solid red;\n  }\n</style>",
+        "full_content": "2024-11-12 14:24:24\n Егор -> 2071074234:\nКомпания : caltat\nВакансия: https://hh.ru/vacancy/110265247?hhtmFrom=favorite_vacancy_list\nЗП: 150к+\nВопросы:\n- Расскажи про свой опыт\n- Как была устроена авторизация\n- flex vs grid\n- var let const\n- === и ==\n- Как сравнить объекты\n - Хуки\n\n <style>\n  .outer {\n    position: relative;\n    height: 5em;\n    border: 1px solid blue;\n  }\n\n  .inner {\n    position: absolute;\n    top: 50%;\n    margin-top: -0.625em;\n    border: 1px solid red;\n  }\n</style>"
+      }
+    ]
+  },
+  {
+    "company": "Оптимакрос",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-10-30 16:05:09",
+        "content": "2024-10-30 16:05:09\n Artyom Sozykin -> 2071074234:\nОптимакрос\nЗП: 250к\nВакансия: https://saratov.hh.ru/vacancy/108179839?hhtmFrom=resume",
+        "full_content": "2024-10-30 16:05:09\n Artyom Sozykin -> 2071074234:\nОптимакрос\nЗП: 250к\nВакансия: https://saratov.hh.ru/vacancy/108179839?hhtmFrom=resume"
+      }
+    ]
+  },
+  {
+    "company": "Вендорteamf",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-02-07 14:33:11",
+        "content": "2025-02-07 14:33:11\n Артем -> 2071074234:\nКомпания: ВендорTeamF\nВопросы:\nЧто используешь для тестировани\nСемантическая вертка\nz-index\ndisplay\ncss in js\nу какого тега в html inline-block\npromise\nasync/await\nEvent Loop\nГде там RequiestAnimationFrame\nСтатический мето vs метод экземпляра\nза счет чего работает наслеодование\nuseEffect\nКакие хуки занешь\nМемоизация в react\nкак можно менять состояния\nвсплытие события \n\nЗадача: создать метод Map\nРешение: \nArray.prototype.map = function(callback, thisArg) ...",
+        "full_content": "2025-02-07 14:33:11\n Артем -> 2071074234:\nКомпания: ВендорTeamF\nВопросы:\nЧто используешь для тестировани\nСемантическая вертка\nz-index\ndisplay\ncss in js\nу какого тега в html inline-block\npromise\nasync/await\nEvent Loop\nГде там RequiestAnimationFrame\nСтатический мето vs метод экземпляра\nза счет чего работает наслеодование\nuseEffect\nКакие хуки занешь\nМемоизация в react\nкак можно менять состояния\nвсплытие события \n\nЗадача: создать метод Map\nРешение: \nArray.prototype.map = function(callback, thisArg) {\n        if (this == null) {\n            throw new TypeError(\"Array.prototype.map called on null or undefined\");\n        }\n        if (typeof callback !== \"function\") {\n            throw new TypeError(callback + \" is not a function\");\n        }\n\n        const arr = Object(this);\n        const len = arr.length >>> 0; // Преобразуем длину к числу\n        const result = new Array(len);\n\n        for (let i = 0; i < len; i++) {\n            if (i in arr) {\n                result[i] = callback.call(thisArg, arr[i], i, arr);\n            }\n        }\n\n        return result;"
+      }
+    ]
+  },
+  {
+    "company": "Датаджайл",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-10-08 12:54:17",
+        "content": "2024-10-08 12:54:17\n Михаил -> 2071074234:\nДатаджайл\nвакансия hh.ru/vacancy/50184098\nзп 200к",
+        "full_content": "2024-10-08 12:54:17\n Михаил -> 2071074234:\nДатаджайл\nвакансия hh.ru/vacancy/50184098\nзп 200к"
+      }
+    ]
+  },
+  {
+    "company": "ФАККТ",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-03-12 19:41:35",
+        "content": "2025-03-12 19:41:35\n Лёша -> 2071074234:\nКомпания: ФАККТ техсобес\nзп: просил 300 net\nгибрид Москва 1 день\nвакансия: hr написал\nфидбек: реджект\nощущение: я сосал, меня ебали (что-то душное)\n\nВопросы:\nРасскажи про свой опыт.\nВиды хранилищ и их отличия (localstorage, session storage, cookie, indexdb).\nКак оптимизировать сложные задачи, которые блокируют рендер (вебворкеры).\nВиды вебворкеров.\nКак общаться между воркером и основным тредом.\nПочему у воркеров нет доступа к DOM.\nКак общаться между 2 при...",
+        "full_content": "2025-03-12 19:41:35\n Лёша -> 2071074234:\nКомпания: ФАККТ техсобес\nзп: просил 300 net\nгибрид Москва 1 день\nвакансия: hr написал\nфидбек: реджект\nощущение: я сосал, меня ебали (что-то душное)\n\nВопросы:\nРасскажи про свой опыт.\nВиды хранилищ и их отличия (localstorage, session storage, cookie, indexdb).\nКак оптимизировать сложные задачи, которые блокируют рендер (вебворкеры).\nВиды вебворкеров.\nКак общаться между воркером и основным тредом.\nПочему у воркеров нет доступа к DOM.\nКак общаться между 2 приложениями на одной странице не используя нетворк (window.dispatchEvent, localstorage, broadcast chanel).\nwindow.sharedData - какие минусы (безопасность)\nКак отлеживать изменение в обновляющемся списке (mutationObserver, setInterval).\nЧто возвращает setInterval.\nЕсть ли какая-то гарантия, что у нас пройдет делей в setInterval и какая эта гарантия.\nКак гарантировать, что у нас пройдет ровно столько delay, сколько указано в delay, а не больше.\nСтатические поля класса.\nЕсть ли у метода static доступ к this.\nКакие есть способы запретить изменение объекта (Object.freeze, symbol, прокси)?\nЧто используется в Object.freeze под капотом (дескрипторы)?\nКакие дескрипторы знаешь?\nКакие есть методы оптимизации сборки?\nКак работает treeshaking?\nVite и его 2 вида сборщика.\nМодули и CommonJS.\n\nЧто такое VDOM?\nНа какой структуре данных работает VDOM и это коцепт или объект?\nВ чем особенность fiber? (fiber и ссылки на альтернативные деревья в этом fiber)\nПодробнее про эвристический алгоритм, какая суть, почему сложность O(n).\nКак строиться VDOM, откуда появляется.\nПодробней, во что превращается JSX, на каком этапе.\n\nКакую проблему решают стейтменеджеры?\nЗачем нам стейтменеджеры, если мы можем использовать нативный context.\nЗачем нам отделять ui от логики?\nКакие есть бенефиты при тестировании при использовании стейт менеджеров?\n\nЛайвкодинг:\n// Задача: Реализовать объект, который позволяет задавать и вызывать пользовательские события (Диспетчер). Пример интерфейса:\n\nclass Dispatcher {\n    //code...\n}\n\nconst dispatcher = new Dispatcher();\n\ndispatcher.on('event_one', function () {\n    console.warn(\"message 1\");\n});\n\ndispatcher.on('event_one', function () {\n    console.warn(\"message 2\");\n});\n\ndispatcher.on('event_two', function () {\n    console.warn(\"message 3\");\n});\n\ndispatcher.trigger('event_one'); // Вызываем событие event_one\n\n// Ожидаемый вывод:\n// message 1\n// message 2\n\nРешение:\nclass Dispatcher {\n  constructor() {\n    this.events = {};\n  }\n\n  on(event, callback) {\n    if (!this.events[event]) {\n      this.events[event] = [];\n    }\n    this.events[event].push(callback);\n  }\n\n  off(event, callback){\n    if(this.events[event]){\n      this.events[event] = this.events[event].filter(fn => fn !== callback)\n    }\n  }\n\n  trigger(event) {\n    if (this.events[event]) {\n      this.events[event].forEach(callback => callback());\n    }\n  }\n}\n\n\nЕще вопросы:\nMap и Set, что такое, какая структура данных под капотом(хеш таблица)."
+      }
+    ]
+  },
+  {
+    "company": "Максбитсолюшен",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-11-04 11:18:11",
+        "content": "2024-11-04 11:18:11\n Вадим -> 2071074234:\nКомпания: Максбитсолюшен(2 этап)\nВакансия : https://rabota.by/vacancy/108686392\nЗП: не обсуждали\nВопросы: \nУ него был набросок проекта\nЕсть сервер - есть браузер \n1) какие слои на мой взгляд должен обладать приложение?\n2) какая архитектура папок должна быть в этом проекте? \n3) как бы я организовал и настроил папки? \nИ все это делал и писал на доске и вокруг этого общались. Нужны знания по архитектуре.",
+        "full_content": "2024-11-04 11:18:11\n Вадим -> 2071074234:\nКомпания: Максбитсолюшен(2 этап)\nВакансия : https://rabota.by/vacancy/108686392\nЗП: не обсуждали\nВопросы: \nУ него был набросок проекта\nЕсть сервер - есть браузер \n1) какие слои на мой взгляд должен обладать приложение?\n2) какая архитектура папок должна быть в этом проекте? \n3) как бы я организовал и настроил папки? \nИ все это делал и писал на доске и вокруг этого общались. Нужны знания по архитектуре."
+      }
+    ]
+  },
+  {
+    "company": "Lanit Bpm",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-08-04 16:59:21",
+        "content": "2024-08-04 16:59:21\n Максим -> 2071074234:\nLanit BPM\nВакансия: https://spb.hh.ru/vacancy/104026317?hhtmFrom=employer_vacancies\nФидбек: К сожалению, вакансию закрыли, тут нас опередил ВТБ. поэтому пока не можем сделать предложение о следующем этапе на данный момент.\nВопросы которые запомнил: \n 1. Как ты понимаешь понятие функциональное программирование?\n 2. Можно ли использовать await без async  ? \n 3. Утилитарные типы в TS?\n 4. Что такое type guard ?\n 5. В чем отличие классовых компонентов от фу...",
+        "full_content": "2024-08-04 16:59:21\n Максим -> 2071074234:\nLanit BPM\nВакансия: https://spb.hh.ru/vacancy/104026317?hhtmFrom=employer_vacancies\nФидбек: К сожалению, вакансию закрыли, тут нас опередил ВТБ. поэтому пока не можем сделать предложение о следующем этапе на данный момент.\nВопросы которые запомнил: \n 1. Как ты понимаешь понятие функциональное программирование?\n 2. Можно ли использовать await без async  ? \n 3. Утилитарные типы в TS?\n 4. Что такое type guard ?\n 5. В чем отличие классовых компонентов от функциональных?\n 6. Что такое package-lock.json, что хранится в package.josn ?\n 7. Какие минусы у npm?\n 8. Как работает webpack module federation?\n 9. Что такое Ngnx ?\n 10. Как обрабатывали ошибки в rtk query ( К примеру не авторизованный пользователь)? \n 11. Сколько создавали сторов?\n 12. От куда узнаешь новости frontenda ?\n 13. Что интересного в React 19?\n 14. Способы авторизации"
+      }
+    ]
+  },
+  {
+    "company": "VegaSoft",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-07-07 19:01:39",
+        "content": "2025-07-07 19:01:39\n Tima Pakholkov -> 2071074234:\nКомпания: VegaSoft\nЗП: от 170 000 до 220 000 р. на руки\nhr: @Olga_team_for_IT\nФормат: удалёнка\n\nОбщие вопросы:\n- расскажи про свой опыт 5–7 минут\n- что такое http/https\n- REST API\n- Чем отличаются get, post, put, patch, delete\n- Какие ещё знаешь протоколы\n- Расскажи про WebSocket\n- CORS\n- Что такое preflight-запросы, http метод OPTIONS\n- Критический путь рендера\n\nTS: \n- any, unknown, never, void\n- тайпгарды\n- тип и интерфейс\n\nReact: \n- Преимущес...",
+        "full_content": "2025-07-07 19:01:39\n Tima Pakholkov -> 2071074234:\nКомпания: VegaSoft\nЗП: от 170 000 до 220 000 р. на руки\nhr: @Olga_team_for_IT\nФормат: удалёнка\n\nОбщие вопросы:\n- расскажи про свой опыт 5–7 минут\n- что такое http/https\n- REST API\n- Чем отличаются get, post, put, patch, delete\n- Какие ещё знаешь протоколы\n- Расскажи про WebSocket\n- CORS\n- Что такое preflight-запросы, http метод OPTIONS\n- Критический путь рендера\n\nTS: \n- any, unknown, never, void\n- тайпгарды\n- тип и интерфейс\n\nReact: \n- Преимущества и недостатки React\n- React.memo, useMemo, useCallback\n\nЗадачи:\n1. Написать debounce на js\n\n2.\n\nconst tree = {\n  value: 1,\n  children: [\n    {\n      value: 2,\n      children: [{ value: 3 }]\n    },\n    {\n      value: 4,\n      children: [{ value: 5 }, { value: 6 }]\n    }\n  ]\n};\n\nfunction getTreeValues(tree) {\n  // закончи функцию\n  const result = []\n\n  function recurse(item) {\n    result.push(item.value)\n\n    if (item.children) {\n      for (let key of item.children) {\n        recurse(key)\n      }\n    }\n  }\n\n  recurse(tree)\n\n  return result\n}\n\nconsole.log(getTreeValues(tree)); // => [1, 2, 3, 4, 5, 6];\n3.\n\nconst UserItem = ({ user, isSelected, onClick }) => {\n  return (\n    <div onClick={onClick}>\n      <h3>{user.name}</h3>\n      {isSelected && <p>Текущий пользователь</p>}\n    </div>\n  )\n}\n\nconst UsersList = ({ users }) => {\n  const [selectedUser, setSelectedUser] = useState(null)\n\n  const toggleSelectedUser = (user) => {\n    // Логика выбора пользователя\n  }\n\n  return (\n    <div>\n      {users.map((user) => (\n        <UserItem\n          user={user}\n          isSelected={selectedUser?.id === user.id}\n          onClick={() => toggleSelectedUser(user)}\n        />\n      ))}\n    </div>\n  )\n}\nСделать так, чтобы при клику по юзеру рамка подсвечивалась, но у других юзеров пропадала\n\nЧто делать, если карточек очень много и подсветка карточки занимает много времени — как оптимизировать?"
+      }
+    ]
+  },
+  {
+    "company": "06 Иц-Айтеко",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-06-05 09:51:20",
+        "content": "2025-06-05 09:51:20\n Stepan Tugarev -> 2071074234:\n05.06 ИЦ-айтеко(проект сбера)\nЗП: до 200\nВакансия: hr написала\n\nТоже самое что и тут: https://t.me/c/2071074234/489/118265\n\nБыла еще 1 задача на консоль логи:\nsetTimeout(()=> console.log(\"setTimeout\"), 0);\n console.log(\"scriptstart\"); \ntry {  Promise.resolve()\n  .then(()=> { console.log(1); throw new Error('err'); console.log(100); })  .then(()=> console.log(2))\n  .then(()=> console.log(3))} catch(e)\n{  console.log(e)\n}\nХочет услышать про: Первы...",
+        "full_content": "2025-06-05 09:51:20\n Stepan Tugarev -> 2071074234:\n05.06 ИЦ-айтеко(проект сбера)\nЗП: до 200\nВакансия: hr написала\n\nТоже самое что и тут: https://t.me/c/2071074234/489/118265\n\nБыла еще 1 задача на консоль логи:\nsetTimeout(()=> console.log(\"setTimeout\"), 0);\n console.log(\"scriptstart\"); \ntry {  Promise.resolve()\n  .then(()=> { console.log(1); throw new Error('err'); console.log(100); })  .then(()=> console.log(2))\n  .then(()=> console.log(3))} catch(e)\n{  console.log(e)\n}\nХочет услышать про: Первый then выводит 1, затем выбрасывается ошибка Error: err.После ошибки выполнение этого then прекращается, а следующие then в цепочке не вызываются .\nНо поскольку ошибка не перехвачена в этой цепочке, она попадает в unhandledrejection (если нет catch в конце цепочки).Блок try...catch не ловит ошибки из промисов , потому что это асинхронный код.  try...catch работает только для синхронных ошибок.\n\nДалее проверили задачу, спросил, как можно отрефакторить(вынести таблицу, вынести логику запроса)\nПосле задачи были вопросы по реакту:\n1.Зачем нужен реакт(декларативность, VDOM, reconcilation), почему не могу через dom api поменять текст в элементе и все2.Умный/глупый компонент\n3.Методы жиз. цикла, useEffect4.Что такое замыкание, покажи пример замыкания в задаче(setState внутри useEffect)\n5.key в реакт6.правила хуков, почему\n7.что такое jsx, можно ли без него"
+      }
+    ]
+  },
+  {
+    "company": "Калина Софт",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-06-19 13:26:09",
+        "content": "2025-06-19 13:26:09\n Zurab -> 2071074234:\nКомпания: Калина Софт\nТип: Техническое интервью\nДлительность: 45-60мин \n\nВопросы\n\nОбщие:\nГде работаешь, расскажи про компанию?\nКакие процессы? По какой методологии работаешь?\nКакой Git Flow?\nСколько чел в команде?\n\nТеория:\n\nJs\nHosting \nPromise\nСинхронный и ассихронный код \nEvent Loop\nКакие типы бывают?\nКлассы (private, public, and protected)\n\nTs\nКакие типы существуют?\nЕсть ли разница между типами? Распределяются ли они по подкатегориям?\nUtilityTypes\n\nRea...",
+        "full_content": "2025-06-19 13:26:09\n Zurab -> 2071074234:\nКомпания: Калина Софт\nТип: Техническое интервью\nДлительность: 45-60мин \n\nВопросы\n\nОбщие:\nГде работаешь, расскажи про компанию?\nКакие процессы? По какой методологии работаешь?\nКакой Git Flow?\nСколько чел в команде?\n\nТеория:\n\nJs\nHosting \nPromise\nСинхронный и ассихронный код \nEvent Loop\nКакие типы бывают?\nКлассы (private, public, and protected)\n\nTs\nКакие типы существуют?\nЕсть ли разница между типами? Распределяются ли они по подкатегориям?\nUtilityTypes\n\nReact \nPropsDrilling \nUseEffect Vs UseLayoutEffect \nHOC\nErrorBoudery\nМемоизация - зачем нужны?\nРассказать как оптимизировать загрузку списка большого ( throttle, denounce, виртуализация )\nSuspense\n\nЗадачи:\n\n// Написать функцию, которая из массива значений, оставит только уникальные числа расположив их по возрастанию важно учитывать, что числа записанные в виде строк тоже должны попадать в финальную выборку\n\n\n// const arr = ['a',0,4,'4','0',5,'d',7,0,'8',7,10,'s',1,3,'9',10,3,1,9,'u',6,5,'2'];\n\n// const getUniqDigits = (arr) => {\n//   const nums = arr\n//   .map(el => Number(el))\n//   .filter(num => !isNaN(num) && Number.isInteger(num))\n  \n//   const uniqNums = [...new Set(nums)].sort((a,b) => a - b)\n  \n//   return uniqNums\n// }\n\n// console.log(getUniqDigits(arr)); // output [0,1,2,3,4,5,6,7,8,9,10]\n\n\n// Написать функцию, которая проверяет входящий массив значений:\n// - если в массиве присутствуют не числа возвращает строку \"входящие данные не удовлетворяют требованиям\"\n// - если входные параметры корректны, то необходимо получить разность суммы чисел кратных 7 и максимального значения из входного массива\n\n// const arr = [1, NaN, 21, 40, 50, 35, 2, NaN, 16, 17, NaN, 98, 77, 49];\n// const arr1 = [true];\n// const arr2 = ['smth'];\n// const arr3 = [1, 11, 21, 40, 50, 35, 2, 6, 16, 17, 63, 98, 77, 49];\n\n\n\n// const checkAndCalculate = (array) => {\n//   for(const item of array) {\n//     if(typeof item !== 'number' || isNaN(item)){\n//       return 'входящие данные не удовлетворяют требованиям'\n//     }\n//   }\n  \n//   const sumMultipOf7 = array\n//   .filter(num => num % 7 ===0)\n//   .reduce((acc, val) =>acc + val, 0)\n  \n//   const maxValue = Math.max(...array)\n  \n//   return sumMultipOf7 - maxValue\n// }\n\n// console.log(checkAndCalculate(arr))\n// console.log(checkAndCalculate(arr1))\n// console.log(checkAndCalculate(arr2))\n// console.log(checkAndCalculate(arr3))\n\n\n\n// Написать функцию, которая на вход принимает некоторое число и возвращает новое число (максимально возможное), которое можно составить из цифр первоначального числа.\n\n// getBigger(6291) // 9621\n// getBigger(417)  // 741\n// getBigger(3814) // 8431\n\n\n\nconst getBigger = (number) => {\n  return Number(String(number)\n  .split('')\n  .sort((a, b) => b - a)\n  .join('')\n  )\n}\n\nconsole.log(getBigger(6291))\nconsole.log(getBigger(417))\nconsole.log(getBigger(3814))"
+      }
+    ]
+  },
+  {
+    "company": "Аv.By",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-06-02 17:04:08",
+        "content": "2025-06-02 17:04:08\n Kirill -> 2071074234:\nаv.by\nзп: 2200$\n\nвопросы:\n1)расскажие о себе \n2) что такое spread опреатор\n3) что такое промисы\n4) какие состояния есть у промисов \n5)  что такое eventLoop\n6) какой порядок в консоли будет\nconsole.log(1)\nsetTimeout(()=>console.log(2))\nPromise.resolve().then(()=> console.log(3))\nconsole.log(4)\n7)у кого больше приоритет: микро или макро таски\n8)какие правила использования хуков знаешь\n9) жк\n10)как орагизован роутинг в next js\n11) как сделать динамические ...",
+        "full_content": "2025-06-02 17:04:08\n Kirill -> 2071074234:\nаv.by\nзп: 2200$\n\nвопросы:\n1)расскажие о себе \n2) что такое spread опреатор\n3) что такое промисы\n4) какие состояния есть у промисов \n5)  что такое eventLoop\n6) какой порядок в консоли будет\nconsole.log(1)\nsetTimeout(()=>console.log(2))\nPromise.resolve().then(()=> console.log(3))\nconsole.log(4)\n7)у кого больше приоритет: микро или макро таски\n8)какие правила использования хуков знаешь\n9) жк\n10)как орагизован роутинг в next js\n11) как сделать динамические роуты\n12) задача\n\n\nimport React, { Fragment, useEffect, useRef, useState, useCallback } from 'react';\nimport Dashboard from './Dashboard';\nimport PropTypes from 'prop-types';\n\nconst Root = ({ dashboardIds, rootId }) => {\n\n  const [activeDashboardId, setId] = useState();\n  \n  const count = useRef(0);\n  \n  useEffect( () => {\n    count.current +=1;\n  });\n  \n  \n    if (!rootId || !dashboardIds) {\n    return null;\n  }\n  \n  const setDashboardId = useCallback((id)=>{\n        setId(id)\n  },[id])\n\n  \n  return (\n    <>\n      <h2>Active dashboard: {activeDashboardId ?? 'not choosen' }</h2>\n      <span>Rerender count: {count}</span>\n      {dashboardIds.map(id => (\n        rootId && <Dashboard\n                      key={id}\n                      dashboardId={id}\n                      onClick={(id) => setDashboardId(id)} \n                      rootId={rootId}\n                      />\n      ))}\n    </>\n  );\n};\n\nRoot.propTypes = {\n  dashboardIds: PropTypes.arrayOf(PropTypes.number).isRequired,\n  rootId: PropTypes.number,\n};\n\nRoot.defaultProps = {\n  \n};\n\nexport default Root;\n\n/**\nУсловия:\nНужно исправить ошибки и отрефакторить компонент Root.\n\nОграничения:\nНельзя менять propTypes, считать, что о валидации пропсов позаботился вызывающий код, и контракт взаимодействия соблюден.\nНет возможности изменить интерфейс пропсов дочерних компонентов.\n\nИнформация:\nActive dashboard: {activeDashboardId}\n- показывает id активного Dashboard или 'not chosen', если активного нет.\n\nRerender count: {count} - показывает количество рендеров компонента\n\nDashboard - по клику дергает callback onClick, в который передает свой id\n*/"
+      }
+    ]
+  },
+  {
+    "company": "Quеen Intеraсtive",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-12-11 12:24:59",
+        "content": "2024-12-11 12:24:59\n Андрей -> 2071074234:\nКомпания: Quеen Intеraсtive\nВакансия: -\nЗП: Не обсуждали\n\nСразу перешли к задачам:\n// Написать sum\nMath.sum(1, 2, 3, 4); // 10\n\n// Написать toNumber\n\"123\".toNumber() // 123\n\n\n// Что выведется\nlet a = 1;\n\nconst fn = () => {\n    console.log(a);\n}\n\nsetTimeout(fn, 1000);\n\na = 2;\n\n// Написать тип\ntype Type = ...\n\nconst a: Type = { status: \"active\" };\nconst b: Type = { status: \"finished\" };\n\na.body = \"123\"; // ok\nb.body = \"123\"; // not exists\n\n\n// Реализовать...",
+        "full_content": "2024-12-11 12:24:59\n Андрей -> 2071074234:\nКомпания: Quеen Intеraсtive\nВакансия: -\nЗП: Не обсуждали\n\nСразу перешли к задачам:\n// Написать sum\nMath.sum(1, 2, 3, 4); // 10\n\n// Написать toNumber\n\"123\".toNumber() // 123\n\n\n// Что выведется\nlet a = 1;\n\nconst fn = () => {\n    console.log(a);\n}\n\nsetTimeout(fn, 1000);\n\na = 2;\n\n// Написать тип\ntype Type = ...\n\nconst a: Type = { status: \"active\" };\nconst b: Type = { status: \"finished\" };\n\na.body = \"123\"; // ok\nb.body = \"123\"; // not exists\n\n\n// Реализовать компонент таймер\nimport React, { useEffect, useRef } from 'react';\n\nconst Time = () => {\n    const timeRef = useRef(new Date().toLocaleTimeString()); // Инициализация текущего времени\n    const [time, setTime] = React.useState(timeRef.current); // Состояние для отображения времени\n\n    useEffect(() => {\n        const interval = setInterval(() => {\n            timeRef.current = new Date().toLocaleTimeString(); // Обновляем текущее время в ref\n            setTime(timeRef.current); // Обновляем состояние для отображения времени\n        }, 1000);\n\n        return () => clearInterval(interval); // Очищаем интервал при размонтировании\n    }, []);\n\n    return (\n        <div>\n            <h1>{time}</h1> {/* Отображаем текущее время */}\n        </div>\n    );\n};\n\nexport default Time;"
+      }
+    ]
+  },
+  {
+    "company": "Лаборатория Безопасных Систем",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-11-15 11:33:28",
+        "content": "2024-11-15 11:33:28\n Егор -> 2071074234:\nКомпания: Лаборатория безопасных систем\nВакансия: https://hh.ru/vacancy/110792643\nЗП: 180+\nВопросы:\nСпрашивали про опыт, с чем работал, про авторизацию как была устроена. \nСпрашивали про docker, умение настраивать CI/CD.\nТехнических вопросов не было, т.к. им нужен Angular, хотя в вакансии это не указано, а также чтобы кандидат умел и что-то на бэкенде делать. Поэтому вакансия для fullstack подходит.",
+        "full_content": "2024-11-15 11:33:28\n Егор -> 2071074234:\nКомпания: Лаборатория безопасных систем\nВакансия: https://hh.ru/vacancy/110792643\nЗП: 180+\nВопросы:\nСпрашивали про опыт, с чем работал, про авторизацию как была устроена. \nСпрашивали про docker, умение настраивать CI/CD.\nТехнических вопросов не было, т.к. им нужен Angular, хотя в вакансии это не указано, а также чтобы кандидат умел и что-то на бэкенде делать. Поэтому вакансия для fullstack подходит."
+      }
+    ]
+  },
+  {
+    "company": "Компани: Медиа Сервис",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-02-12 10:01:44",
+        "content": "2025-02-12 10:01:44\n Артем -> 2071074234:\nКомпани: Медиа Сервис\nЗП: 180r\nВопросы:\nDebounce vs Trottle\nlet const vs var\nЗамыкание\nАссинхронность\nasync/await что будет если использовать без try catch\nФункции генераторы\nReact жизненные циклы компонента\nuseMemo vs useState vs useRef\nПорталы в react\nReact.memo\nRedux vs redux-toolkit vs RTK query\nnext смысл\nSSR vs SSG\nКакие виды тестов знаешь\nКак тестировать запросы в Jest(Моки)\nScss как транспелируеться в чем примущество",
+        "full_content": "2025-02-12 10:01:44\n Артем -> 2071074234:\nКомпани: Медиа Сервис\nЗП: 180r\nВопросы:\nDebounce vs Trottle\nlet const vs var\nЗамыкание\nАссинхронность\nasync/await что будет если использовать без try catch\nФункции генераторы\nReact жизненные циклы компонента\nuseMemo vs useState vs useRef\nПорталы в react\nReact.memo\nRedux vs redux-toolkit vs RTK query\nnext смысл\nSSR vs SSG\nКакие виды тестов знаешь\nКак тестировать запросы в Jest(Моки)\nScss как транспелируеться в чем примущество"
+      }
+    ]
+  },
+  {
+    "company": "Компания Иннова",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-02-04 13:14:05",
+        "content": "2025-02-04 13:14:05\n Александр Богданов -> 2071074234:\n-Компания ИННОВА(1 этап собеса-была теория)\n- топик: https://t.me/c/2071074234/100998 \n- скидываю аудио -т.к лайв-кодинга не было",
+        "full_content": "2025-02-04 13:14:05\n Александр Богданов -> 2071074234:\n-Компания ИННОВА(1 этап собеса-была теория)\n- топик: https://t.me/c/2071074234/100998 \n- скидываю аудио -т.к лайв-кодинга не было"
+      }
+    ]
+  },
+  {
+    "company": "Магнит",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-07-16 12:29:22",
+        "content": "2025-07-16 12:29:22\n Александр -> 2071074234:\nКомпания: Магнит\nСсылка на вакансию: нет (по рефеке)\nЗП: Называл от 400\n\nВопросы:\nРассказать про eventLoop\nЧто уходит в микротаски/макротаски\nЗачем реакт и чем он хорош\nПодробнее про реконсиляцию\n\nЗадачи не сохранились\nТам просто на понимание useCallback и когда он нужен (оборачивать ли функцию, если передаем в небольшой компонет)\nНаписать свой хук, в котором колбэк сработает 1 раз \n\nНа этом все вопросы и задачи закончились, так как отвечал быстро и ...",
+        "full_content": "2025-07-16 12:29:22\n Александр -> 2071074234:\nКомпания: Магнит\nСсылка на вакансию: нет (по рефеке)\nЗП: Называл от 400\n\nВопросы:\nРассказать про eventLoop\nЧто уходит в микротаски/макротаски\nЗачем реакт и чем он хорош\nПодробнее про реконсиляцию\n\nЗадачи не сохранились\nТам просто на понимание useCallback и когда он нужен (оборачивать ли функцию, если передаем в небольшой компонет)\nНаписать свой хук, в котором колбэк сработает 1 раз \n\nНа этом все вопросы и задачи закончились, так как отвечал быстро и уверенно"
+      }
+    ]
+  },
+  {
+    "company": "Dataworks",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-11-20 06:23:58",
+        "content": "2024-11-20 06:23:58\n Стас Тихомиров -> 2071074234:\nКомпания: DataWorks\nВакансия: https://novosibirsk.hh.ru/vacancy/109140057?hhtmFrom=resume\nЗП: не обсуждали\n\nТак же было только знакомство, никаких лайв кодингов\n\nВопросы: \n-Что конкретно делал\n-Что такое SOLID\n-Паттерны проектирования\n-Чистая функция\n-Отличие стрелочных функций от обычных\n- spread rest\n- Хуки какие знаешь",
+        "full_content": "2024-11-20 06:23:58\n Стас Тихомиров -> 2071074234:\nКомпания: DataWorks\nВакансия: https://novosibirsk.hh.ru/vacancy/109140057?hhtmFrom=resume\nЗП: не обсуждали\n\nТак же было только знакомство, никаких лайв кодингов\n\nВопросы: \n-Что конкретно делал\n-Что такое SOLID\n-Паттерны проектирования\n-Чистая функция\n-Отличие стрелочных функций от обычных\n- spread rest\n- Хуки какие знаешь"
+      }
+    ]
+  },
+  {
+    "company": "Unirest",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-10-20 14:55:20",
+        "content": "2024-10-20 14:55:20\n Vildan Khabibov -> 2071074234:\nUnirest (Rostic's)\nВакансия: hr написала\nЗп: 250к\nВопросы:\n\n1-ый этап. Тех. интервью.\n- FSD. Рассказать о ней. Рекомендовал почитать про чистую архитектуру. \n- Вопрос из резюме. Что за плагины приходилось писать для eslint, babel.\n- Какое место занимал место в команде. Как происходило взаимодействие с другими разрабами?\n- Как было устроено ревью кода? \n- Какие знаешь технологии которые применяются для написания стилей?\n- Какие минусы есть у под...",
+        "full_content": "2024-10-20 14:55:20\n Vildan Khabibov -> 2071074234:\nUnirest (Rostic's)\nВакансия: hr написала\nЗп: 250к\nВопросы:\n\n1-ый этап. Тех. интервью.\n- FSD. Рассказать о ней. Рекомендовал почитать про чистую архитектуру. \n- Вопрос из резюме. Что за плагины приходилось писать для eslint, babel.\n- Какое место занимал место в команде. Как происходило взаимодействие с другими разрабами?\n- Как было устроено ревью кода? \n- Какие знаешь технологии которые применяются для написания стилей?\n- Какие минусы есть у подхода css in js? \n- С какими библиотеками UI работал, приходилось ли писать свой UI Kit? \n- Какие линтеры знаешь? \n- Про тестирование. Какие виды тестов знаешь? Чуть подробнее про unit и e2e\n- Про CI. Что запускалось во время запуска. Sentry - что такое для чего нужен.\n- Хуки в реакт. Про useCallback, React.memo, useMemo, useEffect, useLayoutEffect\n- Классовые компонеты приходилось ли работать? \n- Какие стадии отрисовки в браузере знаешь?\n- Fibers, reconcliation, эвристический подход, для чего нужны ключи?\n- Какие библиотеки для работы с формами знаешь? Что больше нравится?\n- RTK Query для чего нужен? \n- СSS. Какой position по умолчанию у элемента? Какие вообще есть position и как работают?\n- Отличие Flex от Grid? \n- Если по умолчанию используем flex то относительно чего выравнивание произойдет с align-items: center? \n- А что делает align-self?\n- Для чего нужно flex-grow?\n- Какие способы есть анимирования в css? Что более производительнее и в каких случаях что лучше использовать? \n- Local storage, cookie\n- Какие образом куки попадают в запрос? \n- HTTP. 401, 403 - что значат эти коды ошибок и чем отличаются? \n- Какие виды редиректов ты знаешь? чем они отличаются? \n- Options в запросе для чего нужны? Про CORS \n- В какой последовательность будут вызваны функции?\nawait f1()\nawait f2()\n- Как их вызвать параллельно? Про Promise.all, Promise.allSettled(), Promise.race(), Promise.race()\n- Как передать f1 и f2 в Promise.all?\nPromise.all([f1(), f2()])\n- Что такое SOLID, Подроне про D (Принцип инверсии зависимостей)\n- Приведи примеры использования этого принципа\n- Расскажи какие утилити тайпы знаешь\n- Тпизизируй функцию\nfunction map<T, U>(array: T[], f: (item: T, index: number, array: T[]) => U): U[] {\n    return array.map(f);\n}\n\n- Какие стейт менеджеы знаешь? От чего бы отталкивлся если выбирал стейт менеджер на новый проект?\n- Какие задачи решает redux toolkit? \n- Какие есть способы для работы с запросами в redux? \n- GraphQL - что такое, какую проблему решают?\n- Какие frontend фреймворки знаешь? \n- SSR - какая идея? Гидрация. Есть ли опытработы с Next ? \n- SSG - что такое?\n- Какие-нибудь слышал фреймворки для ssr кроме Next?\n- За счет чего при копировании ссылки в месседжер появляется дополнительная информация в виде превью и описания?\n\n2-ой этап. Общением с лидом.\n- Есть ли опыт на Vue?\n- Чуть подробнее про FSD. Были ли каке-то разделение вью от бизнес сущностей.\n- Как было реализовано тестирование компонентов?\n- Взаимодействие  с бэкэндом какое было? (rest и.т.д.)\n- Accessibility. Был ли опыт улучшения страниц в этом направлении?\n- Есть ли опыт работы с браузерным API. Приходилось ли использовать worker'ы или может быть bluetooth? \n- Dependency injection. Можешь привести пример? \n- BFF. Что это такое и для чего он нужен? \n- Приходилось ли писать бэкенды? Есть ли опыт работы с редисом, кафкой? \n- Как развиваешь? Что смотришь, что читаешь?"
+      }
+    ]
+  },
+  {
+    "company": "Мосгосэкспертиза",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-06-18 14:36:39",
+        "content": "2025-06-18 14:36:39\n Александр -> 2071074234:\nМосгосэкспертиза\nВакансия - https://hh.ru/vacancy/121128628?hhtmFrom=vacancy_edit\nОни ищут кандидата на VUE 3 \n(я им сказал,что я на reacte,он сказал ничего страшного,типо нет ли у меня желания переучиться)\nВопросы были\n1.Promies\n2.Рассказать про Redux\n3.Cookie\n4.Про авторизацию(Я сказал что у нас на jwt и он про это спросил),если вдруг сказать, про другую может за другое спросит\n5.И был такой вопрос не использую ли я слишком ЗАУМНЫЕ ДЖЕНЕРИКИ.\nИ у н...",
+        "full_content": "2025-06-18 14:36:39\n Александр -> 2071074234:\nМосгосэкспертиза\nВакансия - https://hh.ru/vacancy/121128628?hhtmFrom=vacancy_edit\nОни ищут кандидата на VUE 3 \n(я им сказал,что я на reacte,он сказал ничего страшного,типо нет ли у меня желания переучиться)\nВопросы были\n1.Promies\n2.Рассказать про Redux\n3.Cookie\n4.Про авторизацию(Я сказал что у нас на jwt и он про это спросил),если вдруг сказать, про другую может за другое спросит\n5.И был такой вопрос не использую ли я слишком ЗАУМНЫЕ ДЖЕНЕРИКИ.\nИ у них есть 2ой этап, после 1го этапа они дают ТЕСТОВОЕ задания как раз для VUE 3 отрисовать табличку"
+      }
+    ]
+  },
+  {
+    "company": "Hrp, Проект Техзор",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-07-13 15:05:01",
+        "content": "2024-07-13 15:05:01\n Руслан -> 2071074234:\nhrp, проект техзор\n—вакансия: https://hh.ru/vacancy/102175909\nЗп: 230к\nЗадачи:\nРевью и рефакторинг кода, также необходимо было добавить сохранение кол-ва лайков в каждом посте. Хотел, чтобы я сделал через indexeddb, но сказал, что через localStorage тоже норм\n/* eslint-disable */\n// @ts-nocheck\n\nimport {ReactNode, memo, useCallback, useEffect, useState} from 'react';\nimport './App.css';\n\ninterface IPost {\n  userId: number;\n  id: number;\n  title: string;...",
+        "full_content": "2024-07-13 15:05:01\n Руслан -> 2071074234:\nhrp, проект техзор\n—вакансия: https://hh.ru/vacancy/102175909\nЗп: 230к\nЗадачи:\nРевью и рефакторинг кода, также необходимо было добавить сохранение кол-ва лайков в каждом посте. Хотел, чтобы я сделал через indexeddb, но сказал, что через localStorage тоже норм\n/* eslint-disable */\n// @ts-nocheck\n\nimport {ReactNode, memo, useCallback, useEffect, useState} from 'react';\nimport './App.css';\n\ninterface IPost {\n  userId: number;\n  id: number;\n  title: string;\n  body: string;\n}\n\nfunction App() {\n  const [posts, setPosts] = useState();\n  const [isLoading, setIsLoading] = useState(false);\n\n  const getPosts = useCallback(async () => {\n    try {\n      setIsLoading(true);\n      const response = await fetch(\n        \"https://jsonplaceholder.typicode.com/posts\"\n      );\n      const newPosts = await response.json();\n      setPosts(newPosts as unknown as IPost[]);\n      setIsLoading(false);\n    } catch (error) {\n      console.log(error);\n    }\n  }, []);\n\n  useEffect(() => {\n    getPosts();\n  }, [getPosts]);\n\n  if (isLoading) {\n    return <div>Посты загружаются</div>;\n  }\n\n  return (\n    <div className='app'>\n      {posts.map((post, i) => (\n        <Post post={post} key={i} />\n      ))}\n    </div>\n  );\n}\n\nconst Post = memo(({post}: {post: IPost}) => {\n  const [likes, setLikes] = useState();\n  const icon = (\n    <div>\n      <div>💖</div>\n      {likes}\n    </div>\n  );\n\n  const handleLike = useCallback(() => {\n    const newLikes = likes + 1;\n    setLikes(newLikes);\n  }, []);\n\n  return (\n    <div className='post'>\n      <div className=\"container\">\n        <div className='title'>{post.title}</div>\n        <div className='body'>{post.body}</div>\n      </div>\n      <div className=\"container\">\n        <Button icon={icon} onClick={handleLike}/>\n      </div>\n    </div>\n  );\n});\n\nconst Button = ({icon, onClick}: {icon: ReactNode, onClick: () => void}) => (\n  <button className=\"button\" onClick={onClick}>\n    {icon}\n  </button>\n);\n\nexport default App;"
+      }
+    ]
+  },
+  {
+    "company": "Vk Workspace",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-04-30 11:25:08",
+        "content": "2025-04-30 11:25:08\n Артур Виноградов -> 2071074234:\nVK WorkSpace\nВакансия - https://team.vk.company/vacancy/41448/\nЗП: 300\nВсё точно также как здесь https://t.me/c/2071074234/489/117022\n\nВопросы: \n- Различие между обычными функциями и стрелочными?\nconst counter = {\n value: 0,\n next() {\n   this.value++;\n   console.log(this.value);\n }\n}\n// Что выведет и как решить\n- Про bind, call, apply\n\nfunction foo(n) {\n  return n > 3 ? foo(n-1) + foo(n-4) : 1;\n}\n\nfoo(10) - ok\nfoo(1000) - zavislo\n// почему 10 ...",
+        "full_content": "2025-04-30 11:25:08\n Артур Виноградов -> 2071074234:\nVK WorkSpace\nВакансия - https://team.vk.company/vacancy/41448/\nЗП: 300\nВсё точно также как здесь https://t.me/c/2071074234/489/117022\n\nВопросы: \n- Различие между обычными функциями и стрелочными?\nconst counter = {\n value: 0,\n next() {\n   this.value++;\n   console.log(this.value);\n }\n}\n// Что выведет и как решить\n- Про bind, call, apply\n\nfunction foo(n) {\n  return n > 3 ? foo(n-1) + foo(n-4) : 1;\n}\n\nfoo(10) - ok\nfoo(1000) - zavislo\n// почему 10 - ок, а 1000 - зависло, как решать\n\n- В чём разница между preventDefault и stopPropagation\n- Есть список с элементами, у элемента есть кнопка \"Ещё\", по её нажатию появляется менюшка. у списка висит обработчик клика и у кнопки \"Ещё\" висит обработчик клика.\nНо у кнопки стоит stopPropagation. Прилетает задача, что нужно отсылать аналитику о клике в списке, а кнопка ещё не отправляет событие клика. что будешь делать? P.s лучше посмотреть в видосе как он объясняет её\n- Как удалить элемент из массива. По индексу, а затем просто элемент.\n- Как быстро вставить элемент в отсортированный массив чисел\n- Как отловить js ошибки на странице (не try catch, и не errorBoundary)\n- В чем разница throw 'message' и throw new Error('message')\n- 1) Приходишь в офис, решаешь воспользоваться почтой (проект, который вы разрабатываете), открываешь свой продукт будучи разработчиком и видишь белый экран, что будешь делать?\n2) если там видишь a undefined и b undefined\n- Произошла проблема в продакшене, выкатилась задача с багом, юзеры видели белый экран в течении 30 минут. Кто виноват и что делать по итогам такой проблемы?\n- В чем проблема данного кода ? \nwindow.addEventListener('scroll', () => {\n const el = document.querySelector(\"#navbar\");\n const {top} = el.getBoundingClientRect();\nel.style.top = top <= 0 ? \"0px\" : \"auto\";\nel.style.position = top <= 0 ? \"fixed\" : \"static\";\n});\n- странный баг и непонятно откуда взялся. какие инструменты по отладке будешь использовать?\n- для чего ServiceWorker\n- виды синхронного кода в js. (про промисы, await)\n- Как отменить выполнение fetch запроса\n- почему в 3 промисе мы видим Third Error\nconst first = new Promise(() => {\n throw 'First error'\n})\n\nconst second = new Promise(() => {\n throw 'Second error'\n})\nsecond.catch(() => {})\n\nconst third = new Promise(() => {\n throw 'Third error'\n})\nthird.catch(() => {})\nthird.finally(() => console.log('Third ✅'))\n\n// Third ✅\n// Uncaught (in promise) First error\n// Uncaught (in promise) Third error\n- Хотим получать информацию в реальном времени. Что для этого использовать?\nесть LongPolling MiddlePolling ShortPolling\n- Как можно отцентровать div\n- что должно быть в описании задачи, чтобы ты посчитал её готовым к тому, чтобы взять в работу\n- посчитал задачу готовой, но в процессе понял что компонент не подходит по дизайну и ты не укладываешься в срок, если будешь переделывать, что будешь делать?\n- что такое Virtual DOM\n- если меняю opacity элементу, что будет происходить со страницей\n- библиотека и фреймворк, в чём разница, как выбирать что использовать? почему реакт это библиотека\n- что такое стейт менеджер\n- Props drilling, useContext, state manager, что лучше, в чём проблема useContext\n - перехват ошибок в реакте\n- инструменты профилирования ошибок в реакте\n- как понять что проект запущен в Iframe, что сделать чтобы это запретить или выбраться  из iframe\n- как вставить произвольную строку в HTML не боясь XSS\n- что ты сделаешь если найдёшь XSS в своём проекте\n- тебе доверили написать библиотеку компонентов. в проекте будет участвовать несколько человек. что нужно сделать для организации совместной работы и какие практики и инструменты нужны.\n- какие тесты бы добавил в библиотеку компонентов."
+      }
+    ]
+  },
+  {
+    "company": "Datanomica",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2025-01-28 10:03:12",
+        "content": "2025-01-28 10:03:12\n Владислав -> 2071074234:\n- компания: Datanomica\n- вакансия: https://zheleznodorozhniy50.hh.ru/vacancy/115753897?from=employer&hhtmFrom=employer\n- зп: не обсуждалось\n\nВопросы: \nСпрашивал исключительно по резюме, что я описывал: \n - архитектура FSD (какие есть слои, что каждый слой может использовать и что не может, про то, как реализовывал роутинг)\n - валидация форм, с помощью React-hook-form (в чем преимущество, что такое touched, dirty) \n - про стили (какие библиотеки испоз...",
+        "full_content": "2025-01-28 10:03:12\n Владислав -> 2071074234:\n- компания: Datanomica\n- вакансия: https://zheleznodorozhniy50.hh.ru/vacancy/115753897?from=employer&hhtmFrom=employer\n- зп: не обсуждалось\n\nВопросы: \nСпрашивал исключительно по резюме, что я описывал: \n - архитектура FSD (какие есть слои, что каждый слой может использовать и что не может, про то, как реализовывал роутинг)\n - валидация форм, с помощью React-hook-form (в чем преимущество, что такое touched, dirty) \n - про стили (какие библиотеки испозьвал, про css-modules говорили)\n - кеширование данных (также говорили про браузерные хранилища, их размер, как записывать, как работают)\n - нормализация данных \n - правила использования хуков (где нельзя использовать и вызывать) \n - useEffect\n - useRef (для чего и в чем разница от useState)\n - тестирование (как писал тесты)\n - что такое jest.fn()\n - beforeEach(), afterEach()\n - паттерны проектирования\n - хоки\n - AbortController"
+      }
+    ]
+  },
+  {
+    "company": "CSSSR",
+    "count": 1,
+    "records": [
+      {
+        "timestamp": "2024-11-18 20:26:10",
+        "content": "2024-11-18 20:26:10\n Андрей -> 2071074234:\nCSSSR техсобес\nУспех: ?\nЗП: запросил 300\nВакансия: эйчарка написала.\nВопросы:\nОбщение было в основном за опыт и все вопросы вытекали уже из него. Чем пользовался кроме реакта/редакса, какие плюсы/минусы. При oAuth авторизации где хранить токены и как передавать. \nЗадачи:\n#1 Пройтись по дереву произвольной вложенности и достать все value (сложить их в массив и вернуть)\n\n#2 Написать функцию мемоизации для других функций (декоратор)",
+        "full_content": "2024-11-18 20:26:10\n Андрей -> 2071074234:\nCSSSR техсобес\nУспех: ?\nЗП: запросил 300\nВакансия: эйчарка написала.\nВопросы:\nОбщение было в основном за опыт и все вопросы вытекали уже из него. Чем пользовался кроме реакта/редакса, какие плюсы/минусы. При oAuth авторизации где хранить токены и как передавать. \nЗадачи:\n#1 Пройтись по дереву произвольной вложенности и достать все value (сложить их в массив и вернуть)\n\n#2 Написать функцию мемоизации для других функций (декоратор)"
+      }
