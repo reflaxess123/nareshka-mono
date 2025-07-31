@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 
-from app.shared.dependencies import get_database_session
+from app.shared.dependencies import get_db_session
 from app.shared.logging.api_logger import get_logger
 
 logger = get_logger(__name__)

@@ -1,0 +1,1 @@
+export { InterviewDetailPage } from './ui/InterviewDetailPage';

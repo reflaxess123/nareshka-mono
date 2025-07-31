@@ -38,11 +38,23 @@ const MindMap = lazy(() =>
     default: module.default,
   }))
 );
+const Interviews = lazy(() =>
+  import('@/pages/Interviews').then((module) => ({
+    default: module.InterviewsPage,
+  }))
+);
+const InterviewDetail = lazy(() =>
+  import('@/pages/InterviewDetail').then((module) => ({
+    default: module.InterviewDetailPage,
+  }))
+);
 
 export enum AppRoutes {
   HOME = '/',
   GET_STARTED = '/get-started',
   TASKS = '/tasks',
+  INTERVIEWS = '/interviews',
+  INTERVIEW_DETAIL = '/interviews/:id',
   PROFILE = '/profile',
   SETTINGS = '/settings',
   CODE_EDITOR = '/code-editor',
@@ -56,6 +68,8 @@ export const routeConfig: AppRoute[] = [
   { path: AppRoutes.HOME, element: <Home /> },
   { path: AppRoutes.GET_STARTED, element: <GetStarted /> },
   { path: AppRoutes.TASKS, element: <Tasks /> },
+  { path: AppRoutes.INTERVIEWS, element: <Interviews /> },
+  { path: AppRoutes.INTERVIEW_DETAIL, element: <InterviewDetail /> },
 
   { path: AppRoutes.PROFILE, element: <Profile /> },
   { path: AppRoutes.SETTINGS, element: <Settings /> },

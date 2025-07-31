@@ -10,7 +10,7 @@ echo.
 
 REM Kill processes on development ports
 echo -> Cleaning up existing processes...
-for %%p in (4000 5173 3001) do (
+for %%p in (4000 5173) do (
     for /f "tokens=5" %%a in ('netstat -ano ^| findstr /i ":%%p" 2^>nul') do (
         if not "%%a"=="" if not "%%a"=="0" (
             echo Killing process PID %%a on port %%p
@@ -19,14 +19,6 @@ for %%p in (4000 5173 3001) do (
     )
 )
 
-REM Kill browser-tools-server if running
-echo -> Cleaning up browser-tools-server...
-for /f "tokens=2" %%a in ('tasklist /fi "imagename eq node.exe" /fo table /nh 2^>nul ^| findstr /c "browser-tools-server"') do (
-    if not "%%a"=="" (
-        echo Killing browser-tools-server PID %%a
-        taskkill /PID %%a /F >nul 2>&1
-    )
-)
 
 echo Process cleanup completed.
 timeout /t 2 /nobreak >nul
@@ -98,13 +90,6 @@ REM Wait for backend
 echo Waiting for backend to initialize...
 timeout /t 5 /nobreak >nul
 
-REM Start Browser Tools Server for MCP logging
-echo -> Starting Browser Tools Server (Port 3001)...
-start "Browser Tools Server (MCP Logging)" cmd /k "echo Starting Browser Tools Server for automatic browser logging... && npx @agentdeskai/browser-tools-server || (echo Browser Tools Server failed to start! && pause)"
-
-REM Wait for Browser Tools Server
-echo Waiting for Browser Tools Server to initialize...
-timeout /t 3 /nobreak >nul
 
 REM Start frontend
 echo -> Starting frontend server...
@@ -117,7 +102,6 @@ echo ==========================================
 echo.
 echo 🌐 Backend:     http://localhost:4000
 echo 🎨 Frontend:    http://localhost:5173
-echo 📊 Browser Logs: http://localhost:3001 (MCP Browser Tools)
 echo 📚 API Docs:    http://localhost:4000/docs
 echo 🔧 Health:      http://localhost:4000/api/health
 echo.

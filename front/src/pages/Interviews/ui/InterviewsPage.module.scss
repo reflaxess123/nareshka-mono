@@ -1,0 +1,35 @@
+.page {
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+.header {
+  background: white;
+  padding: 40px 20px;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: center;
+}
+
+.title {
+  font-size: 36px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 16px 0;
+  
+  @media (max-width: 768px) {
+    font-size: 28px;
+  }
+}
+
+.description {
+  font-size: 18px;
+  color: #64748b;
+  margin: 0;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+  
+  @media (max-width: 768px) {
+    font-size: 16px;
+  }
+}
