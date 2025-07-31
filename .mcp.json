@@ -1,0 +1,39 @@
+{
+  "mcpServers": {
+    "sequential-thinking": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": ["/c", "npx", "@modelcontextprotocol/server-sequential-thinking"],
+      "env": {}
+    },
+    "postgres": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://postgres:dev_password@127.0.0.1:5432/nareshka_dev"
+      ],
+      "env": {}
+    },
+    "puppeteer": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": ["/c", "npx", "@hisma/server-puppeteer"],
+      "env": {}
+    },
+    "git": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "@cyanheads/git-mcp-server",
+        "--repository",
+        "C:/Users/refla/nareshka-mono"
+      ],
+      "env": {}
+    }
+  }
+}

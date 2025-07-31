@@ -98,14 +98,9 @@ class InterviewImporter:
             content=content,
             full_content=full_content,
             content_hash=content_hash,
-            stage_number=extracted_data.get("stage"),
             position=extracted_data.get("position"),
-            technologies=extracted_data.get("technologies", []),
             tags=extracted_data.get("tags", []),
             companies=[company_name],
-            telegram_author=extracted_data.get("author"),
-            difficulty_level=extracted_data.get("difficulty"),
-            createdAt=datetime.now(),
             updatedAt=datetime.now()
         )
         
@@ -126,15 +121,6 @@ class InterviewImporter:
         """Извлечение метаданных из текста интервью"""
         result = {}
         
-        # Извлечение автора Telegram
-        author_match = re.search(r'(\w+\s*\w*)\s*->', content)
-        if author_match:
-            result["author"] = author_match.group(1).strip()
-        
-        # Извлечение этапа
-        stage_match = re.search(r'(\d+)\s*этап', content, re.IGNORECASE)
-        if stage_match:
-            result["stage"] = int(stage_match.group(1))
         
         # Извлечение должности
         position_patterns = [
@@ -177,28 +163,6 @@ class InterviewImporter:
         
         result["tags"] = tags
         
-        # Простая оценка сложности по ключевым словам
-        difficulty_keywords = {
-            1: ['простой', 'легкий', 'базовый', 'начальный'],
-            2: ['средний', 'обычный', 'стандартный'],
-            3: ['сложный', 'продвинутый', 'средний+'],
-            4: ['очень сложный', 'экспертный', 'senior'],
-            5: ['невозможный', 'крайне сложный', 'ведущий разработчик']
-        }
-        
-        for level, keywords in difficulty_keywords.items():
-            if any(keyword in content.lower() for keyword in keywords):
-                result["difficulty"] = level
-                break
-        
-        # Если нет явных индикаторов сложности, попробуем оценить по контексту
-        if "difficulty" not in result:
-            if len(technologies) >= 3:
-                result["difficulty"] = 3  # Много технологий = средняя сложность
-            elif any(word in content.lower() for word in ['junior', 'стажер', 'начинающий']):
-                result["difficulty"] = 1
-            elif any(word in content.lower() for word in ['senior', 'ведущий', 'архитектор']):
-                result["difficulty"] = 4
         
         return result
 
@@ -213,44 +177,22 @@ def generate_basic_analytics(session: Session):
     # Аналитика по компаниям
     companies_stats = session.query(
         InterviewRecord.company_name,
-        func.count(InterviewRecord.id).label('total'),
-        func.avg(InterviewRecord.difficulty_level).label('avg_difficulty')
+        func.count(InterviewRecord.id).label('total')
     ).group_by(InterviewRecord.company_name).all()
     
-    for company, total, avg_diff in companies_stats:
+    for company, total in companies_stats:
         analytics = InterviewAnalytics(
             id=str(uuid.uuid4()),
             metric_type="COMPANY",
             metric_value=company,
             period="all",
             total_interviews=int(total),
-            avg_difficulty=float(avg_diff) if avg_diff else None,
             calculated_at=datetime.now(),
             createdAt=datetime.now(),
             updatedAt=datetime.now()
         )
         session.add(analytics)
     
-    # Аналитика по технологиям
-    tech_subquery = session.query(func.unnest(InterviewRecord.technologies).label('tech')).subquery()
-    tech_stats = session.query(
-        tech_subquery.c.tech,
-        func.count(tech_subquery.c.tech).label('count')
-    ).group_by(tech_subquery.c.tech).all()
-    
-    for tech, count in tech_stats:
-        if tech:  # Пропускаем пустые технологии
-            analytics = InterviewAnalytics(
-                id=str(uuid.uuid4()),
-                metric_type="TECHNOLOGY",
-                metric_value=tech,
-                period="all",
-                total_interviews=int(count),
-                calculated_at=datetime.now(),
-                createdAt=datetime.now(),
-                updatedAt=datetime.now()
-            )
-            session.add(analytics)
     
     session.commit()
     print("✅ Базовая аналитика сгенерирована")

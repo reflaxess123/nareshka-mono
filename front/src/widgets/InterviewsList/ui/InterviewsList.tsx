@@ -14,15 +14,7 @@ export const InterviewsList: React.FC = () => {
       page,
       limit,
       company: filters.company,
-      technology: filters.technology,
-      difficulty: filters.difficulty,
-      stage: filters.stage,
       search: filters.search,
-    },
-    {
-      query: {
-        keepPreviousData: true,
-      }
     }
   );
 

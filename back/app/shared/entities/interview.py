@@ -23,7 +23,6 @@ class InterviewRecord(Base):
     id: str = Column(String, primary_key=True)
     company_name: str = Column(String, nullable=False)
     interview_date: datetime = Column(DateTime, nullable=False)
-    stage_number: Optional[int] = Column(Integer, nullable=True)
     position: Optional[str] = Column(String, nullable=True)
     content: str = Column(Text, nullable=False)  # Краткая версия
     full_content: str = Column(Text, nullable=False)  # Полная версия
@@ -31,19 +30,15 @@ class InterviewRecord(Base):
     questions_count: Optional[int] = Column(Integer, nullable=True)
     
     # ARRAY поля как в ContentBlock
-    technologies: List[str] = Column(ARRAY(String), nullable=False, default=list)
     companies: List[str] = Column(ARRAY(String), nullable=False, default=list)
     tags: List[str] = Column(ARRAY(String), nullable=False, default=list)
     extracted_urls: List[str] = Column(ARRAY(String), nullable=False, default=list)
     
     # Метаданные
-    difficulty_level: Optional[int] = Column(Integer, nullable=True)  # 1-5
-    telegram_author: Optional[str] = Column(String, nullable=True)
     source_type: str = Column(String, nullable=True, default="telegram")
     content_hash: Optional[str] = Column(String, nullable=True)
     
     # Timestamp поля (как в BaseModel)
-    createdAt: datetime = Column("createdAt", DateTime, nullable=False, default=func.now())
     updatedAt: datetime = Column("updatedAt", DateTime, nullable=False, default=func.now(), onupdate=func.now())
 
 

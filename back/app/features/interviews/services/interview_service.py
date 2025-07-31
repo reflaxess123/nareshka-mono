@@ -59,9 +59,6 @@ class InterviewService:
         """Получение списка компаний"""
         return self.repository.get_companies_list()
 
-    def get_technologies_list(self) -> list[str]:
-        """Получение списка технологий"""
-        return self.repository.get_technologies_list()
 
     def get_company_statistics(self, company_name: str) -> Optional[CompanyStatsResponse]:
         """Получение статистики по компании"""
