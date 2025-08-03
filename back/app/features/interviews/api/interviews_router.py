@@ -3,7 +3,7 @@ Interviews API Router
 Endpoints для работы с интервью - повторяет паттерн content_router.py
 """
 
-from typing import Optional
+from typing import Optional, List
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
 
@@ -34,7 +34,8 @@ router = APIRouter(
 async def get_interviews(
     page: int = Query(1, ge=1, description="Номер страницы"),
     limit: int = Query(20, ge=1, le=100, description="Количество записей на странице"),
-    company: Optional[str] = Query(None, description="Фильтр по названию компании"),
+    company: Optional[str] = Query(None, description="Фильтр по названию компании (устарел, используйте companies)"),
+    companies: Optional[List[str]] = Query(None, description="Фильтр по списку компаний"),
     search: Optional[str] = Query(None, description="Поиск по содержимому интервью"),
     session: Session = Depends(get_session),
     current_user = Depends(get_current_user_optional)
@@ -43,13 +44,21 @@ async def get_interviews(
     
     - **page**: Номер страницы (начинается с 1)
     - **limit**: Количество записей на странице (максимум 100)
-    - **company**: Название компании для фильтрации
+    - **company**: Название компании для фильтрации (устарел)
+    - **companies**: Список компаний для фильтрации
     - **search**: Поиск по тексту интервью
     """
     service = InterviewService(session)
     
+    # Поддержка как старого формата (company), так и нового (companies)
+    companies_filter = None
+    if companies:
+        companies_filter = companies
+    elif company:
+        companies_filter = [company]
+    
     filters = {
-        "company": company,
+        "companies": companies_filter,
         "search": search
     }
     

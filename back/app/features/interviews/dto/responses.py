@@ -11,9 +11,7 @@ class InterviewRecordResponse(BaseModel):
     company_name: str
     interview_date: datetime
     position: Optional[str]
-    content: str
-    duration_minutes: Optional[int]
-    questions_count: Optional[int]
+    full_content: str
     tags: List[str]
 
     class Config:
@@ -26,10 +24,7 @@ class InterviewDetailResponse(BaseModel):
     company_name: str
     interview_date: datetime
     position: Optional[str]
-    content: str
     full_content: str  # Полная версия
-    duration_minutes: Optional[int]
-    questions_count: Optional[int]
     tags: List[str]
     companies: List[str]
     extracted_urls: List[str]

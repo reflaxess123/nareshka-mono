@@ -72,23 +72,6 @@ export const InterviewDetailPage: React.FC = () => {
             </span>
           </div>
 
-          {interview.duration_minutes && (
-            <div className={styles.metaItem}>
-              <span>⏱️</span>
-              <span className={styles.metaValue}>
-                {interview.duration_minutes} минут
-              </span>
-            </div>
-          )}
-
-          {interview.questions_count && (
-            <div className={styles.metaItem}>
-              <span>❓</span>
-              <span className={styles.metaValue}>
-                {interview.questions_count} вопросов
-              </span>
-            </div>
-          )}
         </div>
 
       </div>

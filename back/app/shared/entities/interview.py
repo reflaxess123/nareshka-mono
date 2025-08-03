@@ -12,6 +12,10 @@ from sqlalchemy.sql import func
 
 from app.shared.database import Base
 
+# Очищаем кэш метаданных для InterviewRecord
+if hasattr(Base, 'metadata') and 'InterviewRecord' in Base.metadata.tables:
+    Base.metadata.remove(Base.metadata.tables['InterviewRecord'])
+
 
 class InterviewRecord(Base):
     """
@@ -24,7 +28,6 @@ class InterviewRecord(Base):
     company_name: str = Column(String, nullable=False)
     interview_date: datetime = Column(DateTime, nullable=False)
     position: Optional[str] = Column(String, nullable=True)
-    content: str = Column(Text, nullable=False)  # Краткая версия
     full_content: str = Column(Text, nullable=False)  # Полная версия
     duration_minutes: Optional[int] = Column(Integer, nullable=True)
     questions_count: Optional[int] = Column(Integer, nullable=True)

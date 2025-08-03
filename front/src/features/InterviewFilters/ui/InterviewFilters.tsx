@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { 
   useGetCompaniesListApiV2InterviewsCompaniesListGet
 } from '../../../shared/api/generated/api';
+import { CompanySelector } from './CompanySelector';
 import styles from './InterviewFilters.module.scss';
 
 export interface InterviewFiltersType {
-  company?: string;
+  companies?: string[];
   search?: string;
 }
 
@@ -29,16 +30,20 @@ export const InterviewFilters: React.FC<InterviewFiltersProps> = ({
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       onFiltersChange(localFilters);
-    }, 300);
+    }, 150);
 
     return () => clearTimeout(timeoutId);
   }, [localFilters, onFiltersChange]);
 
-  const handleFilterChange = (key: keyof InterviewFiltersType, value: string | number | undefined) => {
+  const handleFilterChange = (key: keyof InterviewFiltersType, value: string | string[] | undefined) => {
     setLocalFilters(prev => ({
       ...prev,
       [key]: value || undefined
     }));
+  };
+
+  const handleCompaniesChange = (companies: string[]) => {
+    handleFilterChange('companies', companies.length > 0 ? companies : undefined);
   };
 
   const clearFilters = () => {
@@ -47,7 +52,12 @@ export const InterviewFilters: React.FC<InterviewFiltersProps> = ({
     onFiltersChange(emptyFilters);
   };
 
-  const hasActiveFilters = Object.values(localFilters).some(value => value !== undefined && value !== '');
+  const hasActiveFilters = Object.values(localFilters).some(value => {
+    if (Array.isArray(value)) {
+      return value.length > 0;
+    }
+    return value !== undefined && value !== '';
+  });
 
   return (
     <div className={styles.container}>
@@ -83,21 +93,13 @@ export const InterviewFilters: React.FC<InterviewFiltersProps> = ({
 
           <div className={styles.row}>
             <div className={styles.field}>
-              <label className={styles.label}>Компания</label>
-              <select
-                className={styles.select}
-                value={localFilters.company || ''}
-                onChange={(e) => handleFilterChange('company', e.target.value)}
-              >
-                <option value="">Все компании</option>
-                {companiesData?.companies?.map(company => (
-                  <option key={company} value={company}>
-                    {company}
-                  </option>
-                ))}
-              </select>
+              <label className={styles.label}>Компании</label>
+              <CompanySelector
+                companies={companiesData?.companies || []}
+                selectedCompanies={localFilters.companies || []}
+                onSelectionChange={handleCompaniesChange}
+              />
             </div>
-
           </div>
 
 

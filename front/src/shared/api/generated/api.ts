@@ -26,10 +26,6 @@ import type {
 } from '@tanstack/react-query';
 
 import { generatedApiClient } from '../generated-mutator';
-export type AnalyticsResponseTypePopularTechnologiesItem = { [key: string]: unknown };
-
-export type AnalyticsResponseTypeDifficultyDistribution = { [key: string]: unknown };
-
 export type AnalyticsResponseTypeMonthlyStatsItem = { [key: string]: unknown };
 
 /**
@@ -39,8 +35,6 @@ export interface AnalyticsResponseType {
   total_interviews: number;
   total_companies: number;
   top_companies: CompanyStatsResponseType[];
-  popular_technologies: AnalyticsResponseTypePopularTechnologiesItem[];
-  difficulty_distribution: AnalyticsResponseTypeDifficultyDistribution;
   monthly_stats: AnalyticsResponseTypeMonthlyStatsItem[];
 }
 
@@ -334,11 +328,7 @@ export interface CompaniesListResponseType {
   companies: string[];
 }
 
-export type CompanyStatsResponseTypeAvgDifficulty = number | null;
-
 export type CompanyStatsResponseTypeAvgDuration = number | null;
-
-export type CompanyStatsResponseTypeStagesDistribution = { [key: string]: unknown };
 
 /**
  * Статистика по компании
@@ -346,10 +336,7 @@ export type CompanyStatsResponseTypeStagesDistribution = { [key: string]: unknow
 export interface CompanyStatsResponseType {
   company_name: string;
   total_interviews: number;
-  avg_difficulty: CompanyStatsResponseTypeAvgDifficulty;
   avg_duration: CompanyStatsResponseTypeAvgDuration;
-  popular_technologies: string[];
-  stages_distribution: CompanyStatsResponseTypeStagesDistribution;
 }
 
 /**
@@ -628,17 +615,7 @@ export interface HTTPValidationErrorType {
   detail?: ValidationErrorType[];
 }
 
-export type InterviewDetailResponseTypeStageNumber = number | null;
-
 export type InterviewDetailResponseTypePosition = string | null;
-
-export type InterviewDetailResponseTypeDurationMinutes = number | null;
-
-export type InterviewDetailResponseTypeQuestionsCount = number | null;
-
-export type InterviewDetailResponseTypeDifficultyLevel = number | null;
-
-export type InterviewDetailResponseTypeTelegramAuthor = string | null;
 
 /**
  * Детальный ответ с полным контентом
@@ -647,32 +624,14 @@ export interface InterviewDetailResponseType {
   id: string;
   company_name: string;
   interview_date: string;
-  stage_number: InterviewDetailResponseTypeStageNumber;
   position: InterviewDetailResponseTypePosition;
-  content: string;
   full_content: string;
-  duration_minutes: InterviewDetailResponseTypeDurationMinutes;
-  questions_count: InterviewDetailResponseTypeQuestionsCount;
-  technologies: string[];
-  difficulty_level: InterviewDetailResponseTypeDifficultyLevel;
-  telegram_author: InterviewDetailResponseTypeTelegramAuthor;
   tags: string[];
   companies: string[];
   extracted_urls: string[];
-  createdAt: string;
 }
 
-export type InterviewRecordResponseTypeStageNumber = number | null;
-
 export type InterviewRecordResponseTypePosition = string | null;
-
-export type InterviewRecordResponseTypeDurationMinutes = number | null;
-
-export type InterviewRecordResponseTypeQuestionsCount = number | null;
-
-export type InterviewRecordResponseTypeDifficultyLevel = number | null;
-
-export type InterviewRecordResponseTypeTelegramAuthor = string | null;
 
 /**
  * Ответ с данными интервью
@@ -681,16 +640,9 @@ export interface InterviewRecordResponseType {
   id: string;
   company_name: string;
   interview_date: string;
-  stage_number: InterviewRecordResponseTypeStageNumber;
   position: InterviewRecordResponseTypePosition;
-  content: string;
-  duration_minutes: InterviewRecordResponseTypeDurationMinutes;
-  questions_count: InterviewRecordResponseTypeQuestionsCount;
-  technologies: string[];
-  difficulty_level: InterviewRecordResponseTypeDifficultyLevel;
-  telegram_author: InterviewRecordResponseTypeTelegramAuthor;
+  full_content: string;
   tags: string[];
-  createdAt: string;
 }
 
 /**
@@ -1064,13 +1016,6 @@ export type TechnologiesDataResponseTypeConfigs = {[key: string]: TechnologyConf
 export interface TechnologiesDataResponseType {
   technologies: string[];
   configs: TechnologiesDataResponseTypeConfigs;
-}
-
-/**
- * Список технологий
- */
-export interface TechnologiesListResponseType {
-  technologies: string[];
 }
 
 /**
@@ -2068,21 +2013,13 @@ page?: number;
  */
 limit?: number;
 /**
- * Фильтр по названию компании
+ * Фильтр по названию компании (устарел, используйте companies)
  */
 company?: string | null;
 /**
- * Фильтр по технологии
+ * Фильтр по списку компаний
  */
-technology?: string | null;
-/**
- * Фильтр по сложности (1-5)
- */
-difficulty?: number | null;
-/**
- * Фильтр по этапу собеседования (1-4)
- */
-stage?: number | null;
+companies?: string[] | null;
 /**
  * Поиск по содержимому интервью
  */
@@ -3364,7 +3301,7 @@ export const useUpdateContentBlockProgressApiV2ContentBlocksBlockIdProgressPatch
     }
     
 /**
- * Возвращает список интервью с поддержкой фильтрации по компании, технологиям, сложности и пагинации
+ * Возвращает список интервью с поддержкой фильтрации по компании и пагинации
  * @summary Получить список интервью
  */
 export const getInterviewsApiV2InterviewsGet = (
@@ -3798,95 +3735,6 @@ export function useGetCompaniesListApiV2InterviewsCompaniesListGet<TData = Await
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetCompaniesListApiV2InterviewsCompaniesListGetQueryOptions(options)
-
-  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
-
-  return query;
-}
-
-
-
-
-/**
- * Возвращает список всех технологий для использования в фильтрах
- * @summary Список технологий
- */
-export const getTechnologiesListApiV2InterviewsTechnologiesListGet = (
-    
- signal?: AbortSignal
-) => {
-      
-      
-      return generatedApiClient<TechnologiesListResponseType>(
-      {url: `/api/v2/interviews/technologies/list`, method: 'GET', signal
-    },
-      );
-    }
-  
-
-export const getGetTechnologiesListApiV2InterviewsTechnologiesListGetQueryKey = () => {
-    return [`/api/v2/interviews/technologies/list`] as const;
-    }
-
-    
-export const getGetTechnologiesListApiV2InterviewsTechnologiesListGetQueryOptions = <TData = Awaited<ReturnType<typeof getTechnologiesListApiV2InterviewsTechnologiesListGet>>, TError = void>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTechnologiesListApiV2InterviewsTechnologiesListGet>>, TError, TData>>, }
-) => {
-
-const {query: queryOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getGetTechnologiesListApiV2InterviewsTechnologiesListGetQueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTechnologiesListApiV2InterviewsTechnologiesListGet>>> = ({ signal }) => getTechnologiesListApiV2InterviewsTechnologiesListGet(signal);
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTechnologiesListApiV2InterviewsTechnologiesListGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetTechnologiesListApiV2InterviewsTechnologiesListGetQueryResult = NonNullable<Awaited<ReturnType<typeof getTechnologiesListApiV2InterviewsTechnologiesListGet>>>
-export type GetTechnologiesListApiV2InterviewsTechnologiesListGetQueryError = void
-
-
-export function useGetTechnologiesListApiV2InterviewsTechnologiesListGet<TData = Awaited<ReturnType<typeof getTechnologiesListApiV2InterviewsTechnologiesListGet>>, TError = void>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTechnologiesListApiV2InterviewsTechnologiesListGet>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getTechnologiesListApiV2InterviewsTechnologiesListGet>>,
-          TError,
-          Awaited<ReturnType<typeof getTechnologiesListApiV2InterviewsTechnologiesListGet>>
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetTechnologiesListApiV2InterviewsTechnologiesListGet<TData = Awaited<ReturnType<typeof getTechnologiesListApiV2InterviewsTechnologiesListGet>>, TError = void>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTechnologiesListApiV2InterviewsTechnologiesListGet>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getTechnologiesListApiV2InterviewsTechnologiesListGet>>,
-          TError,
-          Awaited<ReturnType<typeof getTechnologiesListApiV2InterviewsTechnologiesListGet>>
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetTechnologiesListApiV2InterviewsTechnologiesListGet<TData = Awaited<ReturnType<typeof getTechnologiesListApiV2InterviewsTechnologiesListGet>>, TError = void>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTechnologiesListApiV2InterviewsTechnologiesListGet>>, TError, TData>>, }
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
- * @summary Список технологий
- */
-
-export function useGetTechnologiesListApiV2InterviewsTechnologiesListGet<TData = Awaited<ReturnType<typeof getTechnologiesListApiV2InterviewsTechnologiesListGet>>, TError = void>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTechnologiesListApiV2InterviewsTechnologiesListGet>>, TError, TData>>, }
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetTechnologiesListApiV2InterviewsTechnologiesListGetQueryOptions(options)
 
   const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

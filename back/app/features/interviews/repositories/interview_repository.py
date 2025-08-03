@@ -24,15 +24,21 @@ class InterviewRepository:
 
         # Применение фильтров
         if filters:
-            if filters.get("company"):
-                query = query.filter(InterviewRecord.company_name.ilike(f"%{filters['company']}%"))
+            # Фильтр по компаниям (новый формат - список компаний)
+            if filters.get("companies"):
+                companies_list = filters["companies"]
+                if companies_list:
+                    # Точное совпадение по названиям компаний
+                    query = query.filter(InterviewRecord.company_name.in_(companies_list))
             
+            # Поддержка старого формата для обратной совместимости
+            elif filters.get("company"):
+                query = query.filter(InterviewRecord.company_name.ilike(f"%{filters['company']}%"))
             
             if filters.get("search"):
                 search_term = f"%{filters['search']}%"
                 query = query.filter(
                     or_(
-                        InterviewRecord.content.ilike(search_term),
                         InterviewRecord.full_content.ilike(search_term),
                         InterviewRecord.company_name.ilike(search_term)
                     )

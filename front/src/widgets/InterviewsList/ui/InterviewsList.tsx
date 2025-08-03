@@ -1,105 +1,93 @@
-import React, { useState, useCallback } from 'react';
-import { InterviewCard } from '../../../entities/Interview';
+import React, { useState, useCallback, useEffect } from 'react';
+import { InterviewCard, InterviewSkeletonList } from '../../../entities/Interview';
 import { InterviewFilters, type InterviewFiltersType } from '../../../features/InterviewFilters';
-import { useGetInterviewsApiV2InterviewsGet } from '../../../shared/api/generated/api';
+import { getInterviewsApiV2InterviewsGet } from '../../../shared/api/generated/api';
+import { useInfiniteScroll } from '../../../shared/hooks/useInfiniteScroll';
+import type { InterviewRecordResponseType } from '../../../shared/api/generated/api';
 import styles from './InterviewsList.module.scss';
 
 export const InterviewsList: React.FC = () => {
   const [filters, setFilters] = useState<InterviewFiltersType>({});
   const [page, setPage] = useState(1);
+  const [allInterviews, setAllInterviews] = useState<InterviewRecordResponseType[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [total, setTotal] = useState(0);
+  const [hasNextPage, setHasNextPage] = useState(false);
   const limit = 20;
 
-  const { data, isLoading, error } = useGetInterviewsApiV2InterviewsGet(
-    {
-      page,
-      limit,
-      company: filters.company,
-      search: filters.search,
+  // Load interviews function
+  const loadInterviews = useCallback(async (pageNum: number, isLoadMore: boolean = false) => {
+    try {
+      if (pageNum === 1 && !isLoadMore) {
+        setIsLoading(true);
+        setError(null);
+      } else {
+        setIsLoadingMore(true);
+      }
+
+      const response = await getInterviewsApiV2InterviewsGet({
+        page: pageNum,
+        limit,
+        companies: filters.companies,
+        search: filters.search,
+      });
+
+      if (response && response.interviews) {
+        if (pageNum === 1 && !isLoadMore) {
+          // Reset list for new search/filters
+          setAllInterviews(response.interviews);
+        } else {
+          // Append new interviews
+          setAllInterviews(prev => [...prev, ...response.interviews]);
+        }
+        
+        setTotal(response.total);
+        setHasNextPage(response.has_next);
+        setError(null);
+        
+        // После первой успешной загрузки убираем флаг инициальной загрузки
+        if (isInitialLoad) {
+          setIsInitialLoad(false);
+        }
+      }
+    } catch (err) {
+      console.error('Error loading interviews:', err);
+      setError('Не удалось загрузить интервью');
+    } finally {
+      setIsLoading(false);
+      setIsLoadingMore(false);
     }
-  );
+  }, [filters.companies, filters.search, limit, isInitialLoad]);
+
+  // Initial load and filters change
+  useEffect(() => {
+    setPage(1);
+    // НЕ очищаем allInterviews здесь, чтобы избежать мигания
+    loadInterviews(1, false);
+  }, [loadInterviews]);
+
+  const handleLoadMore = useCallback(async () => {
+    if (!isLoadingMore && hasNextPage && !isLoading) {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      await loadInterviews(nextPage, true);
+    }
+  }, [isLoadingMore, hasNextPage, isLoading, page, loadInterviews]);
+
+  const { sentinelRef } = useInfiniteScroll({
+    hasNextPage,
+    isLoading: isLoading || isLoadingMore,
+    onLoadMore: handleLoadMore,
+    threshold: 200
+  });
 
   const handleFiltersChange = useCallback((newFilters: InterviewFiltersType) => {
-    setFilters(prevFilters => {
-      const filtersChanged = JSON.stringify(prevFilters) !== JSON.stringify(newFilters);
-      if (filtersChanged) {
-        setPage(1);
-      }
-      return newFilters;
-    });
+    setFilters(newFilters);
   }, []);
 
-  const handlePageChange = useCallback((newPage: number) => {
-    setPage(newPage);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
-
-  const renderPagination = () => {
-    if (!data || data.total <= limit) return null;
-
-    const totalPages = Math.ceil(data.total / limit);
-    const pages = [];
-
-    // Show max 7 pages around current page
-    const startPage = Math.max(1, page - 3);
-    const endPage = Math.min(totalPages, page + 3);
-
-    if (startPage > 1) {
-      pages.push(1);
-      if (startPage > 2) pages.push('...');
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i);
-    }
-
-    if (endPage < totalPages) {
-      if (endPage < totalPages - 1) pages.push('...');
-      pages.push(totalPages);
-    }
-
-    return (
-      <div className={styles.pagination}>
-        <button
-          className={styles.pageButton}
-          onClick={() => handlePageChange(page - 1)}
-          disabled={!data.has_prev}
-        >
-          ←
-        </button>
-
-        {pages.map((pageNum, index) => {
-          if (pageNum === '...') {
-            return (
-              <span key={`ellipsis-${index}`} className={styles.ellipsis}>
-                ...
-              </span>
-            );
-          }
-
-          const pageNumber = pageNum as number;
-          return (
-            <button
-              key={pageNumber}
-              className={`${styles.pageButton} ${
-                pageNumber === page ? styles.active : ''
-              }`}
-              onClick={() => handlePageChange(pageNumber)}
-            >
-              {pageNumber}
-            </button>
-          );
-        })}
-
-        <button
-          className={styles.pageButton}
-          onClick={() => handlePageChange(page + 1)}
-          disabled={!data.has_next}
-        >
-          →
-        </button>
-      </div>
-    );
-  };
 
   if (error) {
     return (
@@ -112,22 +100,22 @@ export const InterviewsList: React.FC = () => {
     );
   }
 
-  if (isLoading) {
+  // Initial loading with skeleton (только при самой первой загрузке)
+  if (isInitialLoad && isLoading) {
     return (
       <div className={styles.container}>
         <InterviewFilters
           filters={filters}
           onFiltersChange={handleFiltersChange}
         />
-        <div className={styles.loading}>
-          <div className={styles.spinner}></div>
-          <p>Загрузка интервью...</p>
+        <div className={styles.grid}>
+          <InterviewSkeletonList count={8} />
         </div>
       </div>
     );
   }
 
-  if (!data || data.interviews.length === 0) {
+  if (allInterviews.length === 0 && !isLoading && !isInitialLoad) {
     return (
       <div className={styles.container}>
         <InterviewFilters
@@ -148,23 +136,40 @@ export const InterviewsList: React.FC = () => {
       <InterviewFilters
         filters={filters}
         onFiltersChange={handleFiltersChange}
-        resultsCount={data.total}
+        resultsCount={total}
       />
 
       <div className={styles.resultsInfo}>
-        Показано {data.interviews.length} из {data.total} интервью
+        Показано {allInterviews.length} из {total} интервью
+        {isLoading && !isInitialLoad && (
+          <span className={styles.filterLoadingText}> • Загрузка...</span>
+        )}
       </div>
 
-      <div className={styles.grid}>
-        {data.interviews.map(interview => (
+      {/* Показываем полупрозрачный оверлей при загрузке фильтров */}
+      <div className={`${styles.grid} ${isLoading && !isInitialLoad ? styles.gridLoading : ''}`}>
+        {allInterviews.map(interview => (
           <InterviewCard
             key={interview.id}
             interview={interview}
           />
         ))}
+        
+        {/* Loading more indicator */}
+        {isLoadingMore && (
+          <InterviewSkeletonList count={3} />
+        )}
+        
+        {/* Intersection Observer sentinel */}
+        <div ref={sentinelRef} className={styles.sentinel} />
       </div>
 
-      {renderPagination()}
+      {/* Show "end of list" indicator when no more pages */}
+      {!hasNextPage && allInterviews.length > 0 && (
+        <div className={styles.endOfList}>
+          <p>Все интервью загружены</p>
+        </div>
+      )}
     </div>
   );
 };
