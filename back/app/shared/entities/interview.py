@@ -6,7 +6,7 @@ Interview entities - SQLAlchemy модели для работы с собесе
 from datetime import datetime
 from typing import List, Optional
 
-from sqlalchemy import Column, String, Text, Integer, DateTime, ARRAY, Numeric
+from sqlalchemy import Column, String, Text, Integer, DateTime, ARRAY, Numeric, Boolean
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.sql import func
 
@@ -40,6 +40,7 @@ class InterviewRecord(Base):
     # Метаданные
     source_type: str = Column(String, nullable=True, default="telegram")
     content_hash: Optional[str] = Column(String, nullable=True)
+    has_audio_recording: bool = Column(Boolean, nullable=False, default=False)
     
     # Timestamp поля (как в BaseModel)
     updatedAt: datetime = Column("updatedAt", DateTime, nullable=False, default=func.now(), onupdate=func.now())

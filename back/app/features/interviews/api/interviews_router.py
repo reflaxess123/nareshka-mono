@@ -37,6 +37,7 @@ async def get_interviews(
     company: Optional[str] = Query(None, description="Фильтр по названию компании (устарел, используйте companies)"),
     companies: Optional[List[str]] = Query(None, description="Фильтр по списку компаний"),
     search: Optional[str] = Query(None, description="Поиск по содержимому интервью"),
+    has_audio: Optional[bool] = Query(None, description="Фильтр по наличию аудио/видео записи"),
     session: Session = Depends(get_session),
     current_user = Depends(get_current_user_optional)
 ):
@@ -59,7 +60,8 @@ async def get_interviews(
     
     filters = {
         "companies": companies_filter,
-        "search": search
+        "search": search,
+        "has_audio": has_audio
     }
     
     return service.get_interviews_list(

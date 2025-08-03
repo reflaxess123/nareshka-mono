@@ -629,6 +629,7 @@ export interface InterviewDetailResponseType {
   tags: string[];
   companies: string[];
   extracted_urls: string[];
+  has_audio_recording: boolean;
 }
 
 export type InterviewRecordResponseTypePosition = string | null;
@@ -643,6 +644,7 @@ export interface InterviewRecordResponseType {
   position: InterviewRecordResponseTypePosition;
   full_content: string;
   tags: string[];
+  has_audio_recording: boolean;
 }
 
 /**
@@ -2024,6 +2026,10 @@ companies?: string[] | null;
  * Поиск по содержимому интервью
  */
 search?: string | null;
+/**
+ * Фильтр по наличию аудио/видео записи
+ */
+has_audio?: boolean | null;
 };
 
 export type GetTheoryCardsApiV2TheoryCardsGetParams = {

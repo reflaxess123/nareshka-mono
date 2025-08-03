@@ -43,6 +43,9 @@ class InterviewRepository:
                         InterviewRecord.company_name.ilike(search_term)
                     )
                 )
+            
+            if filters.get("has_audio") is not None:
+                query = query.filter(InterviewRecord.has_audio_recording == filters["has_audio"])
 
         # Подсчет общего количества
         total = query.count()

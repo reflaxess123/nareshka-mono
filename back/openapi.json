@@ -6,26 +6,6 @@
     "version": "2.0.0"
   },
   "paths": {
-    "/api/health": {
-      "get": {
-        "tags": [
-          "Health"
-        ],
-        "summary": "Health Check",
-        "description": "Проверка здоровья сервиса",
-        "operationId": "health_check_api_health_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v2/auth/login": {
       "post": {
         "tags": [
@@ -140,6 +120,86 @@
         "summary": "Get Current User Info",
         "description": "Получение информации о текущем пользователе",
         "operationId": "get_current_user_info_api_v2_auth_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/browser-logs/": {
+      "post": {
+        "tags": [
+          "Browser Logs"
+        ],
+        "summary": "Receive Browser Logs",
+        "description": "Endpoint for receiving browser logs from Browser Tools MCP server",
+        "operationId": "receive_browser_logs_api_browser_logs__post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BrowserLogsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/browser-logs/health": {
+      "get": {
+        "tags": [
+          "Browser Logs"
+        ],
+        "summary": "Browser Logs Health",
+        "description": "Health check for browser logs endpoint",
+        "operationId": "browser_logs_health_api_browser_logs_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/browser-logs/stats": {
+      "get": {
+        "tags": [
+          "Browser Logs"
+        ],
+        "summary": "Get Browser Logs Stats",
+        "description": "Get statistics about browser logs",
+        "operationId": "get_browser_logs_stats_api_browser_logs_stats_get",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -603,6 +663,287 @@
         }
       }
     },
+    "/api/v2/interviews/": {
+      "get": {
+        "tags": [
+          "interviews"
+        ],
+        "summary": "Получить список интервью",
+        "description": "Возвращает список интервью с поддержкой фильтрации по компании и пагинации",
+        "operationId": "get_interviews_api_v2_interviews__get",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Номер страницы",
+              "default": 1,
+              "title": "Page"
+            },
+            "description": "Номер страницы"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Количество записей на странице",
+              "default": 20,
+              "title": "Limit"
+            },
+            "description": "Количество записей на странице"
+          },
+          {
+            "name": "company",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Фильтр по названию компании (устарел, используйте companies)",
+              "title": "Company"
+            },
+            "description": "Фильтр по названию компании (устарел, используйте companies)"
+          },
+          {
+            "name": "companies",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Фильтр по списку компаний",
+              "title": "Companies"
+            },
+            "description": "Фильтр по списку компаний"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Поиск по содержимому интервью",
+              "title": "Search"
+            },
+            "description": "Поиск по содержимому интервью"
+          },
+          {
+            "name": "has_audio",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Фильтр по наличию аудио/видео записи",
+              "title": "Has Audio"
+            },
+            "description": "Фильтр по наличию аудио/видео записи"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterviewsListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/interviews/{interview_id}": {
+      "get": {
+        "tags": [
+          "interviews"
+        ],
+        "summary": "Получить детали интервью",
+        "description": "Возвращает полную информацию об интервью включая полный текст",
+        "operationId": "get_interview_detail_api_v2_interviews__interview_id__get",
+        "parameters": [
+          {
+            "name": "interview_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Interview Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterviewDetailResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/interviews/company/{company_name}/stats": {
+      "get": {
+        "tags": [
+          "interviews"
+        ],
+        "summary": "Статистика по компании",
+        "description": "Возвращает подробную статистику по интервью конкретной компании",
+        "operationId": "get_company_stats_api_v2_interviews_company__company_name__stats_get",
+        "parameters": [
+          {
+            "name": "company_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Company Name"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyStatsResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/interviews/analytics/overview": {
+      "get": {
+        "tags": [
+          "interviews"
+        ],
+        "summary": "Общая аналитика",
+        "description": "Возвращает сводную аналитику по всем интервью в системе",
+        "operationId": "get_analytics_overview_api_v2_interviews_analytics_overview_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/api/v2/interviews/companies/list": {
+      "get": {
+        "tags": [
+          "interviews"
+        ],
+        "summary": "Список компаний",
+        "description": "Возвращает список всех компаний для использования в фильтрах",
+        "operationId": "get_companies_list_api_v2_interviews_companies_list_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompaniesListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
     "/api/v2/theory/cards": {
       "get": {
         "tags": [
@@ -837,6 +1178,54 @@
         }
       }
     },
+    "/api/v2/theory/cards/due": {
+      "get": {
+        "tags": [
+          "Theory"
+        ],
+        "summary": "Get Due Theory Cards",
+        "description": "Получение карточек для повторения",
+        "operationId": "get_due_theory_cards_api_v2_theory_cards_due_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Количество карточек",
+              "default": 10,
+              "title": "Limit"
+            },
+            "description": "Количество карточек"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DueCardsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v2/theory/cards/{card_id}": {
       "get": {
         "tags": [
@@ -986,54 +1375,6 @@
         }
       }
     },
-    "/api/v2/theory/cards/due": {
-      "get": {
-        "tags": [
-          "Theory"
-        ],
-        "summary": "Get Due Theory Cards",
-        "description": "Получение карточек для повторения",
-        "operationId": "get_due_theory_cards_api_v2_theory_cards_due_get",
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "maximum": 100,
-              "minimum": 1,
-              "description": "Количество карточек",
-              "default": 10,
-              "title": "Limit"
-            },
-            "description": "Количество карточек"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DueCardsResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v2/theory/stats": {
       "get": {
         "tags": [
@@ -1090,6 +1431,28 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/theory/test-camel-case": {
+      "get": {
+        "tags": [
+          "Theory"
+        ],
+        "summary": "Test Camel Case",
+        "description": "Тестовый endpoint для проверки camelCase",
+        "operationId": "test_camel_case_api_v2_theory_test_camel_case_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TheoryCardResponse"
                 }
               }
             }
@@ -2083,6 +2446,28 @@
         "summary": "Детальный прогресс пользователя",
         "description": "Получение детального прогресса текущего пользователя",
         "operationId": "get_user_detailed_progress_api_v2_progress_detailed_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDetailedProgressResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/progress/user/my/detailed": {
+      "get": {
+        "tags": [
+          "Progress"
+        ],
+        "summary": "Детальный прогресс пользователя (альтернативный путь)",
+        "description": "Получение детального прогресса текущего пользователя",
+        "operationId": "get_my_detailed_progress_api_v2_progress_user_my_detailed_get",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -3352,6 +3737,42 @@
   },
   "components": {
     "schemas": {
+      "AnalyticsResponse": {
+        "properties": {
+          "total_interviews": {
+            "type": "integer",
+            "title": "Total Interviews"
+          },
+          "total_companies": {
+            "type": "integer",
+            "title": "Total Companies"
+          },
+          "top_companies": {
+            "items": {
+              "$ref": "#/components/schemas/CompanyStatsResponse"
+            },
+            "type": "array",
+            "title": "Top Companies"
+          },
+          "monthly_stats": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Monthly Stats"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_interviews",
+          "total_companies",
+          "top_companies",
+          "monthly_stats"
+        ],
+        "title": "AnalyticsResponse",
+        "description": "Общая аналитика"
+      },
       "AttemptHistoryResponse": {
         "properties": {
           "task_id": {
@@ -3428,6 +3849,135 @@
         ],
         "title": "AttemptHistoryResponse",
         "description": "История попыток"
+      },
+      "BrowserLogEntry": {
+        "properties": {
+          "level": {
+            "type": "string",
+            "title": "Level"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          },
+          "user_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Id"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source",
+            "default": "browser"
+          },
+          "stack_trace": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stack Trace"
+          },
+          "metadata": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metadata"
+          }
+        },
+        "type": "object",
+        "required": [
+          "level",
+          "message",
+          "timestamp"
+        ],
+        "title": "BrowserLogEntry"
+      },
+      "BrowserLogsRequest": {
+        "properties": {
+          "console_logs": {
+            "items": {
+              "$ref": "#/components/schemas/BrowserLogEntry"
+            },
+            "type": "array",
+            "title": "Console Logs",
+            "default": []
+          },
+          "network_logs": {
+            "items": {
+              "$ref": "#/components/schemas/NetworkLogEntry"
+            },
+            "type": "array",
+            "title": "Network Logs",
+            "default": []
+          },
+          "page_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page Url"
+          },
+          "user_agent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Agent"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id"
+          }
+        },
+        "type": "object",
+        "title": "BrowserLogsRequest"
       },
       "CardState": {
         "type": "string",
@@ -3915,6 +4465,54 @@
           "RUBY"
         ],
         "title": "CodeLanguage"
+      },
+      "CompaniesListResponse": {
+        "properties": {
+          "companies": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Companies"
+          }
+        },
+        "type": "object",
+        "required": [
+          "companies"
+        ],
+        "title": "CompaniesListResponse",
+        "description": "Список компаний"
+      },
+      "CompanyStatsResponse": {
+        "properties": {
+          "company_name": {
+            "type": "string",
+            "title": "Company Name"
+          },
+          "total_interviews": {
+            "type": "integer",
+            "title": "Total Interviews"
+          },
+          "avg_duration": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Duration"
+          }
+        },
+        "type": "object",
+        "required": [
+          "company_name",
+          "total_interviews",
+          "avg_duration"
+        ],
+        "title": "CompanyStatsResponse",
+        "description": "Статистика по компании"
       },
       "ContentBlockResponse": {
         "properties": {
@@ -4534,6 +5132,174 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
+      "InterviewDetailResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "company_name": {
+            "type": "string",
+            "title": "Company Name"
+          },
+          "interview_date": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Interview Date"
+          },
+          "position": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Position"
+          },
+          "full_content": {
+            "type": "string",
+            "title": "Full Content"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tags"
+          },
+          "companies": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Companies"
+          },
+          "extracted_urls": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Extracted Urls"
+          },
+          "has_audio_recording": {
+            "type": "boolean",
+            "title": "Has Audio Recording"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "company_name",
+          "interview_date",
+          "position",
+          "full_content",
+          "tags",
+          "companies",
+          "extracted_urls",
+          "has_audio_recording"
+        ],
+        "title": "InterviewDetailResponse",
+        "description": "Детальный ответ с полным контентом"
+      },
+      "InterviewRecordResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "company_name": {
+            "type": "string",
+            "title": "Company Name"
+          },
+          "interview_date": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Interview Date"
+          },
+          "position": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Position"
+          },
+          "full_content": {
+            "type": "string",
+            "title": "Full Content"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tags"
+          },
+          "has_audio_recording": {
+            "type": "boolean",
+            "title": "Has Audio Recording"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "company_name",
+          "interview_date",
+          "position",
+          "full_content",
+          "tags",
+          "has_audio_recording"
+        ],
+        "title": "InterviewRecordResponse",
+        "description": "Ответ с данными интервью"
+      },
+      "InterviewsListResponse": {
+        "properties": {
+          "interviews": {
+            "items": {
+              "$ref": "#/components/schemas/InterviewRecordResponse"
+            },
+            "type": "array",
+            "title": "Interviews"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "has_next": {
+            "type": "boolean",
+            "title": "Has Next"
+          },
+          "has_prev": {
+            "type": "boolean",
+            "title": "Has Prev"
+          }
+        },
+        "type": "object",
+        "required": [
+          "interviews",
+          "total",
+          "page",
+          "limit",
+          "has_next",
+          "has_prev"
+        ],
+        "title": "InterviewsListResponse",
+        "description": "Список интервью с пагинацией"
+      },
       "LoginRequest": {
         "properties": {
           "email": {
@@ -4775,6 +5541,91 @@
         ],
         "title": "MindMapResponse",
         "description": "Ответ с данными mindmap"
+      },
+      "NetworkLogEntry": {
+        "properties": {
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "method": {
+            "type": "string",
+            "title": "Method"
+          },
+          "status_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status Code"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "request_headers": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Headers"
+          },
+          "response_headers": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Response Headers"
+          },
+          "error_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Message"
+          },
+          "user_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "url",
+          "method",
+          "timestamp"
+        ],
+        "title": "NetworkLogEntry"
       },
       "PaginatedResponse_ContentBlockResponse_": {
         "properties": {
@@ -5716,13 +6567,13 @@
             "type": "string",
             "title": "Id"
           },
-          "anki_guid": {
+          "ankiGuid": {
             "type": "string",
-            "title": "Anki Guid"
+            "title": "Ankiguid"
           },
-          "card_type": {
+          "cardType": {
             "type": "string",
-            "title": "Card Type"
+            "title": "Cardtype"
           },
           "deck": {
             "type": "string",
@@ -5732,7 +6583,7 @@
             "type": "string",
             "title": "Category"
           },
-          "sub_category": {
+          "subCategory": {
             "anyOf": [
               {
                 "type": "string"
@@ -5741,15 +6592,15 @@
                 "type": "null"
               }
             ],
-            "title": "Sub Category"
+            "title": "Subcategory"
           },
-          "question_block": {
+          "questionBlock": {
             "type": "string",
-            "title": "Question Block"
+            "title": "Questionblock"
           },
-          "answer_block": {
+          "answerBlock": {
             "type": "string",
-            "title": "Answer Block"
+            "title": "Answerblock"
           },
           "tags": {
             "items": {
@@ -5759,33 +6610,33 @@
             "title": "Tags",
             "default": []
           },
-          "order_index": {
+          "orderIndex": {
             "type": "integer",
-            "title": "Order Index",
+            "title": "Orderindex",
             "default": 0
           },
-          "created_at": {
+          "createdAt": {
             "type": "string",
             "format": "date-time",
-            "title": "Created At"
+            "title": "Createdat"
           },
-          "updated_at": {
+          "updatedAt": {
             "type": "string",
             "format": "date-time",
-            "title": "Updated At"
+            "title": "Updatedat"
           }
         },
         "type": "object",
         "required": [
           "id",
-          "anki_guid",
-          "card_type",
+          "ankiGuid",
+          "cardType",
           "deck",
           "category",
-          "question_block",
-          "answer_block",
-          "created_at",
-          "updated_at"
+          "questionBlock",
+          "answerBlock",
+          "createdAt",
+          "updatedAt"
         ],
         "title": "TheoryCardResponse",
         "description": "Ответ с информацией о теоретической карточке"

@@ -33,6 +33,7 @@ export const InterviewsList: React.FC = () => {
         limit,
         companies: filters.companies,
         search: filters.search,
+        has_audio: filters.has_audio,
       });
 
       if (response && response.interviews) {
@@ -60,7 +61,7 @@ export const InterviewsList: React.FC = () => {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [filters.companies, filters.search, limit, isInitialLoad]);
+  }, [filters.companies, filters.search, filters.has_audio, limit, isInitialLoad]);
 
   // Initial load and filters change
   useEffect(() => {
