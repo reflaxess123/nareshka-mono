@@ -17,41 +17,39 @@ export const InterviewCard: React.FC<InterviewCardProps> = ({ interview }) => {
     });
   };
 
+  const formatTime = (dateString: string) => {
+    return new Date(dateString).toLocaleTimeString('ru-RU', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
 
   return (
-    <div className={styles.card}>
-      <div className={styles.header}>
-        <h3 className={styles.company}>{interview.company_name}</h3>
-        <span className={styles.date}>{formatDate(interview.interview_date)}</span>
+    <div className={styles.listItem}>
+      <div className={styles.mainContent}>
+        <div className={styles.header}>
+          <h3 className={styles.company}>{interview.company_name}</h3>
+          <div className={styles.dateTime}>
+            <span className={styles.date}>{formatDate(interview.interview_date)}</span>
+            <span className={styles.time}>{formatTime(interview.interview_date)}</span>
+          </div>
+        </div>
+
+        {/* Position display disabled */}
+
+        <div className={styles.preview}>
+          {interview.full_content.substring(0, 150)}...
+        </div>
+
+        <div className={styles.metadata}>
+          {/* Tags display disabled */}
+        </div>
       </div>
 
-      {interview.position && (
-        <div className={styles.position}>{interview.position}</div>
-      )}
-
-      <div className={styles.metadata}>
-        {interview.duration_minutes && (
-          <span className={styles.duration}>
-            {interview.duration_minutes} мин
-          </span>
-        )}
-
-        {interview.questions_count && (
-          <span className={styles.questions}>
-            {interview.questions_count} вопросов
-          </span>
-        )}
-      </div>
-
-      <div className={styles.content}>
-        <p>{interview.content.substring(0, 200)}...</p>
-      </div>
-
-      <div className={styles.footer}>
-        <Link to={`/interviews/${interview.id}`} className={styles.readMore}>
-          Читать полностью →
+      <div className={styles.actions}>
+        <Link to={`/interviews/${interview.id}`} className={styles.readMoreBtn}>
+          Открыть
         </Link>
-        
       </div>
     </div>
   );

@@ -1,5 +1,0 @@
-flashtext>=2.7
-rapidfuzz>=3.6
-pymorphy2>=0.9
-tqdm>=4.66
-pyyaml>=6.0

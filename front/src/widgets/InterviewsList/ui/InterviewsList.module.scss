@@ -1,7 +1,7 @@
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: calc(var(--navbar-height, 64px) + 20px) 20px 20px 20px; /* Отступ для навбара + дополнительный отступ */
 }
 
 .error,
@@ -57,60 +57,59 @@
   margin-bottom: 20px;
   color: #64748b;
   font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filterLoadingText {
+  color: #3b82f6;
+  font-weight: 500;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 20px;
-  margin-bottom: 40px;
-}
-
-.pagination {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  margin-top: 32px;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 40px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: opacity 0.3s ease;
 }
 
-.pageButton {
-  padding: 8px 12px;
-  border: 1px solid #d1d5db;
-  background: white;
-  color: #374151;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.2s;
-  min-width: 40px;
-  
-  &:hover:not(:disabled) {
-    background: #f9fafb;
-    border-color: #9ca3af;
-  }
-  
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-  
-  &.active {
-    background: #3b82f6;
-    border-color: #3b82f6;
-    color: white;
-    
-    &:hover {
-      background: #2563eb;
-      border-color: #2563eb;
-    }
-  }
+.gridLoading {
+  opacity: 0.6;
+  pointer-events: none;
 }
 
-.ellipsis {
-  padding: 8px 4px;
-  color: #9ca3af;
+.sentinel {
+  height: 20px;
+  width: 100%;
+}
+
+.endOfList {
+  text-align: center;
+  padding: 24px;
+  color: #64748b;
   font-size: 14px;
+  border-top: 1px solid #e5e7eb;
+  margin-top: 20px;
+  
+  p {
+    margin: 0;
+    font-style: italic;
+  }
 }
 
 @media (max-width: 768px) {
@@ -119,8 +118,7 @@
   }
   
   .grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 0;
   }
   
   .pagination {
