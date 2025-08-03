@@ -2,6 +2,8 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  width: 100%;
+  min-width: 0; // Предотвращает переполнение в flex контейнере
 }
 
 // Быстрые кнопки популярных компаний
@@ -9,6 +11,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-height: 60px; // Фиксированная минимальная высота для предотвращения layout shift
 }
 
 .quickLabel {

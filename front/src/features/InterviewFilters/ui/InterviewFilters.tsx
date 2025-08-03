@@ -8,6 +8,7 @@ import styles from './InterviewFilters.module.scss';
 export interface InterviewFiltersType {
   companies?: string[];
   search?: string;
+  has_audio?: boolean;
 }
 
 interface InterviewFiltersProps {
@@ -35,7 +36,7 @@ export const InterviewFilters: React.FC<InterviewFiltersProps> = ({
     return () => clearTimeout(timeoutId);
   }, [localFilters, onFiltersChange]);
 
-  const handleFilterChange = (key: keyof InterviewFiltersType, value: string | string[] | undefined) => {
+  const handleFilterChange = (key: keyof InterviewFiltersType, value: string | string[] | boolean | undefined) => {
     setLocalFilters(prev => ({
       ...prev,
       [key]: value || undefined
@@ -99,6 +100,20 @@ export const InterviewFilters: React.FC<InterviewFiltersProps> = ({
                 selectedCompanies={localFilters.companies || []}
                 onSelectionChange={handleCompaniesChange}
               />
+            </div>
+          </div>
+
+          <div className={styles.row}>
+            <div className={styles.field}>
+              <label className={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  className={styles.checkbox}
+                  checked={localFilters.has_audio || false}
+                  onChange={(e) => handleFilterChange('has_audio', e.target.checked ? true : undefined)}
+                />
+                Только с аудио/видео записью
+              </label>
             </div>
           </div>
 

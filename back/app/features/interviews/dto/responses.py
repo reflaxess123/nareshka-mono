@@ -13,6 +13,7 @@ class InterviewRecordResponse(BaseModel):
     position: Optional[str]
     full_content: str
     tags: List[str]
+    has_audio_recording: bool
 
     class Config:
         from_attributes = True
@@ -28,6 +29,7 @@ class InterviewDetailResponse(BaseModel):
     tags: List[str]
     companies: List[str]
     extracted_urls: List[str]
+    has_audio_recording: bool
 
     class Config:
         from_attributes = True
