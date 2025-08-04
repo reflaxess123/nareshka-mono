@@ -125,7 +125,7 @@ def configure_container():
     from app.features.progress.services.progress_service import ProgressService
     from app.features.stats.services.stats_service import StatsService
     from app.features.code_editor.services.code_editor_service import CodeEditorService
-    from app.features.code_editor.services.code_executor_service import CodeExecutorService
+    from app.features.code_editor.services.enhanced_code_executor_service import EnhancedCodeExecutorService
     from app.features.code_editor.services.ai_test_generator_service import AITestGeneratorService
     from app.features.mindmap.services.mindmap_service import MindMapService
     
@@ -152,7 +152,7 @@ def configure_container():
         return CodeEditorService(container.get(CodeEditorRepository))
     
     def create_code_executor_service():
-        return CodeExecutorService(container.get(CodeEditorRepository))
+        return EnhancedCodeExecutorService(container.get(CodeEditorRepository))
     
     def create_mindmap_service():
         return MindMapService(container.get(MindMapRepository))
@@ -170,7 +170,7 @@ def configure_container():
     container.register_transient(ProgressService, create_progress_service)
     container.register_transient(StatsService, create_stats_service)
     container.register_transient(CodeEditorService, create_code_editor_service)
-    container.register_transient(CodeExecutorService, create_code_executor_service)
+    container.register_transient(EnhancedCodeExecutorService, create_code_executor_service)
     container.register_transient(MindMapService, create_mindmap_service)
     container.register_transient(AITestGeneratorService, create_ai_test_generator_service)
     
@@ -239,8 +239,8 @@ class ServiceFactory:
         return get_container().get(CodeEditorService)
     
     @staticmethod
-    def create_code_executor_service() -> 'CodeExecutorService':
-        return get_container().get(CodeExecutorService)
+    def create_code_executor_service() -> 'EnhancedCodeExecutorService':
+        return get_container().get(EnhancedCodeExecutorService)
     
     @staticmethod
     def create_ai_test_generator_service() -> 'AITestGeneratorService':
