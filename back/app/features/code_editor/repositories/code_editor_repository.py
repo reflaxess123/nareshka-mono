@@ -54,6 +54,10 @@ class CodeEditorRepositoryInterface(ABC):
         pass
 
     @abstractmethod
+    async def save_execution(self, execution: CodeExecution) -> CodeExecution:
+        pass
+
+    @abstractmethod
     async def get_execution_by_id(self, execution_id: str) -> Optional[CodeExecution]:
         pass
 
@@ -177,6 +181,35 @@ class CodeEditorRepository(CodeEditorRepositoryInterface):
             
         except Exception as e:
             logger.error(f"Ошибка при обновлении выполнения: {e}")
+            self.session.rollback()
+            raise
+
+    async def save_execution(self, execution: CodeExecution) -> CodeExecution:
+        """Сохранение выполнения (создание или обновление)"""
+        logger.info(f"Сохранение выполнения кода: {execution.id}")
+        
+        try:
+            # Проверяем, существует ли уже выполнение
+            existing = self.session.query(CodeExecution).filter(CodeExecution.id == execution.id).first()
+            
+            if existing:
+                # Обновляем существующее
+                for key, value in execution.__dict__.items():
+                    if not key.startswith('_') and hasattr(existing, key):
+                        setattr(existing, key, value)
+                self.session.commit()
+                logger.info(f"Выполнение обновлено: {execution.id}")
+                return existing
+            else:
+                # Создаем новое
+                self.session.add(execution)
+                self.session.commit()
+                self.session.refresh(execution)
+                logger.info(f"Выполнение создано: {execution.id}")
+                return execution
+                
+        except Exception as e:
+            logger.error(f"Ошибка при сохранении выполнения: {e}")
             self.session.rollback()
             raise
 

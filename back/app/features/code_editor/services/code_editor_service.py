@@ -6,6 +6,7 @@ from datetime import datetime
 from typing import List, Optional
 
 from app.features.code_editor.repositories.code_editor_repository import CodeEditorRepository
+from app.features.code_editor.services.enhanced_code_executor_service import EnhancedCodeExecutorService
 from app.features.code_editor.dto.requests import (
     CodeExecutionRequest,
     UserCodeSolutionCreateRequest,
@@ -43,6 +44,7 @@ class CodeEditorService:
 
     def __init__(self, code_editor_repository: CodeEditorRepository):
         self.code_editor_repository = code_editor_repository
+        self.code_executor_service = EnhancedCodeExecutorService(code_editor_repository)
 
     async def get_supported_languages(self) -> List[SupportedLanguageResponse]:
         """Получение списка поддерживаемых языков"""
@@ -93,49 +95,16 @@ class CodeEditorService:
             if not language:
                 raise UnsupportedLanguageError(request.language)
 
-            # Создаем запись о выполнении
-            execution_id = str(uuid.uuid4())
-            execution = CodeExecution(
-                id=execution_id,
-                userId=user_id,
-                blockId=request.blockId,
-                languageId=language.id,
-                sourceCode=request.sourceCode,
+            # Выполняем код через EnhancedCodeExecutorService
+            execution_result = await self.code_executor_service.execute_code(
+                source_code=request.sourceCode,
+                language=language,
                 stdin=request.stdin,
-                status=ExecutionStatus.PENDING,
-                createdAt=datetime.now(),
+                user_id=user_id,
+                block_id=request.blockId,
             )
-
-            # Сохраняем в БД
-            created_execution = await self.code_editor_repository.create_code_execution(execution)
-
-            # Выполняем код
-            try:
-                execution_result = await self.code_editor_repository.execute_code_with_language(
-                    request.sourceCode, language, request.stdin
-                )
-                
-                # Обновляем результат выполнения
-                created_execution.status = ExecutionStatus.COMPLETED
-                created_execution.stdout = execution_result.get('stdout')
-                created_execution.stderr = execution_result.get('stderr')
-                created_execution.exitCode = execution_result.get('exit_code')
-                created_execution.executionTimeMs = execution_result.get('execution_time_ms')
-                created_execution.memoryUsedMB = execution_result.get('memory_used_mb')
-                created_execution.containerLogs = execution_result.get('container_logs')
-                created_execution.completedAt = datetime.now()
-                
-                await self.code_editor_repository.update_code_execution(created_execution)
-                
-            except Exception as exec_error:
-                # Отмечаем выполнение как failed
-                created_execution.status = ExecutionStatus.FAILED
-                created_execution.errorMessage = str(exec_error)
-                created_execution.completedAt = datetime.now()
-                
-                await self.code_editor_repository.update_code_execution(created_execution)
-                
-                logger.warning(f"Ошибка выполнения кода: {exec_error}")
+            
+            created_execution = execution_result
 
             return CodeExecutionResponse(
                 id=created_execution.id,
