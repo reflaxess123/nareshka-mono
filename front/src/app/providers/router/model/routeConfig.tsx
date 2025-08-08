@@ -48,6 +48,11 @@ const InterviewDetail = lazy(() =>
     default: module.InterviewDetailPage,
   }))
 );
+const Analytics = lazy(() =>
+  import('@/pages/Analytics').then((module) => ({
+    default: module.AnalyticsPage,
+  }))
+);
 
 export enum AppRoutes {
   HOME = '/',
@@ -62,6 +67,7 @@ export enum AppRoutes {
   ADMIN_PANEL = '/admin-panel',
   ADMIN_USERS = '/admin/users',
   ADMIN_STATS = '/admin/stats',
+  ANALYTICS = '/analytics',
 }
 
 export const routeConfig: AppRoute[] = [
@@ -78,4 +84,5 @@ export const routeConfig: AppRoute[] = [
   { path: AppRoutes.ADMIN_PANEL, element: <Adminka /> },
   { path: AppRoutes.ADMIN_USERS, element: <UserManagement /> },
   { path: AppRoutes.ADMIN_STATS, element: <DetailedStats /> },
+  { path: AppRoutes.ANALYTICS, element: <Analytics /> },
 ];

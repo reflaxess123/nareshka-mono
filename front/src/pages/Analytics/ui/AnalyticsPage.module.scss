@@ -1,0 +1,51 @@
+.wrapper {
+  padding: 16px;
+}
+
+.block {
+  margin-bottom: 24px;
+}
+
+.controls {
+  margin: 12px 0 20px;
+  background: #0b1220;
+  border: 1px solid #1f2a44;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.controlsRow {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 200px;
+}
+
+.chart {
+  background: #0f172a;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.table {
+  overflow: auto;
+}
+
+.table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  border-bottom: 1px solid #1f2937;
+  padding: 8px 10px;
+  text-align: left;
+}
