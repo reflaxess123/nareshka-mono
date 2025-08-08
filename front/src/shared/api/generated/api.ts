@@ -328,6 +328,33 @@ export interface CompaniesListResponseType {
   companies: string[];
 }
 
+export interface CompanyCountModelType {
+  company: string;
+  count: number;
+}
+
+export type CompanyProfileRowModelTypeShare = string | null;
+
+export interface CompanyProfileRowModelType {
+  company: string;
+  rank: string;
+  cluster_id: string;
+  cluster_label: string;
+  count: string;
+  share?: CompanyProfileRowModelTypeShare;
+}
+
+export interface CompanyQuestionItemModelType {
+  question_text: string;
+  count: number;
+}
+
+export interface CompanyQuestionsRowModelType {
+  company: string;
+  total_questions: number;
+  items: CompanyQuestionItemModelType[];
+}
+
 export type CompanyStatsResponseTypeAvgDuration = number | null;
 
 /**
@@ -543,12 +570,33 @@ export interface ContentSubcategoriesResponseType {
   subcategories: string[];
 }
 
+export interface CooccurrenceRowModelType {
+  cluster_label_a: string;
+  cluster_label_b: string;
+  count: string;
+}
+
 /**
  * Ответ с карточками для повторения
  */
 export interface DueCardsResponseType {
   cards: TheoryCardResponseType[];
   total: number;
+}
+
+export interface DuplicateRowModelType {
+  row_id_1: string;
+  row_id_2: string;
+  sim_embed: string;
+  sim_char: string;
+  id_1: string;
+  question_text_1: string;
+  company_1: string;
+  date_1: string;
+  id_2: string;
+  question_text_2: string;
+  company_2: string;
+  date_2: string;
 }
 
 export type ExecutionStatsResponseTypeLanguageStatsItem = { [key: string]: unknown };
@@ -613,6 +661,12 @@ export interface GroupedCategoryProgressResponseType {
 
 export interface HTTPValidationErrorType {
   detail?: ValidationErrorType[];
+}
+
+export interface HeatmapResponseModelType {
+  companies: string[];
+  topics: string[];
+  values: number[][];
 }
 
 export type InterviewDetailResponseTypePosition = string | null;
@@ -838,6 +892,12 @@ export interface ProgressStatsResponseType {
   streak_days: number;
   /** Активных категорий */
   categories_active: number;
+}
+
+export interface QuestionFrequencyRowModelType {
+  question_text: string;
+  total_count: number;
+  companies: CompanyCountModelType[];
 }
 
 /**
@@ -1166,6 +1226,21 @@ export interface TopicResponseType {
   progress?: TopicResponseTypeProgress;
 }
 
+export type TopicRowModelTypeCompanies = string | null;
+
+export type TopicRowModelTypeFirstSeen = string | null;
+
+export type TopicRowModelTypeLastSeen = string | null;
+
+export interface TopicRowModelType {
+  cluster_id: string;
+  cluster_label: string;
+  count: string;
+  companies?: TopicRowModelTypeCompanies;
+  first_seen?: TopicRowModelTypeFirstSeen;
+  last_seen?: TopicRowModelTypeLastSeen;
+}
+
 /**
  * Статистика по теме
  */
@@ -1185,6 +1260,12 @@ export interface TopicTasksResponseType {
   topic: TopicResponseType;
   tasks: AppFeaturesMindmapDtoResponsesTaskResponseType[];
   stats?: TopicTasksResponseTypeStats;
+}
+
+export interface TrendRowModelType {
+  month: string;
+  cluster_label: string;
+  count: string;
 }
 
 /**
@@ -2264,6 +2345,90 @@ technology?: string;
 difficulty_filter?: string | null;
 };
 
+export type GetTopicsApiV2AnalyticsTopicsGetParams = {
+/**
+ * @minimum 1
+ * @maximum 1000
+ */
+limit?: number;
+};
+
+export type GetCompanyProfilesApiV2AnalyticsCompanyProfilesGetParams = {
+company?: string | null;
+/**
+ * @minimum 1
+ * @maximum 50
+ */
+top?: number;
+};
+
+export type GetTrendsApiV2AnalyticsTrendsGetParams = {
+/**
+ * @minimum 1
+ */
+limit?: number;
+};
+
+export type GetCooccurrenceApiV2AnalyticsCooccurrenceGetParams = {
+/**
+ * @minimum 1
+ */
+limit?: number;
+};
+
+export type GetDuplicatesApiV2AnalyticsDuplicatesGetParams = {
+/**
+ * @minimum 1
+ * @maximum 5000
+ */
+limit?: number;
+};
+
+export type GetHeatmapApiV2AnalyticsHeatmapGetParams = {
+/**
+ * @pattern ^(none|row|col)$
+ */
+normalization?: string;
+};
+
+export type GetQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGetParams = {
+/**
+ * @minimum 1
+ */
+min_count?: number;
+/**
+ * @minimum 1
+ * @maximum 20000
+ */
+limit?: number;
+question_contains?: string | null;
+};
+
+export type GetTopQuestionsApiV2AnalyticsTopQuestionsGetParams = {
+/**
+ * @minimum 1
+ * @maximum 10000
+ */
+limit?: number;
+/**
+ * @minimum 1
+ */
+min_count?: number;
+};
+
+export type GetCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGetParams = {
+company?: string | null;
+/**
+ * @minimum 1
+ */
+min_count?: number;
+/**
+ * @minimum 1
+ * @maximum 10000
+ */
+limit_per_company?: number;
+};
+
 /**
  * Вход пользователя
  * @summary Login
@@ -3079,7 +3244,7 @@ export const getContentSubcategoriesApiV2ContentCategoriesCategorySubcategoriesG
     }
   
 
-export const getGetContentSubcategoriesApiV2ContentCategoriesCategorySubcategoriesGetQueryKey = (category: string,) => {
+export const getGetContentSubcategoriesApiV2ContentCategoriesCategorySubcategoriesGetQueryKey = (category?: string,) => {
     return [`/api/v2/content/categories/${category}/subcategories`] as const;
     }
 
@@ -3168,7 +3333,7 @@ export const getContentBlockApiV2ContentBlocksBlockIdGet = (
     }
   
 
-export const getGetContentBlockApiV2ContentBlocksBlockIdGetQueryKey = (blockId: string,) => {
+export const getGetContentBlockApiV2ContentBlocksBlockIdGetQueryKey = (blockId?: string,) => {
     return [`/api/v2/content/blocks/${blockId}`] as const;
     }
 
@@ -3329,7 +3494,7 @@ export const getGetInterviewsApiV2InterviewsGetQueryKey = (params?: GetInterview
     }
 
     
-export const getGetInterviewsApiV2InterviewsGetQueryOptions = <TData = Awaited<ReturnType<typeof getInterviewsApiV2InterviewsGet>>, TError = void | HTTPValidationErrorType>(params?: GetInterviewsApiV2InterviewsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInterviewsApiV2InterviewsGet>>, TError, TData>>, }
+export const getGetInterviewsApiV2InterviewsGetQueryOptions = <TData = Awaited<ReturnType<typeof getInterviewsApiV2InterviewsGet>>, TError = null | HTTPValidationErrorType>(params?: GetInterviewsApiV2InterviewsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInterviewsApiV2InterviewsGet>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
@@ -3348,10 +3513,10 @@ const {query: queryOptions} = options ?? {};
 }
 
 export type GetInterviewsApiV2InterviewsGetQueryResult = NonNullable<Awaited<ReturnType<typeof getInterviewsApiV2InterviewsGet>>>
-export type GetInterviewsApiV2InterviewsGetQueryError = void | HTTPValidationErrorType
+export type GetInterviewsApiV2InterviewsGetQueryError = null | HTTPValidationErrorType
 
 
-export function useGetInterviewsApiV2InterviewsGet<TData = Awaited<ReturnType<typeof getInterviewsApiV2InterviewsGet>>, TError = void | HTTPValidationErrorType>(
+export function useGetInterviewsApiV2InterviewsGet<TData = Awaited<ReturnType<typeof getInterviewsApiV2InterviewsGet>>, TError = null | HTTPValidationErrorType>(
  params: undefined |  GetInterviewsApiV2InterviewsGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInterviewsApiV2InterviewsGet>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getInterviewsApiV2InterviewsGet>>,
@@ -3361,7 +3526,7 @@ export function useGetInterviewsApiV2InterviewsGet<TData = Awaited<ReturnType<ty
       >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetInterviewsApiV2InterviewsGet<TData = Awaited<ReturnType<typeof getInterviewsApiV2InterviewsGet>>, TError = void | HTTPValidationErrorType>(
+export function useGetInterviewsApiV2InterviewsGet<TData = Awaited<ReturnType<typeof getInterviewsApiV2InterviewsGet>>, TError = null | HTTPValidationErrorType>(
  params?: GetInterviewsApiV2InterviewsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInterviewsApiV2InterviewsGet>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getInterviewsApiV2InterviewsGet>>,
@@ -3371,7 +3536,7 @@ export function useGetInterviewsApiV2InterviewsGet<TData = Awaited<ReturnType<ty
       >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetInterviewsApiV2InterviewsGet<TData = Awaited<ReturnType<typeof getInterviewsApiV2InterviewsGet>>, TError = void | HTTPValidationErrorType>(
+export function useGetInterviewsApiV2InterviewsGet<TData = Awaited<ReturnType<typeof getInterviewsApiV2InterviewsGet>>, TError = null | HTTPValidationErrorType>(
  params?: GetInterviewsApiV2InterviewsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInterviewsApiV2InterviewsGet>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
@@ -3379,7 +3544,7 @@ export function useGetInterviewsApiV2InterviewsGet<TData = Awaited<ReturnType<ty
  * @summary Получить список интервью
  */
 
-export function useGetInterviewsApiV2InterviewsGet<TData = Awaited<ReturnType<typeof getInterviewsApiV2InterviewsGet>>, TError = void | HTTPValidationErrorType>(
+export function useGetInterviewsApiV2InterviewsGet<TData = Awaited<ReturnType<typeof getInterviewsApiV2InterviewsGet>>, TError = null | HTTPValidationErrorType>(
  params?: GetInterviewsApiV2InterviewsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInterviewsApiV2InterviewsGet>>, TError, TData>>, }
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -3413,12 +3578,12 @@ export const getInterviewDetailApiV2InterviewsInterviewIdGet = (
     }
   
 
-export const getGetInterviewDetailApiV2InterviewsInterviewIdGetQueryKey = (interviewId: string,) => {
+export const getGetInterviewDetailApiV2InterviewsInterviewIdGetQueryKey = (interviewId?: string,) => {
     return [`/api/v2/interviews/${interviewId}`] as const;
     }
 
     
-export const getGetInterviewDetailApiV2InterviewsInterviewIdGetQueryOptions = <TData = Awaited<ReturnType<typeof getInterviewDetailApiV2InterviewsInterviewIdGet>>, TError = void | HTTPValidationErrorType>(interviewId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInterviewDetailApiV2InterviewsInterviewIdGet>>, TError, TData>>, }
+export const getGetInterviewDetailApiV2InterviewsInterviewIdGetQueryOptions = <TData = Awaited<ReturnType<typeof getInterviewDetailApiV2InterviewsInterviewIdGet>>, TError = null | HTTPValidationErrorType>(interviewId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInterviewDetailApiV2InterviewsInterviewIdGet>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
@@ -3437,10 +3602,10 @@ const {query: queryOptions} = options ?? {};
 }
 
 export type GetInterviewDetailApiV2InterviewsInterviewIdGetQueryResult = NonNullable<Awaited<ReturnType<typeof getInterviewDetailApiV2InterviewsInterviewIdGet>>>
-export type GetInterviewDetailApiV2InterviewsInterviewIdGetQueryError = void | HTTPValidationErrorType
+export type GetInterviewDetailApiV2InterviewsInterviewIdGetQueryError = null | HTTPValidationErrorType
 
 
-export function useGetInterviewDetailApiV2InterviewsInterviewIdGet<TData = Awaited<ReturnType<typeof getInterviewDetailApiV2InterviewsInterviewIdGet>>, TError = void | HTTPValidationErrorType>(
+export function useGetInterviewDetailApiV2InterviewsInterviewIdGet<TData = Awaited<ReturnType<typeof getInterviewDetailApiV2InterviewsInterviewIdGet>>, TError = null | HTTPValidationErrorType>(
  interviewId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInterviewDetailApiV2InterviewsInterviewIdGet>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getInterviewDetailApiV2InterviewsInterviewIdGet>>,
@@ -3450,7 +3615,7 @@ export function useGetInterviewDetailApiV2InterviewsInterviewIdGet<TData = Await
       >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetInterviewDetailApiV2InterviewsInterviewIdGet<TData = Awaited<ReturnType<typeof getInterviewDetailApiV2InterviewsInterviewIdGet>>, TError = void | HTTPValidationErrorType>(
+export function useGetInterviewDetailApiV2InterviewsInterviewIdGet<TData = Awaited<ReturnType<typeof getInterviewDetailApiV2InterviewsInterviewIdGet>>, TError = null | HTTPValidationErrorType>(
  interviewId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInterviewDetailApiV2InterviewsInterviewIdGet>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getInterviewDetailApiV2InterviewsInterviewIdGet>>,
@@ -3460,7 +3625,7 @@ export function useGetInterviewDetailApiV2InterviewsInterviewIdGet<TData = Await
       >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetInterviewDetailApiV2InterviewsInterviewIdGet<TData = Awaited<ReturnType<typeof getInterviewDetailApiV2InterviewsInterviewIdGet>>, TError = void | HTTPValidationErrorType>(
+export function useGetInterviewDetailApiV2InterviewsInterviewIdGet<TData = Awaited<ReturnType<typeof getInterviewDetailApiV2InterviewsInterviewIdGet>>, TError = null | HTTPValidationErrorType>(
  interviewId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInterviewDetailApiV2InterviewsInterviewIdGet>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
@@ -3468,7 +3633,7 @@ export function useGetInterviewDetailApiV2InterviewsInterviewIdGet<TData = Await
  * @summary Получить детали интервью
  */
 
-export function useGetInterviewDetailApiV2InterviewsInterviewIdGet<TData = Awaited<ReturnType<typeof getInterviewDetailApiV2InterviewsInterviewIdGet>>, TError = void | HTTPValidationErrorType>(
+export function useGetInterviewDetailApiV2InterviewsInterviewIdGet<TData = Awaited<ReturnType<typeof getInterviewDetailApiV2InterviewsInterviewIdGet>>, TError = null | HTTPValidationErrorType>(
  interviewId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInterviewDetailApiV2InterviewsInterviewIdGet>>, TError, TData>>, }
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -3502,12 +3667,12 @@ export const getCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet = (
     }
   
 
-export const getGetCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGetQueryKey = (companyName: string,) => {
+export const getGetCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGetQueryKey = (companyName?: string,) => {
     return [`/api/v2/interviews/company/${companyName}/stats`] as const;
     }
 
     
-export const getGetCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGetQueryOptions = <TData = Awaited<ReturnType<typeof getCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet>>, TError = void | HTTPValidationErrorType>(companyName: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet>>, TError, TData>>, }
+export const getGetCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGetQueryOptions = <TData = Awaited<ReturnType<typeof getCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet>>, TError = null | HTTPValidationErrorType>(companyName: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
@@ -3526,10 +3691,10 @@ const {query: queryOptions} = options ?? {};
 }
 
 export type GetCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGetQueryResult = NonNullable<Awaited<ReturnType<typeof getCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet>>>
-export type GetCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGetQueryError = void | HTTPValidationErrorType
+export type GetCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGetQueryError = null | HTTPValidationErrorType
 
 
-export function useGetCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet<TData = Awaited<ReturnType<typeof getCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet>>, TError = void | HTTPValidationErrorType>(
+export function useGetCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet<TData = Awaited<ReturnType<typeof getCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet>>, TError = null | HTTPValidationErrorType>(
  companyName: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet>>,
@@ -3539,7 +3704,7 @@ export function useGetCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet<TDat
       >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet<TData = Awaited<ReturnType<typeof getCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet>>, TError = void | HTTPValidationErrorType>(
+export function useGetCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet<TData = Awaited<ReturnType<typeof getCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet>>, TError = null | HTTPValidationErrorType>(
  companyName: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet>>,
@@ -3549,7 +3714,7 @@ export function useGetCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet<TDat
       >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet<TData = Awaited<ReturnType<typeof getCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet>>, TError = void | HTTPValidationErrorType>(
+export function useGetCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet<TData = Awaited<ReturnType<typeof getCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet>>, TError = null | HTTPValidationErrorType>(
  companyName: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
@@ -3557,7 +3722,7 @@ export function useGetCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet<TDat
  * @summary Статистика по компании
  */
 
-export function useGetCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet<TData = Awaited<ReturnType<typeof getCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet>>, TError = void | HTTPValidationErrorType>(
+export function useGetCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet<TData = Awaited<ReturnType<typeof getCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet>>, TError = null | HTTPValidationErrorType>(
  companyName: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet>>, TError, TData>>, }
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -3596,7 +3761,7 @@ export const getGetAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGetQueryKey 
     }
 
     
-export const getGetAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGetQueryOptions = <TData = Awaited<ReturnType<typeof getAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet>>, TError = void>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet>>, TError, TData>>, }
+export const getGetAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGetQueryOptions = <TData = Awaited<ReturnType<typeof getAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet>>, TError = null>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
@@ -3615,10 +3780,10 @@ const {query: queryOptions} = options ?? {};
 }
 
 export type GetAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGetQueryResult = NonNullable<Awaited<ReturnType<typeof getAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet>>>
-export type GetAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGetQueryError = void
+export type GetAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGetQueryError = null
 
 
-export function useGetAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet<TData = Awaited<ReturnType<typeof getAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet>>, TError = void>(
+export function useGetAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet<TData = Awaited<ReturnType<typeof getAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet>>, TError = null>(
   options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet>>,
@@ -3628,7 +3793,7 @@ export function useGetAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet<TData
       >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet<TData = Awaited<ReturnType<typeof getAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet>>, TError = void>(
+export function useGetAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet<TData = Awaited<ReturnType<typeof getAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet>>, TError = null>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet>>,
@@ -3638,7 +3803,7 @@ export function useGetAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet<TData
       >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet<TData = Awaited<ReturnType<typeof getAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet>>, TError = void>(
+export function useGetAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet<TData = Awaited<ReturnType<typeof getAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet>>, TError = null>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
@@ -3646,7 +3811,7 @@ export function useGetAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet<TData
  * @summary Общая аналитика
  */
 
-export function useGetAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet<TData = Awaited<ReturnType<typeof getAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet>>, TError = void>(
+export function useGetAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet<TData = Awaited<ReturnType<typeof getAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet>>, TError = null>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet>>, TError, TData>>, }
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -3685,7 +3850,7 @@ export const getGetCompaniesListApiV2InterviewsCompaniesListGetQueryKey = () => 
     }
 
     
-export const getGetCompaniesListApiV2InterviewsCompaniesListGetQueryOptions = <TData = Awaited<ReturnType<typeof getCompaniesListApiV2InterviewsCompaniesListGet>>, TError = void>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompaniesListApiV2InterviewsCompaniesListGet>>, TError, TData>>, }
+export const getGetCompaniesListApiV2InterviewsCompaniesListGetQueryOptions = <TData = Awaited<ReturnType<typeof getCompaniesListApiV2InterviewsCompaniesListGet>>, TError = null>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompaniesListApiV2InterviewsCompaniesListGet>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
@@ -3704,10 +3869,10 @@ const {query: queryOptions} = options ?? {};
 }
 
 export type GetCompaniesListApiV2InterviewsCompaniesListGetQueryResult = NonNullable<Awaited<ReturnType<typeof getCompaniesListApiV2InterviewsCompaniesListGet>>>
-export type GetCompaniesListApiV2InterviewsCompaniesListGetQueryError = void
+export type GetCompaniesListApiV2InterviewsCompaniesListGetQueryError = null
 
 
-export function useGetCompaniesListApiV2InterviewsCompaniesListGet<TData = Awaited<ReturnType<typeof getCompaniesListApiV2InterviewsCompaniesListGet>>, TError = void>(
+export function useGetCompaniesListApiV2InterviewsCompaniesListGet<TData = Awaited<ReturnType<typeof getCompaniesListApiV2InterviewsCompaniesListGet>>, TError = null>(
   options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompaniesListApiV2InterviewsCompaniesListGet>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getCompaniesListApiV2InterviewsCompaniesListGet>>,
@@ -3717,7 +3882,7 @@ export function useGetCompaniesListApiV2InterviewsCompaniesListGet<TData = Await
       >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetCompaniesListApiV2InterviewsCompaniesListGet<TData = Awaited<ReturnType<typeof getCompaniesListApiV2InterviewsCompaniesListGet>>, TError = void>(
+export function useGetCompaniesListApiV2InterviewsCompaniesListGet<TData = Awaited<ReturnType<typeof getCompaniesListApiV2InterviewsCompaniesListGet>>, TError = null>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompaniesListApiV2InterviewsCompaniesListGet>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getCompaniesListApiV2InterviewsCompaniesListGet>>,
@@ -3727,7 +3892,7 @@ export function useGetCompaniesListApiV2InterviewsCompaniesListGet<TData = Await
       >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetCompaniesListApiV2InterviewsCompaniesListGet<TData = Awaited<ReturnType<typeof getCompaniesListApiV2InterviewsCompaniesListGet>>, TError = void>(
+export function useGetCompaniesListApiV2InterviewsCompaniesListGet<TData = Awaited<ReturnType<typeof getCompaniesListApiV2InterviewsCompaniesListGet>>, TError = null>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompaniesListApiV2InterviewsCompaniesListGet>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
@@ -3735,7 +3900,7 @@ export function useGetCompaniesListApiV2InterviewsCompaniesListGet<TData = Await
  * @summary Список компаний
  */
 
-export function useGetCompaniesListApiV2InterviewsCompaniesListGet<TData = Awaited<ReturnType<typeof getCompaniesListApiV2InterviewsCompaniesListGet>>, TError = void>(
+export function useGetCompaniesListApiV2InterviewsCompaniesListGet<TData = Awaited<ReturnType<typeof getCompaniesListApiV2InterviewsCompaniesListGet>>, TError = null>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompaniesListApiV2InterviewsCompaniesListGet>>, TError, TData>>, }
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -3948,7 +4113,7 @@ export const getTheorySubcategoriesApiV2TheoryCategoriesCategorySubcategoriesGet
     }
   
 
-export const getGetTheorySubcategoriesApiV2TheoryCategoriesCategorySubcategoriesGetQueryKey = (category: string,) => {
+export const getGetTheorySubcategoriesApiV2TheoryCategoriesCategorySubcategoriesGetQueryKey = (category?: string,) => {
     return [`/api/v2/theory/categories/${category}/subcategories`] as const;
     }
 
@@ -4127,7 +4292,7 @@ export const getTheoryCardApiV2TheoryCardsCardIdGet = (
     }
   
 
-export const getGetTheoryCardApiV2TheoryCardsCardIdGetQueryKey = (cardId: string,) => {
+export const getGetTheoryCardApiV2TheoryCardsCardIdGetQueryKey = (cardId?: string,) => {
     return [`/api/v2/theory/cards/${cardId}`] as const;
     }
 
@@ -5328,7 +5493,7 @@ export const getAttemptHistoryApiV2ProgressAttemptsTaskIdHistoryGet = (
     }
   
 
-export const getGetAttemptHistoryApiV2ProgressAttemptsTaskIdHistoryGetQueryKey = (taskId: string,) => {
+export const getGetAttemptHistoryApiV2ProgressAttemptsTaskIdHistoryGetQueryKey = (taskId?: string,) => {
     return [`/api/v2/progress/attempts/${taskId}/history`] as const;
     }
 
@@ -5573,7 +5738,7 @@ export const getTaskSolutionApiV2ProgressSolutionsTaskIdGet = (
     }
   
 
-export const getGetTaskSolutionApiV2ProgressSolutionsTaskIdGetQueryKey = (taskId: string,) => {
+export const getGetTaskSolutionApiV2ProgressSolutionsTaskIdGetQueryKey = (taskId?: string,) => {
     return [`/api/v2/progress/solutions/${taskId}`] as const;
     }
 
@@ -6509,7 +6674,7 @@ export const getAdminUserProgressSummaryApiV2ProgressAdminUsersUserIdSummaryGet 
     }
   
 
-export const getGetAdminUserProgressSummaryApiV2ProgressAdminUsersUserIdSummaryGetQueryKey = (userId: number,) => {
+export const getGetAdminUserProgressSummaryApiV2ProgressAdminUsersUserIdSummaryGetQueryKey = (userId?: number,) => {
     return [`/api/v2/progress/admin/users/${userId}/summary`] as const;
     }
 
@@ -6598,7 +6763,7 @@ export const getAdminUserDetailedProgressApiV2ProgressAdminUsersUserIdDetailedGe
     }
   
 
-export const getGetAdminUserDetailedProgressApiV2ProgressAdminUsersUserIdDetailedGetQueryKey = (userId: number,) => {
+export const getGetAdminUserDetailedProgressApiV2ProgressAdminUsersUserIdDetailedGetQueryKey = (userId?: number,) => {
     return [`/api/v2/progress/admin/users/${userId}/detailed`] as const;
     }
 
@@ -6932,7 +7097,7 @@ export const getExecutionResultApiV2CodeEditorExecutionsExecutionIdGet = (
     }
   
 
-export const getGetExecutionResultApiV2CodeEditorExecutionsExecutionIdGetQueryKey = (executionId: string,) => {
+export const getGetExecutionResultApiV2CodeEditorExecutionsExecutionIdGetQueryKey = (executionId?: string,) => {
     return [`/api/v2/code-editor/executions/${executionId}`] as const;
     }
 
@@ -7177,7 +7342,7 @@ export const getBlockSolutionsApiV2CodeEditorSolutionsBlockIdGet = (
     }
   
 
-export const getGetBlockSolutionsApiV2CodeEditorSolutionsBlockIdGetQueryKey = (blockId: string,) => {
+export const getGetBlockSolutionsApiV2CodeEditorSolutionsBlockIdGetQueryKey = (blockId?: string,) => {
     return [`/api/v2/code-editor/solutions/${blockId}`] as const;
     }
 
@@ -7421,7 +7586,7 @@ export const getTestCasesApiV2CodeEditorTestCasesBlockIdGet = (
     }
   
 
-export const getGetTestCasesApiV2CodeEditorTestCasesBlockIdGetQueryKey = (blockId: string,) => {
+export const getGetTestCasesApiV2CodeEditorTestCasesBlockIdGetQueryKey = (blockId?: string,) => {
     return [`/api/v2/code-editor/test_cases/${blockId}`] as const;
     }
 
@@ -8470,7 +8635,7 @@ export const getTopicTasksApiV2MindmapTopicTopicKeyTasksGet = (
     }
   
 
-export const getGetTopicTasksApiV2MindmapTopicTopicKeyTasksGetQueryKey = (topicKey: string,
+export const getGetTopicTasksApiV2MindmapTopicTopicKeyTasksGetQueryKey = (topicKey?: string,
     params?: GetTopicTasksApiV2MindmapTopicTopicKeyTasksGetParams,) => {
     return [`/api/v2/mindmap/topic/${topicKey}/tasks`, ...(params ? [params]: [])] as const;
     }
@@ -8565,7 +8730,7 @@ export const getTaskDetailApiV2MindmapTaskTaskIdGet = (
     }
   
 
-export const getGetTaskDetailApiV2MindmapTaskTaskIdGetQueryKey = (taskId: string,) => {
+export const getGetTaskDetailApiV2MindmapTaskTaskIdGetQueryKey = (taskId?: string,) => {
     return [`/api/v2/mindmap/task/${taskId}`] as const;
     }
 
@@ -8982,6 +9147,814 @@ export function useGetAdminStatsApiV2AdminStatsGet<TData = Awaited<ReturnType<ty
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetAdminStatsApiV2AdminStatsGetQueryOptions(options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
+ * @summary Get Topics
+ */
+export const getTopicsApiV2AnalyticsTopicsGet = (
+    params?: GetTopicsApiV2AnalyticsTopicsGetParams,
+ signal?: AbortSignal
+) => {
+      
+      
+      return generatedApiClient<TopicRowModelType[]>(
+      {url: `/api/v2/analytics/topics`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+  
+
+export const getGetTopicsApiV2AnalyticsTopicsGetQueryKey = (params?: GetTopicsApiV2AnalyticsTopicsGetParams,) => {
+    return [`/api/v2/analytics/topics`, ...(params ? [params]: [])] as const;
+    }
+
+    
+export const getGetTopicsApiV2AnalyticsTopicsGetQueryOptions = <TData = Awaited<ReturnType<typeof getTopicsApiV2AnalyticsTopicsGet>>, TError = HTTPValidationErrorType>(params?: GetTopicsApiV2AnalyticsTopicsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTopicsApiV2AnalyticsTopicsGet>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTopicsApiV2AnalyticsTopicsGetQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTopicsApiV2AnalyticsTopicsGet>>> = ({ signal }) => getTopicsApiV2AnalyticsTopicsGet(params, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTopicsApiV2AnalyticsTopicsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetTopicsApiV2AnalyticsTopicsGetQueryResult = NonNullable<Awaited<ReturnType<typeof getTopicsApiV2AnalyticsTopicsGet>>>
+export type GetTopicsApiV2AnalyticsTopicsGetQueryError = HTTPValidationErrorType
+
+
+export function useGetTopicsApiV2AnalyticsTopicsGet<TData = Awaited<ReturnType<typeof getTopicsApiV2AnalyticsTopicsGet>>, TError = HTTPValidationErrorType>(
+ params: undefined |  GetTopicsApiV2AnalyticsTopicsGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTopicsApiV2AnalyticsTopicsGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTopicsApiV2AnalyticsTopicsGet>>,
+          TError,
+          Awaited<ReturnType<typeof getTopicsApiV2AnalyticsTopicsGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTopicsApiV2AnalyticsTopicsGet<TData = Awaited<ReturnType<typeof getTopicsApiV2AnalyticsTopicsGet>>, TError = HTTPValidationErrorType>(
+ params?: GetTopicsApiV2AnalyticsTopicsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTopicsApiV2AnalyticsTopicsGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTopicsApiV2AnalyticsTopicsGet>>,
+          TError,
+          Awaited<ReturnType<typeof getTopicsApiV2AnalyticsTopicsGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTopicsApiV2AnalyticsTopicsGet<TData = Awaited<ReturnType<typeof getTopicsApiV2AnalyticsTopicsGet>>, TError = HTTPValidationErrorType>(
+ params?: GetTopicsApiV2AnalyticsTopicsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTopicsApiV2AnalyticsTopicsGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Topics
+ */
+
+export function useGetTopicsApiV2AnalyticsTopicsGet<TData = Awaited<ReturnType<typeof getTopicsApiV2AnalyticsTopicsGet>>, TError = HTTPValidationErrorType>(
+ params?: GetTopicsApiV2AnalyticsTopicsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTopicsApiV2AnalyticsTopicsGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetTopicsApiV2AnalyticsTopicsGetQueryOptions(params,options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
+ * @summary Get Company Profiles
+ */
+export const getCompanyProfilesApiV2AnalyticsCompanyProfilesGet = (
+    params?: GetCompanyProfilesApiV2AnalyticsCompanyProfilesGetParams,
+ signal?: AbortSignal
+) => {
+      
+      
+      return generatedApiClient<CompanyProfileRowModelType[]>(
+      {url: `/api/v2/analytics/company-profiles`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+  
+
+export const getGetCompanyProfilesApiV2AnalyticsCompanyProfilesGetQueryKey = (params?: GetCompanyProfilesApiV2AnalyticsCompanyProfilesGetParams,) => {
+    return [`/api/v2/analytics/company-profiles`, ...(params ? [params]: [])] as const;
+    }
+
+    
+export const getGetCompanyProfilesApiV2AnalyticsCompanyProfilesGetQueryOptions = <TData = Awaited<ReturnType<typeof getCompanyProfilesApiV2AnalyticsCompanyProfilesGet>>, TError = HTTPValidationErrorType>(params?: GetCompanyProfilesApiV2AnalyticsCompanyProfilesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompanyProfilesApiV2AnalyticsCompanyProfilesGet>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCompanyProfilesApiV2AnalyticsCompanyProfilesGetQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCompanyProfilesApiV2AnalyticsCompanyProfilesGet>>> = ({ signal }) => getCompanyProfilesApiV2AnalyticsCompanyProfilesGet(params, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCompanyProfilesApiV2AnalyticsCompanyProfilesGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetCompanyProfilesApiV2AnalyticsCompanyProfilesGetQueryResult = NonNullable<Awaited<ReturnType<typeof getCompanyProfilesApiV2AnalyticsCompanyProfilesGet>>>
+export type GetCompanyProfilesApiV2AnalyticsCompanyProfilesGetQueryError = HTTPValidationErrorType
+
+
+export function useGetCompanyProfilesApiV2AnalyticsCompanyProfilesGet<TData = Awaited<ReturnType<typeof getCompanyProfilesApiV2AnalyticsCompanyProfilesGet>>, TError = HTTPValidationErrorType>(
+ params: undefined |  GetCompanyProfilesApiV2AnalyticsCompanyProfilesGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompanyProfilesApiV2AnalyticsCompanyProfilesGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCompanyProfilesApiV2AnalyticsCompanyProfilesGet>>,
+          TError,
+          Awaited<ReturnType<typeof getCompanyProfilesApiV2AnalyticsCompanyProfilesGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCompanyProfilesApiV2AnalyticsCompanyProfilesGet<TData = Awaited<ReturnType<typeof getCompanyProfilesApiV2AnalyticsCompanyProfilesGet>>, TError = HTTPValidationErrorType>(
+ params?: GetCompanyProfilesApiV2AnalyticsCompanyProfilesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompanyProfilesApiV2AnalyticsCompanyProfilesGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCompanyProfilesApiV2AnalyticsCompanyProfilesGet>>,
+          TError,
+          Awaited<ReturnType<typeof getCompanyProfilesApiV2AnalyticsCompanyProfilesGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCompanyProfilesApiV2AnalyticsCompanyProfilesGet<TData = Awaited<ReturnType<typeof getCompanyProfilesApiV2AnalyticsCompanyProfilesGet>>, TError = HTTPValidationErrorType>(
+ params?: GetCompanyProfilesApiV2AnalyticsCompanyProfilesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompanyProfilesApiV2AnalyticsCompanyProfilesGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Company Profiles
+ */
+
+export function useGetCompanyProfilesApiV2AnalyticsCompanyProfilesGet<TData = Awaited<ReturnType<typeof getCompanyProfilesApiV2AnalyticsCompanyProfilesGet>>, TError = HTTPValidationErrorType>(
+ params?: GetCompanyProfilesApiV2AnalyticsCompanyProfilesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompanyProfilesApiV2AnalyticsCompanyProfilesGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetCompanyProfilesApiV2AnalyticsCompanyProfilesGetQueryOptions(params,options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
+ * @summary Get Trends
+ */
+export const getTrendsApiV2AnalyticsTrendsGet = (
+    params?: GetTrendsApiV2AnalyticsTrendsGetParams,
+ signal?: AbortSignal
+) => {
+      
+      
+      return generatedApiClient<TrendRowModelType[]>(
+      {url: `/api/v2/analytics/trends`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+  
+
+export const getGetTrendsApiV2AnalyticsTrendsGetQueryKey = (params?: GetTrendsApiV2AnalyticsTrendsGetParams,) => {
+    return [`/api/v2/analytics/trends`, ...(params ? [params]: [])] as const;
+    }
+
+    
+export const getGetTrendsApiV2AnalyticsTrendsGetQueryOptions = <TData = Awaited<ReturnType<typeof getTrendsApiV2AnalyticsTrendsGet>>, TError = HTTPValidationErrorType>(params?: GetTrendsApiV2AnalyticsTrendsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrendsApiV2AnalyticsTrendsGet>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTrendsApiV2AnalyticsTrendsGetQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTrendsApiV2AnalyticsTrendsGet>>> = ({ signal }) => getTrendsApiV2AnalyticsTrendsGet(params, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTrendsApiV2AnalyticsTrendsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetTrendsApiV2AnalyticsTrendsGetQueryResult = NonNullable<Awaited<ReturnType<typeof getTrendsApiV2AnalyticsTrendsGet>>>
+export type GetTrendsApiV2AnalyticsTrendsGetQueryError = HTTPValidationErrorType
+
+
+export function useGetTrendsApiV2AnalyticsTrendsGet<TData = Awaited<ReturnType<typeof getTrendsApiV2AnalyticsTrendsGet>>, TError = HTTPValidationErrorType>(
+ params: undefined |  GetTrendsApiV2AnalyticsTrendsGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrendsApiV2AnalyticsTrendsGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTrendsApiV2AnalyticsTrendsGet>>,
+          TError,
+          Awaited<ReturnType<typeof getTrendsApiV2AnalyticsTrendsGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTrendsApiV2AnalyticsTrendsGet<TData = Awaited<ReturnType<typeof getTrendsApiV2AnalyticsTrendsGet>>, TError = HTTPValidationErrorType>(
+ params?: GetTrendsApiV2AnalyticsTrendsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrendsApiV2AnalyticsTrendsGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTrendsApiV2AnalyticsTrendsGet>>,
+          TError,
+          Awaited<ReturnType<typeof getTrendsApiV2AnalyticsTrendsGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTrendsApiV2AnalyticsTrendsGet<TData = Awaited<ReturnType<typeof getTrendsApiV2AnalyticsTrendsGet>>, TError = HTTPValidationErrorType>(
+ params?: GetTrendsApiV2AnalyticsTrendsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrendsApiV2AnalyticsTrendsGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Trends
+ */
+
+export function useGetTrendsApiV2AnalyticsTrendsGet<TData = Awaited<ReturnType<typeof getTrendsApiV2AnalyticsTrendsGet>>, TError = HTTPValidationErrorType>(
+ params?: GetTrendsApiV2AnalyticsTrendsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrendsApiV2AnalyticsTrendsGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetTrendsApiV2AnalyticsTrendsGetQueryOptions(params,options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
+ * @summary Get Cooccurrence
+ */
+export const getCooccurrenceApiV2AnalyticsCooccurrenceGet = (
+    params?: GetCooccurrenceApiV2AnalyticsCooccurrenceGetParams,
+ signal?: AbortSignal
+) => {
+      
+      
+      return generatedApiClient<CooccurrenceRowModelType[]>(
+      {url: `/api/v2/analytics/cooccurrence`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+  
+
+export const getGetCooccurrenceApiV2AnalyticsCooccurrenceGetQueryKey = (params?: GetCooccurrenceApiV2AnalyticsCooccurrenceGetParams,) => {
+    return [`/api/v2/analytics/cooccurrence`, ...(params ? [params]: [])] as const;
+    }
+
+    
+export const getGetCooccurrenceApiV2AnalyticsCooccurrenceGetQueryOptions = <TData = Awaited<ReturnType<typeof getCooccurrenceApiV2AnalyticsCooccurrenceGet>>, TError = HTTPValidationErrorType>(params?: GetCooccurrenceApiV2AnalyticsCooccurrenceGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCooccurrenceApiV2AnalyticsCooccurrenceGet>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCooccurrenceApiV2AnalyticsCooccurrenceGetQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCooccurrenceApiV2AnalyticsCooccurrenceGet>>> = ({ signal }) => getCooccurrenceApiV2AnalyticsCooccurrenceGet(params, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCooccurrenceApiV2AnalyticsCooccurrenceGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetCooccurrenceApiV2AnalyticsCooccurrenceGetQueryResult = NonNullable<Awaited<ReturnType<typeof getCooccurrenceApiV2AnalyticsCooccurrenceGet>>>
+export type GetCooccurrenceApiV2AnalyticsCooccurrenceGetQueryError = HTTPValidationErrorType
+
+
+export function useGetCooccurrenceApiV2AnalyticsCooccurrenceGet<TData = Awaited<ReturnType<typeof getCooccurrenceApiV2AnalyticsCooccurrenceGet>>, TError = HTTPValidationErrorType>(
+ params: undefined |  GetCooccurrenceApiV2AnalyticsCooccurrenceGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCooccurrenceApiV2AnalyticsCooccurrenceGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCooccurrenceApiV2AnalyticsCooccurrenceGet>>,
+          TError,
+          Awaited<ReturnType<typeof getCooccurrenceApiV2AnalyticsCooccurrenceGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCooccurrenceApiV2AnalyticsCooccurrenceGet<TData = Awaited<ReturnType<typeof getCooccurrenceApiV2AnalyticsCooccurrenceGet>>, TError = HTTPValidationErrorType>(
+ params?: GetCooccurrenceApiV2AnalyticsCooccurrenceGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCooccurrenceApiV2AnalyticsCooccurrenceGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCooccurrenceApiV2AnalyticsCooccurrenceGet>>,
+          TError,
+          Awaited<ReturnType<typeof getCooccurrenceApiV2AnalyticsCooccurrenceGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCooccurrenceApiV2AnalyticsCooccurrenceGet<TData = Awaited<ReturnType<typeof getCooccurrenceApiV2AnalyticsCooccurrenceGet>>, TError = HTTPValidationErrorType>(
+ params?: GetCooccurrenceApiV2AnalyticsCooccurrenceGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCooccurrenceApiV2AnalyticsCooccurrenceGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Cooccurrence
+ */
+
+export function useGetCooccurrenceApiV2AnalyticsCooccurrenceGet<TData = Awaited<ReturnType<typeof getCooccurrenceApiV2AnalyticsCooccurrenceGet>>, TError = HTTPValidationErrorType>(
+ params?: GetCooccurrenceApiV2AnalyticsCooccurrenceGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCooccurrenceApiV2AnalyticsCooccurrenceGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetCooccurrenceApiV2AnalyticsCooccurrenceGetQueryOptions(params,options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
+ * @summary Get Duplicates
+ */
+export const getDuplicatesApiV2AnalyticsDuplicatesGet = (
+    params?: GetDuplicatesApiV2AnalyticsDuplicatesGetParams,
+ signal?: AbortSignal
+) => {
+      
+      
+      return generatedApiClient<DuplicateRowModelType[]>(
+      {url: `/api/v2/analytics/duplicates`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+  
+
+export const getGetDuplicatesApiV2AnalyticsDuplicatesGetQueryKey = (params?: GetDuplicatesApiV2AnalyticsDuplicatesGetParams,) => {
+    return [`/api/v2/analytics/duplicates`, ...(params ? [params]: [])] as const;
+    }
+
+    
+export const getGetDuplicatesApiV2AnalyticsDuplicatesGetQueryOptions = <TData = Awaited<ReturnType<typeof getDuplicatesApiV2AnalyticsDuplicatesGet>>, TError = HTTPValidationErrorType>(params?: GetDuplicatesApiV2AnalyticsDuplicatesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDuplicatesApiV2AnalyticsDuplicatesGet>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetDuplicatesApiV2AnalyticsDuplicatesGetQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDuplicatesApiV2AnalyticsDuplicatesGet>>> = ({ signal }) => getDuplicatesApiV2AnalyticsDuplicatesGet(params, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDuplicatesApiV2AnalyticsDuplicatesGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetDuplicatesApiV2AnalyticsDuplicatesGetQueryResult = NonNullable<Awaited<ReturnType<typeof getDuplicatesApiV2AnalyticsDuplicatesGet>>>
+export type GetDuplicatesApiV2AnalyticsDuplicatesGetQueryError = HTTPValidationErrorType
+
+
+export function useGetDuplicatesApiV2AnalyticsDuplicatesGet<TData = Awaited<ReturnType<typeof getDuplicatesApiV2AnalyticsDuplicatesGet>>, TError = HTTPValidationErrorType>(
+ params: undefined |  GetDuplicatesApiV2AnalyticsDuplicatesGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDuplicatesApiV2AnalyticsDuplicatesGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getDuplicatesApiV2AnalyticsDuplicatesGet>>,
+          TError,
+          Awaited<ReturnType<typeof getDuplicatesApiV2AnalyticsDuplicatesGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetDuplicatesApiV2AnalyticsDuplicatesGet<TData = Awaited<ReturnType<typeof getDuplicatesApiV2AnalyticsDuplicatesGet>>, TError = HTTPValidationErrorType>(
+ params?: GetDuplicatesApiV2AnalyticsDuplicatesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDuplicatesApiV2AnalyticsDuplicatesGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getDuplicatesApiV2AnalyticsDuplicatesGet>>,
+          TError,
+          Awaited<ReturnType<typeof getDuplicatesApiV2AnalyticsDuplicatesGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetDuplicatesApiV2AnalyticsDuplicatesGet<TData = Awaited<ReturnType<typeof getDuplicatesApiV2AnalyticsDuplicatesGet>>, TError = HTTPValidationErrorType>(
+ params?: GetDuplicatesApiV2AnalyticsDuplicatesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDuplicatesApiV2AnalyticsDuplicatesGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Duplicates
+ */
+
+export function useGetDuplicatesApiV2AnalyticsDuplicatesGet<TData = Awaited<ReturnType<typeof getDuplicatesApiV2AnalyticsDuplicatesGet>>, TError = HTTPValidationErrorType>(
+ params?: GetDuplicatesApiV2AnalyticsDuplicatesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDuplicatesApiV2AnalyticsDuplicatesGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetDuplicatesApiV2AnalyticsDuplicatesGetQueryOptions(params,options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
+ * Return heatmap matrix derived from company_cluster_counts.csv
+normalization: none|row|col
+Output: { companies: [...], topics: [...], values: [[...]] }
+ * @summary Get Heatmap
+ */
+export const getHeatmapApiV2AnalyticsHeatmapGet = (
+    params?: GetHeatmapApiV2AnalyticsHeatmapGetParams,
+ signal?: AbortSignal
+) => {
+      
+      
+      return generatedApiClient<HeatmapResponseModelType>(
+      {url: `/api/v2/analytics/heatmap`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+  
+
+export const getGetHeatmapApiV2AnalyticsHeatmapGetQueryKey = (params?: GetHeatmapApiV2AnalyticsHeatmapGetParams,) => {
+    return [`/api/v2/analytics/heatmap`, ...(params ? [params]: [])] as const;
+    }
+
+    
+export const getGetHeatmapApiV2AnalyticsHeatmapGetQueryOptions = <TData = Awaited<ReturnType<typeof getHeatmapApiV2AnalyticsHeatmapGet>>, TError = HTTPValidationErrorType>(params?: GetHeatmapApiV2AnalyticsHeatmapGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHeatmapApiV2AnalyticsHeatmapGet>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetHeatmapApiV2AnalyticsHeatmapGetQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getHeatmapApiV2AnalyticsHeatmapGet>>> = ({ signal }) => getHeatmapApiV2AnalyticsHeatmapGet(params, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getHeatmapApiV2AnalyticsHeatmapGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetHeatmapApiV2AnalyticsHeatmapGetQueryResult = NonNullable<Awaited<ReturnType<typeof getHeatmapApiV2AnalyticsHeatmapGet>>>
+export type GetHeatmapApiV2AnalyticsHeatmapGetQueryError = HTTPValidationErrorType
+
+
+export function useGetHeatmapApiV2AnalyticsHeatmapGet<TData = Awaited<ReturnType<typeof getHeatmapApiV2AnalyticsHeatmapGet>>, TError = HTTPValidationErrorType>(
+ params: undefined |  GetHeatmapApiV2AnalyticsHeatmapGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHeatmapApiV2AnalyticsHeatmapGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getHeatmapApiV2AnalyticsHeatmapGet>>,
+          TError,
+          Awaited<ReturnType<typeof getHeatmapApiV2AnalyticsHeatmapGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetHeatmapApiV2AnalyticsHeatmapGet<TData = Awaited<ReturnType<typeof getHeatmapApiV2AnalyticsHeatmapGet>>, TError = HTTPValidationErrorType>(
+ params?: GetHeatmapApiV2AnalyticsHeatmapGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHeatmapApiV2AnalyticsHeatmapGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getHeatmapApiV2AnalyticsHeatmapGet>>,
+          TError,
+          Awaited<ReturnType<typeof getHeatmapApiV2AnalyticsHeatmapGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetHeatmapApiV2AnalyticsHeatmapGet<TData = Awaited<ReturnType<typeof getHeatmapApiV2AnalyticsHeatmapGet>>, TError = HTTPValidationErrorType>(
+ params?: GetHeatmapApiV2AnalyticsHeatmapGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHeatmapApiV2AnalyticsHeatmapGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Heatmap
+ */
+
+export function useGetHeatmapApiV2AnalyticsHeatmapGet<TData = Awaited<ReturnType<typeof getHeatmapApiV2AnalyticsHeatmapGet>>, TError = HTTPValidationErrorType>(
+ params?: GetHeatmapApiV2AnalyticsHeatmapGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHeatmapApiV2AnalyticsHeatmapGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetHeatmapApiV2AnalyticsHeatmapGetQueryOptions(params,options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
+ * Aggregate by exact question_text. Output rows sorted by total_count desc:
+[{ question_text, total_count, companies: [{ company, count }] }]
+ * @summary Get Questions Frequencies
+ */
+export const getQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGet = (
+    params?: GetQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGetParams,
+ signal?: AbortSignal
+) => {
+      
+      
+      return generatedApiClient<QuestionFrequencyRowModelType[]>(
+      {url: `/api/v2/analytics/questions-frequencies`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+  
+
+export const getGetQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGetQueryKey = (params?: GetQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGetParams,) => {
+    return [`/api/v2/analytics/questions-frequencies`, ...(params ? [params]: [])] as const;
+    }
+
+    
+export const getGetQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGetQueryOptions = <TData = Awaited<ReturnType<typeof getQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGet>>, TError = HTTPValidationErrorType>(params?: GetQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGet>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGetQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGet>>> = ({ signal }) => getQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGet(params, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGetQueryResult = NonNullable<Awaited<ReturnType<typeof getQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGet>>>
+export type GetQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGetQueryError = HTTPValidationErrorType
+
+
+export function useGetQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGet<TData = Awaited<ReturnType<typeof getQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGet>>, TError = HTTPValidationErrorType>(
+ params: undefined |  GetQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGet>>,
+          TError,
+          Awaited<ReturnType<typeof getQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGet<TData = Awaited<ReturnType<typeof getQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGet>>, TError = HTTPValidationErrorType>(
+ params?: GetQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGet>>,
+          TError,
+          Awaited<ReturnType<typeof getQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGet<TData = Awaited<ReturnType<typeof getQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGet>>, TError = HTTPValidationErrorType>(
+ params?: GetQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Questions Frequencies
+ */
+
+export function useGetQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGet<TData = Awaited<ReturnType<typeof getQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGet>>, TError = HTTPValidationErrorType>(
+ params?: GetQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetQuestionsFrequenciesApiV2AnalyticsQuestionsFrequenciesGetQueryOptions(params,options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
+ * @summary Get Top Questions
+ */
+export const getTopQuestionsApiV2AnalyticsTopQuestionsGet = (
+    params?: GetTopQuestionsApiV2AnalyticsTopQuestionsGetParams,
+ signal?: AbortSignal
+) => {
+      
+      
+      return generatedApiClient<QuestionFrequencyRowModelType[]>(
+      {url: `/api/v2/analytics/top-questions`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+  
+
+export const getGetTopQuestionsApiV2AnalyticsTopQuestionsGetQueryKey = (params?: GetTopQuestionsApiV2AnalyticsTopQuestionsGetParams,) => {
+    return [`/api/v2/analytics/top-questions`, ...(params ? [params]: [])] as const;
+    }
+
+    
+export const getGetTopQuestionsApiV2AnalyticsTopQuestionsGetQueryOptions = <TData = Awaited<ReturnType<typeof getTopQuestionsApiV2AnalyticsTopQuestionsGet>>, TError = HTTPValidationErrorType>(params?: GetTopQuestionsApiV2AnalyticsTopQuestionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTopQuestionsApiV2AnalyticsTopQuestionsGet>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTopQuestionsApiV2AnalyticsTopQuestionsGetQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTopQuestionsApiV2AnalyticsTopQuestionsGet>>> = ({ signal }) => getTopQuestionsApiV2AnalyticsTopQuestionsGet(params, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTopQuestionsApiV2AnalyticsTopQuestionsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetTopQuestionsApiV2AnalyticsTopQuestionsGetQueryResult = NonNullable<Awaited<ReturnType<typeof getTopQuestionsApiV2AnalyticsTopQuestionsGet>>>
+export type GetTopQuestionsApiV2AnalyticsTopQuestionsGetQueryError = HTTPValidationErrorType
+
+
+export function useGetTopQuestionsApiV2AnalyticsTopQuestionsGet<TData = Awaited<ReturnType<typeof getTopQuestionsApiV2AnalyticsTopQuestionsGet>>, TError = HTTPValidationErrorType>(
+ params: undefined |  GetTopQuestionsApiV2AnalyticsTopQuestionsGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTopQuestionsApiV2AnalyticsTopQuestionsGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTopQuestionsApiV2AnalyticsTopQuestionsGet>>,
+          TError,
+          Awaited<ReturnType<typeof getTopQuestionsApiV2AnalyticsTopQuestionsGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTopQuestionsApiV2AnalyticsTopQuestionsGet<TData = Awaited<ReturnType<typeof getTopQuestionsApiV2AnalyticsTopQuestionsGet>>, TError = HTTPValidationErrorType>(
+ params?: GetTopQuestionsApiV2AnalyticsTopQuestionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTopQuestionsApiV2AnalyticsTopQuestionsGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTopQuestionsApiV2AnalyticsTopQuestionsGet>>,
+          TError,
+          Awaited<ReturnType<typeof getTopQuestionsApiV2AnalyticsTopQuestionsGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTopQuestionsApiV2AnalyticsTopQuestionsGet<TData = Awaited<ReturnType<typeof getTopQuestionsApiV2AnalyticsTopQuestionsGet>>, TError = HTTPValidationErrorType>(
+ params?: GetTopQuestionsApiV2AnalyticsTopQuestionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTopQuestionsApiV2AnalyticsTopQuestionsGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Top Questions
+ */
+
+export function useGetTopQuestionsApiV2AnalyticsTopQuestionsGet<TData = Awaited<ReturnType<typeof getTopQuestionsApiV2AnalyticsTopQuestionsGet>>, TError = HTTPValidationErrorType>(
+ params?: GetTopQuestionsApiV2AnalyticsTopQuestionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTopQuestionsApiV2AnalyticsTopQuestionsGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetTopQuestionsApiV2AnalyticsTopQuestionsGetQueryOptions(params,options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
+ * Return per-company list of questions with counts:
+[{ company, total_questions, items: [{ question_text, count }] }]
+ * @summary Get Companies Questions
+ */
+export const getCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGet = (
+    params?: GetCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGetParams,
+ signal?: AbortSignal
+) => {
+      
+      
+      return generatedApiClient<CompanyQuestionsRowModelType[]>(
+      {url: `/api/v2/analytics/companies-questions`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+  
+
+export const getGetCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGetQueryKey = (params?: GetCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGetParams,) => {
+    return [`/api/v2/analytics/companies-questions`, ...(params ? [params]: [])] as const;
+    }
+
+    
+export const getGetCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGetQueryOptions = <TData = Awaited<ReturnType<typeof getCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGet>>, TError = HTTPValidationErrorType>(params?: GetCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGet>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGetQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGet>>> = ({ signal }) => getCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGet(params, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGetQueryResult = NonNullable<Awaited<ReturnType<typeof getCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGet>>>
+export type GetCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGetQueryError = HTTPValidationErrorType
+
+
+export function useGetCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGet<TData = Awaited<ReturnType<typeof getCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGet>>, TError = HTTPValidationErrorType>(
+ params: undefined |  GetCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGet>>,
+          TError,
+          Awaited<ReturnType<typeof getCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGet<TData = Awaited<ReturnType<typeof getCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGet>>, TError = HTTPValidationErrorType>(
+ params?: GetCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGet>>,
+          TError,
+          Awaited<ReturnType<typeof getCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGet<TData = Awaited<ReturnType<typeof getCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGet>>, TError = HTTPValidationErrorType>(
+ params?: GetCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Companies Questions
+ */
+
+export function useGetCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGet<TData = Awaited<ReturnType<typeof getCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGet>>, TError = HTTPValidationErrorType>(
+ params?: GetCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGetQueryOptions(params,options)
 
   const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

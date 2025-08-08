@@ -16,16 +16,18 @@ interface AnalyticsData {
 }
 
 const InterviewAnalytics = () => {
-  const [selectedMetric, setSelectedMetric] = useState<'companies' | 'duration' | 'trends'>('companies');
+  const [selectedMetric, setSelectedMetric] = useState<
+    'companies' | 'duration' | 'trends'
+  >('companies');
 
   // Используем существующие API endpoints
-  const { data: analytics, isLoading, error } = useQuery<AnalyticsData>({
+  const { isLoading, error } = useQuery<AnalyticsData>({
     queryKey: ['interviews', 'analytics'],
     queryFn: async () => {
       const response = await fetch('/api/v2/interviews/analytics/overview');
       if (!response.ok) throw new Error('Failed to fetch analytics');
       return response.json();
-    }
+    },
   });
 
   const { data: companies } = useQuery<{ companies: string[] }>({
@@ -34,7 +36,7 @@ const InterviewAnalytics = () => {
       const response = await fetch('/api/v2/interviews/companies/list');
       if (!response.ok) throw new Error('Failed to fetch companies');
       return response.json();
-    }
+    },
   });
 
   if (isLoading) {
@@ -62,7 +64,7 @@ const InterviewAnalytics = () => {
     { name: 'Иннотех', count: 25 },
     { name: 'Linked Helper', count: 20 },
     { name: 'Северсталь', count: 17 },
-    { name: 'IT-One', count: 16 }
+    { name: 'IT-One', count: 16 },
   ];
 
   return (
@@ -84,7 +86,9 @@ const InterviewAnalytics = () => {
           </div>
           <div className={styles.metricContent}>
             <h3>Компаний</h3>
-            <span className={styles.metricValue}>{companies?.companies.length || 0}</span>
+            <span className={styles.metricValue}>
+              {companies?.companies.length || 0}
+            </span>
           </div>
         </div>
 
@@ -120,8 +124,8 @@ const InterviewAnalytics = () => {
                     <div className={styles.companyRank}>#{index + 1}</div>
                     <div className={styles.companyName}>{company.name}</div>
                     <div className={styles.companyBar}>
-                      <div 
-                        className={styles.companyBarFill} 
+                      <div
+                        className={styles.companyBarFill}
                         style={{ width: `${(company.count / 131) * 100}%` }}
                       />
                     </div>
