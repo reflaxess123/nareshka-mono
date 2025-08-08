@@ -225,3 +225,6 @@ ML_DS.txt
 .claude
 sobes-data/Записи_собеседований.txt
 sobes-data/reports/
+NUL
+sobes-data/processed_csv
+
