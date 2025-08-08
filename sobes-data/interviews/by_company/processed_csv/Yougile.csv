@@ -1,0 +1,6 @@
+"id","question_text","company","date","interview_id"
+"q1","Зачем TypeScript если есть юнит тесты","Yougile","2024-11-21","interview_Yougile_000"
+"q2","Что такое CSS-in-JS","Yougile","2024-11-21","interview_Yougile_000"
+"q3","Реализуйте кнопку, которая при нажатии показывает и скрывает текст","Yougile","2024-11-21","interview_Yougile_000"
+"q4","Реализуйте два инпута, при нажатии Enter в первом фокус должен перемещаться на второй","Yougile","2024-11-21","interview_Yougile_000"
+"q5","Разобрать и создать запрос к API Bitrix24 для создания сделки с использованием fetch и async/await","Yougile","2024-11-21","interview_Yougile_000"

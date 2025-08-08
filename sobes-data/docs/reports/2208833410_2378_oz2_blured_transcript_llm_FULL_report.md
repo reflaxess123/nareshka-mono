@@ -1,0 +1,1 @@
+Ошибка при создании отчета: 500 Server Error: Internal Server Error for url: https://api.proxyapi.ru/openai/v1/chat/completions

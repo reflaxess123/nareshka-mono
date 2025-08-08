@@ -1,0 +1,5 @@
+"id","question_text","company","date","interview_id"
+"q1","Реализуйте функцию getRoute, которая принимает массив объектов с полями from, to и weight, и возвращает массив объектов с полями from, to, weight, где для каждого from указан путь с минимальным весом до to","Hyperus","2024-12-13","interview_Hyperus_000"
+"q2","Реализуйте функцию parallelLimit, которая принимает массив асинхронных функций и число limit, и запускает не более limit функций одновременно, возвращая массив результатов в порядке вызова","Hyperus","2024-12-13","interview_Hyperus_000"
+"q3","Что такое event-loop","Hyperus","2024-12-13","interview_Hyperus_000"
+"q4","Что такое замыкания","Hyperus","2024-12-13","interview_Hyperus_000"

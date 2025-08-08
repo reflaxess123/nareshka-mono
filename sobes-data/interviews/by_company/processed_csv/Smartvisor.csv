@@ -1,0 +1,6 @@
+"id","question_text","company","date","interview_id"
+"q1","Опишите процесс авторизации и аутентификации личного кабинета: access и refresh токены, какие коды ответа приходят и какие статусы (200, 201, 401) используются","Smartvisor","2025-06-16","interview_Smartvisor_000"
+"q2","event loop","Smartvisor","2025-06-16","interview_Smartvisor_000"
+"q3","websocket","Smartvisor","2025-06-16","interview_Smartvisor_000"
+"q4","i18n","Smartvisor","2025-06-16","interview_Smartvisor_000"
+"q1","Реализовать React-компонент SmartList, который получает список строк и фильтрует их по введённому пользователем поисковому запросу, показывая только те элементы, что содержат подстроку","Smartvisor","2025-06-16","interview_Smartvisor_000"

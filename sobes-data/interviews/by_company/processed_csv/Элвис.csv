@@ -1,0 +1,4 @@
+"id","question_text","company","date","interview_id"
+"q1","спросил про опыт","Элвис","2024-11-25","interview_Элвис_000"
+"q2","Event loop","Элвис","2024-11-25","interview_Элвис_000"
+"q3","Что такое event-loop и как он работает","Элвис","2024-11-25","interview_Элвис_000"

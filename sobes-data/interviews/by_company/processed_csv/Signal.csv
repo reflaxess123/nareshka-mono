@@ -1,0 +1,8 @@
+"id","question_text","company","date","interview_id"
+"q1","Given a string s, find the first non-repeating character in the entire string and return its index. If it does not exist, return -1","Signal","2025-03-04","interview_Signal_000"
+"q2","Реализовать таймер, который отображает текущее значение в секундах с кнопкой Toggle для остановки и запуска отсчёта и кнопкой Reset для сброса значения","Signal","2025-03-04","interview_Signal_000"
+"q3","Избавиться от лишних ререндеров компонента InnerComponent в React","Signal","2025-03-04","interview_Signal_000"
+"q1","Given a string s, find the first non-repeating character in it and return its index. If it does not exist, return -1","Signal","2024-04-05","interview_Signal_001"
+"q2","Написать таймер на React с кнопками Toggle, который запускает и приостанавливает счетчик, и Reset, который сбрасывает счетчик; если счетчик идет, Reset сбрасывает и запускает заново, если приостановлен — только сбрасывает","Signal","2024-04-05","interview_Signal_001"
+"q3","Реализовать функцию paralellUploading, которая принимает массив URL и ограничение parallelLimit, и возвращает массив ответов, при этом одновременно не выполняется больше parallelLimit запросов, используя asyncFetch","Signal","2024-04-05","interview_Signal_001"
+"q4","Реализовать функцию nodeCleaner, которая удаляет из дерева объектов все узлы с alive=false, при этом если узел alive=true, все его родители и дети должны остаться в дереве; реализовать рекурсивный и итеративный варианты и объяснить преимущества и недостатки каждого","Signal","2024-04-05","interview_Signal_001"
