@@ -1,0 +1,2 @@
+"id","question_text","company","date","interview_id"
+"q1","Задача на рефакторинг React-компонента AppTimer и ProductList с использованием хуков useState, useEffect и useLayoutEffect, включая исправление логики таймера и загрузки данных о продуктах и магазинах","ITL.Team","2025-07-10","interview_ITL.Team_000"

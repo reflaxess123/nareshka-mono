@@ -1,0 +1,8 @@
+"id","question_text","company","date","interview_id"
+"q1","Что такое big O notation и как оценивать сложность алгоритмов","Mobile Up Mts Тех Скриннинг","2024-08-11","interview_Mobile_Up_Mts_Тех_Скриннинг_000"
+"q2","Какие существуют способы центрирования элементов в CSS","Mobile Up Mts Тех Скриннинг","2024-08-11","interview_Mobile_Up_Mts_Тех_Скриннинг_000"
+"q3","Перечислите теги семантической верстки и их назначение","Mobile Up Mts Тех Скриннинг","2024-08-11","interview_Mobile_Up_Mts_Тех_Скриннинг_000"
+"q4","Почему у примитивных типов в JavaScript есть методы","Mobile Up Mts Тех Скриннинг","2024-08-11","interview_Mobile_Up_Mts_Тех_Скриннинг_000"
+"q5","В чем разница между интерфейсами и типами в TypeScript","Mobile Up Mts Тех Скриннинг","2024-08-11","interview_Mobile_Up_Mts_Тех_Скриннинг_000"
+"q6","Как работают зависимости в хукe useEffect в React","Mobile Up Mts Тех Скриннинг","2024-08-11","interview_Mobile_Up_Mts_Тех_Скриннинг_000"
+"q7","Почему в Redux нужно возвращать новый стор вместо мутации существующего","Mobile Up Mts Тех Скриннинг","2024-08-11","interview_Mobile_Up_Mts_Тех_Скриннинг_000"

@@ -1,0 +1,6 @@
+"id","question_text","company","date","interview_id"
+"q1","Что такое event-loop","Iga Tech","2024-11-01","interview_Iga_Tech_000"
+"q2","Что такое замыкания","Iga Tech","2024-11-01","interview_Iga_Tech_000"
+"q3","Реализуйте функцию debounce с настраиваемой задержкой","Iga Tech","2024-11-01","interview_Iga_Tech_000"
+"q4","Реализуйте функцию parallelLimit, которая принимает массив асинхронных функций и ограничивает количество одновременно выполняемых задач","Iga Tech","2024-11-01","interview_Iga_Tech_000"
+"q5","Реализуйте функцию getRoute, которая возвращает маршрут по заданным параметрам","Iga Tech","2024-11-01","interview_Iga_Tech_000"

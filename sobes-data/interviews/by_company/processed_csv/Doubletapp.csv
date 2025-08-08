@@ -1,0 +1,7 @@
+"id","question_text","company","date","interview_id"
+"q1","Причины ухода","Doubletapp","2024-11-14","interview_Doubletapp_000"
+"q2","Расскажи о предыдущем месте работы","Doubletapp","2024-11-14","interview_Doubletapp_000"
+"q3","Какие ожидания от места работы","Doubletapp","2024-11-14","interview_Doubletapp_000"
+"q4","Чем занимался на предыдущем месте работы","Doubletapp","2024-11-14","interview_Doubletapp_000"
+"q5","Реализуйте функцию, которая принимает строку и возвращает объект с подсчетом количества каждого символа в строке","Doubletapp","2024-11-14","interview_Doubletapp_000"
+"q6","Напишите функцию, которая принимает объект дерева с полями value и children и возвращает массив всех значений value из дерева","Doubletapp","2024-11-14","interview_Doubletapp_000"

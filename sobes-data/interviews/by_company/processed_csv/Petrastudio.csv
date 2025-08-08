@@ -1,0 +1,5 @@
+"id","question_text","company","date","interview_id"
+"q1","Глубоко рассказать про event-loop","Petrastudio","2024-03-18","interview_Petrastudio_000"
+"q2","Объяснить, как работает браузер после ввода адреса","Petrastudio","2024-03-18","interview_Petrastudio_000"
+"q3","Провести ревью кода React-компонента","Petrastudio","2024-03-18","interview_Petrastudio_000"
+"q4","Написать юнит-тест на React-компонент псевдокодом","Petrastudio","2024-03-18","interview_Petrastudio_000"

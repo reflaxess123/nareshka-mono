@@ -1,0 +1,4 @@
+"id","question_text","company","date","interview_id"
+"q1","Расскажи о себе","Intermobility","2024-11-11","interview_Intermobility_000"
+"q2","Зачем нужен key в React и что такое VDOM","Intermobility","2024-11-11","interview_Intermobility_000"
+"q3","Реализуйте React-компонент с возможностью добавления любого количества инпутов по кнопке и валидацией: если значение во всех инпутах равно 'react', кнопка 'Сохранить' должна быть активна (disabled=false), иначе неактивна","Intermobility","2024-11-11","interview_Intermobility_000"

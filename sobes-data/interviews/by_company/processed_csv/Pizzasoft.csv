@@ -1,0 +1,5 @@
+"id","question_text","company","date","interview_id"
+"q1","Написать функцию createLimitedCaller, которая ограничивает количество вызовов переданной callback-функции максимум тремя и после этого возвращает undefined или выбрасывает ошибку","Pizzasoft","2025-05-23","interview_Pizzasoft_000"
+"q2","Написать функцию get, которая по объекту, строке пути с разделителем точка и значению по умолчанию возвращает значение по пути или значение по умолчанию, если путь не существует","Pizzasoft","2025-05-23","interview_Pizzasoft_000"
+"q3","Исправить React-компонент CustomProvider: добавить useCallback для функций increment и decrement, добавить useMemo для объекта actions, передать actions в value контекста ActionsContext","Pizzasoft","2025-05-23","interview_Pizzasoft_000"
+"q4","Написать todo-приложение на React с возможностью добавления задач, переключения статуса задачи (выполнена/активна) и фильтрации задач по статусу (все, выполненные, активные)","Pizzasoft","2025-05-23","interview_Pizzasoft_000"

@@ -1,0 +1,5 @@
+"id","question_text","company","date","interview_id"
+"q1","Отрефакторить конфиг ESBuild с использованием промисов и корректным выводом порта сервера","Fractall Design","2025-06-26","interview_Fractall_Design_000"
+"q2","Оптимизировать React-компонент InputSection с использованием useRef и useCallback для обработки onClick и onChange","Fractall Design","2025-06-26","interview_Fractall_Design_000"
+"q3","Отрефакторить React-компонент Component с условным рендерингом счетчика и корректным добавлением обработчика клика без прямого доступа к DOM через ref","Fractall Design","2025-06-26","interview_Fractall_Design_000"
+"q4","Реализовать функцию Factory с типами TypeScript, которая принимает компонент и props, и вызывает компонент с props, при этом должна корректно проверять типы props и выдавать ошибки при несоответствии","Fractall Design","2025-06-26","interview_Fractall_Design_000"
