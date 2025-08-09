@@ -1,5 +1,6 @@
 import argparse
 import json
+import csv
 import math
 import os
 import re
@@ -93,6 +94,7 @@ class ClusterLabel:
     topics: List[str]
     topic_confidence: Dict[str, float]
     rationale_short: str
+    fingerprint: str = ""
 
 
 def normalize_company(name: str) -> str:
@@ -106,11 +108,70 @@ def normalize_company(name: str) -> str:
     return norm
 
 
+def _normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+    df.columns = [str(c).replace("\ufeff", "").strip() for c in df.columns]
+    return df
+
+
 def load_df(input_csv: str) -> pd.DataFrame:
-    df = pd.read_csv(input_csv)
     required_cols = {"id", "question_text", "company", "date", "interview_id"}
+    # Try standard read
+    try:
+        df = _normalize_columns(pd.read_csv(input_csv, encoding="utf-8-sig"))
+        missing = required_cols - set(df.columns)
+        if not missing:
+            df["company_norm"] = df["company"].apply(normalize_company)
+            df["question_text_norm"] = (
+                df["question_text"].astype(str).str.strip().str.replace("\s+", " ", regex=True)
+            )
+            return df
+    except Exception:
+        pass
+    # Try with Python engine and auto-sep detection (handles ;, , and BOM)
+    try:
+        df = _normalize_columns(pd.read_csv(input_csv, sep=None, engine="python", encoding="utf-8-sig"))
+        missing = required_cols - set(df.columns)
+        if not missing:
+            df["company_norm"] = df["company"].apply(normalize_company)
+            df["question_text_norm"] = (
+                df["question_text"].astype(str).str.strip().str.replace("\s+", " ", regex=True)
+            )
+            return df
+    except Exception:
+        pass
+    # Sniff delimiter and parse with tolerant settings
+    try:
+        with open(input_csv, "r", encoding="utf-8-sig", errors="ignore") as f:
+            sample = f.read(8192)
+        dialect = csv.Sniffer().sniff(sample, delimiters=[",", ";", "\t"])  # type: ignore[arg-type]
+        sep = dialect.delimiter
+    except Exception:
+        sep = ","
+    df = _normalize_columns(pd.read_csv(input_csv, sep=sep, engine="python", encoding="utf-8-sig", on_bad_lines="skip"))
     missing = required_cols - set(df.columns)
     if missing:
+        # Final fallback: file without header, assume standard 5 columns order
+        try:
+            df_nohdr = pd.read_csv(
+                input_csv,
+                sep=sep,
+                engine="python",
+                encoding="utf-8-sig",
+                on_bad_lines="skip",
+                header=None,
+                names=["id", "question_text", "company", "date", "interview_id"],
+            )
+            df = _normalize_columns(df_nohdr)
+            missing2 = required_cols - set(df.columns)
+            if not missing2:
+                df["company_norm"] = df["company"].apply(normalize_company)
+                df["question_text_norm"] = (
+                    df["question_text"].astype(str).str.strip().str.replace("\s+", " ", regex=True)
+                )
+                return df
+        except Exception:
+            pass
         raise ValueError(f"Missing required columns: {missing}")
     df["company_norm"] = df["company"].apply(normalize_company)
     df["question_text_norm"] = (
@@ -176,6 +237,7 @@ def build_similarity_graph(
     vectors: np.ndarray,
     cosine_threshold: float = 0.88,
     n_neighbors: int = 20,
+    mutual_knn: bool = False,
 ) -> nx.Graph:
     # Normalize vectors to unit length for cosine
     norms = np.linalg.norm(vectors, axis=1, keepdims=True)
@@ -188,19 +250,33 @@ def build_similarity_graph(
 
     g = nx.Graph()
     g.add_nodes_from(range(len(unit)))
-    for i in range(len(unit)):
-        for dist, j in zip(distances[i], indices[i]):
-            if i == j:
-                continue
-            sim = 1.0 - float(dist)
-            if sim >= cosine_threshold:
-                g.add_edge(int(i), int(j), weight=sim)
+    if mutual_knn:
+        neighbor_sets = [set(map(int, row)) for row in indices]
+        for i in range(len(unit)):
+            for dist, j in zip(distances[i], indices[i]):
+                j = int(j)
+                if i == j:
+                    continue
+                sim = 1.0 - float(dist)
+                if sim >= cosine_threshold and i in neighbor_sets[j]:
+                    g.add_edge(int(i), j, weight=sim)
+    else:
+        for i in range(len(unit)):
+            for dist, j in zip(distances[i], indices[i]):
+                if i == j:
+                    continue
+                sim = 1.0 - float(dist)
+                if sim >= cosine_threshold:
+                    g.add_edge(int(i), int(j), weight=sim)
     return g
 
 
 def connected_components_clusters(graph: nx.Graph) -> Dict[int, int]:
+    # Stable ordering: sort components by smallest node index to stabilize cluster ids
+    comps = [sorted(list(c)) for c in nx.connected_components(graph)]
+    comps.sort(key=lambda c: c[0] if c else 10**9)
     mapping: Dict[int, int] = {}
-    for cid, comp in enumerate(nx.connected_components(graph), start=1):
+    for cid, comp in enumerate(comps, start=1):
         for idx in comp:
             mapping[int(idx)] = int(cid)
     return mapping
@@ -269,6 +345,11 @@ def extract_representatives(
                 deduped.append(t)
         reps[int(cid)] = deduped[:max_examples_per_cluster]
     return reps
+
+
+def cluster_fingerprint(member_indices: List[int]) -> str:
+    key = ",".join(map(str, sorted(member_indices)))
+    return hashlib.sha1(key.encode("utf-8")).hexdigest()[:16]
 
 
 def ensure_json(s: str) -> Optional[dict]:
@@ -442,6 +523,7 @@ def _load_existing_labels(jsonl_path: Path) -> Dict[int, ClusterLabel]:
                     topics=d.get("topics", []) or [],
                     topic_confidence=d.get("topic_confidence", {}) or {},
                     rationale_short=d.get("rationale_short", ""),
+                    fingerprint=str(d.get("fingerprint", "")),
                 )
             except Exception:
                 continue
@@ -455,6 +537,7 @@ def _append_label(jsonl_path: Path, label: ClusterLabel) -> None:
         "topics": label.topics,
         "topic_confidence": label.topic_confidence,
         "rationale_short": label.rationale_short,
+        "fingerprint": getattr(label, "fingerprint", ""),
     }
     with open(jsonl_path, "a", encoding="utf-8") as f:
         f.write(json.dumps(rec, ensure_ascii=False) + "\n")
@@ -474,12 +557,27 @@ def label_all_clusters(
     max_retries: int = 3,
     request_timeout: float = 120.0,
     label_workers: int = 1,
+    label_min_size: int = 1,
+    label_top_k: int = 0,
+    cluster_members: Optional[Dict[int, List[int]]] = None,
 ) -> Dict[int, ClusterLabel]:
     # Load existing labels (resume capability)
     jsonl_path = _labels_jsonl_path(outdir_for_labels or "sobes-data/analysis/outputs", model, cosine, neighbors, merge_t)
     existing = _load_existing_labels(jsonl_path)
 
+    # Precompute labeling order and selection
+    items = list(cluster_to_examples.items())
+    if cluster_members:
+        # Sort by cluster size desc for potential top-k filtering
+        items.sort(key=lambda kv: len(cluster_members.get(kv[0], [])), reverse=True)
+    if label_top_k and label_top_k > 0:
+        items = items[:label_top_k]
+
     def process_cluster(cid: int, examples: List[str]) -> Tuple[int, ClusterLabel]:
+        # Skip small clusters
+        if cluster_members and len(cluster_members.get(cid, [])) < label_min_size:
+            fp = cluster_fingerprint(cluster_members.get(cid, [])) if cluster_members else ""
+            return cid, ClusterLabel(cluster_id=cid, canonical_question="", topics=[], topic_confidence={}, rationale_short="", fingerprint=fp)
         if cid in existing and existing[cid].canonical_question:
             return cid, existing[cid]
         runs: List[ClusterLabel] = []
@@ -497,10 +595,12 @@ def label_all_clusters(
             if lab:
                 runs.append(lab)
         voted = majority_vote_labels(runs, taxonomy)
+        # attach fingerprint if available
+        if cluster_members is not None:
+            voted.fingerprint = cluster_fingerprint(cluster_members.get(cid, []))
         _append_label(jsonl_path, voted)
         return cid, voted
 
-    items = list(cluster_to_examples.items())
     results: Dict[int, ClusterLabel] = dict(existing)
     if label_workers > 1:
         with ThreadPoolExecutor(max_workers=label_workers) as ex:
@@ -574,8 +674,15 @@ def save_outputs(
             "canonical_question": lab.canonical_question,
             "topics": ", ".join(lab.topics),
             "topic_confidence": json.dumps(lab.topic_confidence, ensure_ascii=False),
+            "fingerprint": getattr(lab, "fingerprint", ""),
         })
-    pd.DataFrame(labels_rows).to_csv(os.path.join(outdir, "cluster_labels.csv"), index=False)
+    labels_df = pd.DataFrame(labels_rows)
+    labels_df.to_csv(os.path.join(outdir, "cluster_labels.csv"), index=False)
+
+    # Enriched questions with labels inline
+    labels_inline = labels_df[["cluster_id", "canonical_question", "topics"]].copy()
+    df_enriched = df_with_clusters.merge(labels_inline, on="cluster_id", how="left")
+    df_enriched.to_csv(os.path.join(outdir, "enriched_questions.csv"), index=False)
 
     # Aggregates
     top_clusters.to_csv(os.path.join(outdir, "top_clusters_global.csv"), index=False)
@@ -594,6 +701,9 @@ def main():
     parser.add_argument("--self-consistency-runs", type=int, default=3, help="Number of GPT runs per cluster")
     parser.add_argument("--max-examples-per-cluster", type=int, default=8, help="Max examples sent to GPT per cluster")
     parser.add_argument("--merge-centroid-threshold", type=float, default=0.0, help="Optional extra merge step by centroid cosine (e.g., 0.92). 0 disables.")
+    parser.add_argument("--mutual-knn", action="store_true", help="Require mutual kNN for graph edges (cleaner clusters)")
+    parser.add_argument("--label-min-size", type=int, default=1, help="Label only clusters with size >= this value")
+    parser.add_argument("--label-top-k", type=int, default=0, help="Label only top-K clusters by size (0=all)")
     parser.add_argument("--cache-dir", default="sobes-data/analysis/cache", help="Directory to cache embeddings and intermediates")
     parser.add_argument("--max-retries", type=int, default=3, help="Max retries for API calls")
     parser.add_argument("--request-timeout", type=float, default=120.0, help="Timeout (s) for API calls")
@@ -637,7 +747,12 @@ def main():
     )
 
     # Graph clustering via cosine threshold
-    graph = build_similarity_graph(emb, cosine_threshold=args.cosine_threshold, n_neighbors=args.neighbors)
+    graph = build_similarity_graph(
+        emb,
+        cosine_threshold=args.cosine_threshold,
+        n_neighbors=args.neighbors,
+        mutual_knn=args.mutual_knn if hasattr(args, "mutual_knn") else False,
+    )
     idx_to_cluster = connected_components_clusters(graph)
     # Optional merge by centroids to reduce over-segmentation
     if args.merge_centroid_threshold and args.merge_centroid_threshold > 0.0:
@@ -646,6 +761,11 @@ def main():
 
     # Representatives for labeling
     reps = extract_representatives(df, cluster_col="cluster_id", max_examples_per_cluster=args.max_examples_per_cluster)
+    # Build members map and fingerprints
+    cluster_to_member_indices: Dict[int, List[int]] = defaultdict(list)
+    for i, cid in idx_to_cluster.items():
+        cluster_to_member_indices[cid].append(int(i))
+    cluster_fp: Dict[int, str] = {cid: cluster_fingerprint(members) for cid, members in cluster_to_member_indices.items()}
 
     # Label clusters with GPT (self-consistency)
     cluster_labels = label_all_clusters(
@@ -662,6 +782,9 @@ def main():
         max_retries=args.max_retries,
         request_timeout=args.request_timeout,
         label_workers=args.label_workers,
+        label_min_size=getattr(args, "label_min_size", 1),
+        label_top_k=getattr(args, "label_top_k", 0),
+        cluster_members=cluster_to_member_indices,
     )
 
     # Map topics for aggregates
