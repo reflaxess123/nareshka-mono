@@ -170,7 +170,7 @@ temp/
 tmp/
 
 # Cleanup scripts
-clean_pycache.bat 
+clean_pycache.bat
 
 # Logs
 logs
@@ -226,9 +226,9 @@ ML_DS.txt
 sobes-data/Записи_собеседований.txt
 sobes-data/reports/
 NUL
-sobes-data/processed_csv
-sobes-data/interviews
-sobes-data/datasets 
-sobes-data 
+#sobes-data/processed_csv
+#sobes-data/interviews
+#sobes-data/datasets
+#sobes-data
 
 

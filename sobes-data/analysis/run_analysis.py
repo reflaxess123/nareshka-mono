@@ -18,6 +18,7 @@ from tqdm import tqdm
 
 # Third-party ML
 from sklearn.neighbors import NearestNeighbors
+from sklearn.cluster import HDBSCAN
 import networkx as nx
 
 # OpenAI SDK (works with ProxyAPI-compatible base_url)
@@ -282,6 +283,102 @@ def connected_components_clusters(graph: nx.Graph) -> Dict[int, int]:
     return mapping
 
 
+def hdbscan_clusters(
+    vectors: np.ndarray,
+    min_cluster_size: int = 10,
+    min_samples: int = 5,
+    max_cluster_size: int = 100,
+) -> Dict[int, int]:
+    """
+    HDBSCAN кластеризация с контролем размера кластеров.
+    Решает проблему гигантских кластеров.
+    """
+    print(f"HDBSCAN параметры: min_cluster_size={min_cluster_size}, min_samples={min_samples}")
+    print(f"Векторов для кластеризации: {len(vectors)}")
+    
+    clusterer = HDBSCAN(
+        min_cluster_size=min_cluster_size,
+        min_samples=min_samples,
+        metric='euclidean',
+        cluster_selection_method='eom'
+    )
+    
+    # Нормализуем векторы для euclidean distance
+    print("Нормализуем векторы...")
+    norms = np.linalg.norm(vectors, axis=1, keepdims=True)
+    norms[norms == 0.0] = 1.0
+    unit_vectors = vectors / norms
+    
+    print("Запускаем HDBSCAN fit_predict (может занять несколько минут)...")
+    print("⏳ Это займет 30-60 секунд, ждите...")
+    import time
+    start_time = time.time()
+    cluster_labels = clusterer.fit_predict(unit_vectors)
+    elapsed = time.time() - start_time
+    print(f"✅ HDBSCAN завершен за {elapsed:.1f}с! Уникальных меток: {len(set(cluster_labels))}")
+    
+    # Анализ результатов HDBSCAN
+    unique_labels = set(cluster_labels)
+    n_clusters = len(unique_labels) - (1 if -1 in unique_labels else 0)
+    n_noise = list(cluster_labels).count(-1)
+    coverage = (len(cluster_labels) - n_noise) / len(cluster_labels) * 100
+    
+    print(f"📊 Результаты HDBSCAN:")
+    print(f"   Кластеров найдено: {n_clusters}")
+    print(f"   Покрытие: {coverage:.1f}% ({len(cluster_labels) - n_noise}/{len(cluster_labels)})")
+    print(f"   Noise points: {n_noise}")
+    
+    # Преобразуем в формат {index: cluster_id}
+    print("Конвертируем результаты...")
+    mapping: Dict[int, int] = {}
+    max_valid_label = max([l for l in cluster_labels if l != -1]) if any(l != -1 for l in cluster_labels) else 0
+    noise_cluster_id = max_valid_label + 2  # Отдельный ID для noise
+    
+    for idx, label in enumerate(cluster_labels):
+        if label == -1:
+            # Все noise points в один кластер (их можно потом отфильтровать)
+            mapping[idx] = noise_cluster_id
+        else:
+            mapping[idx] = int(label) + 1  # +1 чтобы начинать с 1, не с 0
+    
+    # Проверяем размеры кластеров и разбиваем большие
+    from collections import Counter
+    cluster_sizes = Counter(mapping.values())
+    large_clusters = [cid for cid, size in cluster_sizes.items() if size > max_cluster_size]
+    
+    print(f"📈 Анализ размеров кластеров:")
+    sizes = sorted(cluster_sizes.values(), reverse=True)
+    print(f"   Топ-10 размеров: {sizes[:10]}")
+    print(f"   Максимальный: {max(sizes) if sizes else 0}")
+    print(f"   Кластеров >50: {len([s for s in sizes if s > 50])}")
+    print(f"   Кластеров 5-50: {len([s for s in sizes if 5 <= s <= 50])}")
+    
+    if large_clusters:
+        print(f"Найдено {len(large_clusters)} кластеров размером >{max_cluster_size}, разбиваем...")
+        next_cluster_id = max(mapping.values()) + 1
+        
+        for large_cid in large_clusters:
+            # Индексы элементов в большом кластере
+            large_indices = [idx for idx, cid in mapping.items() if cid == large_cid]
+            if len(large_indices) <= max_cluster_size:
+                continue
+                
+            # Дополнительная кластеризация k-means для разбивки
+            from sklearn.cluster import KMeans
+            n_subclusters = (len(large_indices) // max_cluster_size) + 1
+            large_vectors = unit_vectors[large_indices]
+            
+            kmeans = KMeans(n_clusters=n_subclusters, random_state=42, n_init=10)
+            sub_labels = kmeans.fit_predict(large_vectors)
+            
+            # Переназначаем кластеры
+            for i, idx in enumerate(large_indices):
+                mapping[idx] = next_cluster_id + sub_labels[i]
+            next_cluster_id += n_subclusters
+    
+    return mapping
+
+
 def merge_clusters_by_centroid(
     vectors: np.ndarray,
     idx_to_cluster: Dict[int, int],
@@ -485,7 +582,7 @@ def majority_vote_labels(labels: List[ClusterLabel], taxonomy: List[str]) -> Clu
     topics: List[str] = []
     topic_conf: Dict[str, float] = {}
     for t, cnt in topic_counter.items():
-        if cnt >= 2:  # majority across 3 runs
+        if cnt >= 1:  # любая тема которая появилась
             topics.append(t)
             vals = conf_accum.get(t, [0.6])
             topic_conf[t] = float(np.mean(vals))
@@ -702,6 +799,10 @@ def main():
     parser.add_argument("--max-examples-per-cluster", type=int, default=8, help="Max examples sent to GPT per cluster")
     parser.add_argument("--merge-centroid-threshold", type=float, default=0.0, help="Optional extra merge step by centroid cosine (e.g., 0.92). 0 disables.")
     parser.add_argument("--mutual-knn", action="store_true", help="Require mutual kNN for graph edges (cleaner clusters)")
+    parser.add_argument("--use-hdbscan", action="store_true", help="Use HDBSCAN instead of connected components (fixes giant cluster problem)")
+    parser.add_argument("--hdbscan-min-cluster-size", type=int, default=10, help="HDBSCAN min cluster size")
+    parser.add_argument("--hdbscan-min-samples", type=int, default=5, help="HDBSCAN min samples")
+    parser.add_argument("--hdbscan-max-cluster-size", type=int, default=100, help="HDBSCAN max cluster size (large clusters will be split)")
     parser.add_argument("--label-min-size", type=int, default=1, help="Label only clusters with size >= this value")
     parser.add_argument("--label-top-k", type=int, default=0, help="Label only top-K clusters by size (0=all)")
     parser.add_argument("--cache-dir", default="sobes-data/analysis/cache", help="Directory to cache embeddings and intermediates")
@@ -746,17 +847,28 @@ def main():
         request_timeout=args.request_timeout,
     )
 
-    # Graph clustering via cosine threshold
-    graph = build_similarity_graph(
-        emb,
-        cosine_threshold=args.cosine_threshold,
-        n_neighbors=args.neighbors,
-        mutual_knn=args.mutual_knn if hasattr(args, "mutual_knn") else False,
-    )
-    idx_to_cluster = connected_components_clusters(graph)
-    # Optional merge by centroids to reduce over-segmentation
-    if args.merge_centroid_threshold and args.merge_centroid_threshold > 0.0:
-        idx_to_cluster = merge_clusters_by_centroid(emb, idx_to_cluster, threshold=args.merge_centroid_threshold)
+    # Кластеризация
+    if getattr(args, "use_hdbscan", False):
+        print("Используем HDBSCAN кластеризацию...")
+        idx_to_cluster = hdbscan_clusters(
+            emb,
+            min_cluster_size=getattr(args, "hdbscan_min_cluster_size", 10),
+            min_samples=getattr(args, "hdbscan_min_samples", 5),
+            max_cluster_size=getattr(args, "hdbscan_max_cluster_size", 100),
+        )
+    else:
+        print("Используем граф + connected components...")
+        # Graph clustering via cosine threshold
+        graph = build_similarity_graph(
+            emb,
+            cosine_threshold=args.cosine_threshold,
+            n_neighbors=args.neighbors,
+            mutual_knn=args.mutual_knn if hasattr(args, "mutual_knn") else False,
+        )
+        idx_to_cluster = connected_components_clusters(graph)
+        # Optional merge by centroids to reduce over-segmentation
+        if args.merge_centroid_threshold and args.merge_centroid_threshold > 0.0:
+            idx_to_cluster = merge_clusters_by_centroid(emb, idx_to_cluster, threshold=args.merge_centroid_threshold)
     df["cluster_id"] = df.index.map(lambda i: idx_to_cluster.get(int(i), -1))
 
     # Representatives for labeling
