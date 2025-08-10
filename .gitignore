@@ -231,4 +231,8 @@ NUL
 #sobes-data/datasets
 #sobes-data
 
+# BERTopic models and embeddings cache
+sobes-data/analysis/outputs_bertopic/bertopic_model/
+sobes-data/analysis/cache/*.npy
+sobes-data/analysis/sobes-data/
 
