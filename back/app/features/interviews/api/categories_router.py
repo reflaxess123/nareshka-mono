@@ -135,6 +135,11 @@ def search_questions(
         le=500, 
         description="Максимальное количество результатов"
     ),
+    offset: int = Query(
+        0, 
+        ge=0, 
+        description="Смещение для пагинации"
+    ),
     session: Session = Depends(get_session),
     current_user=Depends(get_current_user_optional)
 ) -> List[QuestionResponse]:
@@ -150,7 +155,8 @@ def search_questions(
         search_query=q,
         category_id=category_id,
         company=company,
-        limit=limit
+        limit=limit,
+        offset=offset
     )
 
 

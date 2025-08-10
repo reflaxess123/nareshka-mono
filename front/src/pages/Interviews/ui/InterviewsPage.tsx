@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { PageWrapper } from '@/shared/components/PageWrapper/ui/PageWrapper';
 import { Text, TextAlign, TextSize, TextWeight } from '@/shared/components/Text';
 import { InterviewsList } from '../../../widgets/InterviewsList';
-import InterviewAnalytics from '../../../components/InterviewAnalytics/InterviewAnalytics';
-import { BarChart3, List } from 'lucide-react';
+import { InterviewCategories } from '@/features/InterviewCategories';
+import { List, Database } from 'lucide-react';
 import styles from './InterviewsPage.module.scss';
 
-type ActiveTab = 'interviews' | 'analytics';
+type ActiveTab = 'interviews' | 'questions';
 
 export const InterviewsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('interviews');
@@ -20,7 +20,9 @@ export const InterviewsPage: React.FC = () => {
       <div className={styles.page}>
         <header className={styles.header}>
           <Text
-            text={activeTab === 'interviews' ? 'Интервью' : 'Аналитика интервью'}
+            text={
+              activeTab === 'interviews' ? 'Интервью' : 'База вопросов'
+            }
             size={TextSize.XXL}
             weight={TextWeight.MEDIUM}
             align={TextAlign.CENTER}
@@ -29,7 +31,7 @@ export const InterviewsPage: React.FC = () => {
             text={
               activeTab === 'interviews'
                 ? 'База интервью для изучения реального опыта собеседований'
-                : 'Статистика и аналитика по интервью в базе данных'
+                : 'Категоризированная база вопросов для подготовки к собеседованиям'
             }
             size={TextSize.MD}
             align={TextAlign.CENTER}
@@ -46,20 +48,17 @@ export const InterviewsPage: React.FC = () => {
             Список интервью
           </button>
           <button
-            className={`${styles.tabButton} ${activeTab === 'analytics' ? styles.active : ''}`}
-            onClick={() => handleTabChange('analytics')}
+            className={`${styles.tabButton} ${activeTab === 'questions' ? styles.active : ''}`}
+            onClick={() => handleTabChange('questions')}
           >
-            <BarChart3 size={16} />
-            Аналитика
+            <Database size={16} />
+            База вопросов
           </button>
         </div>
 
         <div className={styles.content}>
-          {activeTab === 'interviews' ? (
-            <InterviewsList />
-          ) : (
-            <InterviewAnalytics />
-          )}
+          {activeTab === 'interviews' && <InterviewsList />}
+          {activeTab === 'questions' && <InterviewCategories />}
         </div>
       </div>
     </PageWrapper>

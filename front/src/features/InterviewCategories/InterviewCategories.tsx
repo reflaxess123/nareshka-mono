@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
+import type { InfiniteData } from '@tanstack/react-query';
 import styles from './InterviewCategories.module.scss';
 
 interface Category {
@@ -42,8 +43,6 @@ interface Company {
 }
 
 type ViewMode = 'categories' | 'category-detail' | 'cluster-questions' | 'search' | 'companies';
-
-const API_BASE = '';
 
 // Цвета для категорий
 const CATEGORY_COLORS: Record<string, string> = {
@@ -103,6 +102,37 @@ export const InterviewCategories: React.FC = () => {
     enabled: !!selectedCategory
   });
 
+  // Загрузка вопросов категории с infinite scroll
+  const {
+    data: categoryQuestionsData,
+    fetchNextPage: fetchNextCategoryPage,
+    hasNextPage: hasNextCategoryPage,
+    isFetchingNextPage: isFetchingNextCategoryPage,
+    isLoading: categoryQuestionsLoading,
+  } = useInfiniteQuery<Question[], Error, InfiniteData<Question[]>, (string | null)[], number>({
+    queryKey: ['category-questions', selectedCategory],
+    queryFn: async (context) => {
+      const { pageParam = 0 } = context;
+      if (!selectedCategory) return [];
+      const params = new URLSearchParams({ 
+        q: '*', 
+        category_id: selectedCategory, 
+        limit: '100',
+        offset: pageParam.toString()
+      });
+      
+      const response = await fetch(`/api/v2/interview-categories/search/questions?${params}`);
+      if (!response.ok) throw new Error('Failed to fetch category questions');
+      return response.json();
+    },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage: Question[], allPages: Question[][]) => {
+      if (lastPage.length < 100) return undefined;
+      return allPages.length * 100;
+    },
+    enabled: !!selectedCategory && viewMode === 'category-detail'
+  });
+
   // Загрузка вопросов кластера
   const { data: clusterQuestions, isLoading: clusterQuestionsLoading } = useQuery<Question[]>({
     queryKey: ['cluster-questions', selectedCluster, clusterQuestionsPage],
@@ -131,19 +161,66 @@ export const InterviewCategories: React.FC = () => {
     enabled: searchQuery.length >= 2
   });
 
-  // Вопросы по компании
-  const { data: companyQuestions, isLoading: companyQuestionsLoading } = useQuery<Question[]>({
+  // Вопросы по компании с infinite scroll
+  const {
+    data: companyQuestionsData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading: companyQuestionsLoading,
+  } = useInfiniteQuery<Question[], Error, InfiniteData<Question[]>, (string | null)[], number>({
     queryKey: ['company-questions', selectedCompany],
-    queryFn: async () => {
+    queryFn: async (context) => {
+      const { pageParam = 0 } = context;
       if (!selectedCompany) return [];
-      const params = new URLSearchParams({ q: '*', company: selectedCompany, limit: '500' });
+      const params = new URLSearchParams({ 
+        q: '*', 
+        company: selectedCompany, 
+        limit: '100',
+        offset: pageParam.toString()
+      });
       
       const response = await fetch(`/api/v2/interview-categories/search/questions?${params}`);
       if (!response.ok) throw new Error('Failed to fetch company questions');
       return response.json();
     },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage: Question[], allPages: Question[][]) => {
+      if (lastPage.length < 100) return undefined; // No more pages
+      return allPages.length * 100; // Next offset
+    },
     enabled: !!selectedCompany && viewMode === 'companies'
   });
+
+  // Flatten questions for display  
+  const companyQuestions: Question[] = companyQuestionsData?.pages.flat() || [];
+  const categoryQuestions: Question[] = categoryQuestionsData?.pages.flat() || [];
+
+  // Infinite scroll handler
+  const handleScroll = useCallback(() => {
+    if (
+      window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight
+    ) {
+      return;
+    }
+
+    // Handle company questions infinite scroll
+    if (viewMode === 'companies' && selectedCompany && !isFetchingNextPage && hasNextPage) {
+      fetchNextPage();
+    }
+    
+    // Handle category questions infinite scroll
+    if (viewMode === 'category-detail' && selectedCategory && !isFetchingNextCategoryPage && hasNextCategoryPage) {
+      fetchNextCategoryPage();
+    }
+  }, [viewMode, selectedCompany, selectedCategory, fetchNextPage, isFetchingNextPage, hasNextPage, fetchNextCategoryPage, isFetchingNextCategoryPage, hasNextCategoryPage]);
+
+  useEffect(() => {
+    if ((viewMode === 'companies' && selectedCompany) || (viewMode === 'category-detail' && selectedCategory)) {
+      window.addEventListener('scroll', handleScroll);
+      return () => window.removeEventListener('scroll', handleScroll);
+    }
+  }, [viewMode, selectedCompany, selectedCategory, handleScroll]);
 
   // Навигация
   const handleCategorySelect = (categoryId: string) => {
@@ -271,10 +348,12 @@ export const InterviewCategories: React.FC = () => {
               <span className={styles.statValue}>{categories?.length || 0}</span>
               <span className={styles.statLabel}>категорий</span>
             </div>
-            <div className={styles.stat}>
-              <span className={styles.statValue}>{totalClusters}</span>
-              <span className={styles.statLabel}>топиков</span>
-            </div>
+            {totalClusters > 0 && (
+              <div className={styles.stat}>
+                <span className={styles.statValue}>{totalClusters}</span>
+                <span className={styles.statLabel}>топиков</span>
+              </div>
+            )}
           </div>
         )}
 
@@ -392,10 +471,12 @@ export const InterviewCategories: React.FC = () => {
                   <span className={styles.count}>{category.questions_count.toLocaleString()}</span>
                   <span className={styles.label}>вопросов</span>
                 </div>
-                <div className={styles.statItem}>
-                  <span className={styles.count}>{category.clusters_count}</span>
-                  <span className={styles.label}>топиков</span>
-                </div>
+                {category.clusters_count > 0 && (
+                  <div className={styles.statItem}>
+                    <span className={styles.count}>{category.clusters_count}</span>
+                    <span className={styles.label}>топиков</span>
+                  </div>
+                )}
               </div>
               <div className={styles.progressBar}>
                 <div 
@@ -416,10 +497,11 @@ export const InterviewCategories: React.FC = () => {
           {categoryDetailLoading && <div className={styles.loading}>Загрузка...</div>}
           
           {/* Кластеры/Топики */}
-          <div className={styles.clusters}>
-            <h2>Топики в категории</h2>
-            <div className={styles.clustersList}>
-              {categoryDetail.clusters.map((cluster) => (
+          {categoryDetail.clusters.length > 0 && (
+            <div className={styles.clusters}>
+              <h2>Топики в категории</h2>
+              <div className={styles.clustersList}>
+                {categoryDetail.clusters.map((cluster) => (
                 <div 
                   key={cluster.id} 
                   className={styles.clusterCard}
@@ -449,23 +531,33 @@ export const InterviewCategories: React.FC = () => {
                   </div>
                 </div>
               ))}
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Примеры вопросов */}
+          {/* Вопросы из категории */}
           <div className={styles.sampleQuestions}>
-            <h3>Примеры вопросов из категории</h3>
+            <h3>Вопросы из категории ({categoryQuestions.length} из {categoryDetail.category.questions_count})</h3>
+            {categoryQuestionsLoading && categoryQuestions.length === 0 && (
+              <div className={styles.loading}>Загрузка вопросов...</div>
+            )}
             <div className={styles.questionsList}>
-              {categoryDetail.sample_questions.map((question) => (
+              {categoryQuestions.map((question, index) => (
                 <div key={question.id} className={styles.questionItem}>
-                  <div className={styles.questionText}>{question.question_text}</div>
-                  <div className={styles.questionMeta}>
-                    {question.company && <span className={styles.company}>{question.company}</span>}
-                    {question.topic_name && <span className={styles.topic}>{question.topic_name}</span>}
+                  <div className={styles.questionNumber}>#{index + 1}</div>
+                  <div className={styles.questionContent}>
+                    <div className={styles.questionText}>{question.question_text}</div>
+                    <div className={styles.questionMeta}>
+                      {question.company && <span className={styles.company}>{question.company}</span>}
+                      {question.topic_name && <span className={styles.topic}>{question.topic_name}</span>}
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
+            {isFetchingNextCategoryPage && (
+              <div className={styles.loading}>Загрузка дополнительных вопросов...</div>
+            )}
           </div>
         </div>
       )}
@@ -583,6 +675,11 @@ export const InterviewCategories: React.FC = () => {
                 ))}
               </div>
             </>
+          )}
+
+          {/* Loading indicator for infinite scroll */}
+          {isFetchingNextPage && (
+            <div className={styles.loading}>Загрузка дополнительных вопросов...</div>
           )}
 
           {companyQuestions && companyQuestions.length === 0 && !companyQuestionsLoading && (

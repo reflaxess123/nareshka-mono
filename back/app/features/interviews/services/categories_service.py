@@ -131,7 +131,8 @@ class CategoriesService:
         search_query: str,
         category_id: Optional[str] = None,
         company: Optional[str] = None,
-        limit: int = 50
+        limit: int = 50,
+        offset: int = 0
     ) -> List[QuestionResponse]:
         """Поиск вопросов"""
         
@@ -139,7 +140,8 @@ class CategoriesService:
             search_query=search_query,
             category_id=category_id,
             company=company,
-            limit=limit
+            limit=limit,
+            offset=offset
         )
         
         return [

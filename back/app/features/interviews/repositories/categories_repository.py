@@ -214,7 +214,8 @@ class CategoriesRepository:
         search_query: str,
         category_id: Optional[str] = None,
         company: Optional[str] = None,
-        limit: int = 50
+        limit: int = 50,
+        offset: int = 0
     ) -> List[Dict[str, Any]]:
         """Поиск вопросов"""
         query = """
@@ -227,23 +228,28 @@ class CategoriesRepository:
                 topic_name, 
                 canonical_question
             FROM "InterviewQuestion"
-            WHERE LOWER(question_text) LIKE LOWER(:search_pattern)
         """
         
-        params = {
-            'search_pattern': f'%{search_query}%',
-            'limit': limit
-        }
+        conditions = []
+        params = {'limit': limit, 'offset': offset}
+        
+        # Обработка поискового запроса
+        if search_query != '*':
+            conditions.append("LOWER(question_text) LIKE LOWER(:search_pattern)")
+            params['search_pattern'] = f'%{search_query}%'
         
         if category_id:
-            query += " AND category_id = :category_id"
+            conditions.append("category_id = :category_id")
             params['category_id'] = category_id
         
         if company:
-            query += " AND LOWER(company) = LOWER(:company)"
+            conditions.append("LOWER(company) = LOWER(:company)")
             params['company'] = company
         
-        query += " LIMIT :limit"
+        if conditions:
+            query += " WHERE " + " AND ".join(conditions)
+        
+        query += " ORDER BY id LIMIT :limit OFFSET :offset"
         
         result = self.session.execute(text(query), params).fetchall()
         
