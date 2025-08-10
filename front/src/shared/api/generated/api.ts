@@ -333,14 +333,21 @@ export interface CompanyCountModelType {
   count: number;
 }
 
-export type CompanyProfileRowModelTypeShare = string | null;
+export interface CompanyDiversityRowModelType {
+  company: string;
+  total_count: number;
+  distinct_topics: number;
+  entropy: number;
+}
+
+export type CompanyProfileRowModelTypeShare = number | null;
 
 export interface CompanyProfileRowModelType {
   company: string;
-  rank: string;
+  rank: number;
   cluster_id: string;
   cluster_label: string;
-  count: string;
+  count: number;
   share?: CompanyProfileRowModelTypeShare;
 }
 
@@ -353,6 +360,11 @@ export interface CompanyQuestionsRowModelType {
   company: string;
   total_questions: number;
   items: CompanyQuestionItemModelType[];
+}
+
+export interface CompanySimilarResponseModelType {
+  company: string;
+  similar: SimilarCompanyItemModelType[];
 }
 
 export type CompanyStatsResponseTypeAvgDuration = number | null;
@@ -573,7 +585,7 @@ export interface ContentSubcategoriesResponseType {
 export interface CooccurrenceRowModelType {
   cluster_label_a: string;
   cluster_label_b: string;
-  count: string;
+  count: number;
 }
 
 /**
@@ -587,8 +599,8 @@ export interface DueCardsResponseType {
 export interface DuplicateRowModelType {
   row_id_1: string;
   row_id_2: string;
-  sim_embed: string;
-  sim_char: string;
+  sim_embed: number;
+  sim_char: number;
   id_1: string;
   question_text_1: string;
   company_1: string;
@@ -970,6 +982,11 @@ export interface RoadmapStatsResponseType {
   categories: RoadmapStatsResponseTypeCategoriesItem[];
 }
 
+export interface SimilarCompanyItemModelType {
+  company: string;
+  similarity: number;
+}
+
 /**
  * Ответ health check для статистики
  */
@@ -1210,6 +1227,13 @@ export interface TheorySubcategoriesResponseType {
   subcategories: string[];
 }
 
+export interface TopQuestionExtendedRowModelType {
+  question_text: string;
+  total_count: number;
+  normalized_score: number;
+  unique_companies: number;
+}
+
 export type TopicResponseTypeProgressAnyOf = { [key: string]: unknown };
 
 export type TopicResponseTypeProgress = TopicResponseTypeProgressAnyOf | null;
@@ -1235,7 +1259,7 @@ export type TopicRowModelTypeLastSeen = string | null;
 export interface TopicRowModelType {
   cluster_id: string;
   cluster_label: string;
-  count: string;
+  count: number;
   companies?: TopicRowModelTypeCompanies;
   first_seen?: TopicRowModelTypeFirstSeen;
   last_seen?: TopicRowModelTypeLastSeen;
@@ -1262,10 +1286,17 @@ export interface TopicTasksResponseType {
   stats?: TopicTasksResponseTypeStats;
 }
 
+export interface TopicTopRowModelType {
+  cluster_label: string;
+  total_count: number;
+  normalized_score: number;
+  company_count: number;
+}
+
 export interface TrendRowModelType {
   month: string;
   cluster_label: string;
-  count: string;
+  count: number;
 }
 
 /**
@@ -2427,6 +2458,47 @@ min_count?: number;
  * @maximum 10000
  */
 limit_per_company?: number;
+};
+
+export type GetTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGetParams = {
+/**
+ * @minimum 1
+ * @maximum 1000
+ */
+limit?: number;
+/**
+ * @minimum 1
+ */
+min_count?: number;
+};
+
+export type GetTopicsTopApiV2AnalyticsTopicsTopGetParams = {
+/**
+ * @minimum 1
+ * @maximum 1000
+ */
+limit?: number;
+};
+
+export type GetCompanyDiversityApiV2AnalyticsCompanyDiversityGetParams = {
+/**
+ * @minimum 1
+ * @maximum 1000
+ */
+top?: number;
+/**
+ * @pattern ^(entropy|distinct|total)$
+ */
+order?: string;
+};
+
+export type GetCompaniesSimilarApiV2AnalyticsCompaniesSimilarGetParams = {
+company: string;
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+top?: number;
 };
 
 /**
@@ -9955,6 +10027,367 @@ export function useGetCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGet<TDat
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetCompaniesQuestionsApiV2AnalyticsCompaniesQuestionsGetQueryOptions(params,options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
+ * Compute absolute and normalized score for each exact question_text.
+Normalized score is sum over companies of (count(question, company) / total_questions_in_company).
+ * @summary Get Top Questions Extended
+ */
+export const getTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGet = (
+    params?: GetTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGetParams,
+ signal?: AbortSignal
+) => {
+      
+      
+      return generatedApiClient<TopQuestionExtendedRowModelType[]>(
+      {url: `/api/v2/analytics/top-questions-extended`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+  
+
+export const getGetTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGetQueryKey = (params?: GetTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGetParams,) => {
+    return [`/api/v2/analytics/top-questions-extended`, ...(params ? [params]: [])] as const;
+    }
+
+    
+export const getGetTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGetQueryOptions = <TData = Awaited<ReturnType<typeof getTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGet>>, TError = HTTPValidationErrorType>(params?: GetTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGet>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGetQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGet>>> = ({ signal }) => getTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGet(params, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGetQueryResult = NonNullable<Awaited<ReturnType<typeof getTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGet>>>
+export type GetTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGetQueryError = HTTPValidationErrorType
+
+
+export function useGetTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGet<TData = Awaited<ReturnType<typeof getTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGet>>, TError = HTTPValidationErrorType>(
+ params: undefined |  GetTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGet>>,
+          TError,
+          Awaited<ReturnType<typeof getTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGet<TData = Awaited<ReturnType<typeof getTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGet>>, TError = HTTPValidationErrorType>(
+ params?: GetTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGet>>,
+          TError,
+          Awaited<ReturnType<typeof getTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGet<TData = Awaited<ReturnType<typeof getTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGet>>, TError = HTTPValidationErrorType>(
+ params?: GetTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Top Questions Extended
+ */
+
+export function useGetTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGet<TData = Awaited<ReturnType<typeof getTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGet>>, TError = HTTPValidationErrorType>(
+ params?: GetTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetTopQuestionsExtendedApiV2AnalyticsTopQuestionsExtendedGetQueryOptions(params,options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
+ * Top topics by absolute count and normalized score (sum over companies of count/company_total).
+ * @summary Get Topics Top
+ */
+export const getTopicsTopApiV2AnalyticsTopicsTopGet = (
+    params?: GetTopicsTopApiV2AnalyticsTopicsTopGetParams,
+ signal?: AbortSignal
+) => {
+      
+      
+      return generatedApiClient<TopicTopRowModelType[]>(
+      {url: `/api/v2/analytics/topics-top`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+  
+
+export const getGetTopicsTopApiV2AnalyticsTopicsTopGetQueryKey = (params?: GetTopicsTopApiV2AnalyticsTopicsTopGetParams,) => {
+    return [`/api/v2/analytics/topics-top`, ...(params ? [params]: [])] as const;
+    }
+
+    
+export const getGetTopicsTopApiV2AnalyticsTopicsTopGetQueryOptions = <TData = Awaited<ReturnType<typeof getTopicsTopApiV2AnalyticsTopicsTopGet>>, TError = HTTPValidationErrorType>(params?: GetTopicsTopApiV2AnalyticsTopicsTopGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTopicsTopApiV2AnalyticsTopicsTopGet>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTopicsTopApiV2AnalyticsTopicsTopGetQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTopicsTopApiV2AnalyticsTopicsTopGet>>> = ({ signal }) => getTopicsTopApiV2AnalyticsTopicsTopGet(params, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTopicsTopApiV2AnalyticsTopicsTopGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetTopicsTopApiV2AnalyticsTopicsTopGetQueryResult = NonNullable<Awaited<ReturnType<typeof getTopicsTopApiV2AnalyticsTopicsTopGet>>>
+export type GetTopicsTopApiV2AnalyticsTopicsTopGetQueryError = HTTPValidationErrorType
+
+
+export function useGetTopicsTopApiV2AnalyticsTopicsTopGet<TData = Awaited<ReturnType<typeof getTopicsTopApiV2AnalyticsTopicsTopGet>>, TError = HTTPValidationErrorType>(
+ params: undefined |  GetTopicsTopApiV2AnalyticsTopicsTopGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTopicsTopApiV2AnalyticsTopicsTopGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTopicsTopApiV2AnalyticsTopicsTopGet>>,
+          TError,
+          Awaited<ReturnType<typeof getTopicsTopApiV2AnalyticsTopicsTopGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTopicsTopApiV2AnalyticsTopicsTopGet<TData = Awaited<ReturnType<typeof getTopicsTopApiV2AnalyticsTopicsTopGet>>, TError = HTTPValidationErrorType>(
+ params?: GetTopicsTopApiV2AnalyticsTopicsTopGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTopicsTopApiV2AnalyticsTopicsTopGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTopicsTopApiV2AnalyticsTopicsTopGet>>,
+          TError,
+          Awaited<ReturnType<typeof getTopicsTopApiV2AnalyticsTopicsTopGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTopicsTopApiV2AnalyticsTopicsTopGet<TData = Awaited<ReturnType<typeof getTopicsTopApiV2AnalyticsTopicsTopGet>>, TError = HTTPValidationErrorType>(
+ params?: GetTopicsTopApiV2AnalyticsTopicsTopGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTopicsTopApiV2AnalyticsTopicsTopGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Topics Top
+ */
+
+export function useGetTopicsTopApiV2AnalyticsTopicsTopGet<TData = Awaited<ReturnType<typeof getTopicsTopApiV2AnalyticsTopicsTopGet>>, TError = HTTPValidationErrorType>(
+ params?: GetTopicsTopApiV2AnalyticsTopicsTopGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTopicsTopApiV2AnalyticsTopicsTopGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetTopicsTopApiV2AnalyticsTopicsTopGetQueryOptions(params,options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
+ * Compute per-company diversity of topics using entropy and distinct topic count.
+ * @summary Get Company Diversity
+ */
+export const getCompanyDiversityApiV2AnalyticsCompanyDiversityGet = (
+    params?: GetCompanyDiversityApiV2AnalyticsCompanyDiversityGetParams,
+ signal?: AbortSignal
+) => {
+      
+      
+      return generatedApiClient<CompanyDiversityRowModelType[]>(
+      {url: `/api/v2/analytics/company-diversity`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+  
+
+export const getGetCompanyDiversityApiV2AnalyticsCompanyDiversityGetQueryKey = (params?: GetCompanyDiversityApiV2AnalyticsCompanyDiversityGetParams,) => {
+    return [`/api/v2/analytics/company-diversity`, ...(params ? [params]: [])] as const;
+    }
+
+    
+export const getGetCompanyDiversityApiV2AnalyticsCompanyDiversityGetQueryOptions = <TData = Awaited<ReturnType<typeof getCompanyDiversityApiV2AnalyticsCompanyDiversityGet>>, TError = HTTPValidationErrorType>(params?: GetCompanyDiversityApiV2AnalyticsCompanyDiversityGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompanyDiversityApiV2AnalyticsCompanyDiversityGet>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCompanyDiversityApiV2AnalyticsCompanyDiversityGetQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCompanyDiversityApiV2AnalyticsCompanyDiversityGet>>> = ({ signal }) => getCompanyDiversityApiV2AnalyticsCompanyDiversityGet(params, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCompanyDiversityApiV2AnalyticsCompanyDiversityGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetCompanyDiversityApiV2AnalyticsCompanyDiversityGetQueryResult = NonNullable<Awaited<ReturnType<typeof getCompanyDiversityApiV2AnalyticsCompanyDiversityGet>>>
+export type GetCompanyDiversityApiV2AnalyticsCompanyDiversityGetQueryError = HTTPValidationErrorType
+
+
+export function useGetCompanyDiversityApiV2AnalyticsCompanyDiversityGet<TData = Awaited<ReturnType<typeof getCompanyDiversityApiV2AnalyticsCompanyDiversityGet>>, TError = HTTPValidationErrorType>(
+ params: undefined |  GetCompanyDiversityApiV2AnalyticsCompanyDiversityGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompanyDiversityApiV2AnalyticsCompanyDiversityGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCompanyDiversityApiV2AnalyticsCompanyDiversityGet>>,
+          TError,
+          Awaited<ReturnType<typeof getCompanyDiversityApiV2AnalyticsCompanyDiversityGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCompanyDiversityApiV2AnalyticsCompanyDiversityGet<TData = Awaited<ReturnType<typeof getCompanyDiversityApiV2AnalyticsCompanyDiversityGet>>, TError = HTTPValidationErrorType>(
+ params?: GetCompanyDiversityApiV2AnalyticsCompanyDiversityGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompanyDiversityApiV2AnalyticsCompanyDiversityGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCompanyDiversityApiV2AnalyticsCompanyDiversityGet>>,
+          TError,
+          Awaited<ReturnType<typeof getCompanyDiversityApiV2AnalyticsCompanyDiversityGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCompanyDiversityApiV2AnalyticsCompanyDiversityGet<TData = Awaited<ReturnType<typeof getCompanyDiversityApiV2AnalyticsCompanyDiversityGet>>, TError = HTTPValidationErrorType>(
+ params?: GetCompanyDiversityApiV2AnalyticsCompanyDiversityGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompanyDiversityApiV2AnalyticsCompanyDiversityGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Company Diversity
+ */
+
+export function useGetCompanyDiversityApiV2AnalyticsCompanyDiversityGet<TData = Awaited<ReturnType<typeof getCompanyDiversityApiV2AnalyticsCompanyDiversityGet>>, TError = HTTPValidationErrorType>(
+ params?: GetCompanyDiversityApiV2AnalyticsCompanyDiversityGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompanyDiversityApiV2AnalyticsCompanyDiversityGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetCompanyDiversityApiV2AnalyticsCompanyDiversityGetQueryOptions(params,options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
+ * Find companies most similar by topic distribution (cosine similarity on company x topic counts).
+ * @summary Get Companies Similar
+ */
+export const getCompaniesSimilarApiV2AnalyticsCompaniesSimilarGet = (
+    params: GetCompaniesSimilarApiV2AnalyticsCompaniesSimilarGetParams,
+ signal?: AbortSignal
+) => {
+      
+      
+      return generatedApiClient<CompanySimilarResponseModelType>(
+      {url: `/api/v2/analytics/companies-similar`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+  
+
+export const getGetCompaniesSimilarApiV2AnalyticsCompaniesSimilarGetQueryKey = (params?: GetCompaniesSimilarApiV2AnalyticsCompaniesSimilarGetParams,) => {
+    return [`/api/v2/analytics/companies-similar`, ...(params ? [params]: [])] as const;
+    }
+
+    
+export const getGetCompaniesSimilarApiV2AnalyticsCompaniesSimilarGetQueryOptions = <TData = Awaited<ReturnType<typeof getCompaniesSimilarApiV2AnalyticsCompaniesSimilarGet>>, TError = HTTPValidationErrorType>(params: GetCompaniesSimilarApiV2AnalyticsCompaniesSimilarGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompaniesSimilarApiV2AnalyticsCompaniesSimilarGet>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCompaniesSimilarApiV2AnalyticsCompaniesSimilarGetQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCompaniesSimilarApiV2AnalyticsCompaniesSimilarGet>>> = ({ signal }) => getCompaniesSimilarApiV2AnalyticsCompaniesSimilarGet(params, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCompaniesSimilarApiV2AnalyticsCompaniesSimilarGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetCompaniesSimilarApiV2AnalyticsCompaniesSimilarGetQueryResult = NonNullable<Awaited<ReturnType<typeof getCompaniesSimilarApiV2AnalyticsCompaniesSimilarGet>>>
+export type GetCompaniesSimilarApiV2AnalyticsCompaniesSimilarGetQueryError = HTTPValidationErrorType
+
+
+export function useGetCompaniesSimilarApiV2AnalyticsCompaniesSimilarGet<TData = Awaited<ReturnType<typeof getCompaniesSimilarApiV2AnalyticsCompaniesSimilarGet>>, TError = HTTPValidationErrorType>(
+ params: GetCompaniesSimilarApiV2AnalyticsCompaniesSimilarGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompaniesSimilarApiV2AnalyticsCompaniesSimilarGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCompaniesSimilarApiV2AnalyticsCompaniesSimilarGet>>,
+          TError,
+          Awaited<ReturnType<typeof getCompaniesSimilarApiV2AnalyticsCompaniesSimilarGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCompaniesSimilarApiV2AnalyticsCompaniesSimilarGet<TData = Awaited<ReturnType<typeof getCompaniesSimilarApiV2AnalyticsCompaniesSimilarGet>>, TError = HTTPValidationErrorType>(
+ params: GetCompaniesSimilarApiV2AnalyticsCompaniesSimilarGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompaniesSimilarApiV2AnalyticsCompaniesSimilarGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCompaniesSimilarApiV2AnalyticsCompaniesSimilarGet>>,
+          TError,
+          Awaited<ReturnType<typeof getCompaniesSimilarApiV2AnalyticsCompaniesSimilarGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCompaniesSimilarApiV2AnalyticsCompaniesSimilarGet<TData = Awaited<ReturnType<typeof getCompaniesSimilarApiV2AnalyticsCompaniesSimilarGet>>, TError = HTTPValidationErrorType>(
+ params: GetCompaniesSimilarApiV2AnalyticsCompaniesSimilarGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompaniesSimilarApiV2AnalyticsCompaniesSimilarGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Companies Similar
+ */
+
+export function useGetCompaniesSimilarApiV2AnalyticsCompaniesSimilarGet<TData = Awaited<ReturnType<typeof getCompaniesSimilarApiV2AnalyticsCompaniesSimilarGet>>, TError = HTTPValidationErrorType>(
+ params: GetCompaniesSimilarApiV2AnalyticsCompaniesSimilarGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompaniesSimilarApiV2AnalyticsCompaniesSimilarGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetCompaniesSimilarApiV2AnalyticsCompaniesSimilarGetQueryOptions(params,options)
 
   const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

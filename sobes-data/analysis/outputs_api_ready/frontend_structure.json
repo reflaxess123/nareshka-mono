@@ -1,0 +1,3200 @@
+{
+  "JavaScript Core": {
+    "name": "JavaScript Core",
+    "total_questions": 2082,
+    "total_clusters": 60,
+    "percentage": 24.4,
+    "topics": [
+      {
+        "id": 7,
+        "name": "Функциональный JS & Web API",
+        "keywords": [
+          "такое",
+          "каррирование",
+          "промисы",
+          "куки",
+          "дженерики"
+        ],
+        "questions_count": 90,
+        "example_questions": [
+          "Какие бывают бандлеры",
+          "FLUX - что такое",
+          "Зачем использовать Pinia, если можно обойтись ref."
+        ]
+      },
+      {
+        "id": 10,
+        "name": "Event Loop",
+        "keywords": [
+          "loop",
+          "event",
+          "микро",
+          "while",
+          "работает"
+        ],
+        "questions_count": 73,
+        "example_questions": [
+          "event-loop",
+          "Что такое event-loop",
+          "Event loop"
+        ]
+      },
+      {
+        "id": 12,
+        "name": "Числовые задачи массива",
+        "keywords": [
+          "чисел",
+          "числа",
+          "число",
+          "11",
+          "массиве"
+        ],
+        "questions_count": 72,
+        "example_questions": [
+          "Привести строку с дробью к формату без скобок, например преобразовать '(9999/9999)'",
+          "Написать функцию для поиска числа, которое встречается ровно 2 раза в массиве",
+          "Напишите метод, который генерирует случайный 4-х значный код от 0000 до 9999, при этом каждый вызов должен возвращать новый, неповторяющийся код, а после использования всех кодов метод должен обнулить счетчик"
+        ]
+      },
+      {
+        "id": 13,
+        "name": "Функциональное программирование",
+        "keywords": [
+          "аргументов",
+          "функцию",
+          "функций",
+          "compose",
+          "counter"
+        ],
+        "questions_count": 70,
+        "example_questions": [
+          "Реализовать функцию compose, которая принимает несколько функций и возвращает новую функцию, последовательно применяющую переданные функции к аргументу",
+          "Написать каррированную функцию, которая принимает числа аргументами, после всех вызовов идет пустой вызов без аргументов, который свидетельствует об окончании работы функции, если функция сразу вызвана без аргументов — вернуть 0",
+          "Написать функцию мемоизации для других функций (декоратор)"
+        ]
+      },
+      {
+        "id": 14,
+        "name": "Next.js и Three.js интервью",
+        "keywords": [
+          "next",
+          "js",
+          "node",
+          "three",
+          "nextjs"
+        ],
+        "questions_count": 65,
+        "example_questions": [
+          "Работали ли вы с Next.js?",
+          "Работали ли вы с 3D графикой в JavaScript (Three.js)?",
+          "Почему выбирают React, а не нативный JavaScript? Какие преимущества дает эта библиотека? И что ты знаешь о методах оптимизации в React?"
+        ]
+      },
+      {
+        "id": 15,
+        "name": "Браузерные хранилища",
+        "keywords": [
+          "браузере",
+          "хранилища",
+          "хранения",
+          "памяти",
+          "браузерные"
+        ],
+        "questions_count": 63,
+        "example_questions": [
+          "Как настроить кэширование в браузере",
+          "Что такое browser object model и что туда входит?",
+          "Какие методы использовались чтобы не было утечек памяти?"
+        ]
+      },
+      {
+        "id": 17,
+        "name": "Асинхронный JavaScript",
+        "keywords": [
+          "js",
+          "асинхронность",
+          "типы",
+          "workers",
+          "однопоточный"
+        ],
+        "questions_count": 62,
+        "example_questions": [
+          "модули в JS",
+          "Когда подключится js",
+          "JS интерпретируемый или компилируемый ЯП?"
+        ]
+      },
+      {
+        "id": 22,
+        "name": "Асинхронное программирование",
+        "keywords": [
+          "await",
+          "async",
+          "asyncauth",
+          "auth",
+          "promise"
+        ],
+        "questions_count": 57,
+        "example_questions": [
+          "async/await",
+          "Расскажите все про промисы, включая статичные методы промиса, async/await и способы избегания callback hell",
+          "Что такое callback hell, promise и async/await"
+        ]
+      },
+      {
+        "id": 29,
+        "name": "Переменные в JavaScript",
+        "keywords": [
+          "let",
+          "const",
+          "var",
+          "изменить",
+          "между"
+        ],
+        "questions_count": 51,
+        "example_questions": [
+          "Пользовался ли var и почему не рекомендуется использовать эту переменную",
+          "Можно ли через const изменить свойства объекта",
+          "Объясните разницу между var, let и const"
+        ]
+      },
+      {
+        "id": 38,
+        "name": "Хранилища данных в браузере",
+        "keywords": [
+          "localstorage",
+          "sessionstorage",
+          "cookie",
+          "storage",
+          "indexeddb"
+        ],
+        "questions_count": 47,
+        "example_questions": [
+          "sessionStorage vs localStorage",
+          "Объясните разницу между Cookie, LocalStorage и SessionStorage",
+          "Какие хранилища данных ты знаешь в браузере и в чем их отличие? Назови различия между localStorage и cookies в сценариях использования."
+        ]
+      },
+      {
+        "id": 40,
+        "name": "Дебаунс и лимит вызовов",
+        "keywords": [
+          "fn",
+          "debounce",
+          "вызовов",
+          "ограничивает",
+          "limit"
+        ],
+        "questions_count": 47,
+        "example_questions": [
+          "Реализовать кастомный React-хук useDebounce, который принимает значение и возвращает его с задержкой обновления в 500 мс, очищая таймаут при изменении значения",
+          "Реализуйте функцию debounce с настраиваемой задержкой",
+          "Написать декоратор callLimit(fn, count[, callback]), который ограничивает число вызовов функции fn максимум count раз, при достижении лимита вызывается callback, если он передан, а также у возвращаемой функции должен быть метод reset для сброса счетчика вызовов"
+        ]
+      },
+      {
+        "id": 42,
+        "name": "JavaScript: наследование и типы данных",
+        "keywords": [
+          "javascript",
+          "наследование",
+          "типы",
+          "данных",
+          "прототипное"
+        ],
+        "questions_count": 46,
+        "example_questions": [
+          "Объясните прототипное наследование в JavaScript",
+          "Для чего нужны классы в JavaScript",
+          "Объясните разницу между примитивными и ссылочными типами данных в JavaScript"
+        ]
+      },
+      {
+        "id": 43,
+        "name": "REST и GraphQL API",
+        "keywords": [
+          "rest",
+          "graphql",
+          "spread",
+          "es6",
+          "api"
+        ],
+        "questions_count": 46,
+        "example_questions": [
+          "Перечислите и объясните REST API методы",
+          "graphQL",
+          "Объясните spread и rest операторы"
+        ]
+      },
+      {
+        "id": 45,
+        "name": "Микрофронты и задачи",
+        "keywords": [
+          "микрофронты",
+          "микрофронтами",
+          "federation",
+          "module",
+          "макротаски"
+        ],
+        "questions_count": 45,
+        "example_questions": [
+          "Что относится к микротаскам",
+          "Что такое микрофронты и как они работают",
+          "Микро- и макрозадачи."
+        ]
+      },
+      {
+        "id": 46,
+        "name": "Обработка событий в JavaScript",
+        "keywords": [
+          "eventloop",
+          "stoppropagation",
+          "preventdefault",
+          "event",
+          "currenttarget"
+        ],
+        "questions_count": 45,
+        "example_questions": [
+          "EventLoop",
+          "stopPropagation и preventDefault",
+          "Что такое EventLoop?"
+        ]
+      },
+      {
+        "id": 52,
+        "name": "Работа с коллекциями",
+        "keywords": [
+          "map",
+          "set",
+          "foreach",
+          "reduce",
+          "maps"
+        ],
+        "questions_count": 42,
+        "example_questions": [
+          "Map, Set.",
+          "что такое Set и Map",
+          "Как работает map, reduce"
+        ]
+      },
+      {
+        "id": 56,
+        "name": "Псевдоклассы и классы",
+        "keywords": [
+          "псевдоклассы",
+          "псевдоэлементы",
+          "конструктор",
+          "класса",
+          "class"
+        ],
+        "questions_count": 40,
+        "example_questions": [
+          "Псевдоклассы и псевдоэлементы: что такое, чем отличаются",
+          "Как сымитировать класс на обычной функции",
+          "Отличия классовых компонентов от функциональных"
+        ]
+      },
+      {
+        "id": 60,
+        "name": "Копирование объектов",
+        "keywords": [
+          "копирования",
+          "копирование",
+          "объекта",
+          "скопировать",
+          "глубокое"
+        ],
+        "questions_count": 38,
+        "example_questions": [
+          "Методы копирования объектов",
+          "Что выведет в консоль при выполнении кода с поверхностным копированием объекта и изменением вложенного свойства",
+          "Как можно избежать ссылочной зависимости при копировании объекта"
+        ]
+      },
+      {
+        "id": 61,
+        "name": "Консольные выводы объектов",
+        "keywords": [
+          "объекта",
+          "person",
+          "выведено",
+          "вызове",
+          "консоль"
+        ],
+        "questions_count": 38,
+        "example_questions": [
+          "Что выведет в консоль при присваивании объекта другой переменной и последующем изменении первой переменной на новый объект",
+          "Что будет выведено в консоль при вызове функции showThis, если она дважды привязана через bind к разным объектам?",
+          "Что будет выведено в консоли при вызове функции getName без и с привязкой контекста через bind?"
+        ]
+      },
+      {
+        "id": 63,
+        "name": "Анимации в браузере",
+        "keywords": [
+          "requestanimationframe",
+          "анимации",
+          "requestidlecallback",
+          "анимаций",
+          "transform"
+        ],
+        "questions_count": 38,
+        "example_questions": [
+          "Что самое дешёвое для анимации в браузере (transform) и как часто RequestAnimationFrame будет запускаться",
+          "Какой процесс анимации более ресурсоемкий: transform или position:absolute",
+          "Что такое requestAnimationFrame и как он работает?"
+        ]
+      },
+      {
+        "id": 65,
+        "name": "Консоль и переменные",
+        "keywords": [
+          "console",
+          "log",
+          "var",
+          "typeof",
+          "выведет"
+        ],
+        "questions_count": 36,
+        "example_questions": [
+          "Объяснить, что выведет console.log при вызове функции с замыканием, которая увеличивает внутреннюю переменную, и почему при повторных вызовах выводится одно и то же значение",
+          "Объяснить, что выведет console.log при изменении свойства объекта через другую переменную, и как исправить проблему, чтобы избежать изменения исходного объекта (сделать копию объекта)",
+          "Объяснить значение this в строгом режиме внутри функции: function foo() { 'use strict'; console.log(this); }"
+        ]
+      },
+      {
+        "id": 66,
+        "name": "Обработка запросов fetch",
+        "keywords": [
+          "fetch",
+          "url",
+          "запрос",
+          "get",
+          "ошибке"
+        ],
+        "questions_count": 36,
+        "example_questions": [
+          "Написать функцию, которая делает заданное количество попыток загрузить данные с URL с помощью fetch и возвращает результат или ошибку после исчерпания попыток",
+          "Напиши решение в одну строку чтобы избавиться от finally в цепочке промисов с fetchData().then().catch().finally()",
+          "Создать асинхронную функцию fetchAllData, которая параллельно запускает функции fetchData1, fetchData2, fetchData3, возвращает массив данных, если все вызовы успешны, либо выводит в консоль сообщение об ошибке и возвращает частичные данные при неуспешном вызове, обеспечивая корректное завершение программы и правильную обработку данных"
+        ]
+      },
+      {
+        "id": 67,
+        "name": "Прототипное наследование",
+        "keywords": [
+          "prototype",
+          "наследование",
+          "proto",
+          "прототипы",
+          "прототипное"
+        ],
+        "questions_count": 36,
+        "example_questions": [
+          "Все про прототипы.",
+          "В чем разница между prototype и __proto__?",
+          "В чем разница между proto и prototype"
+        ]
+      },
+      {
+        "id": 69,
+        "name": "Методы Promise",
+        "keywords": [
+          "promise",
+          "методы",
+          "приведите",
+          "optimistic",
+          "источников"
+        ],
+        "questions_count": 34,
+        "example_questions": [
+          "Какие существуют статические методы у Promise",
+          "Promise.",
+          "Что такое Promise и какие у него методы"
+        ]
+      },
+      {
+        "id": 76,
+        "name": "Web Workers и Service Workers",
+        "keywords": [
+          "worker",
+          "service",
+          "web",
+          "workers",
+          "webworker"
+        ],
+        "questions_count": 32,
+        "example_questions": [
+          "Что такое web workers и как они используются?",
+          "Web worker: подробно как отправляем туда данные и как получаем",
+          "Service worker"
+        ]
+      },
+      {
+        "id": 77,
+        "name": "DOM и его особенности",
+        "keywords": [
+          "dom",
+          "domcontentloaded",
+          "воркеров",
+          "погружение",
+          "ведет"
+        ],
+        "questions_count": 32,
+        "example_questions": [
+          "Почему нельзя просто изменить текст в элементе через DOM API в React",
+          "Почему не можем использовать HTML вместо DOM (JavaScript работает только через DOM)",
+          "Как работают эвенты в DOM"
+        ]
+      },
+      {
+        "id": 81,
+        "name": "Методы bind, call, apply",
+        "keywords": [
+          "bind",
+          "call",
+          "apply",
+          "методов",
+          "применение"
+        ],
+        "questions_count": 31,
+        "example_questions": [
+          "call/bind/apply",
+          "Можно ли применять bind/call/apply к стрелочным функциям и почему",
+          "Объясните работу методов bind, call и apply"
+        ]
+      },
+      {
+        "id": 82,
+        "name": "Порядок вывода в JavaScript",
+        "keywords": [
+          "вывода",
+          "settimeout",
+          "порядок",
+          "promise",
+          "кода"
+        ],
+        "questions_count": 31,
+        "example_questions": [
+          "Определи порядок вывода в консоль для кода с setTimeout, Promise и console.log",
+          "Расставьте порядок вывода console.log в функции checkOrder с асинхронными вызовами и Promise",
+          "Определить порядок вывода в консоль и объяснить почему для кода: setTimeout(() => console.log('timeout')); Promise.resolve().then(() => console.log('promise')); window.requestAnimationFrame(() => console.log('requestAnimationFrame')); console.log('code');"
+        ]
+      },
+      {
+        "id": 84,
+        "name": "Функции и замыкания",
+        "keywords": [
+          "runonce",
+          "раз",
+          "fn",
+          "один",
+          "undefined"
+        ],
+        "questions_count": 31,
+        "example_questions": [
+          "Задача на замыкание: написать функцию runOnce которая выполняется только один раз",
+          "Объясните поведение функции fn, которая изменяет объект и выводит значения до и после вызова",
+          "Что выведет последовательность вызовов замыкания outer() с внутренней функцией inner(), которая увеличивает и выводит переменную a?"
+        ]
+      },
+      {
+        "id": 85,
+        "name": "Всплытие и погружение событий",
+        "keywords": [
+          "всплытие",
+          "погружение",
+          "фазы",
+          "событий",
+          "bubbling"
+        ],
+        "questions_count": 30,
+        "example_questions": [
+          "Всплытие и погружение событий подробно",
+          "Что такое оптимистический ответ на фронте?",
+          "Расскажи про фазы всплытия-погружения"
+        ]
+      },
+      {
+        "id": 86,
+        "name": "Методы работы с массивами",
+        "keywords": [
+          "мутирующие",
+          "методы",
+          "массива",
+          "знаете",
+          "массивов"
+        ],
+        "questions_count": 30,
+        "example_questions": [
+          "Методы массивов",
+          "Какие основные методы массива вы знаете",
+          "Деструктуризация массива"
+        ]
+      },
+      {
+        "id": 88,
+        "name": "Группировка данных по ключу",
+        "keywords": [
+          "groupby",
+          "группирует",
+          "ключу",
+          "массива",
+          "prototype"
+        ],
+        "questions_count": 29,
+        "example_questions": [
+          "Реализовать метод groupBy, который группирует элементы массива объектов по заданному ключу и возвращает объект с массивами сгруппированных элементов",
+          "Реализовать функцию groupDataBySkill, которая группирует массив объектов по полю skill, возвращая объект с ключами-скиллами и значениями-массивами объектов с этим скиллом",
+          "Как можно улучшить функцию groupDataBySkill, которая группирует массив объектов по полю skill, используя reduce и учитывая обработку ошибок при асинхронном получении данных"
+        ]
+      },
+      {
+        "id": 89,
+        "name": "Слабые ссылки в JavaScript",
+        "keywords": [
+          "мусора",
+          "weakmap",
+          "сборщик",
+          "weakset",
+          "collector"
+        ],
+        "questions_count": 29,
+        "example_questions": [
+          "Отличия Map и WeakMap",
+          "Расскажи про Set и Map, WeakSet и WeakMap, назови отличия",
+          "Что такое слабая ссылка weak links"
+        ]
+      },
+      {
+        "id": 91,
+        "name": "Загрузка скриптов в JS",
+        "keywords": [
+          "defer",
+          "async",
+          "скриптов",
+          "script",
+          "скрипты"
+        ],
+        "questions_count": 29,
+        "example_questions": [
+          "как подгружаются скрипты в JS: async и defer",
+          "Отличия async и defer",
+          "Объясните разницу между async и defer, а также использование type=module в скриптах"
+        ]
+      },
+      {
+        "id": 92,
+        "name": "Объекты и контекст исполнения",
+        "keywords": [
+          "obj",
+          "obj1",
+          "obj2",
+          "f2",
+          "f1"
+        ],
+        "questions_count": 29,
+        "example_questions": [
+          "Определи что выведется в консоль в функции logContext и исправь код так, чтобы выводился контекст 'inner obj'",
+          "Объяснить поведение вызова метода объекта через отдельную переменную: const obj = { message: 'Hello', getMessage() { return this.message; } }; const get = obj.getMessage; что вернет get()",
+          "Что будет выведено в консоль при выполнении кода с объектом obj, в который ключи — объекты a и b, а значения 10 и 20 соответственно, и выводе obj[a]"
+        ]
+      },
+      {
+        "id": 93,
+        "name": "Функции в JavaScript",
+        "keywords": [
+          "declaration",
+          "function",
+          "expression",
+          "sayname",
+          "arrow"
+        ],
+        "questions_count": 29,
+        "example_questions": [
+          "Что выведет метод массива в зависимости от того, какая функция используется: стрелочная или function declaration",
+          "Объясните разницу между Function declaration, Function expression и стрелочными функциями",
+          "В чем разница между <Component func={this.foo}/> и <Component func={() => this.foo()}/> и как лучше делать"
+        ]
+      },
+      {
+        "id": 99,
+        "name": "Логирование и асинхронность",
+        "keywords": [
+          "log",
+          "console",
+          "resolve",
+          "settimeout",
+          "then"
+        ],
+        "questions_count": 27,
+        "example_questions": [
+          "Проанализируйте вывод консольных логов в следующем коде: setTimeout(()=> console.log('setTimeout'), 0); console.log('scriptstart'); Promise.resolve().then(()=> { console.log(1); throw new Error('err'); console.log(100); }).then(()=> console.log(2)).then(()=> console.log(3))",
+          "Мы хотим проверять режим логгера, чтобы не выводить лишние сообщения в консоль. Всё ли работает верно при вызове logger.check(), loggerCheck.call(logger) и execute(logger.check.bind(logger))?",
+          "Определить порядок вывода в консоль для кода с Promise: console.log('start'); const promise1 = new Promise((res,rej)=>{console.log(1); res(2)}); promise1.then(res=>{console.log(res)}); console.log('end')"
+        ]
+      },
+      {
+        "id": 101,
+        "name": "Операторы сравнения",
+        "keywords": [
+          "операторы",
+          "somearray",
+          "at",
+          "оператором",
+          "оператор"
+        ],
+        "questions_count": 27,
+        "example_questions": [
+          "=== и ==",
+          "Чем отличаются == и === и почему это важно",
+          "== и === разница"
+        ]
+      },
+      {
+        "id": 103,
+        "name": "Логические выражения в JavaScript",
+        "keywords": [
+          "выведет",
+          "console",
+          "log",
+          "выражения",
+          "undefined"
+        ],
+        "questions_count": 26,
+        "example_questions": [
+          "Что выведет console.log('' || {})",
+          "Что выведет console.log('' ?? {})",
+          "Что такое оператор ?? и что будет выведено в консоль при выполнении console.log('' || {}) и console.log('' ?? {})"
+        ]
+      },
+      {
+        "id": 104,
+        "name": "Параллельные асинхронные запросы",
+        "keywords": [
+          "parallellimit",
+          "асинхронных",
+          "запросов",
+          "выполняемых",
+          "одновременно"
+        ],
+        "questions_count": 26,
+        "example_questions": [
+          "Реализуйте функцию parallelLimit, которая выполняет несколько асинхронных задач с ограничением на количество параллельных вызовов",
+          "Реализуйте функцию parallelLimit, которая выполняет несколько асинхронных задач с ограничением по количеству параллельных вызовов",
+          "Реализуйте функцию parallelLimit, которая принимает массив асинхронных функций и число limit, и запускает не более limit функций одновременно, возвращая массив результатов в порядке вызова"
+        ]
+      },
+      {
+        "id": 109,
+        "name": "Мемоизация в вопросах",
+        "keywords": [
+          "мемоизация",
+          "мемоизацию",
+          "мемоизации",
+          "нужна",
+          "нужно"
+        ],
+        "questions_count": 25,
+        "example_questions": [
+          "Какой лучший мем по твоему мнению на данный момент?",
+          "Как реализовать мемоизирующую функцию",
+          "Что такое мемоизация и как она применяется?"
+        ]
+      },
+      {
+        "id": 111,
+        "name": "JavaScript: ошибки и байдинг",
+        "keywords": [
+          "javascript",
+          "message",
+          "throw",
+          "оператор",
+          "байдинга"
+        ],
+        "questions_count": 25,
+        "example_questions": [
+          "Что такое JavaScript?",
+          "Объясните понятие байдинга в JavaScript",
+          "Объясните методы массивов в JavaScript"
+        ]
+      },
+      {
+        "id": 112,
+        "name": "Работа с промисами",
+        "keywords": [
+          "промисов",
+          "промис",
+          "all",
+          "aggregateerror",
+          "отклонены"
+        ],
+        "questions_count": 25,
+        "example_questions": [
+          "Реализовать загрузку данных с использованием Promise.all для параллельного получения userData и postData с последующим обновлением состояния в React",
+          "Напишите функцию promiseAll, которая принимает массив промисов и возвращает промис, который резолвится массивом результатов всех промисов или реджектится при первом ошибочном промисе",
+          "Написать функцию, которая реализует аналог Promise.all для массива промисов"
+        ]
+      },
+      {
+        "id": 114,
+        "name": "События и цикл JavaScript",
+        "keywords": [
+          "javascript",
+          "loop",
+          "event",
+          "событий",
+          "события"
+        ],
+        "questions_count": 25,
+        "example_questions": [
+          "Объясните event loop и когда происходит render",
+          "Что такое event-loop в JavaScript?",
+          "Объясните event-loop в JavaScript"
+        ]
+      },
+      {
+        "id": 119,
+        "name": "Событийный эмиттер",
+        "keywords": [
+          "eventemitter",
+          "on",
+          "off",
+          "класс",
+          "методами"
+        ],
+        "questions_count": 25,
+        "example_questions": [
+          "Написать event emitter с методами on и trigger, который позволяет добавлять обработчики событий и вызывать их",
+          "Реализовать класс Dispatcher, который реализует паттерн издатель-подписчик с методами on для подписки на событие и trigger для вызова обработчиков события",
+          "Реализуйте класс Dispatcher с типизацией TypeScript, который поддерживает методы on(event: EventType, callback: EventCallback), trigger(event: EventType) и off(event: EventType, callback: EventCallback) для управления событиями с типами EventType = 'event_one' | 'event_two' и EventCallback = () => void"
+        ]
+      },
+      {
+        "id": 120,
+        "name": "Таймауты и интервалы",
+        "keywords": [
+          "settimeout",
+          "гарантия",
+          "выполнится",
+          "setinterval",
+          "таймаут"
+        ],
+        "questions_count": 24,
+        "example_questions": [
+          "Что выведет в консоль при выполнении цепочки промисов с setTimeout, then, catch и finally",
+          "У нас есть таймауты, таймеры, интервалы и тд. Мы запустили таймаут, хотим какое-то отложенное действие, но пользователь уходит со страницы, не дождался нашего таймаута и нам нужно таймаут как-то отменить. Каким образом мы можем это сделать?",
+          "Как можно отменить таймаут без использования метода clearTimeout?"
+        ]
+      },
+      {
+        "id": 125,
+        "name": "Стрелочные и обычные функции",
+        "keywords": [
+          "обычной",
+          "стрелочной",
+          "стрелочная",
+          "perimeter",
+          "diameter"
+        ],
+        "questions_count": 22,
+        "example_questions": [
+          "В чем отличие стрелочных функций от обычных функций",
+          "Расскажи про контекст у стрелочной функции",
+          "Объясните поведение и результат вызова методов diameter и perimeter объекта shape, где diameter — обычный метод, а perimeter — стрелочная функция, использующая this.radius"
+        ]
+      },
+      {
+        "id": 132,
+        "name": "Замыкания в программировании",
+        "keywords": [
+          "замыкание",
+          "замыкания",
+          "привести",
+          "пример",
+          "оно"
+        ],
+        "questions_count": 21,
+        "example_questions": [
+          "Что такое замыкания",
+          "Что такое замыкание?",
+          "Что такое замыкание (привести кейс замыкания)"
+        ]
+      },
+      {
+        "id": 133,
+        "name": "Асинхронный порядок вывода",
+        "keywords": [
+          "settimeout",
+          "порядок",
+          "func2",
+          "вывода",
+          "promise"
+        ],
+        "questions_count": 21,
+        "example_questions": [
+          "Определите порядок вывода чисел в консоль для данного асинхронного кода с setTimeout и Promise",
+          "Определите порядок вывода чисел в консоль при выполнении вложенных setTimeout и Promise с учетом event-loop",
+          "Задача на Event Loop: определить порядок вывода символов 'А', 'F', 'D', 'E', 'B', 'C' с учетом синхронного кода, Promise microtask, queueMicrotask, setTimeout и ответа от axios.get"
+        ]
+      },
+      {
+        "id": 137,
+        "name": "Promise: все методы",
+        "keywords": [
+          "allsettled",
+          "promise",
+          "all",
+          "race",
+          "any"
+        ],
+        "questions_count": 20,
+        "example_questions": [
+          "Отличия Promise.all и Promise.allSettled",
+          "В чем разница между Promise.all, Promise.allSettled, Promise.race и Promise.any?",
+          "Назови реальный use case для Promise.race"
+        ]
+      },
+      {
+        "id": 142,
+        "name": "Обработка ошибок в промисах",
+        "keywords": [
+          "catch",
+          "then",
+          "reject",
+          "try",
+          "цепочки"
+        ],
+        "questions_count": 20,
+        "example_questions": [
+          "Объясните, почему блок try...catch не ловит ошибки из промисов и как работает обработка ошибок в цепочке промисов",
+          "Как правильно типизировать параметр error в блоке catch (error: ?), и почему именно так",
+          "Что выведет в консоль самовызывающаяся функция с Promise.reject(), цепочками then и catch?"
+        ]
+      },
+      {
+        "id": 146,
+        "name": "Работа с массивами",
+        "keywords": [
+          "arr",
+          "acc",
+          "arrsort",
+          "arrunsort",
+          "массива"
+        ],
+        "questions_count": 19,
+        "example_questions": [
+          "Оптимизировать редьюс, который создает новый массив на каждой итерации: const arr = [1,2,3].reduce((acc, x) => { return [...acc, {value: x, name: x}] }, [])",
+          "Объяснить поведение массива с пропущенными индексами: const arr = [4, 5, 6]; arr[10] = 99; определить длину и содержимое массива",
+          "Исправить ошибку в функции arraySorted, которая пытается отсортировать массив arrUnSort и вывести отсортированный массив arrSort в консоль"
+        ]
+      },
+      {
+        "id": 161,
+        "name": "JavaScript: замыкания и асинхронность",
+        "keywords": [
+          "замыкания",
+          "javascript",
+          "асинхронность",
+          "hoisting",
+          "mode"
+        ],
+        "questions_count": 17,
+        "example_questions": [
+          "Объясните асинхронность в JavaScript, как работает RequestAnimationFrame, и как работают промисы",
+          "Что такое замыкания в JavaScript?",
+          "Объясните, что такое замыкания в JavaScript и приведите пример их использования"
+        ]
+      },
+      {
+        "id": 168,
+        "name": "Функции в JavaScript",
+        "keywords": [
+          "javascript",
+          "функциями",
+          "ecmascript",
+          "обычными",
+          "стрелочными"
+        ],
+        "questions_count": 16,
+        "example_questions": [
+          "Что такое ECMAScript?",
+          "Что ещё хостится в JavaScript и почему (function declaration)",
+          "Какие функции бывают в JavaScript и их отличия"
+        ]
+      },
+      {
+        "id": 170,
+        "name": "Рекурсивные вызовы функций",
+        "keywords": [
+          "foo",
+          "foo1",
+          "baz",
+          "foo2",
+          "рекурсивно"
+        ],
+        "questions_count": 16,
+        "example_questions": [
+          "Объяснить поведение цепочки вызовов foo(1).foo(2).foo(3).foo(4) в функции foo с вложенным методом foo",
+          "Что будет выведено в консоль при выполнении цепочки вызовов foo(1).foo(2).foo(3).foo(4) для функции function foo(a) { console.log(b); return { foo: (b) => foo(b) } }",
+          "Что будет выведено в консоль при выполнении функции sayHi(), если phrase = 'Hello', а user объявлен внутри блока if с let?"
+        ]
+      },
+      {
+        "id": 172,
+        "name": "Типы и операторы в TypeScript",
+        "keywords": [
+          "keyof",
+          "any",
+          "extends",
+          "тип",
+          "typeof"
+        ],
+        "questions_count": 16,
+        "example_questions": [
+          "Что делает оператор keyof в TypeScript",
+          "Keyof и typeof в TypeScript",
+          "Что обозначают типы Func<T, K extends keyof T>, ReturnType<any>, Parameters<any>, Omit<any, any>, Pick<any, any>, Partial<any>, Required<any> в TypeScript?"
+        ]
+      },
+      {
+        "id": 175,
+        "name": "Области видимости и фокус",
+        "keywords": [
+          "видимости",
+          "области",
+          "область",
+          "focus",
+          "scope"
+        ],
+        "questions_count": 15,
+        "example_questions": [
+          "Разница между focus и active",
+          "Объясните области видимости let, const и var",
+          "чем отличается focus от focus-visible"
+        ]
+      },
+      {
+        "id": 179,
+        "name": "Статические методы и поля",
+        "keywords": [
+          "статические",
+          "методы",
+          "класса",
+          "поля",
+          "динамическая"
+        ],
+        "questions_count": 15,
+        "example_questions": [
+          "Статические поля класса и чем отличаются от обычных, привести примеры",
+          "Промисы, что это, как с ними работает, какие статические методы есть, all и allSettled разница",
+          "Разница между статик и обычными методами"
+        ]
+      },
+      {
+        "id": 180,
+        "name": "Циклы и setTimeout",
+        "keywords": [
+          "settimeout",
+          "цикла",
+          "выводящем",
+          "for",
+          "var"
+        ],
+        "questions_count": 15,
+        "example_questions": [
+          "Почему в цикле с let i=0; i<10; i++ с setTimeout выводятся числа от 0 до 9?",
+          "Почему в цикле с var i=0; i<10; i++ с setTimeout выводится число 10 десять раз?",
+          "Реализуйте вывод значений переменной i в консоль с задержкой в 1 секунду между выводами, при этом вывод должен отображать значение переменной на каждой итерации"
+        ]
+      },
+      {
+        "id": 181,
+        "name": "Файлы package.json и package-lock.json",
+        "keywords": [
+          "package",
+          "json",
+          "lock",
+          "поле",
+          "нужен"
+        ],
+        "questions_count": 15,
+        "example_questions": [
+          "Что такое package-lock.json и что хранится в package.json?",
+          "Для чего нужны файлы package.json и package-lock.json",
+          "В чем разница между package.json и package-lock.json"
+        ]
+      }
+    ]
+  },
+  "React": {
+    "name": "React",
+    "total_questions": 1407,
+    "total_clusters": 39,
+    "percentage": 16.49,
+    "topics": [
+      {
+        "id": 2,
+        "name": "Управление состоянием в JS",
+        "keywords": [
+          "redux",
+          "mobx",
+          "toolkit",
+          "middleware",
+          "паттерн"
+        ],
+        "questions_count": 130,
+        "example_questions": [
+          "Middleware в Redux",
+          "Есть два стора в Redux как их объединить?",
+          "Чем отличается концепция Redux и MobX?"
+        ]
+      },
+      {
+        "id": 3,
+        "name": "Хуки и замыкания",
+        "keywords": [
+          "хуки",
+          "знаешь",
+          "всплытие",
+          "факапы",
+          "дженерики"
+        ],
+        "questions_count": 111,
+        "example_questions": [
+          "Замыкание",
+          "http/https",
+          "Что для тебя является редфлагом"
+        ]
+      },
+      {
+        "id": 16,
+        "name": "Ререндеринг в React",
+        "keywords": [
+          "ререндер",
+          "react",
+          "перерисовки",
+          "компонента",
+          "рендеринг"
+        ],
+        "questions_count": 63,
+        "example_questions": [
+          "Перечислить хуки React",
+          "Что такое рендеринг в React",
+          "3 задачи на React"
+        ]
+      },
+      {
+        "id": 20,
+        "name": "Редукция и рендеринг компонентов",
+        "keywords": [
+          "reduce",
+          "reducer",
+          "компонента",
+          "car2",
+          "рендер"
+        ],
+        "questions_count": 59,
+        "example_questions": [
+          "Можно ли сделать так, чтобы нельзя было менять свойства объекта (заморозить объект)",
+          "А к чему может привести поведение, при котором старый дом сразу же удаляется, если элементы разные (эвристический алгоритм)?",
+          "как сделать валидацию поля, чтобы оно зависело от другого поля"
+        ]
+      },
+      {
+        "id": 26,
+        "name": "Виртуальный DOM и Reconciliation",
+        "keywords": [
+          "virtual",
+          "dom",
+          "vdom",
+          "виртуального",
+          "reconciliation"
+        ],
+        "questions_count": 54,
+        "example_questions": [
+          "Зачем нужен React, объясните преимущества декларативности, виртуального DOM и процесса reconciliation",
+          "Что такое VDOM",
+          "Расскажи про virtual dom, как вообще это работает (reconciliation, эвристический алгоритм, сравнение узлов)?"
+        ]
+      },
+      {
+        "id": 27,
+        "name": "Хук useEffect и его особенности",
+        "keywords": [
+          "useeffect",
+          "зависимостей",
+          "cleanup",
+          "хук",
+          "useimperativehandle"
+        ],
+        "questions_count": 53,
+        "example_questions": [
+          "Что такое cleanup функция в useEffect",
+          "useEffect: как может себя вести при отсутствии зависимостей или при их удалении",
+          "Для чего нужна cleanup функция в useEffect"
+        ]
+      },
+      {
+        "id": 28,
+        "name": "Хуки в React",
+        "keywords": [
+          "хуки",
+          "react",
+          "они",
+          "используете",
+          "хуками"
+        ],
+        "questions_count": 51,
+        "example_questions": [
+          "С какими хуками React вы работали и для чего они используются",
+          "Назовите 3 React-хука, с которыми чаще всего работали",
+          "Что такое хуки в React"
+        ]
+      },
+      {
+        "id": 32,
+        "name": "Хуки React и рефы",
+        "keywords": [
+          "useeffect",
+          "useref",
+          "рендере",
+          "forwardref",
+          "usestate"
+        ],
+        "questions_count": 49,
+        "example_questions": [
+          "useRef и forwardRef, можно ли реф прокинуть в дочерний компонент просто как пропс",
+          "Рассказать про React.forwardRef",
+          "Что такое useEffect в React?"
+        ]
+      },
+      {
+        "id": 35,
+        "name": "Ключи в React",
+        "keywords": [
+          "key",
+          "атрибут",
+          "ключей",
+          "нужен",
+          "зачем"
+        ],
+        "questions_count": 48,
+        "example_questions": [
+          "Объясните назначение свойства key в React",
+          "Для чего используется key в React",
+          "Что используешь для key в React"
+        ]
+      },
+      {
+        "id": 44,
+        "name": "Рефакторинг компонентов React",
+        "keywords": [
+          "usestate",
+          "рефакторинг",
+          "окна",
+          "компонент",
+          "компонента"
+        ],
+        "questions_count": 46,
+        "example_questions": [
+          "как заставить рефетчнуть данные, если мы добавили новый элемент в массив в redux-toolkit или react-query",
+          "В React приложении с двумя компонентами реализуйте обновление id в главном компоненте при нажатии на кнопку и добавьте key={name} для корректного рендеринга",
+          "Отрефакторить React-компонент Component с условным рендерингом счетчика и корректным добавлением обработчика клика без прямого доступа к DOM через ref"
+        ]
+      },
+      {
+        "id": 49,
+        "name": "Оптимизация React хуков",
+        "keywords": [
+          "usememo",
+          "usecallback",
+          "memo",
+          "стоит",
+          "оборачивать"
+        ],
+        "questions_count": 43,
+        "example_questions": [
+          "useMemo vs useCallback",
+          "Нужно ли выносить статический список из useMemo за компонент и почему",
+          "Когда использовать хуки useCallback или useMemo"
+        ]
+      },
+      {
+        "id": 57,
+        "name": "Основы React и Suspense",
+        "keywords": [
+          "смысл",
+          "react",
+          "suspense",
+          "решает",
+          "базовые"
+        ],
+        "questions_count": 40,
+        "example_questions": [
+          "Что такое React",
+          "Объясните разницу между умным и глупым компонентом в React",
+          "Расскажите кратко про React"
+        ]
+      },
+      {
+        "id": 62,
+        "name": "Хуки React",
+        "keywords": [
+          "useref",
+          "usestate",
+          "usesyncexternalstore",
+          "триггерить",
+          "нужен"
+        ],
+        "questions_count": 38,
+        "example_questions": [
+          "Что такое ref и зачем нужен",
+          "useRef",
+          "useState, колбек функция стейта"
+        ]
+      },
+      {
+        "id": 64,
+        "name": "Управление состоянием в React",
+        "keywords": [
+          "setstate",
+          "count",
+          "setcount",
+          "prev",
+          "usecount"
+        ],
+        "questions_count": 37,
+        "example_questions": [
+          "Что такое замыкание, приведите пример замыкания на основе использования setState внутри useEffect",
+          "что такое setValue и setError в react-hook-form",
+          "Что будет выведено в консоль при клике на кнопку, если в обработчике вызываются два setState подряд: первый увеличивает состояние на 1, второй умножает состояние на 2"
+        ]
+      },
+      {
+        "id": 71,
+        "name": "Отличия useEffect и useLayoutEffect",
+        "keywords": [
+          "uselayouteffect",
+          "useeffect",
+          "отличается",
+          "от",
+          "отличие"
+        ],
+        "questions_count": 34,
+        "example_questions": [
+          "Отличия useEffect от useLayoutEffect",
+          "useEffect и useLayoutEffect",
+          "Разница между useEffect и useLayoutEffect"
+        ]
+      },
+      {
+        "id": 72,
+        "name": "Оптимизация производительности React",
+        "keywords": [
+          "оптимизации",
+          "оптимизировать",
+          "способы",
+          "react",
+          "производительности"
+        ],
+        "questions_count": 33,
+        "example_questions": [
+          "Какие способы оптимизации React-приложений вы знаете",
+          "Стратегии оптимизации в React",
+          "Какие методы оптимизации существуют в React и в целом в фронтенде"
+        ]
+      },
+      {
+        "id": 75,
+        "name": "Оптимизация React-компонентов",
+        "keywords": [
+          "usememo",
+          "usecallback",
+          "memo",
+          "назначение",
+          "react"
+        ],
+        "questions_count": 33,
+        "example_questions": [
+          "Объясните принцип работы React.memo и useCallback",
+          "useCallback и React.memo: когда нужно использовать и когда можно не использовать",
+          "Отрефакторить данный React-компонент Posts с использованием хуков useEffect, useMemo и Redux"
+        ]
+      },
+      {
+        "id": 80,
+        "name": "Дейли взаимодействия и релизы",
+        "keywords": [
+          "дейли",
+          "взаимодействовал",
+          "релизы",
+          "был",
+          "хуки"
+        ],
+        "questions_count": 32,
+        "example_questions": [
+          "Сколько нужно было апрувов для пуша в фичи в ветку",
+          "На базе чего писали вёрстку?",
+          "С нуля приходилось что либо верстать или по макетам что то делали"
+        ]
+      },
+      {
+        "id": 95,
+        "name": "Загрузка и обработка данных",
+        "keywords": [
+          "загрузки",
+          "пользователя",
+          "постов",
+          "обработкой",
+          "компонент"
+        ],
+        "questions_count": 28,
+        "example_questions": [
+          "Отрефакторь React-компонент Users с использованием useState и useEffect, исправь ошибки в обработке формы и запросах fetch",
+          "Реализуйте отображение 'loading...' пока идёт загрузка данных задач из API",
+          "Рефактор компоненты PokemonsNamesList с использованием useEffect, useState и useCallback для загрузки и отображения списка покемонов с обработкой ошибок"
+        ]
+      },
+      {
+        "id": 97,
+        "name": "Виртуализация в React",
+        "keywords": [
+          "виртуализацию",
+          "виртуализация",
+          "дом",
+          "виртуальный",
+          "виртуализации"
+        ],
+        "questions_count": 28,
+        "example_questions": [
+          "Что такое виртуальный дом в React",
+          "Virtual dom",
+          "Про виртуализацию списков"
+        ]
+      },
+      {
+        "id": 102,
+        "name": "Стилизация компонентов",
+        "keywords": [
+          "styled",
+          "components",
+          "стилей",
+          "стили",
+          "emotion"
+        ],
+        "questions_count": 26,
+        "example_questions": [
+          "Способы изоляции стилей.",
+          "Какие преимущества и недостатки использования Styled Components или Emotion по сравнению с традиционными методами?",
+          "Как стилизовать чекбоксы?"
+        ]
+      },
+      {
+        "id": 105,
+        "name": "Контекст и менеджеры",
+        "keywords": [
+          "context",
+          "контекст",
+          "менеджеры",
+          "контекста",
+          "стейт"
+        ],
+        "questions_count": 26,
+        "example_questions": [
+          "Какие бывают виды функций, как работает контекст и какие есть методы сохранения контекста",
+          "Когда лучше использовать API Context, а когда прибегать к стейт-менеджерам",
+          "Что такое this, какие бывают контексты исполнения и как его менять"
+        ]
+      },
+      {
+        "id": 106,
+        "name": "Webpack и его компоненты",
+        "keywords": [
+          "webpack",
+          "плагины",
+          "loaders",
+          "bootstrap",
+          "билде"
+        ],
+        "questions_count": 26,
+        "example_questions": [
+          "Вопросы по работе с webpack",
+          "Что такое webpack и как он используется в сборке проектов",
+          "Что такое плагины в контексте webpack и как их использовать"
+        ]
+      },
+      {
+        "id": 107,
+        "name": "useCallback и подписчики",
+        "keywords": [
+          "usecallback",
+          "subscribe",
+          "unsubscribe",
+          "подписчиков",
+          "оборачивать"
+        ],
+        "questions_count": 26,
+        "example_questions": [
+          "Нужен ли функции useCallback и в каких случаях",
+          "Что произойдет при вызове метода pay экземпляра класса Customer после удаления метода из прототипа?",
+          "Как работает useCallback, зачем нужен"
+        ]
+      },
+      {
+        "id": 113,
+        "name": "Кнопки и счетчики",
+        "keywords": [
+          "кнопку",
+          "счетчик",
+          "кнопки",
+          "кнопка",
+          "клика"
+        ],
+        "questions_count": 25,
+        "example_questions": [
+          "Реализовать счетчик с кнопками стоп, старт и рестарт",
+          "Как на погружение обработать обработчик клика",
+          "Реализуйте React-компонент с кнопкой и таймером, которые начинаются с 10 и заканчиваются на 0, при этом отслеживать счетчик кликов по кнопке до истечения времени таймера, а кнопка должна исчезать после истечения времени таймера"
+        ]
+      },
+      {
+        "id": 117,
+        "name": "ToDo задачи на React",
+        "keywords": [
+          "задач",
+          "todo",
+          "список",
+          "list",
+          "выполненные"
+        ],
+        "questions_count": 25,
+        "example_questions": [
+          "Сделать условный ToDo-лист на React с возможностью редактирования, удаления и переключения режима редактирования пользователя",
+          "Реализуйте React-компонент ToDoList, который принимает массив задач и отображает их в виде списка",
+          "Что выведет консоль при выполнении функции addToList, которая возвращает результат list.push(item), если вызвать addToList('apple', ['banana']) и вывести результат"
+        ]
+      },
+      {
+        "id": 124,
+        "name": "Высшие компоненты в React",
+        "keywords": [
+          "hoc",
+          "higher",
+          "order",
+          "component",
+          "memo"
+        ],
+        "questions_count": 23,
+        "example_questions": [
+          "HOC (Higher Order Component)",
+          "HOC (Higher Order Function)",
+          "Что такое HOC (Higher-Order Component) в React"
+        ]
+      },
+      {
+        "id": 126,
+        "name": "Контекст в React",
+        "keywords": [
+          "context",
+          "контекст",
+          "темы",
+          "react",
+          "контекста"
+        ],
+        "questions_count": 22,
+        "example_questions": [
+          "Что такое контекст в React, зачем он нужен и как работает",
+          "Что такое Context в React?",
+          "Объясните контекст в React"
+        ]
+      },
+      {
+        "id": 129,
+        "name": "Обработка ошибок в React",
+        "keywords": [
+          "errorboundary",
+          "error",
+          "boundary",
+          "ошибок",
+          "функциональных"
+        ],
+        "questions_count": 22,
+        "example_questions": [
+          "Что мы не можем написать на функциональных компонентах (например, Error Boundary)",
+          "Какие способы существуют для отлова ошибок в React приложении?",
+          "Как перехватывать ошибки в react"
+        ]
+      },
+      {
+        "id": 140,
+        "name": "Ключи в React",
+        "keywords": [
+          "key",
+          "ключ",
+          "реакте",
+          "нужен",
+          "prop"
+        ],
+        "questions_count": 20,
+        "example_questions": [
+          "Открытый и закрытый ключ",
+          "Проп key",
+          "Что такое key, зачем нужен"
+        ]
+      },
+      {
+        "id": 145,
+        "name": "Жизненные циклы компонентов",
+        "keywords": [
+          "жизненный",
+          "цикл",
+          "жизненного",
+          "цикла",
+          "жизненные"
+        ],
+        "questions_count": 20,
+        "example_questions": [
+          "Какие жизненные циклы реализует useEffect",
+          "Методы жизненного цикла компонента",
+          "Какие методы жизненного цикла есть в useEffect"
+        ]
+      },
+      {
+        "id": 148,
+        "name": "Комментарии пользователей онлайн",
+        "keywords": [
+          "комментарии",
+          "пользователей",
+          "постов",
+          "онлайн",
+          "dummyjson"
+        ],
+        "questions_count": 19,
+        "example_questions": [
+          "Реализовать страницу с счетчиком, который показывает сколько времени пользователь находится на странице в секундах, увеличивая значение каждую секунду",
+          "Как реализовать функционал на сайте с AI-чатом, чтобы убрать кнопку 'редактировать' транскрипт и оставить только вопросы от ИИ, чтобы пользователь не видел свои ответы?",
+          "Сколько пользователей онлайн?"
+        ]
+      },
+      {
+        "id": 151,
+        "name": "RTK Query и кеширование",
+        "keywords": [
+          "rtk",
+          "query",
+          "кеширование",
+          "инвалидацию",
+          "неавторизованный"
+        ],
+        "questions_count": 18,
+        "example_questions": [
+          "Как реализовано кеширование в RTK Query?",
+          "Как мы можем сами реализовать кеширование без использования RTK Query?",
+          "RTK Query плюсы"
+        ]
+      },
+      {
+        "id": 152,
+        "name": "Порталы в React",
+        "keywords": [
+          "portal",
+          "порталы",
+          "портал",
+          "createportal",
+          "всплывать"
+        ],
+        "questions_count": 18,
+        "example_questions": [
+          "Что такое Portal в React. Когда использовать",
+          "Что такое порталы в React (createPortal)",
+          "Что такое Portal в React?"
+        ]
+      },
+      {
+        "id": 157,
+        "name": "Жизненный цикл компонентов",
+        "keywords": [
+          "жизненный",
+          "жизненного",
+          "цикл",
+          "цикла",
+          "компонента"
+        ],
+        "questions_count": 17,
+        "example_questions": [
+          "Перечислите и опишите методы жизненного цикла в React и работу хука useEffect",
+          "Опишите этапы жизненного цикла компонента в React",
+          "Опиши жизненный цикл компонента в React"
+        ]
+      },
+      {
+        "id": 164,
+        "name": "JSX и современные технологии",
+        "keywords": [
+          "jsx",
+          "во",
+          "выходит",
+          "jsdoc",
+          "xsd"
+        ],
+        "questions_count": 16,
+        "example_questions": [
+          "Что такое JSX и можно ли использовать React без него",
+          "Для чего нужен JSX и как он работает",
+          "Изучаешь спецификацию js, что нового выходит за последнее время?"
+        ]
+      },
+      {
+        "id": 165,
+        "name": "Мемоизация в React 19",
+        "keywords": [
+          "мемоизация",
+          "мемоизации",
+          "нужна",
+          "19",
+          "реализована"
+        ],
+        "questions_count": 16,
+        "example_questions": [
+          "Мемоизация в react",
+          "Что такое мемоизация в React и как мы ее используем",
+          "Как реализована мемоизация в React 19?"
+        ]
+      },
+      {
+        "id": 166,
+        "name": "Сравнение React.memo",
+        "keywords": [
+          "memo",
+          "сравнения",
+          "сравнивает",
+          "пропсов",
+          "пропсы"
+        ],
+        "questions_count": 16,
+        "example_questions": [
+          "Объясните принцип работы React.memo",
+          "React.memo, что такое, как юзать, как аргументы",
+          "Как работает React.memo, когда может быть бесполезен"
+        ]
+      },
+      {
+        "id": 174,
+        "name": "Динамическая визуализация данных",
+        "keywords": [
+          "данными",
+          "аналогичную",
+          "динамическими",
+          "визуализации",
+          "динамическую"
+        ],
+        "questions_count": 16,
+        "example_questions": [
+          "Работа с графиками: опишите подходы к визуализации данных на графиках в React",
+          "Провести ревью кода React-компонента",
+          "Написать юнит-тест на React-компонент псевдокодом"
+        ]
+      }
+    ]
+  },
+  "Soft Skills": {
+    "name": "Soft Skills",
+    "total_questions": 823,
+    "total_clusters": 17,
+    "percentage": 9.65,
+    "topics": [
+      {
+        "id": 4,
+        "name": "Командная работа и взаимодействие",
+        "keywords": [
+          "команде",
+          "команды",
+          "команда",
+          "команду",
+          "человек"
+        ],
+        "questions_count": 108,
+        "example_questions": [
+          "Как внутри команды договаривались о внедрении новой технологии или библиотеки?",
+          "Какой у тебя был уровень в команде?",
+          "По какому флоу разработки работали в команде? (Git Flow)"
+        ]
+      },
+      {
+        "id": 8,
+        "name": "Опыт работы во фронтенде",
+        "keywords": [
+          "работал",
+          "какими",
+          "ли",
+          "занимался",
+          "делал"
+        ],
+        "questions_count": 86,
+        "example_questions": [
+          "Работал с zustand или valtio?",
+          "работал ли с zod",
+          "Как пришел во фронтенд и как выбирал стэк для изучения"
+        ]
+      },
+      {
+        "id": 9,
+        "name": "Код-ревью и внимание",
+        "keywords": [
+          "код",
+          "ревью",
+          "кода",
+          "leetcode",
+          "внимание"
+        ],
+        "questions_count": 84,
+        "example_questions": [
+          "Сколько по времени тратили на просмотр кода на ревью?",
+          "Как проводили код-ревью",
+          "Какие коды ошибок знаешь и как с ними борешься"
+        ]
+      },
+      {
+        "id": 11,
+        "name": "Проектные вопросы",
+        "keywords": [
+          "проекты",
+          "проекте",
+          "проект",
+          "сейчас",
+          "проектах"
+        ],
+        "questions_count": 72,
+        "example_questions": [
+          "На сколько большой проект был на фронте: сколько было репозиторий на фронте?",
+          "Рассказать про сокет в проекте.",
+          "Сколько весил проект под конец билда?"
+        ]
+      },
+      {
+        "id": 19,
+        "name": "Опыт и работа",
+        "keywords": [
+          "работы",
+          "резюме",
+          "место",
+          "опыт",
+          "месте"
+        ],
+        "questions_count": 60,
+        "example_questions": [
+          "Кратко про опыт работы",
+          "Расскажи про свой самый большой факап на работе?",
+          "Были ли конфликты на предыдущем месте работы"
+        ]
+      },
+      {
+        "id": 21,
+        "name": "Опыт и истории",
+        "keywords": [
+          "опыт",
+          "опыте",
+          "себе",
+          "расскажи",
+          "storybook"
+        ],
+        "questions_count": 59,
+        "example_questions": [
+          "Кратко про опыт",
+          "Об опыте",
+          "Расскажи про опыт"
+        ]
+      },
+      {
+        "id": 24,
+        "name": "Интересные и сложные задачи",
+        "keywords": [
+          "самая",
+          "интересные",
+          "сложная",
+          "задачи",
+          "интересная"
+        ],
+        "questions_count": 55,
+        "example_questions": [
+          "Рассказать про задачи какие делал",
+          "Расскажи про свои сложные задачи",
+          "Расскажи о последних интересных и трудных задачах, которые тебе запомнились"
+        ]
+      },
+      {
+        "id": 41,
+        "name": "Менеджеры и стейтменеджеры",
+        "keywords": [
+          "стейт",
+          "менеджеры",
+          "менеджерами",
+          "какими",
+          "менеджер"
+        ],
+        "questions_count": 46,
+        "example_questions": [
+          "2 этап - знакомство с менеджерами: рассказ о корпоративной культуре, технике, пересмотре зарплаты, соцпакете и дополнительных бонусах",
+          "Какие стейтменеджеры использовал?",
+          "С какими стейт менеджерами работал?"
+        ]
+      },
+      {
+        "id": 48,
+        "name": "Путь к развитию",
+        "keywords": [
+          "развиваешься",
+          "видишь",
+          "развиваться",
+          "кем",
+          "развитие"
+        ],
+        "questions_count": 44,
+        "example_questions": [
+          "Какое для себя видишь развитие",
+          "Как планируешь расти в разработке или в тимлида?",
+          "Есть ли у тебя какие-то активности для обучения и развития? Что ты предпринимаешь для этого, что смотришь или слушаешь?"
+        ]
+      },
+      {
+        "id": 51,
+        "name": "Оценка и планирование задач",
+        "keywords": [
+          "задачи",
+          "происходила",
+          "дома",
+          "оценка",
+          "планирование"
+        ],
+        "questions_count": 42,
+        "example_questions": [
+          "Опишите порядок выполнения операций в вашем решении задачи с медианой",
+          "Как распределялись задачи на спринт?",
+          "Как у вас происходит ход мыслей, если стоит задача сделать визуально 5 сервисов одинаково, а вы представляете одну из 5 команд и у вас у всех визуально разный фронт?"
+        ]
+      },
+      {
+        "id": 79,
+        "name": "Архитектурные подходы",
+        "keywords": [
+          "архитектура",
+          "архитектурные",
+          "какая",
+          "проекте",
+          "архитектуры"
+        ],
+        "questions_count": 32,
+        "example_questions": [
+          "Какую архитектуру используешь на проекте, какие знаешь?",
+          "Какие архитектурные подходы используешь (FSD, атомарный дизайн)",
+          "Какая у вас была архитектура?"
+        ]
+      },
+      {
+        "id": 90,
+        "name": "Оценка себя и грейда",
+        "keywords": [
+          "себе",
+          "себя",
+          "грейд",
+          "оцениваешь",
+          "оценишь"
+        ],
+        "questions_count": 29,
+        "example_questions": [
+          "Как отсматриваете свои фичи и как кто смотрит",
+          "На какой грейд себя оцениваешь",
+          "Расскажи о себе."
+        ]
+      },
+      {
+        "id": 108,
+        "name": "Свободное время и хобби",
+        "keywords": [
+          "свободное",
+          "хобби",
+          "заниматься",
+          "увлекаешься",
+          "время"
+        ],
+        "questions_count": 26,
+        "example_questions": [
+          "Какие хобби?",
+          "Как развиваетесь в свободное время?",
+          "Что в свободное время делаешь?"
+        ]
+      },
+      {
+        "id": 127,
+        "name": "Опыт и практики разработки",
+        "keywords": [
+          "ревью",
+          "было",
+          "ли",
+          "приходилось",
+          "делали"
+        ],
+        "questions_count": 22,
+        "example_questions": [
+          "Делали ли вы дженерики и в каких случаях, например в кастомных утилитах",
+          "Приходилось ли делать микрофронтенды? Понравилось ли?",
+          "Был ли опыт тимлидства?"
+        ]
+      },
+      {
+        "id": 134,
+        "name": "Гордость и достижения",
+        "keywords": [
+          "гордишься",
+          "которыми",
+          "гордитесь",
+          "достижения",
+          "задачах"
+        ],
+        "questions_count": 21,
+        "example_questions": [
+          "Топ 5 твоих достижений в компании (какую идею/фичу внедрил и как она помогла бизнесу)",
+          "Топ 5 твоих достижений в жизни",
+          "Расскажи о последнем релевантном опыте. Сделать акцент на личных достижениях, знаковых задачах."
+        ]
+      },
+      {
+        "id": 144,
+        "name": "Конфликтные ситуации и решения",
+        "keywords": [
+          "конфликтные",
+          "конфликты",
+          "ситуации",
+          "были",
+          "решаешь"
+        ],
+        "questions_count": 20,
+        "example_questions": [
+          "Как решал конфликтные вопросы?",
+          "Как вы решаете конфликтные ситуации?",
+          "Как поступать, если твое решение не принимают либо предлагают другое — как разруливаешь такие ситуации"
+        ]
+      },
+      {
+        "id": 162,
+        "name": "Проектные вызовы",
+        "keywords": [
+          "проекта",
+          "хуже",
+          "уйдешь",
+          "неё",
+          "станет"
+        ],
+        "questions_count": 17,
+        "example_questions": [
+          "Расскажите про задачи на текущей работе и продукт",
+          "Как для тебя выглядит налаженный процесс постановки задачи?",
+          "У тебя есть проект с более чем 10 разделами с разной бизнес логикой, у проекта нет автоматического тестирования. Что ты будешь делать, чтобы исправить это"
+        ]
+      }
+    ]
+  },
+  "TypeScript": {
+    "name": "TypeScript",
+    "total_questions": 672,
+    "total_clusters": 12,
+    "percentage": 7.88,
+    "topics": [
+      {
+        "id": 0,
+        "name": "Типы и дженерики в TypeScript",
+        "keywords": [
+          "typescript",
+          "типы",
+          "тип",
+          "дженерики",
+          "omit"
+        ],
+        "questions_count": 183,
+        "example_questions": [
+          "Что такое as const в TypeScript?",
+          "Есть ли перегрузка в TypeScript?",
+          "Что такое satisfies в TypeScript, отличия от as"
+        ]
+      },
+      {
+        "id": 1,
+        "name": "Специфичность CSS селекторов",
+        "keywords": [
+          "css",
+          "специфичность",
+          "div",
+          "in",
+          "селекторов"
+        ],
+        "questions_count": 155,
+        "example_questions": [
+          "Какие ещё css правила затрагивают изменение layout?",
+          "Объяснить специфичность селекторов в CSS",
+          "Объясните специфичность CSS селекторов"
+        ]
+      },
+      {
+        "id": 23,
+        "name": "Технологии передачи данных",
+        "keywords": [
+          "websocket",
+          "sse",
+          "websockets",
+          "polling",
+          "webrtc"
+        ],
+        "questions_count": 57,
+        "example_questions": [
+          "Знаком ли с WebRTC?",
+          "Использовали ли WebSocket, где и какие нюансы при работе",
+          "http, sse, websocket"
+        ]
+      },
+      {
+        "id": 25,
+        "name": "Интерфейсы и типы в TypeScript",
+        "keywords": [
+          "interface",
+          "type",
+          "typescript",
+          "разница",
+          "интерфейса"
+        ],
+        "questions_count": 55,
+        "example_questions": [
+          "Отличия типа от интерфейса в TypeScript",
+          "В чем разница между интерфейсами и типами в TypeScript?",
+          "Отличия type от interface в TypeScript"
+        ]
+      },
+      {
+        "id": 54,
+        "name": "Типы any, unknown, never",
+        "keywords": [
+          "unknown",
+          "any",
+          "never",
+          "void",
+          "typescript"
+        ],
+        "questions_count": 41,
+        "example_questions": [
+          "Разница между any / never / unknown",
+          "Объясните разницу между any и unknown в TypeScript",
+          "Зачем нужен тип never? В чем отличие от void?"
+        ]
+      },
+      {
+        "id": 58,
+        "name": "Типы данных и селекторы",
+        "keywords": [
+          "данных",
+          "ссылочных",
+          "ссылочные",
+          "типы",
+          "типов"
+        ],
+        "questions_count": 40,
+        "example_questions": [
+          "разница между примитивами и объектами",
+          "Рассказать про aria и data-* атрибуты",
+          "Разница между :nth-child и :nth-of-type"
+        ]
+      },
+      {
+        "id": 74,
+        "name": "Интерфейсы и типы в TS",
+        "keywords": [
+          "interface",
+          "ts",
+          "type",
+          "bar",
+          "отделять"
+        ],
+        "questions_count": 33,
+        "example_questions": [
+          "Разница интерфейсов и типов",
+          "class vs id",
+          "Минусы / плюсы TS"
+        ]
+      },
+      {
+        "id": 83,
+        "name": "Типы и ключи объектов",
+        "keywords": [
+          "ключами",
+          "объект",
+          "id",
+          "значениями",
+          "вложенный"
+        ],
+        "questions_count": 31,
+        "example_questions": [
+          "Написать тип someName и наиболее оптимальную проверку наличия ключа id в объекте pictures типа Record<ID, Picture>",
+          "Реализовать тип ValueOf, который получает значения всех ключей объекта, например для объекта user = { name: 'John', email: 'John@gmail.com', city: 'NY' } тип ValueOf должен быть 'John' | 'John@gmail.com' | 'NY'",
+          "Как сделать так, чтобы generic принимал объект, но чтобы у объекта было обязательно поле id (используя extends)"
+        ]
+      },
+      {
+        "id": 94,
+        "name": "Работа с деревьями в TypeScript",
+        "keywords": [
+          "src",
+          "отступами",
+          "ts",
+          "дерева",
+          "index"
+        ],
+        "questions_count": 29,
+        "example_questions": [
+          "Реализуйте компонент MyPick с функционалом, описанным в исходном коде из src/MyPick.ts",
+          "Реализуйте функцию myFlat, которая принимает вложенный массив с файлами и папками и возвращает плоский массив путей к файлам с правильным префиксом, например: входные данные const data = [ 'index.ts', { src: [ 'index.ts', { ui: [ 'index.ts', { cards: ['cards.tsx', 'index.ts'], wallets: ['index.ts', 'all-wallets.tsx'] } ] } ] } ]; результат должен быть [ 'index.ts', 'src/index.ts', 'src/ui/index.ts', 'src/ui/cards/cards.tsx', 'src/ui/cards/index.ts', 'src/ui/wallets/index.ts', 'src/ui/wallets/all-wallets.tsx' ]",
+          "Пройтись по дереву произвольной вложенности и достать все value (сложить их в массив и вернуть)"
+        ]
+      },
+      {
+        "id": 160,
+        "name": "Утилитарные типы TypeScript",
+        "keywords": [
+          "types",
+          "utility",
+          "typescript",
+          "omit",
+          "exclude"
+        ],
+        "questions_count": 17,
+        "example_questions": [
+          "Utility types в TypeScript",
+          "Какие utility types в TypeScript знаешь? С какими сталкивался в работе? Что они делают?",
+          "Какие utility types знаешь в TypeScript"
+        ]
+      },
+      {
+        "id": 171,
+        "name": "Типы и перечисления",
+        "keywords": [
+          "enum",
+          "env",
+          "estate",
+          "переменные",
+          "status"
+        ],
+        "questions_count": 16,
+        "example_questions": [
+          "Дан enum EState с тремя значениями и generic интерфейс IProps с ограничением V extends Record<EState, number>. Нужно дописать generic так, чтобы props соответствовал типу IProps с value, где ключи из EState и значения числа",
+          "Чем enum отличается от union в TypeScript?",
+          "Что такое Enum и почему его не любят"
+        ]
+      },
+      {
+        "id": 177,
+        "name": "Типы и охранники в TypeScript",
+        "keywords": [
+          "guard",
+          "type",
+          "typeguard",
+          "guards",
+          "user"
+        ],
+        "questions_count": 15,
+        "example_questions": [
+          "Что такое typeguard в TypeScript?",
+          "Что возвращает typeof Alert()",
+          "Что такое Type Guards в TypeScript"
+        ]
+      }
+    ]
+  },
+  "Сеть": {
+    "name": "Сеть",
+    "total_questions": 410,
+    "total_clusters": 13,
+    "percentage": 4.81,
+    "topics": [
+      {
+        "id": 30,
+        "name": "Авторизация и токены",
+        "keywords": [
+          "авторизации",
+          "refresh",
+          "авторизацией",
+          "авторизацию",
+          "token"
+        ],
+        "questions_count": 51,
+        "example_questions": [
+          "Что хранится на бэке для авторизации",
+          "Как бы ты делал аутентификацию, если бы тебе сказали делать на новом продукте?",
+          "В чем разница между аутентификацией и авторизацией"
+        ]
+      },
+      {
+        "id": 31,
+        "name": "Процесс ввода URL",
+        "keywords": [
+          "происходит",
+          "enter",
+          "адреса",
+          "адрес",
+          "url"
+        ],
+        "questions_count": 49,
+        "example_questions": [
+          "Расскажи про DNS/DNS-Resolving",
+          "Что делает браузер после того, как мы ввели адрес в адресной строке",
+          "Что происходит в браузере, когда мы пишем в адресной строке и нажимаем Enter"
+        ]
+      },
+      {
+        "id": 36,
+        "name": "HTTP запросы и заголовки",
+        "keywords": [
+          "http",
+          "коды",
+          "методы",
+          "заголовки",
+          "перечислите"
+        ],
+        "questions_count": 48,
+        "example_questions": [
+          "Из чего состоит HTTP запрос?",
+          "Что такое заголовки в HTTP запросе, их правила, зачем они нужны, и почему мы не можем просто передавать заголовки в body например?",
+          "Что такое HTTP запросы и как они работают?"
+        ]
+      },
+      {
+        "id": 39,
+        "name": "CORS и preflight запросы",
+        "keywords": [
+          "cors",
+          "preflight",
+          "он",
+          "заголовки",
+          "запросы"
+        ],
+        "questions_count": 47,
+        "example_questions": [
+          "Что такое CORS? Как настроить CORS?",
+          "Что такое preflight запрос (OPTIONS) в CORS и зачем он нужен?",
+          "Что такое CORS и как работают заголовки CORS и куки?"
+        ]
+      },
+      {
+        "id": 70,
+        "name": "Взаимодействие клиент-сервер",
+        "keywords": [
+          "сервером",
+          "сервер",
+          "сервера",
+          "взаимодействия",
+          "клиенте"
+        ],
+        "questions_count": 34,
+        "example_questions": [
+          "Как устанавливается соединение между клиентом и сервером",
+          "Как передаются куки с клиента на сервер",
+          "Клиент зарегистрировался, попал на главную, перешёл в личный кабинет, который грузится 30 секунд. Что с этим делать?"
+        ]
+      },
+      {
+        "id": 73,
+        "name": "CI/CD и CDN",
+        "keywords": [
+          "cd",
+          "ci",
+          "cdn",
+          "настраивал",
+          "релизами"
+        ],
+        "questions_count": 33,
+        "example_questions": [
+          "Что такое CDN",
+          "Готов ли поработать с CI-CD и релизами",
+          "Что такое CI/CD?"
+        ]
+      },
+      {
+        "id": 87,
+        "name": "JWT и авторизация",
+        "keywords": [
+          "jwt",
+          "авторизация",
+          "токен",
+          "токена",
+          "подпись"
+        ],
+        "questions_count": 30,
+        "example_questions": [
+          "Где хранили JWT",
+          "Что такое jwt авторизация",
+          "Как была устроена авторизация в проекте, расскажите про JWT?"
+        ]
+      },
+      {
+        "id": 123,
+        "name": "Дизайн и разработка API",
+        "keywords": [
+          "дизайнером",
+          "апи",
+          "дизайнерами",
+          "разработка",
+          "разработки"
+        ],
+        "questions_count": 23,
+        "example_questions": [
+          "Как была построена работа с аналитиками и дизайнерами?",
+          "Как пришла идея сторибука, почему и зачем он нужен?",
+          "С каким продуктом работали подробности"
+        ]
+      },
+      {
+        "id": 128,
+        "name": "Запросы GET и POST",
+        "keywords": [
+          "post",
+          "get",
+          "body",
+          "запроса",
+          "запросы"
+        ],
+        "questions_count": 22,
+        "example_questions": [
+          "Запросы GET передаются query параметрами, а можем ли мы сделать то же самое методом POST?",
+          "Как бы реализовал очередь на отправку запросов",
+          "Отличие GET от POST"
+        ]
+      },
+      {
+        "id": 131,
+        "name": "Безопасность веб-приложений",
+        "keywords": [
+          "xss",
+          "безопасности",
+          "атак",
+          "безопасность",
+          "защиты"
+        ],
+        "questions_count": 21,
+        "example_questions": [
+          "Какие методы защиты ты используешь для своего приложения.",
+          "Какие виды уязвимостей XSS, CORS, CSRF вы знаете и как бы их исправляли",
+          "Что такое XSS и как защититься от этой уязвимости"
+        ]
+      },
+      {
+        "id": 143,
+        "name": "Протоколы HTTP и HTTPS",
+        "keywords": [
+          "http",
+          "https",
+          "протоколов",
+          "версий",
+          "протокола"
+        ],
+        "questions_count": 20,
+        "example_questions": [
+          "HTTP vs HTTPS",
+          "отличие HTTP/1.1 vs HTTP/2",
+          "HTTPS что такое и отличие от HTTP"
+        ]
+      },
+      {
+        "id": 159,
+        "name": "API и мессенджеры",
+        "keywords": [
+          "api",
+          "first",
+          "мессенджер",
+          "мессенджера",
+          "ui"
+        ],
+        "questions_count": 17,
+        "example_questions": [
+          "Чем пользовался для взаимодействия с api",
+          "Как API с бэками обсуждали?",
+          "Подробно про мессенджер"
+        ]
+      },
+      {
+        "id": 176,
+        "name": "Сетевые протоколы и безопасность",
+        "keywords": [
+          "tcp",
+          "https",
+          "udp",
+          "шифрование",
+          "шифруется"
+        ],
+        "questions_count": 15,
+        "example_questions": [
+          "Что такое TCP и IP, как работают, чем отличаются",
+          "Как осуществляется шифрование в TLS",
+          "в чем заключается безопасность https"
+        ]
+      }
+    ]
+  },
+  "Алгоритмы": {
+    "name": "Алгоритмы",
+    "total_questions": 314,
+    "total_clusters": 8,
+    "percentage": 3.68,
+    "topics": [
+      {
+        "id": 6,
+        "name": "Карьерный поиск",
+        "keywords": [
+          "места",
+          "работы",
+          "новом",
+          "почему",
+          "ищешь"
+        ],
+        "questions_count": 94,
+        "example_questions": [
+          "Где сейчас проживаете?",
+          "Собираетесь ли переезжать?",
+          "Как относитесь к посещению офиса 2 раза в неделю?"
+        ]
+      },
+      {
+        "id": 18,
+        "name": "Сложность алгоритмов",
+        "keywords": [
+          "сложность",
+          "алгоритма",
+          "алгоритмов",
+          "оценить",
+          "какова"
+        ],
+        "questions_count": 60,
+        "example_questions": [
+          "Обсуждение сложности алгоритмов и понятия Big O",
+          "Оценить сложность (Big O) написанного алгоритма суммирования чисел, представленных массивами",
+          "Оценить сложность операций чтения и записи в различные структуры данных: linked list, map, array"
+        ]
+      },
+      {
+        "id": 47,
+        "name": "Переворот строк",
+        "keywords": [
+          "строку",
+          "строки",
+          "the",
+          "переворачивает",
+          "строк"
+        ],
+        "questions_count": 45,
+        "example_questions": [
+          "Написать функцию reverseString без использования arr.reverse, которая переворачивает строку",
+          "Написать функцию reverseWords, которая переворачивает каждое слово в предложении, используя функцию reverseString",
+          "Напишите функцию stringJoin, которая склеивает строки через разделитель, например stringJoin('  *  ', '1', '5', '7') возвращает '1 * 5 * 7'"
+        ]
+      },
+      {
+        "id": 59,
+        "name": "Библиотеки и графики",
+        "keywords": [
+          "библиотеки",
+          "графиками",
+          "формами",
+          "библиотеку",
+          "библиотеками"
+        ],
+        "questions_count": 38,
+        "example_questions": [
+          "Почему именно эти библиотеки были выбраны при решении задачи?",
+          "Расскажи как у вас был построен процесс внедрения новых библиотек, кто принимал решение за их внедрение?",
+          "В целом отдаешь предпочтение готовым решениям или сам изобретаешь велосипед?"
+        ]
+      },
+      {
+        "id": 122,
+        "name": "Проверка строковых свойств",
+        "keywords": [
+          "палиндромом",
+          "строка",
+          "проверяет",
+          "является",
+          "проверки"
+        ],
+        "questions_count": 24,
+        "example_questions": [
+          "Написать функцию для проверки, является ли строка палиндромом, и предложить способы оптимизации решения",
+          "Написать функцию для проверки правильности совпадения скобок в строке (например, '((()))') и предложить способы оптимизации решения",
+          "Реализовать функцию isUnique, которая проверяет, что все строки в массиве уникальны"
+        ]
+      },
+      {
+        "id": 149,
+        "name": "Вычисления и равенства",
+        "keywords": [
+          "вычислении",
+          "равно",
+          "выражения",
+          "909",
+          "равны"
+        ],
+        "questions_count": 19,
+        "example_questions": [
+          "Чему будет равно выражение 0.1 + 0.2 === 0.3, как избавиться от этой проблемы и почему так работает",
+          "Чему равны выражения a = 1 + 2 + 3 + \\\\\\\\\\\\\\\\\" и b = \\\\\\\\\"\\\\\\\\\" + 1 + 2 + 3?\"",
+          "Что вернет тернарный оператор d ? 1 : 2, если d = []?"
+        ]
+      },
+      {
+        "id": 153,
+        "name": "Генерация HEX цветов",
+        "keywords": [
+          "цвет",
+          "blue",
+          "hex",
+          "box",
+          "red"
+        ],
+        "questions_count": 18,
+        "example_questions": [
+          "Напишите функцию, которая генерирует случайный цвет в формате HEX (#ffffff)",
+          "Напишите функцию генерации случайного цвета в формате HEX в одну строку",
+          "Написать функцию генерации случайного hex цвета, возвращающую строку вида #xxxxxx с шестью символами от 0 до f"
+        ]
+      },
+      {
+        "id": 167,
+        "name": "Функции суммы и аргументы",
+        "keywords": [
+          "sum",
+          "сумму",
+          "вернет",
+          "аргументов",
+          "любое"
+        ],
+        "questions_count": 16,
+        "example_questions": [
+          "Написать тип для функции multiplyBy2, которая является свойством функции sum: sum принимает два числа и возвращает число, sum.multiplyBy2 принимает два числа и возвращает число, равное sum(a,b) * 2",
+          "Реализовать вызов функции foo(a, b = 4, c = 5) так, чтобы сумма аргументов была равна 18, при этом второй параметр должен использовать дефолтное значение.",
+          "Написать функцию каррирования sum(a)(b)"
+        ]
+      }
+    ]
+  },
+  "Верстка": {
+    "name": "Верстка",
+    "total_questions": 278,
+    "total_clusters": 10,
+    "percentage": 3.26,
+    "topics": [
+      {
+        "id": 33,
+        "name": "Свойства отображения элементов",
+        "keywords": [
+          "inline",
+          "display",
+          "block",
+          "box",
+          "perfect"
+        ],
+        "questions_count": 48,
+        "example_questions": [
+          "По пункту в резюме: как реализовано скачивание файлов в pdf",
+          "Как сделать так чтобы при нажатии на ссылку у нас скачивался файл? А теперь как сделать так, чтобы при переходе по урлу у нас сразу скачивался файл?",
+          "Рассказать про тег picture, как использовать"
+        ]
+      },
+      {
+        "id": 37,
+        "name": "Технологии веб-разработки",
+        "keywords": [
+          "ssr",
+          "ssg",
+          "scss",
+          "spa",
+          "isr"
+        ],
+        "questions_count": 47,
+        "example_questions": [
+          "Что такое CSP, для чего нужно",
+          "Объясните плюсы и минусы SPA и SSR, как они работают",
+          "расскажи про ssr"
+        ]
+      },
+      {
+        "id": 50,
+        "name": "Сравнение Grid и Flexbox",
+        "keywords": [
+          "grid",
+          "flex",
+          "flexbox",
+          "template",
+          "css"
+        ],
+        "questions_count": 43,
+        "example_questions": [
+          "В чем отличие Grid от Flexbox",
+          "flex vs grid",
+          "Разница между flex и grid"
+        ]
+      },
+      {
+        "id": 78,
+        "name": "Семантическая верстка",
+        "keywords": [
+          "теги",
+          "семантическая",
+          "верстка",
+          "семантические",
+          "мета"
+        ],
+        "questions_count": 32,
+        "example_questions": [
+          "Зачем использовать семантическую верстку. Назвать теги семантической верстки",
+          "Семантическая верстка",
+          "Сделать рефакторинг компоненты: учесть семантику и дополнительные ререндеры"
+        ]
+      },
+      {
+        "id": 135,
+        "name": "Паттерны проектирования",
+        "keywords": [
+          "проектирования",
+          "паттерны",
+          "дизайн",
+          "адаптивный",
+          "синглтон"
+        ],
+        "questions_count": 21,
+        "example_questions": [
+          "Расскажите про паттерны проектирования, которые вы использовали",
+          "Паттерны проектирования",
+          "Дизайн систему какую использовали"
+        ]
+      },
+      {
+        "id": 138,
+        "name": "Семантика HTML и HTML5",
+        "keywords": [
+          "html",
+          "html5",
+          "семантика",
+          "семантику",
+          "понимает"
+        ],
+        "questions_count": 20,
+        "example_questions": [
+          "Что происходит после получения HTML страницы?",
+          "На одном уровне два HTML-элемента: чем обернуть?",
+          "Какие есть способы получить HTML элемент (в том числе через ref с передачей колбэка)"
+        ]
+      },
+      {
+        "id": 154,
+        "name": "Центрирование элементов",
+        "keywords": [
+          "центру",
+          "элемент",
+          "отцентровать",
+          "высоты",
+          "выровнять"
+        ],
+        "questions_count": 18,
+        "example_questions": [
+          "Задача: отрисовать шахматную доску и реализовать управление королем, который может ходить только на соседние 8 клеток, при этом закрашивать возможные ходы",
+          "Сверстать нянкэт с позиционированием элементов",
+          "Как центрировать элемент по вертикали?"
+        ]
+      },
+      {
+        "id": 156,
+        "name": "Адаптивная верстка и методы",
+        "keywords": [
+          "адаптивной",
+          "верстке",
+          "верстки",
+          "промисов",
+          "методы"
+        ],
+        "questions_count": 17,
+        "example_questions": [
+          "Как рефакторишь легаси-компоненты",
+          "Как разбиваешь логику между slice и thunk",
+          "Какие методы адаптивной верстки знаешь?"
+        ]
+      },
+      {
+        "id": 163,
+        "name": "Свойства позиционирования",
+        "keywords": [
+          "position",
+          "absolute",
+          "fixed",
+          "sticky",
+          "relative"
+        ],
+        "questions_count": 17,
+        "example_questions": [
+          "Какие position бывают",
+          "Чем отличается sticky от fixed",
+          "Какие есть свойства position"
+        ]
+      },
+      {
+        "id": 178,
+        "name": "Дескрипторы и элементы HTML",
+        "keywords": [
+          "дескрипторы",
+          "блочными",
+          "строчными",
+          "строчных",
+          "селектор"
+        ],
+        "questions_count": 15,
+        "example_questions": [
+          "Какие бывают дескрипторы?",
+          "Чем блочные элементы отличаются от строчных?",
+          "В чем разница между тегами ol и ul"
+        ]
+      }
+    ]
+  },
+  "Инструменты": {
+    "name": "Инструменты",
+    "total_questions": 218,
+    "total_clusters": 8,
+    "percentage": 2.56,
+    "topics": [
+      {
+        "id": 53,
+        "name": "UI Kit и его особенности",
+        "keywords": [
+          "ui",
+          "kit",
+          "uikit",
+          "свой",
+          "точки"
+        ],
+        "questions_count": 42,
+        "example_questions": [
+          "Какие UI киты использовал",
+          "Вижу в резюме что писал свой UI kit самописный или на чем то? Ant или MUI использовал?",
+          "Расскажите про особенности UI kitа."
+        ]
+      },
+      {
+        "id": 55,
+        "name": "Веб-технологии и доступность",
+        "keywords": [
+          "веб",
+          "вебсокеты",
+          "мессенджера",
+          "вебворкеры",
+          "доступность"
+        ],
+        "questions_count": 41,
+        "example_questions": [
+          "Расскажите про особенности хостинга веб-приложений",
+          "Что знаешь про Web Vitals, как следил за метриками",
+          "Какие могут быть проблемы с вебсокетом? Когда вебсокет нужен, а когда не очень?"
+        ]
+      },
+      {
+        "id": 98,
+        "name": "Принципы SOLID в ООП",
+        "keywords": [
+          "solid",
+          "принципы",
+          "ооп",
+          "принцип",
+          "применение"
+        ],
+        "questions_count": 27,
+        "example_questions": [
+          "Объясните основные принципы ООП",
+          "Объясните принципы SOLID и их применение в разработке",
+          "Расскажи про SOLID и как использовал"
+        ]
+      },
+      {
+        "id": 100,
+        "name": "Git и команды разработки",
+        "keywords": [
+          "git",
+          "flow",
+          "stash",
+          "github",
+          "команды"
+        ],
+        "questions_count": 27,
+        "example_questions": [
+          "По процессу разработки как шло взаимодействие с git git flow",
+          "Что такое git stash",
+          "git pull для чего"
+        ]
+      },
+      {
+        "id": 116,
+        "name": "npm и Nginx в CI",
+        "keywords": [
+          "npm",
+          "nginx",
+          "приватный",
+          "реестр",
+          "ci"
+        ],
+        "questions_count": 25,
+        "example_questions": [
+          "Спрашивал о работе веб-сервера Nginx, что это и зачем вообще надо",
+          "Расскажи подробно как редачили npm пакеты, где хранили и тд",
+          "Какие минусы у npm?"
+        ]
+      },
+      {
+        "id": 136,
+        "name": "Сравнение фреймворков",
+        "keywords": [
+          "vue",
+          "angular",
+          "библиотекой",
+          "считается",
+          "реактивность"
+        ],
+        "questions_count": 21,
+        "example_questions": [
+          "Сравните React, Vue и Angular",
+          "отличие React vs Vue vs Angular",
+          "Сравните Angular, Vue и React по основным характеристикам"
+        ]
+      },
+      {
+        "id": 150,
+        "name": "Git: rebase и merge",
+        "keywords": [
+          "rebase",
+          "merge",
+          "git",
+          "отличается",
+          "reset"
+        ],
+        "questions_count": 19,
+        "example_questions": [
+          "git rebase",
+          "Что используете на проекте merge или rebase?",
+          "В чем разница между merge и rebase в Git"
+        ]
+      },
+      {
+        "id": 169,
+        "name": "Сравнение сборщиков Vite и Webpack",
+        "keywords": [
+          "vite",
+          "webpack",
+          "сборщика",
+          "быстрее",
+          "webm"
+        ],
+        "questions_count": 16,
+        "example_questions": [
+          "Почему Vite быстрее webpack",
+          "Как настроить webpack так, чтобы он приблизился по скорости к Vite",
+          "Является ли формат .webm оптимальным для сборки видео на бэкенде?"
+        ]
+      }
+    ]
+  },
+  "Производительность": {
+    "name": "Производительность",
+    "total_questions": 136,
+    "total_clusters": 5,
+    "percentage": 1.59,
+    "topics": [
+      {
+        "id": 68,
+        "name": "Способы оптимизации",
+        "keywords": [
+          "оптимизации",
+          "оптимизировал",
+          "способы",
+          "оптимизация",
+          "средства"
+        ],
+        "questions_count": 36,
+        "example_questions": [
+          "Как оптимизировать бандл",
+          "Если будет идея по оптимизации процессов, что ты с ней сделаешь",
+          "Какие приёмы оптимизации использовались на проекте?"
+        ]
+      },
+      {
+        "id": 96,
+        "name": "Рендеринг и рекурсия",
+        "keywords": [
+          "repaint",
+          "reflow",
+          "рекурсия",
+          "реконсиляция",
+          "рендеринга"
+        ],
+        "questions_count": 28,
+        "example_questions": [
+          "Виды рендеринга",
+          "Что такое условный рендеринг?",
+          "что такое рекурсия"
+        ]
+      },
+      {
+        "id": 110,
+        "name": "Оптимизация маршрутов и бронирование",
+        "keywords": [
+          "маршрут",
+          "getroute",
+          "билетов",
+          "маршруту",
+          "оптимальный"
+        ],
+        "questions_count": 25,
+        "example_questions": [
+          "Реализуйте функцию getRoute, которая возвращает маршрут по заданным параметрам",
+          "Расскажите, как спроектировать пошаговую систему бронирования и оплаты, а также как обработать ситуацию, когда несколько человек бронируют одно и то же время",
+          "Напишите функцию bookingCalculate, которая рассчитывает стоимость бронирования с разной стоимостью для будних и выходных дней, учитывая количество ночей и дату начала"
+        ]
+      },
+      {
+        "id": 115,
+        "name": "Оптимизация приложений",
+        "keywords": [
+          "приложение",
+          "оптимизировать",
+          "приложения",
+          "приложений",
+          "оптимизации"
+        ],
+        "questions_count": 25,
+        "example_questions": [
+          "Какие способы оптимизации ты использовал в своём приложении.",
+          "Способы оптимизации vue приложений.",
+          "У тебя есть бандл, твоя задача его оптимизировать (только js). Сборка приложения происходит на webpack"
+        ]
+      },
+      {
+        "id": 130,
+        "name": "Оптимизация скорости загрузки",
+        "keywords": [
+          "грузится",
+          "аудио",
+          "долго",
+          "скорость",
+          "сайт"
+        ],
+        "questions_count": 22,
+        "example_questions": [
+          "Тебе нужно выполнить объёмную операцию, которая займёт продолжительное время, что нужно сделать, чтобы браузер не тормозил, не завис.",
+          "Как мы можем оптимизировать скорость загрузки страницы",
+          "Как диагностировать проблему с быстродействием веб-приложения"
+        ]
+      }
+    ]
+  },
+  "Тестирование": {
+    "name": "Тестирование",
+    "total_questions": 102,
+    "total_clusters": 1,
+    "percentage": 1.2,
+    "topics": [
+      {
+        "id": 5,
+        "name": "Unit-тестирование и его аспекты",
+        "keywords": [
+          "тесты",
+          "писали",
+          "unit",
+          "тестов",
+          "тестирование"
+        ],
+        "questions_count": 102,
+        "example_questions": [
+          "Какими свойствами должен обладать хороший unit-тест?",
+          "Есть процентная метрика покрытия unit тестами проекта. Как думаешь, насколько эта метрика вообще полезна?",
+          "В каких случаях покрытие тестами может только навредить разработке? Не ускорить, а замедлить?"
+        ]
+      }
+    ]
+  },
+  "Другое": {
+    "name": "Другое",
+    "total_questions": 100,
+    "total_clusters": 5,
+    "percentage": 1.17,
+    "topics": [
+      {
+        "id": 118,
+        "name": "Пути и объекты",
+        "keywords": [
+          "пути",
+          "объекте",
+          "полями",
+          "путь",
+          "to"
+        ],
+        "questions_count": 25,
+        "example_questions": [
+          "Объяснить поведение this в объекте bet с методом getBetType и при вызове getType, который ссылается на bet.getBetType, а также почему при вызове getType() выводится значение глобальной переменной type.",
+          "Реализовать функцию getResult, которая принимает массив объектов с полями name и region и возвращает объект с подсчётом количества субъектов в регионах 1 и 2, без использования дополнительных переменных-массивов, реализовав логику внутри самой функции",
+          "Реализуйте функцию getRoute, которая принимает массив объектов с полями from, to и weight, и возвращает массив объектов с полями from, to, weight, где для каждого from указан путь с минимальным весом до to"
+        ]
+      },
+      {
+        "id": 121,
+        "name": "Программирование и зависимости",
+        "keywords": [
+          "программирования",
+          "программирование",
+          "функциональное",
+          "devdependencies",
+          "dependencies"
+        ],
+        "questions_count": 24,
+        "example_questions": [
+          "В чем отличие интерпретируемого ЯП от компилируемого?",
+          "Что такое функциональное программирование?",
+          "Что такое SOLID принципы в программировании"
+        ]
+      },
+      {
+        "id": 155,
+        "name": "Асинхронная функция sleep",
+        "keywords": [
+          "sleep",
+          "миллисекунд",
+          "успешно",
+          "завершается",
+          "количество"
+        ],
+        "questions_count": 18,
+        "example_questions": [
+          "Как реализовать асинхронную функцию sleep() без setTimeout",
+          "Реализуйте функцию sleep, которая при вызове приостанавливает выполнение кода на указанное количество миллисекунд и работает как промис с поддержкой await",
+          "Написать функцию sleep"
+        ]
+      },
+      {
+        "id": 158,
+        "name": "Плюсы и минусы технологий",
+        "keywords": [
+          "плюсы",
+          "минусы",
+          "yup",
+          "преимущества",
+          "отрицательные"
+        ],
+        "questions_count": 17,
+        "example_questions": [
+          "В чем плюсы React?",
+          "Назовите плюсы и минусы React",
+          "Плюсы Yup?"
+        ]
+      },
+      {
+        "id": 173,
+        "name": "Вывод кода и объекты",
+        "keywords": [
+          "const",
+          "выполнении",
+          "some",
+          "кода",
+          "выведено"
+        ],
+        "questions_count": 16,
+        "example_questions": [
+          "Что будет выведено в консоль при выполнении кода const a = {key: 'a'}, b = {key: 'b'}, c = {key: 'c'}; a[b] = c; a[c] = b; console.log(a[b], a[c])",
+          "Что выведет следующий код и как исправить, чтобы изменения в копии объекта не влияли на оригинал: const a = {name: 'Петя'}; const b = a; b.name = 'Вася'; console.log(b.name); console.log(a.name);",
+          "Что выведет в консоли при деструктуризации объекта и массива: const { a, b } = obj; const [c, ...d] = arr; console.log(a, b, c, d);?"
+        ]
+      }
+    ]
+  },
+  "Архитектура": {
+    "name": "Архитектура",
+    "total_questions": 59,
+    "total_clusters": 3,
+    "percentage": 0.69,
+    "topics": [
+      {
+        "id": 139,
+        "name": "Архитектура FSD",
+        "keywords": [
+          "fsd",
+          "design",
+          "feature",
+          "sliced",
+          "архитектуру"
+        ],
+        "questions_count": 20,
+        "example_questions": [
+          "Расскажи про архитектуру FCD",
+          "Опишите архитектуру FSD: какие есть слои, что каждый слой может использовать и что не может, как реализовывался роутинг",
+          "Как организовать фичи и слои в FSD-подходе"
+        ]
+      },
+      {
+        "id": 141,
+        "name": "Чистые функции и перегрузка",
+        "keywords": [
+          "чистая",
+          "функция",
+          "чистые",
+          "перегрузка",
+          "функций"
+        ],
+        "questions_count": 20,
+        "example_questions": [
+          "Что такое чистая функция",
+          "Синхронные и асинхронные функции.",
+          "Чем может быть опасен new Function"
+        ]
+      },
+      {
+        "id": 147,
+        "name": "FSD: Внедрение и Проблемы",
+        "keywords": [
+          "fsd",
+          "разделение",
+          "минусы",
+          "организовывали",
+          "соединить"
+        ],
+        "questions_count": 19,
+        "example_questions": [
+          "Что такое fsd, как внедряли его на проект",
+          "FSD - в чем заключается, что куда положить",
+          "Расскажи что такое FSD и как организовывали на проекте"
+        ]
+      }
+    ]
+  },
+  "Браузеры": {
+    "name": "Браузеры",
+    "total_questions": 48,
+    "total_clusters": 1,
+    "percentage": 0.56,
+    "topics": [
+      {
+        "id": 34,
+        "name": "Отрисовка страниц в браузере",
+        "keywords": [
+          "страницы",
+          "страница",
+          "страницу",
+          "странице",
+          "отрисовки"
+        ],
+        "questions_count": 48,
+        "example_questions": [
+          "Как выполняется отрисовка в браузере",
+          "Бывает, что страница прыгает при отрисовке, как этого избежать.",
+          "Представь что возникла ошибка на странице в UI например, как бы ты решал эту проблему? Например ошибка в внешней библиотеке, как бы ты решал в этом случае проблему?"
+        ]
+      }
+    ]
+  }
+}

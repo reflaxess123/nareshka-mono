@@ -20,10 +20,11 @@ from app.features.browser_logs.api.browser_logs_router import router as browser_
 from app.features.code_editor.api import router as code_editor_router
 from app.features.content.api import router as content_router
 from app.features.interviews.api.interviews_router import router as interviews_router
+from app.features.interviews.api.categories_router import router as categories_router
 from app.features.mindmap.api import router as mindmap_router
 from app.features.progress.api import router as progress_router
 from app.features.stats.api import router as stats_router
-from app.features.analytics.api.analytics_router import router as analytics_router
+# from app.features.analytics.api.analytics_router import router as analytics_router
 from app.features.task.api import router as task_router
 from app.features.theory.api import router as theory_router
 
@@ -64,6 +65,7 @@ app.include_router(auth_router, prefix="/api/v2")
 app.include_router(browser_logs_router)
 app.include_router(content_router, prefix="/api/v2")
 app.include_router(interviews_router, prefix="/api/v2")
+app.include_router(categories_router, prefix="/api/v2")
 app.include_router(theory_router, prefix="/api/v2")
 app.include_router(task_router, prefix="/api/v2")
 app.include_router(progress_router, prefix="/api/v2")
@@ -71,7 +73,7 @@ app.include_router(code_editor_router, prefix="/api/v2/code-editor")
 app.include_router(stats_router, prefix="/api/v2/stats")
 app.include_router(mindmap_router, prefix="/api/v2/mindmap")
 app.include_router(admin_router, prefix="/api/v2/admin")
-app.include_router(analytics_router, prefix="/api/v2")
+# app.include_router(analytics_router, prefix="/api/v2")
 
 # Serve analytics static assets (PNG/CSV) from sobes-analysis/out
 analytics_out_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'sobes-analysis', 'out'))
