@@ -21,6 +21,7 @@ from app.features.code_editor.api import router as code_editor_router
 from app.features.content.api import router as content_router
 from app.features.interviews.api.interviews_router import router as interviews_router
 from app.features.interviews.api.categories_router import router as categories_router
+from app.features.interviews.api.companies_router import router as companies_router
 from app.features.mindmap.api import router as mindmap_router
 from app.features.progress.api import router as progress_router
 from app.features.stats.api import router as stats_router
@@ -66,6 +67,7 @@ app.include_router(browser_logs_router)
 app.include_router(content_router, prefix="/api/v2")
 app.include_router(interviews_router, prefix="/api/v2")
 app.include_router(categories_router, prefix="/api/v2")
+app.include_router(companies_router, prefix="/api/v2")
 app.include_router(theory_router, prefix="/api/v2")
 app.include_router(task_router, prefix="/api/v2")
 app.include_router(progress_router, prefix="/api/v2")
@@ -106,6 +108,11 @@ async def api_root():
 @app.get("/redirect")
 async def redirect():
     return RedirectResponse(url="/")
+
+
+@app.get("/api/test-companies")
+async def get_top_companies_simple():
+    return [{"name": "test", "count": 123}]
 
 
 if __name__ == "__main__":

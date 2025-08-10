@@ -14,7 +14,8 @@ from app.features.interviews.dto.categories_responses import (
     CategoryDetailResponse,
     QuestionResponse,
     QuestionsListResponse,
-    CategoriesStatisticsResponse
+    CategoriesStatisticsResponse,
+    CompanyResponse
 )
 from app.features.interviews.exceptions.interview_exceptions import (
     CategoryNotFoundError,
@@ -73,42 +74,6 @@ def get_statistics(
 
 
 @router.get(
-    "/{category_id}",
-    response_model=CategoryDetailResponse,
-    summary="Получить детали категории",
-    description="Возвращает подробную информацию о категории с кластерами и примерами"
-)
-def get_category_detail(
-    category_id: str = Path(..., description="ID категории (например: javascript_core)"),
-    limit_questions: int = Query(
-        10, 
-        ge=1, 
-        le=50, 
-        description="Количество примеров вопросов"
-    ),
-    session: Session = Depends(get_session),
-    current_user=Depends(get_current_user_optional)
-) -> CategoryDetailResponse:
-    """
-    Получить детальную информацию о категории
-    
-    Возвращает полную информацию о категории, включая:
-    - Основную информацию о категории
-    - Список всех кластеров категории
-    - Примеры вопросов из категории
-    """
-    service = CategoriesService(session)
-    
-    try:
-        return service.get_category_detail(
-            category_id=category_id,
-            limit_questions=limit_questions
-        )
-    except CategoryNotFoundError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-
-
-@router.get(
     "/cluster/{cluster_id}/questions",
     response_model=List[QuestionResponse],
     summary="Получить вопросы кластера",
@@ -153,8 +118,8 @@ def get_cluster_questions(
 def search_questions(
     q: str = Query(
         ..., 
-        min_length=2, 
-        description="Поисковый запрос (минимум 2 символа)"
+        min_length=1, 
+        description="Поисковый запрос (минимум 1 символ, * для всех)"
     ),
     category_id: Optional[str] = Query(
         None, 
@@ -167,7 +132,7 @@ def search_questions(
     limit: int = Query(
         50, 
         ge=1, 
-        le=200, 
+        le=500, 
         description="Максимальное количество результатов"
     ),
     session: Session = Depends(get_session),
@@ -187,3 +152,60 @@ def search_questions(
         company=company,
         limit=limit
     )
+
+
+
+@router.get(
+    "/companies/top",
+    response_model=List[CompanyResponse],
+    summary="Получить топ компаний",
+    description="Возвращает список компаний с наибольшим количеством вопросов"
+)
+def get_top_companies_endpoint(
+    limit: int = Query(
+        20, 
+        ge=1, 
+        le=100, 
+        description="Количество компаний в топе"
+    ),
+    session: Session = Depends(get_session),
+    current_user=Depends(get_current_user_optional)
+) -> List[CompanyResponse]:
+    service = CategoriesService(session)
+    return service.get_top_companies(limit=limit)
+
+
+@router.get(
+    "/{category_id}",
+    response_model=CategoryDetailResponse,
+    summary="Получить детали категории",
+    description="Возвращает подробную информацию о категории с кластерами и примерами"
+)
+def get_category_detail(
+    category_id: str = Path(..., description="ID категории (например: javascript_core)"),
+    limit_questions: int = Query(
+        10, 
+        ge=1, 
+        le=50, 
+        description="Количество примеров вопросов"
+    ),
+    session: Session = Depends(get_session),
+    current_user=Depends(get_current_user_optional)
+) -> CategoryDetailResponse:
+    """
+    Получить детальную информацию о категории
+    
+    Возвращает полную информацию о категории, включая:
+    - Основную информацию о категории
+    - Список всех кластеров категории
+    - Примеры вопросов из категории
+    """
+    service = CategoriesService(session)
+    
+    try:
+        return service.get_category_detail(
+            category_id=category_id,
+            limit_questions=limit_questions
+        )
+    except CategoryNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))

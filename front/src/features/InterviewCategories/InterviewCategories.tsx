@@ -36,7 +36,12 @@ interface CategoryDetail {
   sample_questions: Question[];
 }
 
-type ViewMode = 'categories' | 'category-detail' | 'cluster-questions' | 'search';
+interface Company {
+  name: string;
+  count: number;
+}
+
+type ViewMode = 'categories' | 'category-detail' | 'cluster-questions' | 'search' | 'companies';
 
 const API_BASE = '';
 
@@ -61,8 +66,10 @@ export const InterviewCategories: React.FC = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('categories');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedCluster, setSelectedCluster] = useState<number | null>(null);
+  const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [clusterQuestionsPage, setClusterQuestionsPage] = useState(1);
+  const [showFilters, setShowFilters] = useState(false);
 
   // Загрузка категорий
   const { data: categories, isLoading: categoriesLoading } = useQuery<Category[]>({
@@ -70,6 +77,16 @@ export const InterviewCategories: React.FC = () => {
     queryFn: async () => {
       const response = await fetch('/api/v2/interview-categories/');
       if (!response.ok) throw new Error('Failed to fetch categories');
+      return response.json();
+    }
+  });
+
+  // Загрузка топ компаний
+  const { data: topCompanies } = useQuery<Company[]>({
+    queryKey: ['top-companies'],
+    queryFn: async () => {
+      const response = await fetch('/api/v2/interview-categories/companies/top');
+      if (!response.ok) throw new Error('Failed to fetch companies');
       return response.json();
     }
   });
@@ -100,17 +117,32 @@ export const InterviewCategories: React.FC = () => {
 
   // Поиск вопросов
   const { data: searchResults, isLoading: searchLoading } = useQuery<Question[]>({
-    queryKey: ['search-questions', searchQuery, selectedCategory],
+    queryKey: ['search-questions', searchQuery, selectedCategory, selectedCompany],
     queryFn: async () => {
       if (!searchQuery || searchQuery.length < 2) return [];
-      const params = new URLSearchParams({ q: searchQuery, limit: '100' });
+      const params = new URLSearchParams({ q: searchQuery, limit: '500' });
       if (selectedCategory) params.append('category_id', selectedCategory);
+      if (selectedCompany) params.append('company', selectedCompany);
       
       const response = await fetch(`/api/v2/interview-categories/search/questions?${params}`);
       if (!response.ok) throw new Error('Failed to search questions');
       return response.json();
     },
     enabled: searchQuery.length >= 2
+  });
+
+  // Вопросы по компании
+  const { data: companyQuestions, isLoading: companyQuestionsLoading } = useQuery<Question[]>({
+    queryKey: ['company-questions', selectedCompany],
+    queryFn: async () => {
+      if (!selectedCompany) return [];
+      const params = new URLSearchParams({ q: '*', company: selectedCompany, limit: '500' });
+      
+      const response = await fetch(`/api/v2/interview-categories/search/questions?${params}`);
+      if (!response.ok) throw new Error('Failed to fetch company questions');
+      return response.json();
+    },
+    enabled: !!selectedCompany && viewMode === 'companies'
   });
 
   // Навигация
@@ -146,6 +178,22 @@ export const InterviewCategories: React.FC = () => {
       setViewMode('search');
     } else if (query.length === 0) {
       setViewMode(selectedCategory ? 'category-detail' : 'categories');
+    }
+  };
+
+  const handleCompanySelect = (company: string | null) => {
+    setSelectedCompany(company);
+    if (company) {
+      setViewMode('companies');
+      setSelectedCategory(null);
+      setSelectedCluster(null);
+      setSearchQuery('');
+      setShowFilters(false);
+    } else {
+      setViewMode('categories');
+      setSelectedCategory(null);
+      setSelectedCluster(null);
+      setSearchQuery('');
     }
   };
 
@@ -193,6 +241,14 @@ export const InterviewCategories: React.FC = () => {
             </span>
           </>
         )}
+        {viewMode === 'companies' && selectedCompany && (
+          <>
+            <span className={styles.separator}>›</span>
+            <span className={`${styles.breadcrumb} ${styles.active}`}>
+              🏢 {selectedCompany}
+            </span>
+          </>
+        )}
       </div>
 
       {/* Заголовок и статистика */}
@@ -202,6 +258,7 @@ export const InterviewCategories: React.FC = () => {
           {viewMode === 'category-detail' && categoryDetail?.category.name}
           {viewMode === 'cluster-questions' && currentCluster?.name}
           {viewMode === 'search' && `Результаты поиска: "${searchQuery}"`}
+          {viewMode === 'companies' && `Вопросы ${selectedCompany}`}
         </h1>
         
         {viewMode === 'categories' && (
@@ -250,9 +307,22 @@ export const InterviewCategories: React.FC = () => {
             </div>
           </div>
         )}
+
+        {viewMode === 'companies' && selectedCompany && companyQuestions && (
+          <div className={styles.stats}>
+            <div className={styles.stat}>
+              <span className={styles.statValue}>{companyQuestions.length}</span>
+              <span className={styles.statLabel}>вопросов</span>
+            </div>
+            <div className={styles.stat}>
+              <span className={styles.statValue}>{topCompanies?.find(c => c.name === selectedCompany)?.count || 0}</span>
+              <span className={styles.statLabel}>всего в базе</span>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Поиск */}
+      {/* Поиск и фильтры */}
       <div className={styles.searchBar}>
         <input
           type="text"
@@ -269,7 +339,34 @@ export const InterviewCategories: React.FC = () => {
             ✕
           </button>
         )}
+        <button 
+          onClick={() => setShowFilters(!showFilters)}
+          className={styles.filtersToggle}
+        >
+          🔍 Фильтры
+        </button>
       </div>
+
+      {/* Панель фильтров */}
+      {showFilters && viewMode !== 'companies' && (
+        <div className={styles.filtersPanel}>
+          <div className={styles.filterGroup}>
+            <label>Компания:</label>
+            <select 
+              value={selectedCompany || ''} 
+              onChange={(e) => handleCompanySelect(e.target.value || null)}
+              className={styles.companySelect}
+            >
+              <option value="">Все компании</option>
+              {topCompanies?.map(company => (
+                <option key={company.name} value={company.name}>
+                  {company.name} ({company.count})
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      )}
 
       {/* Контент в зависимости от режима просмотра */}
       {viewMode === 'categories' && (
@@ -456,6 +553,41 @@ export const InterviewCategories: React.FC = () => {
           {searchResults && searchResults.length === 0 && !searchLoading && (
             <div className={styles.noResults}>
               <span>По запросу "{searchQuery}" ничего не найдено</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {viewMode === 'companies' && selectedCompany && (
+        <div className={styles.companyQuestions}>
+          {companyQuestionsLoading && <div className={styles.loading}>Загрузка вопросов...</div>}
+          
+          {companyQuestions && companyQuestions.length > 0 && (
+            <>
+              <div className={styles.companyStats}>
+                <span>Найдено: <strong>{companyQuestions.length}</strong> вопросов от {selectedCompany}</span>
+              </div>
+              
+              <div className={styles.questionsList}>
+                {companyQuestions.map((question, index) => (
+                  <div key={question.id} className={styles.questionItem}>
+                    <div className={styles.questionNumber}>#{index + 1}</div>
+                    <div className={styles.questionContent}>
+                      <div className={styles.questionText}>{question.question_text}</div>
+                      <div className={styles.questionMeta}>
+                        {question.topic_name && <span className={styles.topic}>{question.topic_name}</span>}
+                        {question.category_id && <span className={styles.category}>{question.category_id}</span>}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          {companyQuestions && companyQuestions.length === 0 && !companyQuestionsLoading && (
+            <div className={styles.noResults}>
+              <span>У компании {selectedCompany} нет вопросов в базе</span>
             </div>
           )}
         </div>

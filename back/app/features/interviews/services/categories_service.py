@@ -11,7 +11,8 @@ from app.features.interviews.dto.categories_responses import (
     ClusterResponse,
     QuestionResponse,
     CategoryDetailResponse,
-    CategoriesStatisticsResponse
+    CategoriesStatisticsResponse,
+    CompanyResponse
 )
 
 
@@ -165,3 +166,15 @@ class CategoriesService:
             total_clusters=stats['total_clusters'],
             categorization_rate=stats['categorization_rate']
         )
+    
+    def get_top_companies(self, limit: int = 20) -> List[CompanyResponse]:
+        """Получить топ компаний по количеству вопросов"""
+        companies_data = self.repository.get_top_companies(limit=limit)
+        
+        return [
+            CompanyResponse(
+                name=company['name'],
+                count=company['count']
+            )
+            for company in companies_data
+        ]

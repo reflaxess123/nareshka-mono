@@ -6,6 +6,20 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 
 
+class CompanyResponse(BaseModel):
+    """Модель ответа для компании"""
+    name: str = Field(..., description="Название компании")
+    count: int = Field(..., description="Количество вопросов")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "name": "Сбер",
+                "count": 723
+            }
+        }
+
+
 class CategoryResponse(BaseModel):
     """Модель ответа для категории"""
     id: str = Field(..., description="ID категории")

@@ -286,3 +286,21 @@ class CategoriesRepository:
             'total_clusters': total_clusters,
             'categorization_rate': (categorized_questions / total_questions * 100) if total_questions > 0 else 0
         }
+    
+    def get_top_companies(self, limit: int = 20) -> List[Dict[str, Any]]:
+        """Получить топ компаний по количеству вопросов"""
+        result = self.session.execute(
+            text("""
+                SELECT 
+                    company as name, 
+                    COUNT(*) as count
+                FROM "InterviewQuestion" 
+                WHERE company IS NOT NULL 
+                GROUP BY company 
+                ORDER BY count DESC 
+                LIMIT :limit
+            """),
+            {"limit": limit}
+        )
+        
+        return [dict(row._mapping) for row in result]

@@ -15,6 +15,8 @@ from app.features.interviews.dto.responses import (
     CompanyStatsResponse,
     CompaniesListResponse
 )
+from app.features.interviews.dto.categories_responses import CompanyResponse
+from app.features.interviews.services.categories_service import CategoriesService
 from app.shared.dependencies import get_current_user_optional
 from app.shared.database import get_session
 
@@ -71,32 +73,6 @@ async def get_interviews(
     )
 
 
-@router.get(
-    "/{interview_id}", 
-    response_model=InterviewDetailResponse,
-    summary="Получить детали интервью",
-    description="Возвращает полную информацию об интервью включая полный текст"
-)
-async def get_interview_detail(
-    interview_id: str,
-    session: Session = Depends(get_session),
-    current_user = Depends(get_current_user_optional)
-):
-    """Получение детальной информации об интервью
-    
-    Возвращает полную информацию об интервью включая:
-    - Полный текст интервью
-    - Все метаданные
-    - Извлеченные URL
-    - Технологии и теги
-    """
-    service = InterviewService(session)
-    interview = service.get_interview_by_id(interview_id)
-    
-    if not interview:
-        raise HTTPException(status_code=404, detail="Interview not found")
-    
-    return interview
 
 
 @router.get(
@@ -163,4 +139,57 @@ async def get_companies_list(
     service = InterviewService(session)
     return {"companies": service.get_companies_list()}
 
+
+@router.get(
+    "/top-companies",
+    response_model=List[CompanyResponse],
+    summary="Получить топ компаний",
+    description="Возвращает список компаний с наибольшим количеством вопросов"
+)
+async def get_top_companies(
+    limit: int = Query(
+        20, 
+        ge=1, 
+        le=100, 
+        description="Количество компаний в топе"
+    ),
+    session: Session = Depends(get_session),
+    current_user = Depends(get_current_user_optional)
+) -> List[CompanyResponse]:
+    """
+    Получить топ компаний по количеству вопросов
+    
+    Возвращает список компаний, отсортированный по убыванию количества
+    вопросов от каждой компании.
+    """
+    cat_service = CategoriesService(session)
+    return cat_service.get_top_companies(limit=limit)
+
+
+@router.get(
+    "/detail/{interview_id}", 
+    response_model=InterviewDetailResponse,
+    summary="Получить детали интервью",
+    description="Возвращает полную информацию об интервью включая полный текст"
+)
+async def get_interview_detail(
+    interview_id: str,
+    session: Session = Depends(get_session),
+    current_user = Depends(get_current_user_optional)
+):
+    """Получение детальной информации об интервью
+    
+    Возвращает полную информацию об интервью включая:
+    - Полный текст интервью
+    - Все метаданные
+    - Извлеченные URL
+    - Технологии и теги
+    """
+    service = InterviewService(session)
+    interview = service.get_interview_by_id(interview_id)
+    
+    if not interview:
+        raise HTTPException(status_code=404, detail="Interview not found")
+    
+    return interview
 
