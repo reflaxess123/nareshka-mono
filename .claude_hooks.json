@@ -1,0 +1,50 @@
+{
+  "hooks": {
+    "pre-commit": {
+      "description": "Автоматическая проверка перед коммитом",
+      "commands": [
+        "cd back && poetry run ruff check . --fix",
+        "cd front && npm run lint",
+        "cd front && npm run type-check"
+      ],
+      "enabled": true
+    },
+    "post-api-change": {
+      "description": "Регенерация API клиента после изменений backend",
+      "trigger": "backend schema change",
+      "commands": [
+        "cd front && npm run api:generate"
+      ],
+      "enabled": true
+    },
+    "pre-deploy": {
+      "description": "Проверки перед деплоем",
+      "commands": [
+        "cd back && poetry run mypy .",
+        "cd front && npm run build",
+        "docker-compose config"
+      ],
+      "enabled": true
+    },
+    "db-migration": {
+      "description": "Создание и применение миграций",
+      "commands": [
+        "cd back && alembic revision --autogenerate -m \"$MIGRATION_MESSAGE\"",
+        "cd back && alembic upgrade head"
+      ],
+      "enabled": true
+    }
+  },
+  "auto_tasks": {
+    "code_completion": {
+      "suggest_imports": true,
+      "validate_patterns": true,
+      "security_checks": true
+    },
+    "error_handling": {
+      "suggest_fixes": true,
+      "log_correlation": true,
+      "context_aware": true
+    }
+  }
+}

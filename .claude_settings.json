@@ -1,0 +1,100 @@
+{
+  "project": {
+    "name": "Nareshka Platform",
+    "description": "Full-stack образовательная платформа с ML-анализом интервью",
+    "type": "full-stack",
+    "languages": ["Python", "TypeScript", "JavaScript", "SQL"],
+    "frameworks": ["FastAPI", "React", "SQLAlchemy", "Vite"],
+    "version": "2.0.0"
+  },
+  "development": {
+    "preferred_editor": "webstorm",
+    "python_version": "3.11",
+    "node_version": "20",
+    "package_manager": {
+      "backend": "poetry",
+      "frontend": "npm"
+    }
+  },
+  "commands": {
+    "dev_start": "start-dev-simple.bat",
+    "backend_dev": "cd back && poetry run uvicorn main:app --host 0.0.0.0 --port 4000 --reload",
+    "frontend_dev": "cd front && npm run dev",
+    "lint_backend": "cd back && poetry run ruff check .",
+    "lint_frontend": "cd front && npm run lint",
+    "type_check": "cd front && npm run type-check && cd ../back && poetry run mypy .",
+    "test_backend": "cd back && poetry run pytest",
+    "api_generate": "cd front && npm run api:generate",
+    "db_migrate": "cd back && alembic upgrade head",
+    "db_create_migration": "cd back && alembic revision --autogenerate -m",
+    "docker_dev": "docker-compose -f docker-compose.dev.yml up",
+    "docker_prod": "docker-compose up -d"
+  },
+  "paths": {
+    "backend": "back/",
+    "frontend": "front/",
+    "data": "sobes-data/",
+    "scripts": "back/scripts/",
+    "analysis": "sobes-data/analysis/",
+    "migrations": "back/alembic/versions/",
+    "logs": "back/logs/",
+    "uploads": "back/uploads/"
+  },
+  "database": {
+    "dev_url": "postgresql://postgres:dev_password@127.0.0.1:5432/nareshka_dev",
+    "tables": [
+      "InterviewCategory",
+      "InterviewCluster",
+      "InterviewQuestion",
+      "User",
+      "ContentBlock",
+      "Task",
+      "Progress"
+    ]
+  },
+  "apis": {
+    "backend": "http://localhost:4000",
+    "frontend": "http://localhost:5173",
+    "docs": "http://localhost:4000/docs",
+    "openapi": "http://localhost:4000/openapi.json"
+  },
+  "features": {
+    "code_execution": {
+      "enabled": true,
+      "isolation": "docker",
+      "languages": ["python", "javascript", "java", "cpp", "typescript"],
+      "security": "sandboxed"
+    },
+    "interviews": {
+      "total_questions": 8560,
+      "categories": 13,
+      "companies": 380,
+      "ml_categorization": true
+    },
+    "mindmaps": {
+      "enabled": true,
+      "technology": "React Flow",
+      "dynamic_generation": true
+    },
+    "ai_features": {
+      "test_generation": true,
+      "code_validation": true,
+      "question_categorization": true
+    }
+  },
+  "ml_pipeline": {
+    "model": "BERTopic",
+    "embeddings": "paraphrase-multilingual-mpnet-base-v2",
+    "clustering": "HDBSCAN",
+    "postprocessing": "GPT-4",
+    "quality": "82% useful clusters"
+  },
+  "security": {
+    "code_execution": "docker-in-docker",
+    "network_isolation": true,
+    "resource_limits": true,
+    "dangerous_patterns_validation": true,
+    "authentication": "JWT + Sessions",
+    "cors_enabled": true
+  }
+}
