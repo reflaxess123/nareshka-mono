@@ -10,6 +10,7 @@ from app.features.interviews.dto.categories_responses import (
     CategoryResponse,
     ClusterResponse,
     QuestionResponse,
+    QuestionsListResponse,
     CategoryDetailResponse,
     CategoriesStatisticsResponse,
     CompanyResponse
@@ -133,9 +134,17 @@ class CategoriesService:
         company: Optional[str] = None,
         limit: int = 50,
         offset: int = 0
-    ) -> List[QuestionResponse]:
-        """Поиск вопросов"""
+    ) -> QuestionsListResponse:
+        """Поиск вопросов с пагинацией"""
         
+        # Получаем общее количество вопросов
+        total_count = self.repository.count_questions(
+            search_query=search_query,
+            category_id=category_id,
+            company=company
+        )
+        
+        # Получаем вопросы для текущей страницы
         questions_data = self.repository.search_questions(
             search_query=search_query,
             category_id=category_id,
@@ -144,7 +153,8 @@ class CategoriesService:
             offset=offset
         )
         
-        return [
+        # Конвертируем в DTO
+        questions = [
             QuestionResponse(
                 id=q['id'],
                 question_text=q['question_text'],
@@ -156,6 +166,18 @@ class CategoriesService:
             )
             for q in questions_data
         ]
+        
+        # Рассчитываем пагинацию
+        page = (offset // limit) + 1
+        has_next = (offset + limit) < total_count
+        
+        return QuestionsListResponse(
+            questions=questions,
+            total=total_count,
+            page=page,
+            limit=limit,
+            has_next=has_next
+        )
     
     def get_statistics(self) -> CategoriesStatisticsResponse:
         """Получить общую статистику"""
@@ -180,3 +202,7 @@ class CategoriesService:
             )
             for company in companies_data
         ]
+    
+    def get_total_companies_count(self) -> int:
+        """Получить общее количество компаний"""
+        return self.repository.count_total_companies()

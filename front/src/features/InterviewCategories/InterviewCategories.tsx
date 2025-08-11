@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 import type { InfiniteData } from '@tanstack/react-query';
+import { Search, Filter, X, Eye, Copy, Heart, ChevronRight, Grid, List, Table } from 'lucide-react';
 import styles from './InterviewCategories.module.scss';
 
 interface Category {
@@ -42,7 +43,13 @@ interface Company {
   count: number;
 }
 
-type ViewMode = 'categories' | 'category-detail' | 'cluster-questions' | 'search' | 'companies';
+type ViewMode = 'categories' | 'questions' | 'search';
+type DisplayMode = 'table' | 'cards' | 'compact';
+type FilterTag = {
+  type: 'category' | 'company' | 'search';
+  value: string;
+  label: string;
+};
 
 // Цвета для категорий
 const CATEGORY_COLORS: Record<string, string> = {
@@ -62,14 +69,46 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 
 export const InterviewCategories: React.FC = () => {
-  const [viewMode, setViewMode] = useState<ViewMode>('categories');
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedCluster, setSelectedCluster] = useState<number | null>(null);
-  const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>('questions'); // По умолчанию показываем вопросы
+  const [displayMode, setDisplayMode] = useState<DisplayMode>('table');
   const [searchQuery, setSearchQuery] = useState('');
-  const [clusterQuestionsPage, setClusterQuestionsPage] = useState(1);
-  const [showFilters, setShowFilters] = useState(false);
+  const [activeFilters, setActiveFilters] = useState<FilterTag[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const ITEMS_PER_PAGE = 50;
 
+  // Helper functions
+  const addFilter = (filter: FilterTag) => {
+    setActiveFilters(prev => {
+      const exists = prev.find(f => f.type === filter.type && f.value === filter.value);
+      if (exists) return prev;
+      
+      // Remove existing filter of same type for categories/companies
+      if (filter.type === 'category' || filter.type === 'company') {
+        const filtered = prev.filter(f => f.type !== filter.type);
+        return [...filtered, filter];
+      }
+      
+      return [...prev, filter];
+    });
+    setCurrentPage(1); // Сброс на первую страницу при фильтрации
+  };
+
+  const removeFilter = (filter: FilterTag) => {
+    setActiveFilters(prev => prev.filter(f => !(f.type === filter.type && f.value === filter.value)));
+    setCurrentPage(1);
+  };
+
+  const clearAllFilters = () => {
+    setActiveFilters([]);
+    setSearchQuery('');
+    setCurrentPage(1);
+  };
+
+  // Derived state
+  const currentCategory = activeFilters.find(f => f.type === 'category')?.value || null;
+  const currentCompany = activeFilters.find(f => f.type === 'company')?.value || null;
+  
   // Загрузка категорий
   const { data: categories, isLoading: categoriesLoading } = useQuery<Category[]>({
     queryKey: ['interview-categories'],
@@ -80,7 +119,7 @@ export const InterviewCategories: React.FC = () => {
     }
   });
 
-  // Загрузка топ компаний
+  // Загрузка топ компаний (для фильтров)
   const { data: topCompanies } = useQuery<Company[]>({
     queryKey: ['top-companies'],
     queryFn: async () => {
@@ -90,605 +129,342 @@ export const InterviewCategories: React.FC = () => {
     }
   });
 
-  // Загрузка деталей категории
-  const { data: categoryDetail, isLoading: categoryDetailLoading } = useQuery<CategoryDetail>({
-    queryKey: ['category-detail', selectedCategory],
+  // Загрузка общего количества компаний (для статистики)
+  const { data: totalCompaniesCount } = useQuery<number>({
+    queryKey: ['total-companies-count'],
     queryFn: async () => {
-      if (!selectedCategory) return null;
-      const response = await fetch(`/api/v2/interview-categories/${selectedCategory}?limit_questions=20`);
-      if (!response.ok) throw new Error('Failed to fetch category detail');
+      const response = await fetch('/api/v2/interview-categories/companies/count');
+      if (!response.ok) throw new Error('Failed to fetch companies count');
       return response.json();
-    },
-    enabled: !!selectedCategory
-  });
-
-  // Загрузка вопросов категории с infinite scroll
-  const {
-    data: categoryQuestionsData,
-    fetchNextPage: fetchNextCategoryPage,
-    hasNextPage: hasNextCategoryPage,
-    isFetchingNextPage: isFetchingNextCategoryPage,
-    isLoading: categoryQuestionsLoading,
-  } = useInfiniteQuery<Question[], Error, InfiniteData<Question[]>, (string | null)[], number>({
-    queryKey: ['category-questions', selectedCategory],
-    queryFn: async (context) => {
-      const { pageParam = 0 } = context;
-      if (!selectedCategory) return [];
-      const params = new URLSearchParams({ 
-        q: '*', 
-        category_id: selectedCategory, 
-        limit: '100',
-        offset: pageParam.toString()
-      });
-      
-      const response = await fetch(`/api/v2/interview-categories/search/questions?${params}`);
-      if (!response.ok) throw new Error('Failed to fetch category questions');
-      return response.json();
-    },
-    initialPageParam: 0,
-    getNextPageParam: (lastPage: Question[], allPages: Question[][]) => {
-      if (lastPage.length < 100) return undefined;
-      return allPages.length * 100;
-    },
-    enabled: !!selectedCategory && viewMode === 'category-detail'
-  });
-
-  // Загрузка вопросов кластера
-  const { data: clusterQuestions, isLoading: clusterQuestionsLoading } = useQuery<Question[]>({
-    queryKey: ['cluster-questions', selectedCluster, clusterQuestionsPage],
-    queryFn: async () => {
-      if (!selectedCluster) return [];
-      const response = await fetch(`/api/v2/interview-categories/cluster/${selectedCluster}/questions?page=${clusterQuestionsPage}&limit=50`);
-      if (!response.ok) throw new Error('Failed to fetch cluster questions');
-      return response.json();
-    },
-    enabled: !!selectedCluster
-  });
-
-  // Поиск вопросов
-  const { data: searchResults, isLoading: searchLoading } = useQuery<Question[]>({
-    queryKey: ['search-questions', searchQuery, selectedCategory, selectedCompany],
-    queryFn: async () => {
-      if (!searchQuery || searchQuery.length < 2) return [];
-      const params = new URLSearchParams({ q: searchQuery, limit: '500' });
-      if (selectedCategory) params.append('category_id', selectedCategory);
-      if (selectedCompany) params.append('company', selectedCompany);
-      
-      const response = await fetch(`/api/v2/interview-categories/search/questions?${params}`);
-      if (!response.ok) throw new Error('Failed to search questions');
-      return response.json();
-    },
-    enabled: searchQuery.length >= 2
-  });
-
-  // Вопросы по компании с infinite scroll
-  const {
-    data: companyQuestionsData,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading: companyQuestionsLoading,
-  } = useInfiniteQuery<Question[], Error, InfiniteData<Question[]>, (string | null)[], number>({
-    queryKey: ['company-questions', selectedCompany],
-    queryFn: async (context) => {
-      const { pageParam = 0 } = context;
-      if (!selectedCompany) return [];
-      const params = new URLSearchParams({ 
-        q: '*', 
-        company: selectedCompany, 
-        limit: '100',
-        offset: pageParam.toString()
-      });
-      
-      const response = await fetch(`/api/v2/interview-categories/search/questions?${params}`);
-      if (!response.ok) throw new Error('Failed to fetch company questions');
-      return response.json();
-    },
-    initialPageParam: 0,
-    getNextPageParam: (lastPage: Question[], allPages: Question[][]) => {
-      if (lastPage.length < 100) return undefined; // No more pages
-      return allPages.length * 100; // Next offset
-    },
-    enabled: !!selectedCompany && viewMode === 'companies'
-  });
-
-  // Flatten questions for display  
-  const companyQuestions: Question[] = companyQuestionsData?.pages.flat() || [];
-  const categoryQuestions: Question[] = categoryQuestionsData?.pages.flat() || [];
-
-  // Infinite scroll handler
-  const handleScroll = useCallback(() => {
-    if (
-      window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight
-    ) {
-      return;
     }
+  });
 
-    // Handle company questions infinite scroll
-    if (viewMode === 'companies' && selectedCompany && !isFetchingNextPage && hasNextPage) {
-      fetchNextPage();
+  // Always fetch questions - всегда показываем вопросы
+  const shouldFetchQuestions = true;
+  
+  const buildQuestionsQuery = () => {
+    const params = new URLSearchParams();
+    
+    if (searchQuery.length >= 2) {
+      params.append('q', searchQuery);
+    } else {
+      params.append('q', '*'); // Показываем все вопросы
     }
     
-    // Handle category questions infinite scroll
-    if (viewMode === 'category-detail' && selectedCategory && !isFetchingNextCategoryPage && hasNextCategoryPage) {
-      fetchNextCategoryPage();
+    if (currentCategory) {
+      params.append('category_id', currentCategory);
     }
-  }, [viewMode, selectedCompany, selectedCategory, fetchNextPage, isFetchingNextPage, hasNextPage, fetchNextCategoryPage, isFetchingNextCategoryPage, hasNextCategoryPage]);
+    
+    if (currentCompany) {
+      params.append('company', currentCompany);
+    }
+    
+    params.append('limit', ITEMS_PER_PAGE.toString());
+    params.append('offset', ((currentPage - 1) * ITEMS_PER_PAGE).toString());
+    return params.toString();
+  };
 
+  // Unified questions query with pagination
+  const { data: questionsData, isLoading: questionsLoading } = useQuery<{questions: Question[], total: number}>({
+    queryKey: ['questions', currentCategory, currentCompany, searchQuery, currentPage],
+    queryFn: async () => {
+      const queryString = buildQuestionsQuery();
+      const response = await fetch(`/api/v2/interview-categories/search/questions?${queryString}`);
+      if (!response.ok) throw new Error('Failed to fetch questions');
+      const data = await response.json();
+      
+      // API теперь возвращает QuestionsListResponse с пагинацией
+      return {
+        questions: data.questions || [],
+        total: data.total || 0
+      };
+    },
+    enabled: shouldFetchQuestions
+  });
+
+  const questions = questionsData?.questions || [];
+  const totalQuestions = questionsData?.total || 0;
+  
+  // Update total pages when data changes
   useEffect(() => {
-    if ((viewMode === 'companies' && selectedCompany) || (viewMode === 'category-detail' && selectedCategory)) {
-      window.addEventListener('scroll', handleScroll);
-      return () => window.removeEventListener('scroll', handleScroll);
-    }
-  }, [viewMode, selectedCompany, selectedCategory, handleScroll]);
+    setTotalPages(Math.ceil(totalQuestions / ITEMS_PER_PAGE));
+  }, [totalQuestions]);
 
-  // Навигация
-  const handleCategorySelect = (categoryId: string) => {
-    setSelectedCategory(categoryId);
-    setSelectedCluster(null);
-    setViewMode('category-detail');
-    setSearchQuery('');
-  };
 
-  const handleClusterSelect = (clusterId: number) => {
-    setSelectedCluster(clusterId);
-    setViewMode('cluster-questions');
-    setClusterQuestionsPage(1);
-  };
 
-  const handleBackToCategories = () => {
-    setViewMode('categories');
-    setSelectedCategory(null);
-    setSelectedCluster(null);
-    setSearchQuery('');
-  };
 
-  const handleBackToCategoryDetail = () => {
-    setViewMode('category-detail');
-    setSelectedCluster(null);
-    setClusterQuestionsPage(1);
-  };
-
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    if (query.length >= 2) {
-      setViewMode('search');
-    } else if (query.length === 0) {
-      setViewMode(selectedCategory ? 'category-detail' : 'categories');
-    }
-  };
-
-  const handleCompanySelect = (company: string | null) => {
-    setSelectedCompany(company);
-    if (company) {
-      setViewMode('companies');
-      setSelectedCategory(null);
-      setSelectedCluster(null);
-      setSearchQuery('');
-      setShowFilters(false);
+  // Handle search input
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    setCurrentPage(1); // Сброс на первую страницу при поиске
+    if (value.length >= 2) {
+      const searchFilter: FilterTag = {
+        type: 'search',
+        value: value,
+        label: `"${value}"`
+      };
+      setActiveFilters(prev => {
+        const withoutSearch = prev.filter(f => f.type !== 'search');
+        return [...withoutSearch, searchFilter];
+      });
     } else {
-      setViewMode('categories');
-      setSelectedCategory(null);
-      setSelectedCluster(null);
-      setSearchQuery('');
+      setActiveFilters(prev => prev.filter(f => f.type !== 'search'));
     }
   };
 
-  // Расчет статистики
-  const totalQuestions = categories?.reduce((sum, cat) => sum + cat.questions_count, 0) || 0;
-  const totalClusters = categories?.reduce((sum, cat) => sum + cat.clusters_count, 0) || 0;
+  // Handle question click - copy to clipboard
+  const handleQuestionSelect = async (question: Question) => {
+    try {
+      await navigator.clipboard.writeText(question.question_text);
+      // TODO: Add toast notification here
+      console.log('Вопрос скопирован в буфер обмена');
+    } catch (err) {
+      console.error('Ошибка копирования:', err);
+    }
+  };
 
-  // Получаем данные о текущем кластере
-  const currentCluster = categoryDetail?.clusters.find(c => c.id === selectedCluster);
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === 'k') {
+        e.preventDefault();
+        const searchInput = document.querySelector('#question-search') as HTMLInputElement;
+        searchInput?.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Statistics
+  const totalQuestionsInDB = categories?.reduce((sum, cat) => sum + cat.questions_count, 0) || 0;
+  const totalClusters = categories?.reduce((sum, cat) => sum + cat.clusters_count, 0) || 0;
+  const totalCompanies = totalCompaniesCount || 0;
+  
+  // All categories for filtering
+  const topCategories = useMemo(() => {
+    if (!categories) return [];
+    return categories; // Show all categories
+  }, [categories]);
+
+  // Navigation handlers
+  const handleCategorySelect = (category: Category) => {
+    const filter: FilterTag = {
+      type: 'category',
+      value: category.id,
+      label: category.name
+    };
+    addFilter(filter);
+  };
+
+  const handleCompanySelect = (company: Company) => {
+    const filter: FilterTag = {
+      type: 'company',
+      value: company.name,
+      label: company.name
+    };
+    addFilter(filter);
+  };
 
   return (
     <div className={styles.container}>
-      {/* Навигационная панель */}
-      <div className={styles.breadcrumbs}>
-        <button 
-          onClick={handleBackToCategories}
-          className={`${styles.breadcrumb} ${viewMode === 'categories' ? styles.active : ''}`}
-        >
-          📊 Категории
-        </button>
-        {selectedCategory && (
-          <>
-            <span className={styles.separator}>›</span>
-            <button 
-              onClick={handleBackToCategoryDetail}
-              className={`${styles.breadcrumb} ${viewMode === 'category-detail' ? styles.active : ''}`}
-            >
-              {categoryDetail?.category.name}
-            </button>
-          </>
-        )}
-        {selectedCluster && currentCluster && (
-          <>
-            <span className={styles.separator}>›</span>
-            <span className={`${styles.breadcrumb} ${styles.active}`}>
-              {currentCluster.name}
-            </span>
-          </>
-        )}
-        {viewMode === 'search' && searchQuery && (
-          <>
-            <span className={styles.separator}>›</span>
-            <span className={`${styles.breadcrumb} ${styles.active}`}>
-              Поиск: "{searchQuery}"
-            </span>
-          </>
-        )}
-        {viewMode === 'companies' && selectedCompany && (
-          <>
-            <span className={styles.separator}>›</span>
-            <span className={`${styles.breadcrumb} ${styles.active}`}>
-              🏢 {selectedCompany}
-            </span>
-          </>
-        )}
-      </div>
-
-      {/* Заголовок и статистика */}
-      <div className={styles.header}>
-        <h1>
-          {viewMode === 'categories' && 'Категории вопросов интервью'}
-          {viewMode === 'category-detail' && categoryDetail?.category.name}
-          {viewMode === 'cluster-questions' && currentCluster?.name}
-          {viewMode === 'search' && `Результаты поиска: "${searchQuery}"`}
-          {viewMode === 'companies' && `Вопросы ${selectedCompany}`}
-        </h1>
+      {/* Sticky Toolbar */}
+      <div className={styles.stickyToolbar}>
+        {/* Search Bar */}
+        <div className={styles.searchSection}>
+          <div className={styles.searchInputWrapper}>
+            <Search size={20} className={styles.searchIcon} />
+            <input
+              id="question-search"
+              type="text"
+              placeholder="Поиск вопросов... (Ctrl+K)"
+              value={searchQuery}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              className={styles.searchInput}
+            />
+            {searchQuery && (
+              <button
+                onClick={() => handleSearchChange('')}
+                className={styles.clearSearchButton}
+              >
+                <X size={16} />
+              </button>
+            )}
+          </div>
+        </div>
         
-        {viewMode === 'categories' && (
-          <div className={styles.stats}>
-            <div className={styles.stat}>
-              <span className={styles.statValue}>{totalQuestions.toLocaleString()}</span>
-              <span className={styles.statLabel}>вопросов</span>
-            </div>
-            <div className={styles.stat}>
-              <span className={styles.statValue}>{categories?.length || 0}</span>
-              <span className={styles.statLabel}>категорий</span>
-            </div>
-            {totalClusters > 0 && (
-              <div className={styles.stat}>
-                <span className={styles.statValue}>{totalClusters}</span>
-                <span className={styles.statLabel}>топиков</span>
-              </div>
-            )}
-          </div>
-        )}
-
-        {viewMode === 'category-detail' && categoryDetail && (
-          <div className={styles.stats}>
-            <div className={styles.stat}>
-              <span className={styles.statValue}>{categoryDetail.category.questions_count.toLocaleString()}</span>
-              <span className={styles.statLabel}>вопросов</span>
-            </div>
-            <div className={styles.stat}>
-              <span className={styles.statValue}>{categoryDetail.category.clusters_count}</span>
-              <span className={styles.statLabel}>топиков</span>
-            </div>
-            <div className={styles.stat}>
-              <span className={styles.statValue}>{categoryDetail.category.percentage.toFixed(1)}%</span>
-              <span className={styles.statLabel}>от общего числа</span>
-            </div>
-          </div>
-        )}
-
-        {viewMode === 'cluster-questions' && currentCluster && (
-          <div className={styles.stats}>
-            <div className={styles.stat}>
-              <span className={styles.statValue}>{currentCluster.questions_count}</span>
-              <span className={styles.statLabel}>вопросов</span>
-            </div>
-            <div className={styles.stat}>
-              <span className={styles.statValue}>{currentCluster.keywords.length}</span>
-              <span className={styles.statLabel}>ключевых слов</span>
-            </div>
-          </div>
-        )}
-
-        {viewMode === 'companies' && selectedCompany && companyQuestions && (
-          <div className={styles.stats}>
-            <div className={styles.stat}>
-              <span className={styles.statValue}>{companyQuestions.length}</span>
-              <span className={styles.statLabel}>вопросов</span>
-            </div>
-            <div className={styles.stat}>
-              <span className={styles.statValue}>{topCompanies?.find(c => c.name === selectedCompany)?.count || 0}</span>
-              <span className={styles.statLabel}>всего в базе</span>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Поиск и фильтры */}
-      <div className={styles.searchBar}>
-        <input
-          type="text"
-          placeholder="Поиск вопросов..."
-          value={searchQuery}
-          onChange={(e) => handleSearch(e.target.value)}
-          className={styles.searchInput}
-        />
-        {searchQuery && (
-          <button 
-            onClick={() => handleSearch('')}
-            className={styles.clearButton}
-          >
-            ✕
-          </button>
-        )}
-        <button 
-          onClick={() => setShowFilters(!showFilters)}
-          className={styles.filtersToggle}
-        >
-          🔍 Фильтры
-        </button>
-      </div>
-
-      {/* Панель фильтров */}
-      {showFilters && viewMode !== 'companies' && (
-        <div className={styles.filtersPanel}>
-          <div className={styles.filterGroup}>
-            <label>Компания:</label>
-            <select 
-              value={selectedCompany || ''} 
-              onChange={(e) => handleCompanySelect(e.target.value || null)}
-              className={styles.companySelect}
-            >
-              <option value="">Все компании</option>
-              {topCompanies?.map(company => (
-                <option key={company.name} value={company.name}>
-                  {company.name} ({company.count})
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      )}
-
-      {/* Контент в зависимости от режима просмотра */}
-      {viewMode === 'categories' && (
-        <div className={styles.categoriesGrid}>
-          {categoriesLoading && <div className={styles.loading}>Загрузка категорий...</div>}
-          
-          {categories?.map(category => (
-            <div
-              key={category.id}
-              className={styles.categoryCard}
-              onClick={() => handleCategorySelect(category.id)}
-              style={{
-                borderColor: CATEGORY_COLORS[category.id] || '#ddd',
-                '--category-color': CATEGORY_COLORS[category.id] || '#ddd'
-              } as React.CSSProperties}
-            >
-              <div className={styles.categoryHeader}>
-                <h3>{category.name}</h3>
-                <span className={styles.percentage}>{category.percentage.toFixed(1)}%</span>
-              </div>
-              <div className={styles.categoryStats}>
-                <div className={styles.statItem}>
-                  <span className={styles.count}>{category.questions_count.toLocaleString()}</span>
-                  <span className={styles.label}>вопросов</span>
-                </div>
-                {category.clusters_count > 0 && (
-                  <div className={styles.statItem}>
-                    <span className={styles.count}>{category.clusters_count}</span>
-                    <span className={styles.label}>топиков</span>
-                  </div>
-                )}
-              </div>
-              <div className={styles.progressBar}>
-                <div 
-                  className={styles.progressFill}
-                  style={{ width: `${category.percentage}%` }}
-                />
-              </div>
-              <div className={styles.cardAction}>
-                <span>Изучить →</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {viewMode === 'category-detail' && categoryDetail && (
-        <div className={styles.categoryDetail}>
-          {categoryDetailLoading && <div className={styles.loading}>Загрузка...</div>}
-          
-          {/* Кластеры/Топики */}
-          {categoryDetail.clusters.length > 0 && (
-            <div className={styles.clusters}>
-              <h2>Топики в категории</h2>
-              <div className={styles.clustersList}>
-                {categoryDetail.clusters.map((cluster) => (
-                <div 
-                  key={cluster.id} 
-                  className={styles.clusterCard}
-                  onClick={() => handleClusterSelect(cluster.id)}
-                >
-                  <div className={styles.clusterHeader}>
-                    <div className={styles.clusterName}>{cluster.name}</div>
-                    <span className={styles.questionsCount}>
-                      {cluster.questions_count} вопросов
-                    </span>
-                  </div>
-                  
-                  <div className={styles.keywords}>
-                    {cluster.keywords.slice(0, 5).map((keyword, idx) => (
-                      <span key={idx} className={styles.keyword}>{keyword}</span>
-                    ))}
-                  </div>
-                  
-                  {cluster.example_question && (
-                    <div className={styles.exampleQuestion}>
-                      "{cluster.example_question}"
-                    </div>
-                  )}
-                  
-                  <div className={styles.cardAction}>
-                    <span>Все вопросы →</span>
-                  </div>
-                </div>
-              ))}
-              </div>
-            </div>
-          )}
-
-          {/* Вопросы из категории */}
-          <div className={styles.sampleQuestions}>
-            <h3>Вопросы из категории ({categoryQuestions.length} из {categoryDetail.category.questions_count})</h3>
-            {categoryQuestionsLoading && categoryQuestions.length === 0 && (
-              <div className={styles.loading}>Загрузка вопросов...</div>
-            )}
-            <div className={styles.questionsList}>
-              {categoryQuestions.map((question, index) => (
-                <div key={question.id} className={styles.questionItem}>
-                  <div className={styles.questionNumber}>#{index + 1}</div>
-                  <div className={styles.questionContent}>
-                    <div className={styles.questionText}>{question.question_text}</div>
-                    <div className={styles.questionMeta}>
-                      {question.company && <span className={styles.company}>{question.company}</span>}
-                      {question.topic_name && <span className={styles.topic}>{question.topic_name}</span>}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            {isFetchingNextCategoryPage && (
-              <div className={styles.loading}>Загрузка дополнительных вопросов...</div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {viewMode === 'cluster-questions' && currentCluster && (
-        <div className={styles.clusterQuestions}>
-          {clusterQuestionsLoading && <div className={styles.loading}>Загрузка вопросов...</div>}
-          
-          <div className={styles.clusterInfo}>
-            <div className={styles.keywords}>
-              {currentCluster.keywords.map((keyword, idx) => (
-                <span key={idx} className={styles.keyword}>{keyword}</span>
-              ))}
-            </div>
-          </div>
-
-          <div className={styles.questionsList}>
-            {clusterQuestions?.map((question, index) => (
-              <div key={question.id} className={styles.questionItem}>
-                <div className={styles.questionNumber}>#{(clusterQuestionsPage - 1) * 50 + index + 1}</div>
-                <div className={styles.questionContent}>
-                  <div className={styles.questionText}>{question.question_text}</div>
-                  <div className={styles.questionMeta}>
-                    {question.company && <span className={styles.company}>{question.company}</span>}
-                    {question.topic_name && <span className={styles.topic}>{question.topic_name}</span>}
-                  </div>
-                </div>
-              </div>
+        {/* Quick Category Filters */}
+        <div className={styles.toolbarActions}>
+          <div className={styles.quickCategories}>
+            {topCategories.map((category) => (
+              <button
+                key={category.id}
+                onClick={() => handleCategorySelect(category)}
+                className={styles.categoryChip}
+                style={{
+                  '--category-color': CATEGORY_COLORS[category.id] || '#ddd'
+                } as React.CSSProperties}
+              >
+                <span className={styles.chipLabel}>{category.name}</span>
+                <span className={styles.chipCount}>{category.questions_count}</span>
+              </button>
             ))}
           </div>
-
-          {/* Пагинация */}
-          {currentCluster.questions_count > 50 && (
-            <div className={styles.pagination}>
-              <button 
-                onClick={() => setClusterQuestionsPage(prev => Math.max(1, prev - 1))}
-                disabled={clusterQuestionsPage === 1}
-                className={styles.paginationButton}
-              >
-                ← Предыдущая
-              </button>
-              <span className={styles.pageInfo}>
-                Страница {clusterQuestionsPage} из {Math.ceil(currentCluster.questions_count / 50)}
+        </div>
+      </div>
+      
+      {/* Active Filters Tags */}
+      {activeFilters.length > 0 && (
+        <div className={styles.activeFiltersSection}>
+          <div className={styles.activeFilters}>
+            {activeFilters.map((filter, index) => (
+              <span key={`${filter.type}-${filter.value}-${index}`} className={styles.filterTag}>
+                {filter.type === 'category' && '📁'}
+                {filter.type === 'company' && '🏢'}
+                {filter.type === 'search' && '🔍'}
+                {filter.label}
+                <button
+                  onClick={() => removeFilter(filter)}
+                  className={styles.removeFilterButton}
+                >
+                  <X size={12} />
+                </button>
               </span>
-              <button 
-                onClick={() => setClusterQuestionsPage(prev => prev + 1)}
-                disabled={clusterQuestionsPage * 50 >= currentCluster.questions_count}
-                className={styles.paginationButton}
-              >
-                Следующая →
-              </button>
-            </div>
-          )}
+            ))}
+            <button onClick={clearAllFilters} className={styles.clearAllFilters}>
+              Очистить всё
+            </button>
+          </div>
         </div>
       )}
+      
+      {/* Statistics Bar */}
+      <div className={styles.statisticsBar}>
+        <div className={styles.statItem}>
+          <span className={styles.statValue}>
+            {totalQuestions.toLocaleString()}
+          </span>
+          <span className={styles.statLabel}>
+            {activeFilters.length > 0 || searchQuery ? 'найдено вопросов' : 'всего вопросов'}
+          </span>
+        </div>
+        {totalQuestions > 0 && (
+          <>
+            <div className={styles.statSeparator}>•</div>
+            <div className={styles.statItem}>
+              <span className={styles.statValue}>{currentPage}</span>
+              <span className={styles.statLabel}>из {totalPages}</span>
+            </div>
+          </>
+        )}
+        <div className={styles.statSeparator}>•</div>
+        <div className={styles.statItem}>
+          <span className={styles.statValue}>{categories?.length || 0}</span>
+          <span className={styles.statLabel}>категорий</span>
+        </div>
+        <div className={styles.statSeparator}>•</div>
+        <div className={styles.statItem}>
+          <span className={styles.statValue}>{totalCompanies}</span>
+          <span className={styles.statLabel}>компаний</span>
+        </div>
+      </div>
 
-      {viewMode === 'search' && searchQuery && (
-        <div className={styles.searchResults}>
-          {searchLoading && <div className={styles.loading}>Поиск...</div>}
+      
+
+
+      {/* Main Content Area */}
+      <div className={styles.mainContent}>
+        <div className={styles.questionsSection}>
+          {questionsLoading && <div className={styles.loading}>Загрузка вопросов...</div>}
           
-          {searchResults && searchResults.length > 0 && (
-            <>
-              <div className={styles.searchStats}>
-                <span>Найдено: <strong>{searchResults.length}</strong> вопросов</span>
-              </div>
-              
-              <div className={styles.questionsList}>
-                {searchResults.map((question, index) => (
-                  <div key={question.id} className={styles.questionItem}>
-                    <div className={styles.questionNumber}>#{index + 1}</div>
-                    <div className={styles.questionContent}>
-                      <div className={styles.questionText}>{question.question_text}</div>
-                      <div className={styles.questionMeta}>
-                        {question.company && <span className={styles.company}>{question.company}</span>}
-                        {question.topic_name && <span className={styles.topic}>{question.topic_name}</span>}
-                        {question.category_id && <span className={styles.category}>{question.category_id}</span>}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-
-          {searchResults && searchResults.length === 0 && !searchLoading && (
+          {!questionsLoading && questions.length === 0 && (
             <div className={styles.noResults}>
-              <span>По запросу "{searchQuery}" ничего не найдено</span>
+              <span>Вопросы не найдены</span>
             </div>
           )}
-        </div>
-      )}
-
-      {viewMode === 'companies' && selectedCompany && (
-        <div className={styles.companyQuestions}>
-          {companyQuestionsLoading && <div className={styles.loading}>Загрузка вопросов...</div>}
           
-          {companyQuestions && companyQuestions.length > 0 && (
-            <>
-              <div className={styles.companyStats}>
-                <span>Найдено: <strong>{companyQuestions.length}</strong> вопросов от {selectedCompany}</span>
-              </div>
-              
-              <div className={styles.questionsList}>
-                {companyQuestions.map((question, index) => (
-                  <div key={question.id} className={styles.questionItem}>
-                    <div className={styles.questionNumber}>#{index + 1}</div>
-                    <div className={styles.questionContent}>
+          {questions.length > 0 && (
+            <table className={styles.dataTable}>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Вопрос</th>
+                  <th>Компания</th>
+                  <th>Категория</th>
+                </tr>
+              </thead>
+              <tbody>
+                {questions.map((question, index) => (
+                  <tr 
+                    key={question.id}
+                    className={styles.tableRow}
+                    onClick={() => handleQuestionSelect(question)}
+                  >
+                    <td className={styles.numberCell}>#{((currentPage - 1) * ITEMS_PER_PAGE) + index + 1}</td>
+                    <td className={styles.questionCell}>
                       <div className={styles.questionText}>{question.question_text}</div>
-                      <div className={styles.questionMeta}>
-                        {question.topic_name && <span className={styles.topic}>{question.topic_name}</span>}
-                        {question.category_id && <span className={styles.category}>{question.category_id}</span>}
-                      </div>
-                    </div>
-                  </div>
+                    </td>
+                    <td className={styles.companyCell}>{question.company || '-'}</td>
+                    <td className={styles.categoryCell}>{question.category_id || '-'}</td>
+                  </tr>
                 ))}
-              </div>
-            </>
-          )}
-
-          {/* Loading indicator for infinite scroll */}
-          {isFetchingNextPage && (
-            <div className={styles.loading}>Загрузка дополнительных вопросов...</div>
-          )}
-
-          {companyQuestions && companyQuestions.length === 0 && !companyQuestionsLoading && (
-            <div className={styles.noResults}>
-              <span>У компании {selectedCompany} нет вопросов в базе</span>
-            </div>
+              </tbody>
+            </table>
           )}
         </div>
-      )}
+        
+        {/* Pagination */}
+        {/* Отладка: показываем всегда для тестирования */}
+        <div style={{ padding: '1rem', background: '#f0f0f0', color: '#000' }}>
+          Отладка: totalQuestions={totalQuestions}, totalPages={totalPages}, currentPage={currentPage}
+        </div>
+        
+        <div className={styles.pagination}>
+          <button
+            className={styles.paginationButton}
+            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+            disabled={currentPage === 1}
+          >
+            ← Предыдущая
+          </button>
+          
+          <div className={styles.paginationNumbers}>
+            {Array.from({ length: Math.max(1, Math.min(5, totalPages)) }, (_, i) => {
+              let pageNum: number;
+              if (totalPages <= 5) {
+                pageNum = i + 1;
+              } else if (currentPage <= 3) {
+                pageNum = i + 1;
+              } else if (currentPage >= totalPages - 2) {
+                pageNum = totalPages - 4 + i;
+              } else {
+                pageNum = currentPage - 2 + i;
+              }
+              
+              return (
+                <button
+                  key={pageNum}
+                  className={`${styles.paginationButton} ${currentPage === pageNum ? styles.active : ''}`}
+                  onClick={() => setCurrentPage(pageNum)}
+                >
+                  {pageNum}
+                </button>
+              );
+            })}
+          </div>
+          
+          <button
+            className={styles.paginationButton}
+            onClick={() => setCurrentPage(prev => Math.min(totalPages || 1, prev + 1))}
+            disabled={currentPage === totalPages}
+          >
+            Следующая →
+          </button>
+        </div>
+      </div>
+      
+
     </div>
   );
 };

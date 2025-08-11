@@ -111,9 +111,9 @@ def get_cluster_questions(
 
 @router.get(
     "/search/questions",
-    response_model=List[QuestionResponse],
+    response_model=QuestionsListResponse,
     summary="Поиск вопросов",
-    description="Полнотекстовый поиск по вопросам интервью с фильтрацией"
+    description="Полнотекстовый поиск по вопросам интервью с фильтрацией и пагинацией"
 )
 def search_questions(
     q: str = Query(
@@ -142,7 +142,7 @@ def search_questions(
     ),
     session: Session = Depends(get_session),
     current_user=Depends(get_current_user_optional)
-) -> List[QuestionResponse]:
+) -> QuestionsListResponse:
     """
     Поиск вопросов по тексту
     
@@ -179,6 +179,20 @@ def get_top_companies_endpoint(
 ) -> List[CompanyResponse]:
     service = CategoriesService(session)
     return service.get_top_companies(limit=limit)
+
+
+@router.get(
+    "/companies/count",
+    response_model=int,
+    summary="Получить общее количество компаний",
+    description="Возвращает общее количество уникальных компаний в базе данных"
+)
+def get_total_companies_count(
+    session: Session = Depends(get_session),
+    current_user=Depends(get_current_user_optional)
+) -> int:
+    service = CategoriesService(session)
+    return service.get_total_companies_count()
 
 
 @router.get(

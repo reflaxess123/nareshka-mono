@@ -1,30 +1,29 @@
 import React from 'react';
 import { PageWrapper } from '@/shared/components/PageWrapper/ui/PageWrapper';
 import { Text, TextAlign, TextSize, TextWeight } from '@/shared/components/Text';
-import { InterviewsList } from '../../../widgets/InterviewsList';
-import { List } from 'lucide-react';
-import styles from './InterviewsPage.module.scss';
+import { InterviewCategories } from '@/features/InterviewCategories';
+import { Database } from 'lucide-react';
+import styles from './QuestionsDatabasePage.module.scss';
 
-export const InterviewsPage: React.FC = () => {
-
+export const QuestionsDatabasePage: React.FC = () => {
   return (
     <PageWrapper>
       <div className={styles.page}>
         <header className={styles.header}>
           <div className={styles.headerContent}>
             <div className={styles.iconWrapper}>
-              <List size={32} className={styles.pageIcon} />
+              <Database size={40} className={styles.pageIcon} />
             </div>
             <div className={styles.headerText}>
               <Text
-                text="Интервью"
+                text="База вопросов"
                 size={TextSize.XXL}
                 weight={TextWeight.BOLD}
                 align={TextAlign.LEFT}
                 className={styles.title}
               />
               <Text
-                text="База интервью для изучения реального опыта собеседований"
+                text="Категоризированная база из 8,560 вопросов для подготовки к собеседованиям"
                 size={TextSize.MD}
                 align={TextAlign.LEFT}
                 className={styles.description}
@@ -34,7 +33,7 @@ export const InterviewsPage: React.FC = () => {
         </header>
 
         <div className={styles.content}>
-          <InterviewsList />
+          <InterviewCategories />
         </div>
       </div>
     </PageWrapper>

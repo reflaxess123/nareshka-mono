@@ -53,9 +53,9 @@ const Analytics = lazy(() =>
     default: module.AnalyticsPage,
   }))
 );
-const InterviewCategories = lazy(() =>
-  import('@/features/InterviewCategories').then((module) => ({
-    default: module.InterviewCategories,
+const QuestionsDatabase = lazy(() =>
+  import('@/pages/QuestionsDatabase').then((module) => ({
+    default: module.QuestionsDatabasePage,
   }))
 );
 
@@ -64,7 +64,7 @@ export enum AppRoutes {
   GET_STARTED = '/get-started',
   TASKS = '/tasks',
   INTERVIEWS = '/interviews',
-  INTERVIEW_CATEGORIES = '/interview-categories',
+  QUESTIONS_DATABASE = '/questions-database',
   INTERVIEW_DETAIL = '/interviews/:id',
   PROFILE = '/profile',
   SETTINGS = '/settings',
@@ -81,7 +81,7 @@ export const routeConfig: AppRoute[] = [
   { path: AppRoutes.GET_STARTED, element: <GetStarted /> },
   { path: AppRoutes.TASKS, element: <Tasks /> },
   { path: AppRoutes.INTERVIEWS, element: <Interviews /> },
-  { path: AppRoutes.INTERVIEW_CATEGORIES, element: <InterviewCategories /> },
+  { path: AppRoutes.QUESTIONS_DATABASE, element: <QuestionsDatabase /> },
   { path: AppRoutes.INTERVIEW_DETAIL, element: <InterviewDetail /> },
 
   { path: AppRoutes.PROFILE, element: <Profile /> },

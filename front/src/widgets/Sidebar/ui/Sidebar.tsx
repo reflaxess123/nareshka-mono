@@ -3,7 +3,7 @@ import { AppRoutes } from '@/app/providers/router';
 import { isAdmin } from '@/entities/User/model/types';
 import { Link } from '@/shared/components/Link';
 import { useAppDispatch, useAuth } from '@/shared/hooks';
-import { Bird, Code, Map, Shield, MessageSquare } from 'lucide-react';
+import { Bird, Code, Map, Shield, MessageSquare, Database } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { toggleSidebar } from '../model/slice/sidebarSlice';
 import styles from './Sidebar.module.scss';
@@ -58,6 +58,15 @@ export const Sidebar = ({ children }: { children: React.ReactNode }) => {
             icon={<MessageSquare size={24} />}
             isParentHovered={isOpen}
             to={AppRoutes.INTERVIEWS}
+            variant="sidebar"
+          />
+
+          <Link
+            text="База вопросов"
+            className={styles.link}
+            icon={<Database size={24} />}
+            isParentHovered={isOpen}
+            to={AppRoutes.QUESTIONS_DATABASE}
             variant="sidebar"
           />
 

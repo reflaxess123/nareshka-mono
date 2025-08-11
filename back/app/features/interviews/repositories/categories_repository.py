@@ -266,6 +266,40 @@ class CategoriesRepository:
             })
         
         return questions
+
+    def count_questions(
+        self,
+        search_query: str,
+        category_id: Optional[str] = None,
+        company: Optional[str] = None
+    ) -> int:
+        """Подсчет количества вопросов для поиска"""
+        query = """
+            SELECT COUNT(*) as count
+            FROM "InterviewQuestion"
+        """
+        
+        conditions = []
+        params = {}
+        
+        # Обработка поискового запроса
+        if search_query != '*':
+            conditions.append("LOWER(question_text) LIKE LOWER(:search_pattern)")
+            params['search_pattern'] = f'%{search_query}%'
+        
+        if category_id:
+            conditions.append("category_id = :category_id")
+            params['category_id'] = category_id
+        
+        if company:
+            conditions.append("LOWER(company) = LOWER(:company)")
+            params['company'] = company
+        
+        if conditions:
+            query += " WHERE " + " AND ".join(conditions)
+        
+        result = self.session.execute(text(query), params).fetchone()
+        return result.count
     
     def get_category_statistics(self) -> Dict[str, Any]:
         """Получить общую статистику по категориям"""
@@ -310,3 +344,15 @@ class CategoriesRepository:
         )
         
         return [dict(row._mapping) for row in result]
+    
+    def count_total_companies(self) -> int:
+        """Получить общее количество компаний"""
+        result = self.session.execute(
+            text("""
+                SELECT COUNT(DISTINCT company) as count
+                FROM "InterviewQuestion" 
+                WHERE company IS NOT NULL AND company != ''
+            """)
+        ).scalar()
+        
+        return result or 0

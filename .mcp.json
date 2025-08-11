@@ -1,11 +1,5 @@
 {
   "mcpServers": {
-    "sequential-thinking": {
-      "type": "stdio",
-      "command": "cmd",
-      "args": ["/c", "npx", "@modelcontextprotocol/server-sequential-thinking"],
-      "env": {}
-    },
     "postgres": {
       "type": "stdio",
       "command": "cmd",
@@ -15,12 +9,6 @@
         "@modelcontextprotocol/server-postgres",
         "postgresql://postgres:dev_password@127.0.0.1:5432/nareshka_dev"
       ],
-      "env": {}
-    },
-    "puppeteer": {
-      "type": "stdio",
-      "command": "cmd",
-      "args": ["/c", "npx", "@hisma/server-puppeteer"],
       "env": {}
     },
     "git": {
@@ -42,6 +30,18 @@
         "C:/Users/refla/AppData/Roaming/npm/node_modules/mcp-chrome-bridge/dist/mcp/mcp-server-stdio.js"
       ],
       "env": {}
+    },
+    "github": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "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"
+      }
     }
   }
 }
