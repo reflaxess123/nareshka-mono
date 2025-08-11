@@ -34,6 +34,14 @@
         "C:/Users/refla/nareshka-mono"
       ],
       "env": {}
+    },
+    "chrome-mcp-server": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "C:/Users/refla/AppData/Roaming/npm/node_modules/mcp-chrome-bridge/dist/mcp/mcp-server-stdio.js"
+      ],
+      "env": {}
     }
   }
 }

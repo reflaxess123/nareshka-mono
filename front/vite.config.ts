@@ -1,10 +1,12 @@
 import react from '@vitejs/plugin-react-swc';
 import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
+import { chromeMonitorPlugin } from './vite-plugin-chrome-monitor';
 
 export default defineConfig({
   plugins: [
     react(),
+    chromeMonitorPlugin(), // 🔍 Chrome MCP Monitor плагин
     checker({
       typescript: {
         tsconfigPath: './tsconfig.app.json',
