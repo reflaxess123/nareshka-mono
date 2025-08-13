@@ -58,6 +58,11 @@ const QuestionsDatabase = lazy(() =>
     default: module.QuestionsDatabasePage,
   }))
 );
+const Visualization = lazy(() =>
+  import('@/pages/VisualizationPage/VisualizationPage').then((module) => ({
+    default: module.default,
+  }))
+);
 
 export enum AppRoutes {
   HOME = '/',
@@ -74,6 +79,7 @@ export enum AppRoutes {
   ADMIN_USERS = '/admin/users',
   ADMIN_STATS = '/admin/stats',
   ANALYTICS = '/analytics',
+  VISUALIZATION = '/visualization',
 }
 
 export const routeConfig: AppRoute[] = [
@@ -92,4 +98,5 @@ export const routeConfig: AppRoute[] = [
   { path: AppRoutes.ADMIN_USERS, element: <UserManagement /> },
   { path: AppRoutes.ADMIN_STATS, element: <DetailedStats /> },
   { path: AppRoutes.ANALYTICS, element: <Analytics /> },
+  { path: AppRoutes.VISUALIZATION, element: <Visualization /> },
 ];

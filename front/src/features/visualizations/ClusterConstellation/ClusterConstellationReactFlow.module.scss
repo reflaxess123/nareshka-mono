@@ -1,0 +1,596 @@
+.container {
+  width: 100%;
+  height: calc(100vh - 70px); // Отступ от хедера приложения
+  margin-top: 70px; // Отступ от фиксированного хедера
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+  color: #fff;
+  position: relative;
+  overflow: hidden; // Предотвращаем скролл
+}
+
+.header {
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 10;
+
+  h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    
+    .resetButton {
+      padding: 8px 16px;
+      background: rgba(97, 218, 251, 0.1);
+      border: 1px solid rgba(97, 218, 251, 0.3);
+      border-radius: 6px;
+      color: #61dafb;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      
+      &:hover {
+        background: rgba(97, 218, 251, 0.2);
+        transform: translateY(-1px);
+      }
+    }
+
+    .info {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.7);
+      font-style: italic;
+      min-width: 200px;
+      text-align: center;
+      padding: 4px 8px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  .stats {
+    display: flex;
+    gap: 30px;
+    font-size: 14px;
+    opacity: 0.8;
+
+    span {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+  }
+}
+
+.flowContainer {
+  flex: 1;
+  position: relative;
+
+  // React Flow кастомизация
+  .react-flow {
+    background: transparent;
+  }
+
+  .react-flow__background {
+    background: transparent;
+  }
+
+  .react-flow__controls {
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    
+    button {
+      background: rgba(97, 218, 251, 0.1);
+      border: 1px solid rgba(97, 218, 251, 0.3);
+      color: #61dafb;
+      
+      &:hover {
+        background: rgba(97, 218, 251, 0.2);
+      }
+    }
+  }
+
+  .react-flow__minimap {
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
+
+.clusterNode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: scale(1.05);
+    z-index: 100;
+  }
+
+  &.selected {
+    transform: scale(1.1);
+    z-index: 100;
+  }
+
+  &.topCluster {
+    .circle {
+      border: 4px solid #ffffff !important;
+      box-shadow: 0 0 30px currentColor, 0 0 60px rgba(255, 255, 255, 0.3) !important;
+    }
+
+    .label {
+      font-size: 14px !important;
+      font-weight: bold !important;
+      color: #ffffff !important;
+      text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.9) !important;
+    }
+
+    .stats {
+      background: rgba(0, 0, 0, 0.7) !important;
+      font-weight: bold;
+    }
+  }
+
+  .circle {
+    border-radius: 50%;
+    border: 2px solid #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  .label {
+    margin-top: 8px;
+    font-weight: bold;
+    color: #ffffff;
+    text-align: center;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    font-size: 12px;
+    line-height: 1.2;
+    max-width: 120px;
+    word-wrap: break-word;
+  }
+
+  .stats {
+    margin-top: 4px;
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 2px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-size: 18px;
+  color: #61dafb;
+  background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+}
+
+.details {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 20px;
+  width: 500px; // Увеличена ширина с 400px до 500px
+  max-height: 70vh;
+  overflow-y: auto;
+  z-index: 100;
+  animation: slideUp 0.3s ease-out;
+
+  .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  h3 {
+    margin: 0 0 10px 0;
+    font-size: 20px;
+    color: #61dafb;
+  }
+
+  .category {
+    font-size: 12px;
+    opacity: 0.7;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .info {
+    p {
+      margin: 10px 0;
+      font-size: 14px;
+      line-height: 1.5;
+
+      strong {
+        color: #61dafb;
+      }
+    }
+
+    blockquote {
+      margin: 10px 0;
+      padding: 10px;
+      background: rgba(97, 218, 251, 0.05);
+      border-left: 3px solid #61dafb;
+      font-style: italic;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+  }
+
+  .keywords {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 10px;
+
+    .keyword {
+      padding: 4px 10px;
+      background: rgba(97, 218, 251, 0.1);
+      border: 1px solid rgba(97, 218, 251, 0.3);
+      border-radius: 4px;
+      font-size: 12px;
+      transition: all 0.2s;
+
+      &:hover {
+        background: rgba(97, 218, 251, 0.2);
+        transform: translateY(-1px);
+      }
+    }
+  }
+  
+  .companies {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+    
+    .company {
+      padding: 4px 12px;
+      background: rgba(255, 193, 7, 0.15);
+      border: 1px solid rgba(255, 193, 7, 0.4);
+      border-radius: 6px;
+      color: #ffc107;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s;
+      
+      &:hover {
+        background: rgba(255, 193, 7, 0.25);
+        transform: translateY(-1px);
+      }
+    }
+  }
+  
+  .difficulty {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+    
+    .difficultyItem {
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.2s;
+      
+      &[data-level="junior"] {
+        background: rgba(76, 175, 80, 0.15);
+        border: 1px solid rgba(76, 175, 80, 0.4);
+        color: #4caf50;
+      }
+      
+      &[data-level="middle"] {
+        background: rgba(255, 193, 7, 0.15);
+        border: 1px solid rgba(255, 193, 7, 0.4);
+        color: #ffc107;
+      }
+      
+      &[data-level="senior"] {
+        background: rgba(244, 67, 54, 0.15);
+        border: 1px solid rgba(244, 67, 54, 0.4);
+        color: #f44336;
+      }
+      
+      &:hover {
+        transform: translateY(-1px);
+        filter: brightness(1.2);
+      }
+    }
+  }
+  
+  .relatedTopics {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 8px;
+    
+    .relatedTopic {
+      padding: 3px 8px;
+      background: rgba(156, 39, 176, 0.15);
+      border: 1px solid rgba(156, 39, 176, 0.3);
+      border-radius: 4px;
+      color: #9c27b0;
+      font-size: 11px;
+      transition: all 0.2s;
+      
+      &:hover {
+        background: rgba(156, 39, 176, 0.25);
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.legend {
+  position: absolute;
+  top: 90px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 15px;
+  z-index: 10;
+  max-height: 400px;
+  overflow-y: auto;
+
+  h4 {
+    margin: 0 0 10px 0;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.7;
+  }
+
+  .categories {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .categoryItem {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+
+      .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        box-shadow: 0 0 10px currentColor;
+      }
+    }
+  }
+  
+  .connections {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    
+    .connectionType {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      
+      .connectionLine {
+        height: 3px;
+        border-radius: 2px;
+        box-shadow: 0 0 6px currentColor;
+        min-width: 20px;
+      }
+    }
+  }
+  
+  .tips {
+    margin-top: 12px;
+    
+    .tip {
+      font-size: 10px;
+      opacity: 0.8;
+      margin: 2px 0;
+      color: #61dafb;
+    }
+  }
+  
+  .questionsSection {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    
+    .questionsList {
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: 10px;
+      
+      .questionItem {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        padding: 8px;
+        margin-bottom: 6px;
+        transition: all 0.2s;
+        
+        &:hover {
+          background: rgba(0, 0, 0, 0.4);
+          border-color: rgba(97, 218, 251, 0.3);
+        }
+        
+        .questionText {
+          font-size: 13px;
+          line-height: 1.4;
+          margin-bottom: 4px;
+          color: #fff;
+        }
+        
+        .questionMeta {
+          display: flex;
+          gap: 8px;
+          align-items: center;
+          
+          .questionCompany {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+          }
+          
+          .questionPosition {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+          }
+          
+          .questionDate {
+            background: rgba(156, 39, 176, 0.2);
+            color: #9c27b0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+          }
+          
+          .questionDuration {
+            background: rgba(96, 125, 139, 0.2);
+            color: #607d8b;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+          }
+        }
+      }
+      
+      .moreQuestions {
+        text-align: center;
+        font-style: italic;
+        color: rgba(255, 255, 255, 0.6);
+        padding: 8px;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+        margin-top: 8px;
+      }
+    }
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Scrollbar styles
+.details::-webkit-scrollbar,
+.legend::-webkit-scrollbar {
+  width: 6px;
+}
+
+.details::-webkit-scrollbar-track,
+.legend::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+.details::-webkit-scrollbar-thumb,
+.legend::-webkit-scrollbar-thumb {
+  background: rgba(97, 218, 251, 0.3);
+  border-radius: 3px;
+  
+  &:hover {
+    background: rgba(97, 218, 251, 0.5);
+  }
+}
+
+// React Flow глобальные стили
+:global(.react-flow) {
+  .react-flow__edge-path {
+    stroke: #61dafb;
+    filter: drop-shadow(0 0 3px rgba(97, 218, 251, 0.4));
+    transition: all 0.3s ease;
+  }
+  
+  .react-flow__edge-text {
+    font-size: 12px;
+    fill: #fff;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    
+    rect {
+      fill: rgba(0, 0, 0, 0.8);
+      stroke: rgba(255, 255, 255, 0.3);
+      stroke-width: 1;
+      rx: 4;
+      ry: 4;
+    }
+  }
+
+  .react-flow__handle {
+    opacity: 0;
+    pointer-events: none;
+  }
+  
+  // Анимация для связей
+  .react-flow__edge.animated .react-flow__edge-path {
+    stroke-dasharray: 10;
+    animation: dashdraw 2s linear infinite;
+  }
+}
+
+@keyframes dashdraw {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
