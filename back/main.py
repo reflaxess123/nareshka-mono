@@ -10,7 +10,7 @@ from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 import os
 
-from app.config.settings import settings
+from app.core.settings import settings
 from app.core.error_handlers import register_exception_handlers
 from app.core.logging import get_logger, init_default_logging
 from app.shared.di import setup_di_container
@@ -22,7 +22,7 @@ from app.features.content.api import router as content_router
 from app.features.interviews.api.interviews_router import router as interviews_router
 from app.features.interviews.api.categories_router import router as categories_router
 from app.features.interviews.api.companies_router import router as companies_router
-from app.features.interviews.api.cluster_visualization_router import router as cluster_viz_router
+from app.features.visualization.api import router as cluster_viz_router
 from app.features.mindmap.api import router as mindmap_router
 from app.features.progress.api import router as progress_router
 from app.features.stats.api import router as stats_router
@@ -77,9 +77,7 @@ app.include_router(code_editor_router, prefix="/api/v2/code-editor")
 app.include_router(stats_router, prefix="/api/v2/stats")
 app.include_router(mindmap_router, prefix="/api/v2/mindmap")
 app.include_router(admin_router, prefix="/api/v2/admin")
-# app.include_router(analytics_router, prefix="/api/v2")
 
-# Serve analytics static assets (PNG/CSV) from sobes-analysis/out
 analytics_out_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'sobes-analysis', 'out'))
 if os.path.isdir(analytics_out_dir):
     app.mount("/analytics-static", StaticFiles(directory=analytics_out_dir), name="analytics-static")
