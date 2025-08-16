@@ -1,0 +1,205 @@
+// Стили для корневого узла
+.rootNode {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  box-shadow: 
+    0 10px 30px rgba(102, 126, 234, 0.3),
+    0 5px 15px rgba(0, 0, 0, 0.2);
+  padding: 24px;
+  min-width: 300px;
+  min-height: 200px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 3px solid rgba(255, 255, 255, 0.3);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+      0 15px 40px rgba(102, 126, 234, 0.4),
+      0 8px 20px rgba(0, 0, 0, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+
+  &.selected {
+    transform: scale(1.05);
+    box-shadow: 
+      0 20px 50px rgba(102, 126, 234, 0.5),
+      0 10px 25px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.rootContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+}
+
+.rootHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .rootIcon {
+    font-size: 32px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  }
+
+  .rootTitle {
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    line-height: 1.2;
+  }
+}
+
+.rootStats {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex: 1;
+  align-items: center;
+
+  .statItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+
+    .statNumber {
+      font-size: 24px;
+      font-weight: 800;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      line-height: 1;
+    }
+
+    .statLabel {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.9);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+  }
+}
+
+.rootFooter {
+  .footerText {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    display: block;
+  }
+}
+
+// Стили для узлов категорий
+.categoryNode {
+  border-radius: 12px;
+  box-shadow: 
+    0 6px 20px rgba(0, 0, 0, 0.2),
+    0 3px 10px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  min-width: 200px;
+  min-height: 120px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+
+  &:hover {
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 
+      0 10px 30px rgba(0, 0, 0, 0.3),
+      0 5px 15px rgba(0, 0, 0, 0.2);
+    border-width: 3px;
+    z-index: 10;
+  }
+
+  &.selected {
+    transform: scale(1.1);
+    box-shadow: 
+      0 15px 40px rgba(0, 0, 0, 0.4),
+      0 8px 20px rgba(0, 0, 0, 0.25);
+    z-index: 20;
+  }
+}
+
+.categoryContent {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+}
+
+.categoryHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .categoryIcon {
+    font-size: 20px;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+  }
+
+  .categoryName {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    line-height: 1.2;
+  }
+}
+
+.categoryStats {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+
+  .statItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .statNumber {
+      font-size: 14px;
+      font-weight: 800;
+      color: white;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      line-height: 1;
+      margin-bottom: 2px;
+    }
+
+    .statLabel {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.8);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      font-weight: 600;
+    }
+  }
+}
+
+.categoryPercentage {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  justify-content: center;
+
+  .percentageValue {
+    font-size: 13px;
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  .percentageLabel {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.8);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+}

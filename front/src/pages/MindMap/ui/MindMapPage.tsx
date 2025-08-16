@@ -19,7 +19,10 @@ import { TaskDetailModal } from '../../../components/mindmap/TaskDetailModal';
 import CenterNode from '../../../components/MindMapNodes/CenterNode';
 import MindMapProgressSidebar from '../../../components/MindMapNodes/MindMapProgressSidebar';
 import TopicNode from '../../../components/MindMapNodes/TopicNode';
+import InterviewRootNode from '../../../components/mindmap/InterviewRootNode';
+import InterviewCategoryNode from '../../../components/mindmap/InterviewCategoryNode';
 import { useTaskDetails } from '../../../hooks/useMindMap';
+import { useInterviewsVisualization } from '../../../hooks/useInterviewsVisualization';
 import styles from './MindMapPage.module.scss';
 
 interface MindMapData {
@@ -49,12 +52,17 @@ interface SelectedTopicData {
   icon: string;
 }
 
-const nodeTypes: NodeTypes = {
+const defaultNodeTypes: NodeTypes = {
   center: CenterNode,
   centerNode: CenterNode,
   topic: TopicNode,
   topicNode: TopicNode,
   conceptNode: TopicNode,
+};
+
+const interviewNodeTypes: NodeTypes = {
+  interviewRoot: InterviewRootNode,
+  interviewCategory: InterviewCategoryNode,
 };
 
 const NewMindMapPage: React.FC = () => {
@@ -70,18 +78,34 @@ const NewMindMapPage: React.FC = () => {
     null
   );
   const { task: theoreticalTaskDetail } = useTaskDetails(theoreticalTaskId);
+  
+  // Используем хук для данных интервью
+  const interviewsData = useInterviewsVisualization();
 
   // Используем generated hook для получения данных mindmap
   const {
     data: mindMapResponse,
-    isLoading: loading,
-    error,
-  } = useGenerateMindmapApiV2MindmapGenerateGet({
-    technology: currentTechnology,
-    structure_type: 'topics',
-  });
+    isLoading: mindMapLoading,
+    error: mindMapError,
+  } = useGenerateMindmapApiV2MindmapGenerateGet(
+    currentTechnology !== 'interviews' ? {
+      technology: currentTechnology,
+      structure_type: 'topics',
+    } : undefined,
+    {
+      query: {
+        enabled: currentTechnology !== 'interviews'
+      }
+    }
+  );
 
   const mindMapData = mindMapResponse?.data as unknown as MindMapData | null;
+  
+  // Выбираем данные и состояния в зависимости от режима
+  const isInterviewsMode = currentTechnology === 'interviews';
+  const loading = isInterviewsMode ? interviewsData.isLoading : mindMapLoading;
+  const error = isInterviewsMode ? interviewsData.error : mindMapError;
+  const nodeTypes = isInterviewsMode ? interviewNodeTypes : defaultNodeTypes;
 
   const handleTechnologyChange = useCallback((technology: TechnologyType) => {
     setCurrentTechnology(technology);
@@ -89,6 +113,16 @@ const NewMindMapPage: React.FC = () => {
   }, []);
 
   const onNodeClick = useCallback((_event: React.MouseEvent, node: Node) => {
+    // Обработка клика для interviews режима
+    if (currentTechnology === 'interviews') {
+      if (node.type === 'interviewCategory') {
+        // Можем показать детальную информацию о категории
+        console.log('Клик на категорию интервью:', node.data.name);
+      }
+      return;
+    }
+    
+    // Обычная обработка для других технологий
     if (node.type === 'topic' && node.data.topic_key) {
       const topicData: SelectedTopicData = {
         key: node.data.topic_key as string,
@@ -100,7 +134,7 @@ const NewMindMapPage: React.FC = () => {
       setSelectedTopic(topicData);
       setIsSidebarOpen(true);
     }
-  }, []);
+  }, [currentTechnology]);
 
   const handleCloseSidebar = useCallback(() => {
     setIsSidebarOpen(false);
@@ -114,11 +148,20 @@ const NewMindMapPage: React.FC = () => {
 
   // Обновляем nodes и edges при изменении данных
   useEffect(() => {
-    if (mindMapData?.nodes && mindMapData?.edges) {
-      setNodes(mindMapData.nodes);
-      setEdges(mindMapData.edges);
+    if (isInterviewsMode) {
+      // Используем данные интервью
+      if (interviewsData.data) {
+        setNodes(interviewsData.data.nodes);
+        setEdges(interviewsData.data.edges);
+      }
+    } else {
+      // Используем обычные mindmap данные
+      if (mindMapData?.nodes && mindMapData?.edges) {
+        setNodes(mindMapData.nodes);
+        setEdges(mindMapData.edges);
+      }
     }
-  }, [mindMapData, setNodes, setEdges]);
+  }, [mindMapData, interviewsData.data, isInterviewsMode, setNodes, setEdges]);
 
   if (loading) {
     return (
@@ -157,7 +200,7 @@ const NewMindMapPage: React.FC = () => {
     );
   }
 
-  if (!mindMapData) {
+  if (!isInterviewsMode && !mindMapData) {
     return (
       <div
         style={{
@@ -237,14 +280,16 @@ const NewMindMapPage: React.FC = () => {
         </ReactFlow>
       </div>
 
-      <MindMapProgressSidebar
-        isOpen={isSidebarOpen}
-        onClose={handleCloseSidebar}
-        selectedTopic={selectedTopic}
-        currentTechnology={currentTechnology}
-        onTaskClick={handleTaskClick}
-        onTheoreticalTaskClick={setTheoreticalTaskId}
-      />
+      {!isInterviewsMode && (
+        <MindMapProgressSidebar
+          isOpen={isSidebarOpen}
+          onClose={handleCloseSidebar}
+          selectedTopic={selectedTopic}
+          currentTechnology={currentTechnology}
+          onTaskClick={handleTaskClick}
+          onTheoreticalTaskClick={setTheoreticalTaskId}
+        />
+      )}
 
       <TaskDetailModal
         isOpen={!!theoreticalTaskId}

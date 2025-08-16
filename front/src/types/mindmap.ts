@@ -227,7 +227,7 @@ export const TOPIC_ICONS = {
 } as const;
 
 // Добавляем типы для технологий
-export type TechnologyType = 'javascript' | 'react' | 'typescript';
+export type TechnologyType = 'javascript' | 'react' | 'typescript' | 'interviews';
 
 export interface TechnologyConfig {
   title: string;

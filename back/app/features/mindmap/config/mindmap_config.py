@@ -23,6 +23,13 @@ TECHNOLOGY_CENTERS = {
         "color": "#3178C6",
         "mainCategory": "TS",
     },
+    "interviews": {
+        "title": "Банк вопросов",
+        "description": "База вопросов для интервью",
+        "icon": "💎",
+        "color": "#667eea",
+        "mainCategory": "INTERVIEWS",
+    },
 }
 
 # Маппинг ключей топиков MindMap к категориям ContentBlocks для JavaScript
