@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+My name is Nikolas
+
 Этот файл предоставляет руководство для Claude Code (claude.ai/code) при работе с кодом в данном репозитории.
 
 ## Обзор проекта

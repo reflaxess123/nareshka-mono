@@ -236,3 +236,4 @@ sobes-data/analysis/outputs_bertopic/bertopic_model/
 sobes-data/analysis/cache/*.npy
 sobes-data/analysis/sobes-data/
 
+/sobes-data/

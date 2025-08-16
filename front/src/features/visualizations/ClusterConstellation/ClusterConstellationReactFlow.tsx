@@ -74,13 +74,15 @@ const categoryColors: Record<string, string> = {
   'другое': '#9e9e9e'
 };
 
-// Импортируем новый круглый компонент
-import CircularClusterNode from './CircularClusterNode';
+// Импортируем компоненты для иерархической структуры
+import ClusterNode from './ClusterNode';
+import RootNode from './RootNode';
+import CategoryNode from './CategoryNode';
 
-// Кастомный круглый узел кластера - оптимизирован для производительности
-const ClusterNode: React.FC<NodeProps<ClusterNodeData & { isHovered?: boolean; isFocused?: boolean }>> = (props) => {
+// Кастомный блочный узел кластера - оптимизирован для производительности
+const ClusterNodeComponent: React.FC<NodeProps<ClusterNodeData & { isHovered?: boolean; isFocused?: boolean }>> = (props) => {
   return (
-    <CircularClusterNode 
+    <ClusterNode 
       {...props} 
       isHovered={props.data.isHovered} 
       isFocused={props.data.isFocused}
@@ -88,8 +90,30 @@ const ClusterNode: React.FC<NodeProps<ClusterNodeData & { isHovered?: boolean; i
   );
 };
 
+// Компонент корневого узла
+const RootNodeComponent: React.FC<NodeProps<any>> = (props) => {
+  return (
+    <RootNode 
+      {...props} 
+      isHovered={props.data.isHovered}
+    />
+  );
+};
+
+// Компонент узла категории
+const CategoryNodeComponent: React.FC<NodeProps<any>> = (props) => {
+  return (
+    <CategoryNode 
+      {...props} 
+      isHovered={props.data.isHovered}
+    />
+  );
+};
+
 const nodeTypes: NodeTypes = {
-  cluster: ClusterNode,
+  root: RootNodeComponent,
+  category: CategoryNodeComponent,
+  cluster: ClusterNodeComponent,
 };
 
 export const ClusterConstellationReactFlow: React.FC = () => {
@@ -99,38 +123,65 @@ export const ClusterConstellationReactFlow: React.FC = () => {
   const [focusedNode, setFocusedNode] = useState<ClusterNodeData | null>(null);
   const [loading, setLoading] = useState(true);
   const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
-  const [showLegend, setShowLegend] = useState(true);
   const [clusterQuestions, setClusterQuestions] = useState<any>(null);
   const [loadingQuestions, setLoadingQuestions] = useState(false);
+  // Убираем состояние раскрытия - всегда показываем иерархию
   
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-  // Загрузка данных - ТОЛЬКО топ кластеры для производительности
+  // Загрузка корректных данных категорий с правильным подсчетом кластеров
   useEffect(() => {
-    // Загружаем только самые важные кластеры с высокими порогами
-    fetch('/api/v2/cluster-visualization/constellation?min_interview_count=50&min_link_weight=15&limit=20')
-      .then(res => res.json())
-      .then(data => {
-        // Ограничиваем количество узлов для производительности
-        const limitedData = {
-          ...data,
-          nodes: data.nodes?.slice(0, 20) || [], // Максимум 20 узлов
-          links: data.links?.filter(link => 
-            data.nodes?.slice(0, 20).find(n => n.id === link.source) &&
-            data.nodes?.slice(0, 20).find(n => n.id === link.target)
-          ).slice(0, 15) || [] // Максимум 15 связей
-        };
-        setData(limitedData);
-      })
-      .catch(err => {
-        console.error('Ошибка загрузки данных:', err);
-        // Fallback - загружаем с еще более строгими ограничениями
-        fetch('/api/v2/cluster-visualization/constellation?min_interview_count=100&limit=10')
-          .then(res => res.json())
-          .then(setData);
-      })
-      .finally(() => setLoading(false));
+    // Загружаем правильную статистику и исправляем clusters_count
+    Promise.all([
+      fetch('/api/v2/interview-categories/').then(res => res.json()),
+      // Загружаем все кластеры для правильного подсчета
+      fetch('/api/v2/cluster-visualization/constellation?min_interview_count=1&limit=200').then(res => res.json())
+    ])
+    .then(([categories, clusterData]) => {
+      console.log('Загруженные категории:', categories);
+      console.log('Данные кластеров:', clusterData);
+      
+      // Подсчитываем реальное количество кластеров по категориям
+      const clusterCounts = {};
+      if (clusterData.nodes) {
+        clusterData.nodes.forEach(cluster => {
+          clusterCounts[cluster.category_id] = (clusterCounts[cluster.category_id] || 0) + 1;
+        });
+      }
+      
+      // Исправляем данные категорий с правильным clusters_count
+      const correctedCategories = categories.map(cat => ({
+        ...cat,
+        clusters_count: clusterCounts[cat.id] || 0 // Используем реальный подсчет
+      }));
+      
+      console.log('Исправленные категории:', correctedCategories);
+      
+      // Создаем корректные данные для визуализации
+      const correctData = {
+        nodes: clusterData.nodes || [],
+        links: clusterData.links || [],
+        categories: categories.reduce((acc, cat) => {
+          acc[cat.id] = cat.name;
+          return acc;
+        }, {}),
+        stats: { 
+          total_clusters: Object.values(clusterCounts).reduce((sum, count) => sum + count, 0),
+          total_questions: categories.reduce((sum, cat) => sum + (cat.questions_count || 0), 0)
+        },
+        // Используем исправленные данные категорий
+        categoriesStats: correctedCategories
+      };
+      
+      console.log('Финальные данные:', correctData);
+      setData(correctData);
+    })
+    .catch(err => {
+      console.error('Ошибка загрузки данных:', err);
+      setData(null);
+    })
+    .finally(() => setLoading(false));
   }, []);
   
   // Очистка таймаутов при размонтировании
@@ -140,69 +191,98 @@ export const ClusterConstellationReactFlow: React.FC = () => {
     };
   }, [hoverTimeout]);
 
-  // Мемоизированные узлы для предотвращения пересчета позиций
+  // Улучшенное иерархическое расположение узлов
   const memoizedNodes = useMemo(() => {
     if (!data) return [];
 
-    // Сортируем по популярности
-    const sortedNodes = [...data.nodes].sort((a, b) => b.interview_penetration - a.interview_penetration);
+    const flowNodes: Node[] = [];
+    const centerX = 800; // Центр координат
+    const centerY = 500;
     
-    // Группируем узлы по категориям для более организованного расположения
-    const nodesByCategory = sortedNodes.reduce((acc, node) => {
-      if (!acc[node.category_id]) acc[node.category_id] = [];
-      acc[node.category_id].push(node);
-      return acc;
-    }, {} as Record<string, typeof sortedNodes>);
+    // Размеры корневого блока
+    const rootWidth = 300;
+    const rootHeight = 200;
+
+    // 1. Создаем корневой узел в центре
+    flowNodes.push({
+      id: 'root',
+      type: 'root',
+      position: { x: centerX - rootWidth/2, y: centerY - rootHeight/2 },
+      data: {
+        totalQuestions: data.stats?.total_questions || 8532,
+        totalClusters: data.stats?.total_clusters || 182,
+        totalCategories: Object.keys(data.categories || {}).length || 13,
+        isHovered: hoveredNode?.id === 'root'
+      },
+      draggable: false,
+    });
+
+    // 2. Используем правильные данные из categoriesStats
+    const categories = (data.categoriesStats || []).map(category => ({
+      id: category.id,
+      name: category.name,
+      questionsCount: category.questions_count || 0,
+      clustersCount: category.clusters_count || 0,
+      avgPenetration: category.percentage || 0,
+      clusters: [], // Пока не загружаем кластеры
+      isExpanded: true
+    })).sort((a, b) => b.questionsCount - a.questionsCount);
+
+    // 4. Простое равномерное размещение 13 категорий по кругу
+    const categoryRadius = 520; // Увеличиваем радиус для избежания слипания
     
-    // Создаем узлы с оптимальным расположением для производительности
-    const flowNodes: Node<ClusterNodeData>[] = [];
-    const nodeSize = 180; // Уменьшенный размер для круглых узлов
-    const minDistance = 220; // Минимальное расстояние между узлами
-    
-    // Размещаем все узлы по спирали для лучшей читаемости
-    const centerX = 800; // Увеличен для лучшего использования ширины экрана
-    const centerY = 350; // Слегка поднят для учета отступа от хедера
-    
-    sortedNodes.forEach((node, index) => {
-      // Спиральное размещение с увеличивающимся радиусом
-      const angle = index * (2 * Math.PI / 3.618); // Золотое сечение для равномерности
-      const radius = 150 + index * 80; // Увеличивающийся радиус
-      const x = centerX + Math.cos(angle) * radius;
-      const y = centerY + Math.sin(angle) * radius;
+    categories.forEach((category, index) => {
+      // Компактные размеры после упрощения контента
+      const categoryWidth = 200;
+      const categoryHeight = 120;
       
-      // Добавляем полезную информацию для отображения на узле
-      const nodeData = {
-        ...node,
-        // Ранг по популярности (топ-5 помечаем как важные)
-        rank: index + 1,
-        isTopCluster: index < 5,
-        // Уровень сложности на основе проникновения
-        difficultyLevel: node.interview_penetration > 8 ? 'high' : 
-                        node.interview_penetration > 6 ? 'medium' : 'low',
-        // Статус востребованности
-        demandStatus: node.interview_penetration > 9 ? 'Очень востребован' :
-                     node.interview_penetration > 7 ? 'Востребован' :
-                     node.interview_penetration > 5 ? 'Умеренно востребован' : 'Нишевая тема'
-      };
+      // Равномерное распределение 13 категорий по кругу
+      const angle = (index / categories.length) * 2 * Math.PI - Math.PI / 2;
+      const x = centerX + Math.cos(angle) * categoryRadius - categoryWidth/2;
+      const y = centerY + Math.sin(angle) * categoryRadius - categoryHeight/2;
 
       flowNodes.push({
-        id: node.id.toString(),
-        type: 'cluster',
+        id: `category-${category.id}`,
+        type: 'category',
         position: { x, y },
-        data: nodeData,
-        draggable: true,
+        data: {
+          ...category,
+          isHovered: hoveredNode?.id === `category-${category.id}`
+        },
+        draggable: false, // Отключаем перетаскивание
+      });
+
+      // 5. Пока не показываем кластеры - только корень и категории
+      // (кластеры будут добавлены позже при клике на категорию)
+    });
+
+    return flowNodes;
+  }, [data, hoveredNode, focusedNode]);
+
+  // Создаем иерархические связи: корень → категории → кластеры
+  const memoizedEdges = useMemo(() => {
+    if (!data) return [];
+
+    const flowEdges: Edge[] = [];
+
+    // Связи от корня к категориям
+    (data.categoriesStats || []).forEach(category => {
+      flowEdges.push({
+        id: `root-to-${category.id}`,
+        source: 'root',
+        target: `category-${category.id}`,
+        type: 'straight',
+        style: { 
+          stroke: '#61dafb', 
+          strokeWidth: 2,
+          opacity: 0.6
+        },
+        animated: false,
       });
     });
-    
-    // Удаляем сложную логику категорий - теперь все узлы размещаются по спирали
-    
-    return flowNodes;
-  }, [data]);
 
-  // Убираем связи - возвращаем пустой массив
-  const memoizedEdges = useMemo(() => {
-    return [];
-  }, []);
+    return flowEdges;
+  }, [data]);
 
   // Обновляем узлы и связи только при изменении мемоизированных данных
   useEffect(() => {
@@ -210,17 +290,11 @@ export const ClusterConstellationReactFlow: React.FC = () => {
     setEdges(memoizedEdges);
   }, [memoizedNodes, memoizedEdges, setNodes, setEdges]);
 
-  // Обработка hover на узел с debouncing
-  const onNodeMouseEnter = useCallback((event: React.MouseEvent, node: Node<ClusterNodeData>) => {
-    if (hoverTimeout) clearTimeout(hoverTimeout);
-    setHoveredNode(node.data);
-  }, [hoverTimeout]);
-  
   const onNodeMouseLeave = useCallback(() => {
     if (hoverTimeout) clearTimeout(hoverTimeout);
     const timeout = setTimeout(() => {
       setHoveredNode(null);
-    }, 150); // Небольшая задержка
+    }, 150);
     setHoverTimeout(timeout);
   }, [hoverTimeout]);
   
@@ -239,130 +313,41 @@ export const ClusterConstellationReactFlow: React.FC = () => {
     }
   }, []);
 
-  // Обработка клика на узел - режим фокусировки с загрузкой вопросов
-  const onNodeClick = useCallback((event: React.MouseEvent, node: Node<ClusterNodeData>) => {
+  // Обработка клика на узел
+  const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
     event.preventDefault();
     event.stopPropagation();
     
-    if (focusedNode && focusedNode.id === node.data.id) {
-      // Если уже сфокусирован - убираем фокус
+    // Обработка клика на корневой узел
+    if (node.id === 'root') {
+      // Можно добавить общую статистику
+      return;
+    }
+    
+    // Обработка клика на категорию - показываем информацию о категории
+    if (node.id.startsWith('category-')) {
+      // Можно добавить детальную информацию о категории
+      console.log('Клик на категорию:', node.data.name);
+      return;
+    }
+    
+    // Обработка клика на кластер - детальная информация
+    if (focusedNode && focusedNode.id === parseInt(node.id)) {
       setFocusedNode(null);
       setSelectedNode(null);
       setClusterQuestions(null);
     } else {
-      // Фокусируемся на узле и загружаем вопросы
       setFocusedNode(node.data);
       setSelectedNode(node.data);
-      loadClusterQuestions(node.data.id);
+      loadClusterQuestions(parseInt(node.id));
     }
   }, [focusedNode, loadClusterQuestions]);
 
-  // Сброс позиций
-  const resetLayout = useCallback(() => {
-    if (!data) return;
-    
-    const sortedNodes = [...data.nodes].sort((a, b) => b.interview_penetration - a.interview_penetration);
-    
-    // Группируем узлы по категориям
-    const nodesByCategory = sortedNodes.reduce((acc, node) => {
-      if (!acc[node.category_id]) acc[node.category_id] = [];
-      acc[node.category_id].push(node);
-      return acc;
-    }, {} as Record<string, typeof sortedNodes>);
-    
-    const resetNodes: Node<ClusterNodeData>[] = [];
-    const cardWidth = 320;
-    const cardHeight = 250;
-    const spacing = 40;
-    
-    // Размещаем топ-5 узлов в центре
-    sortedNodes.slice(0, 5).forEach((node, index) => {
-      const angle = (index / 5) * 2 * Math.PI - Math.PI / 2;
-      const radius = 300;
-      const x = 800 + Math.cos(angle) * radius;
-      const y = 450 + Math.sin(angle) * radius;
-      
-      const strongConnections = data?.links
-        ?.filter(link => 
-          link.source === node.id || link.target === node.id
-        )
-        ?.sort((a, b) => b.strength - a.strength)
-        ?.slice(0, 3)
-        ?.map(link => {
-          const connectedNodeId = link.source === node.id ? link.target : link.source;
-          const connectedNode = sortedNodes.find(n => n.id === connectedNodeId);
-          return connectedNode ? {
-            name: connectedNode.name.length > 20 ? connectedNode.name.substring(0, 17) + '...' : connectedNode.name,
-            strength: link.strength
-          } : null;
-        })
-        ?.filter(Boolean) || [];
-      
-      resetNodes.push({
-        id: node.id.toString(),
-        type: 'cluster',
-        position: { x, y },
-        data: {
-          ...node,
-          strongConnections
-        },
-        draggable: true,
-      });
-    });
-    
-    // Размещаем остальные узлы по категориям
-    const categories = Object.keys(nodesByCategory);
-    
-    categories.forEach((categoryId, catIndex) => {
-      const categoryNodes = nodesByCategory[categoryId].filter(n => 
-        !sortedNodes.slice(0, 5).includes(n)
-      );
-      
-      if (categoryNodes.length === 0) return;
-      
-      const sectorAngle = (2 * Math.PI) / categories.length;
-      const baseSectorAngle = catIndex * sectorAngle;
-      
-      categoryNodes.forEach((node, nodeIndex) => {
-        const layerIndex = Math.floor(nodeIndex / 3);
-        const positionInLayer = nodeIndex % 3;
-        const radius = 600 + layerIndex * (cardHeight + spacing);
-        const angleOffset = (positionInLayer - 1) * 0.15;
-        const angle = baseSectorAngle + angleOffset;
-        const x = 800 + Math.cos(angle) * radius;
-        const y = 450 + Math.sin(angle) * radius;
-        
-        const strongConnections = data?.links
-          ?.filter(link => 
-            link.source === node.id || link.target === node.id
-          )
-          ?.sort((a, b) => b.strength - a.strength)
-          ?.slice(0, 3)
-          ?.map(link => {
-            const connectedNodeId = link.source === node.id ? link.target : link.source;
-            const connectedNode = sortedNodes.find(n => n.id === connectedNodeId);
-            return connectedNode ? {
-              name: connectedNode.name.length > 20 ? connectedNode.name.substring(0, 17) + '...' : connectedNode.name,
-              strength: link.strength
-            } : null;
-          })
-          ?.filter(Boolean) || [];
-        
-        resetNodes.push({
-          id: node.id.toString(),
-          type: 'cluster',
-          position: { x, y },
-          data: {
-            ...node,
-            strongConnections
-          },
-          draggable: true,
-        });
-      });
-    });
-    
-    setNodes(resetNodes);
-  }, [data, setNodes]);
+  // Обработка hover на узел с debouncing
+  const onNodeMouseEnter = useCallback((event: React.MouseEvent, node: Node) => {
+    if (hoverTimeout) clearTimeout(hoverTimeout);
+    setHoveredNode({ id: node.id });
+  }, [hoverTimeout]);
 
   // Настройки MiniMap
   const miniMapNodeColor = useCallback((node: Node<ClusterNodeData>) => {
@@ -378,35 +363,9 @@ export const ClusterConstellationReactFlow: React.FC = () => {
       <div className={styles.header}>
         <h2>🌌 Созвездие кластеров</h2>
         <div className={styles.controls}>
-          <button className={styles.resetButton} onClick={resetLayout}>
-            🔄 Сбросить расположение
-          </button>
-          <button 
-            className={styles.resetButton} 
-            onClick={() => setShowLegend(!showLegend)}
-            style={{ background: showLegend ? 'rgba(76, 175, 80, 0.2)' : 'rgba(97, 218, 251, 0.1)', borderColor: showLegend ? '#4caf50' : '#61dafb', color: showLegend ? '#4caf50' : '#61dafb' }}
-          >
-            {showLegend ? '👁️ Скрыть легенду' : '👁️ Показать легенду'}
-          </button>
-          {focusedNode && (
-            <button 
-              className={styles.resetButton} 
-              onClick={() => { setFocusedNode(null); setSelectedNode(null); }}
-              style={{ background: 'rgba(255, 193, 7, 0.2)', borderColor: '#ffc107', color: '#ffc107' }}
-            >
-              ✕ Убрать фокус
-            </button>
-          )}
-          <div className={styles.info}>
-            {focusedNode 
-              ? `Фокус: ${focusedNode.name}` 
-              : 'Кликните на кластер для детальной информации'}
-          </div>
         </div>
         <div className={styles.stats}>
           <span>Кластеров: {data?.stats.total_clusters}</span>
-          <span>Связей: {data?.stats.total_links}</span>
-          <span>Средняя популярность: {data?.stats.avg_penetration.toFixed(1)}%</span>
         </div>
       </div>
 
@@ -438,15 +397,19 @@ export const ClusterConstellationReactFlow: React.FC = () => {
           nodeTypes={nodeTypes}
           connectionMode={ConnectionMode.Loose}
           fitView
-          fitViewOptions={{ padding: 100, minZoom: 0.1, maxZoom: 2 }}
+          fitViewOptions={{ padding: 150, minZoom: 0.1, maxZoom: 1.5 }}
           minZoom={0.1}
-          maxZoom={2}
-          defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
+          maxZoom={1.5}
+          defaultViewport={{ x: 0, y: 0, zoom: 0.7 }}
           attributionPosition="bottom-right"
           proOptions={{ hideAttribution: true }}
         >
           <Background color="#61dafb" gap={50} size={2} />
-          <Controls showInteractive={false} />
+          <Controls 
+            showInteractive={false} 
+            showFitView={true}
+            showZoom={true}
+          />
           <MiniMap
             nodeColor={miniMapNodeColor}
             maskColor="rgba(10, 14, 39, 0.8)"
@@ -536,47 +499,17 @@ export const ClusterConstellationReactFlow: React.FC = () => {
         </div>
       )}
 
-      {showLegend && (
-        <div className={styles.legend}>
-          <h4>Категории:</h4>
-          <div className={styles.categories}>
-            {Object.entries(categoryColors).map(([id, color]) => (
-              <div key={id} className={styles.categoryItem}>
-                <span className={styles.dot} style={{ backgroundColor: color }} />
-                <span>{data?.categories[id] || id}</span>
-              </div>
-            ))}
-          </div>
-          
-          <h4 style={{ marginTop: '15px' }}>Важность тем:</h4>
-          <div className={styles.connections}>
-            <div className={styles.connectionType}>
-              <span>⭐</span>
-              <span>Топ-5 самых популярных</span>
+      <div className={styles.legend}>
+        <h4>Категории:</h4>
+        <div className={styles.categories}>
+          {Object.entries(categoryColors).map(([id, color]) => (
+            <div key={id} className={styles.categoryItem}>
+              <span className={styles.dot} style={{ backgroundColor: color }} />
+              <span>{data?.categories[id] || id}</span>
             </div>
-            <div className={styles.connectionType}>
-              <span>#1-5</span>
-              <span>Очень востребованы (&gt;9%)</span>
-            </div>
-            <div className={styles.connectionType}>
-              <span>#6-12</span>
-              <span>Востребованы (7-9%)</span>
-            </div>
-            <div className={styles.connectionType}>
-              <span>#13+</span>
-              <span>Нишевые темы (&lt;7%)</span>
-            </div>
-          </div>
-          
-          <div className={styles.tips}>
-            <h4>Управление:</h4>
-            <div className={styles.tip}>• Кликните - детали кластера</div>
-            <div className={styles.tip}>• Наведите - краткая информация</div>
-            <div className={styles.tip}>• Колесо - масштабирование</div>
-            <div className={styles.tip}>• Перетаскивайте для перемещения</div>
-          </div>
+          ))}
         </div>
-      )}
+      </div>
     </div>
   );
 };
