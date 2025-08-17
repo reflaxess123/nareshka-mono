@@ -75,6 +75,7 @@ class QuestionResponse(BaseModel):
     category_id: Optional[str] = Field(None, description="ID категории")
     topic_name: Optional[str] = Field(None, description="Название топика")
     canonical_question: Optional[str] = Field(None, description="Канонический вопрос")
+    interview_id: Optional[str] = Field(None, description="ID интервью")
     
     class Config:
         json_schema_extra = {
@@ -85,7 +86,8 @@ class QuestionResponse(BaseModel):
                 "cluster_id": 25,
                 "category_id": "javascript_core",
                 "topic_name": "Замыкания и область видимости",
-                "canonical_question": "Что такое замыкание?"
+                "canonical_question": "Что такое замыкание?",
+                "interview_id": "interview_Яндекс_001"
             }
         }
 

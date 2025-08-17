@@ -294,6 +294,40 @@ export interface CategoryResponseType {
   icon?: CategoryResponseTypeIcon;
 }
 
+export type ClusterConstellationResponseTypeCategories = {[key: string]: string};
+
+export type ClusterConstellationResponseTypeStats = { [key: string]: unknown };
+
+export interface ClusterConstellationResponseType {
+  nodes: ClusterNodeType[];
+  links: ClusterLinkType[];
+  categories: ClusterConstellationResponseTypeCategories;
+  stats: ClusterConstellationResponseTypeStats;
+}
+
+export interface ClusterLinkType {
+  source: number;
+  target: number;
+  weight: number;
+  strength: number;
+}
+
+export type ClusterNodeTypeDifficultyDistribution = {[key: string]: number};
+
+export interface ClusterNodeType {
+  id: number;
+  name: string;
+  category_id: string;
+  category_name: string;
+  questions_count: number;
+  interview_penetration: number;
+  keywords: string[];
+  example_question: string;
+  size: number;
+  top_companies: string[];
+  difficulty_distribution: ClusterNodeTypeDifficultyDistribution;
+}
+
 /**
  * Пример вопроса
  */
@@ -2259,6 +2293,21 @@ export type GetTopCompaniesApiV2CompaniesTopGetParams = {
  * @maximum 100
  */
 limit?: number;
+};
+
+export type GetClusterConstellationApiV2ClusterVisualizationConstellationGetParams = {
+/**
+ * Минимальное количество интервью для кластера
+ */
+min_interview_count?: number;
+/**
+ * Минимальный вес связи для отображения
+ */
+min_link_weight?: number;
+/**
+ * Фильтр по категориям
+ */
+category_filter?: string[] | null;
 };
 
 export type GetTheoryCardsApiV2TheoryCardsGetParams = {
@@ -4791,6 +4840,185 @@ export function useGetTopCompaniesApiV2CompaniesTopGet<TData = Awaited<ReturnTyp
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetTopCompaniesApiV2CompaniesTopGetQueryOptions(params,options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
+ * Возвращает узлы и связи для D3.js / ReactFlow графа
+ * @summary Получить данные для визуализации созвездия кластеров
+ */
+export const getClusterConstellationApiV2ClusterVisualizationConstellationGet = (
+    params?: GetClusterConstellationApiV2ClusterVisualizationConstellationGetParams,
+ signal?: AbortSignal
+) => {
+      
+      
+      return generatedApiClient<ClusterConstellationResponseType>(
+      {url: `/api/v2/cluster-visualization/constellation`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+  
+
+export const getGetClusterConstellationApiV2ClusterVisualizationConstellationGetQueryKey = (params?: GetClusterConstellationApiV2ClusterVisualizationConstellationGetParams,) => {
+    return [`/api/v2/cluster-visualization/constellation`, ...(params ? [params]: [])] as const;
+    }
+
+    
+export const getGetClusterConstellationApiV2ClusterVisualizationConstellationGetQueryOptions = <TData = Awaited<ReturnType<typeof getClusterConstellationApiV2ClusterVisualizationConstellationGet>>, TError = null | HTTPValidationErrorType>(params?: GetClusterConstellationApiV2ClusterVisualizationConstellationGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClusterConstellationApiV2ClusterVisualizationConstellationGet>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetClusterConstellationApiV2ClusterVisualizationConstellationGetQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getClusterConstellationApiV2ClusterVisualizationConstellationGet>>> = ({ signal }) => getClusterConstellationApiV2ClusterVisualizationConstellationGet(params, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getClusterConstellationApiV2ClusterVisualizationConstellationGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetClusterConstellationApiV2ClusterVisualizationConstellationGetQueryResult = NonNullable<Awaited<ReturnType<typeof getClusterConstellationApiV2ClusterVisualizationConstellationGet>>>
+export type GetClusterConstellationApiV2ClusterVisualizationConstellationGetQueryError = null | HTTPValidationErrorType
+
+
+export function useGetClusterConstellationApiV2ClusterVisualizationConstellationGet<TData = Awaited<ReturnType<typeof getClusterConstellationApiV2ClusterVisualizationConstellationGet>>, TError = null | HTTPValidationErrorType>(
+ params: undefined |  GetClusterConstellationApiV2ClusterVisualizationConstellationGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClusterConstellationApiV2ClusterVisualizationConstellationGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getClusterConstellationApiV2ClusterVisualizationConstellationGet>>,
+          TError,
+          Awaited<ReturnType<typeof getClusterConstellationApiV2ClusterVisualizationConstellationGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetClusterConstellationApiV2ClusterVisualizationConstellationGet<TData = Awaited<ReturnType<typeof getClusterConstellationApiV2ClusterVisualizationConstellationGet>>, TError = null | HTTPValidationErrorType>(
+ params?: GetClusterConstellationApiV2ClusterVisualizationConstellationGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClusterConstellationApiV2ClusterVisualizationConstellationGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getClusterConstellationApiV2ClusterVisualizationConstellationGet>>,
+          TError,
+          Awaited<ReturnType<typeof getClusterConstellationApiV2ClusterVisualizationConstellationGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetClusterConstellationApiV2ClusterVisualizationConstellationGet<TData = Awaited<ReturnType<typeof getClusterConstellationApiV2ClusterVisualizationConstellationGet>>, TError = null | HTTPValidationErrorType>(
+ params?: GetClusterConstellationApiV2ClusterVisualizationConstellationGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClusterConstellationApiV2ClusterVisualizationConstellationGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Получить данные для визуализации созвездия кластеров
+ */
+
+export function useGetClusterConstellationApiV2ClusterVisualizationConstellationGet<TData = Awaited<ReturnType<typeof getClusterConstellationApiV2ClusterVisualizationConstellationGet>>, TError = null | HTTPValidationErrorType>(
+ params?: GetClusterConstellationApiV2ClusterVisualizationConstellationGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClusterConstellationApiV2ClusterVisualizationConstellationGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetClusterConstellationApiV2ClusterVisualizationConstellationGetQueryOptions(params,options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
+ * Получение всех вопросов для кластера
+ * @summary Get Cluster Questions
+ */
+export const getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet = (
+    clusterId: number,
+ signal?: AbortSignal
+) => {
+      
+      
+      return generatedApiClient<unknown>(
+      {url: `/api/v2/cluster-visualization/cluster/${clusterId}/questions`, method: 'GET', signal
+    },
+      );
+    }
+  
+
+export const getGetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetQueryKey = (clusterId?: number,) => {
+    return [`/api/v2/cluster-visualization/cluster/${clusterId}/questions`] as const;
+    }
+
+    
+export const getGetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetQueryOptions = <TData = Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError = null | HTTPValidationErrorType>(clusterId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetQueryKey(clusterId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>> = ({ signal }) => getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet(clusterId, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(clusterId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetQueryResult = NonNullable<Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>>
+export type GetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetQueryError = null | HTTPValidationErrorType
+
+
+export function useGetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet<TData = Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError = null | HTTPValidationErrorType>(
+ clusterId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>,
+          TError,
+          Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet<TData = Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError = null | HTTPValidationErrorType>(
+ clusterId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>,
+          TError,
+          Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet<TData = Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError = null | HTTPValidationErrorType>(
+ clusterId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Cluster Questions
+ */
+
+export function useGetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet<TData = Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError = null | HTTPValidationErrorType>(
+ clusterId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetQueryOptions(clusterId,options)
 
   const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

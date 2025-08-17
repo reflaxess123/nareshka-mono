@@ -88,7 +88,8 @@ class CategoriesService:
                 cluster_id=q.get('cluster_id'),
                 category_id=q.get('category_id'),
                 topic_name=q.get('topic_name'),
-                canonical_question=q.get('canonical_question')
+                canonical_question=q.get('canonical_question'),
+                interview_id=q.get('interview_id')
             )
             for q in questions_data
         ]
@@ -122,7 +123,8 @@ class CategoriesService:
                 cluster_id=q.get('cluster_id'),
                 category_id=q.get('category_id'),
                 topic_name=q.get('topic_name'),
-                canonical_question=q.get('canonical_question')
+                canonical_question=q.get('canonical_question'),
+                interview_id=q.get('interview_id')
             )
             for q in questions_data
         ]
@@ -130,8 +132,9 @@ class CategoriesService:
     def search_questions(
         self,
         search_query: str,
-        category_id: Optional[str] = None,
-        company: Optional[str] = None,
+        category_ids: Optional[List[str]] = None,
+        cluster_ids: Optional[List[int]] = None,
+        companies: Optional[List[str]] = None,
         limit: int = 50,
         offset: int = 0
     ) -> QuestionsListResponse:
@@ -140,15 +143,17 @@ class CategoriesService:
         # Получаем общее количество вопросов
         total_count = self.repository.count_questions(
             search_query=search_query,
-            category_id=category_id,
-            company=company
+            category_ids=category_ids,
+            cluster_ids=cluster_ids,
+            companies=companies
         )
         
         # Получаем вопросы для текущей страницы
         questions_data = self.repository.search_questions(
             search_query=search_query,
-            category_id=category_id,
-            company=company,
+            category_ids=category_ids,
+            cluster_ids=cluster_ids,
+            companies=companies,
             limit=limit,
             offset=offset
         )
@@ -162,7 +167,8 @@ class CategoriesService:
                 cluster_id=q.get('cluster_id'),
                 category_id=q.get('category_id'),
                 topic_name=q.get('topic_name'),
-                canonical_question=q.get('canonical_question')
+                canonical_question=q.get('canonical_question'),
+                interview_id=q.get('interview_id')
             )
             for q in questions_data
         ]
@@ -206,3 +212,28 @@ class CategoriesService:
     def get_total_companies_count(self) -> int:
         """Получить общее количество компаний"""
         return self.repository.count_total_companies()
+    
+    def get_all_clusters(
+        self,
+        category_id: Optional[str] = None,
+        search: Optional[str] = None,
+        limit: int = 100
+    ) -> List[ClusterResponse]:
+        """Получить все кластеры с фильтрацией"""
+        clusters_data = self.repository.get_all_clusters(
+            category_id=category_id,
+            search=search,
+            limit=limit
+        )
+        
+        return [
+            ClusterResponse(
+                id=cluster['id'],
+                name=cluster['name'],
+                category_id=cluster['category_id'],
+                keywords=cluster['keywords'],
+                questions_count=cluster['questions_count'],
+                example_question=cluster.get('example_question')
+            )
+            for cluster in clusters_data
+        ]

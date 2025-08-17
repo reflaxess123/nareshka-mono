@@ -12,6 +12,7 @@ from app.features.interviews.services.categories_service import CategoriesServic
 from app.features.interviews.dto.categories_responses import (
     CategoryResponse,
     CategoryDetailResponse,
+    ClusterResponse,
     QuestionResponse,
     QuestionsListResponse,
     CategoriesStatisticsResponse,
@@ -121,13 +122,17 @@ def search_questions(
         min_length=1, 
         description="Поисковый запрос (минимум 1 символ, * для всех)"
     ),
-    category_id: Optional[str] = Query(
+    category_ids: Optional[List[str]] = Query(
         None, 
-        description="Фильтр по ID категории"
+        description="Фильтр по ID категорий (множественный)"
     ),
-    company: Optional[str] = Query(
+    cluster_ids: Optional[List[int]] = Query(
         None, 
-        description="Фильтр по названию компании"
+        description="Фильтр по ID кластеров (множественный)"
+    ),
+    companies: Optional[List[str]] = Query(
+        None, 
+        description="Фильтр по названиям компаний (множественный)"
     ),
     limit: int = Query(
         50, 
@@ -153,8 +158,9 @@ def search_questions(
     
     return service.search_questions(
         search_query=q,
-        category_id=category_id,
-        company=company,
+        category_ids=category_ids,
+        cluster_ids=cluster_ids,
+        companies=companies,
         limit=limit,
         offset=offset
     )
@@ -193,6 +199,44 @@ def get_total_companies_count(
 ) -> int:
     service = CategoriesService(session)
     return service.get_total_companies_count()
+
+
+@router.get(
+    "/clusters/all",
+    response_model=List[ClusterResponse],
+    summary="Получить все кластеры",
+    description="Возвращает список всех кластеров с возможностью фильтрации по категории"
+)
+def get_all_clusters(
+    category_id: Optional[str] = Query(
+        None, 
+        description="Фильтр по ID категории"
+    ),
+    search: Optional[str] = Query(
+        None,
+        description="Поиск по названию кластера"
+    ),
+    limit: int = Query(
+        100, 
+        ge=1, 
+        le=500, 
+        description="Максимальное количество кластеров"
+    ),
+    session: Session = Depends(get_session),
+    current_user=Depends(get_current_user_optional)
+) -> List[ClusterResponse]:
+    """
+    Получить все кластеры
+    
+    Возвращает список всех кластеров с возможностью фильтрации по категории
+    и поиска по названию.
+    """
+    service = CategoriesService(session)
+    return service.get_all_clusters(
+        category_id=category_id,
+        search=search,
+        limit=limit
+    )
 
 
 @router.get(

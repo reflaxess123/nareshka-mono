@@ -139,7 +139,8 @@ class CategoriesRepository:
                     cluster_id, 
                     category_id, 
                     topic_name, 
-                    canonical_question
+                    canonical_question,
+                    interview_id
                 FROM "InterviewQuestion"
                 WHERE category_id = :category_id
                 {order_clause}
@@ -161,7 +162,8 @@ class CategoriesRepository:
                 'cluster_id': row.cluster_id,
                 'category_id': row.category_id,
                 'topic_name': row.topic_name,
-                'canonical_question': row.canonical_question
+                'canonical_question': row.canonical_question,
+                'interview_id': row.interview_id
             })
         
         return questions
@@ -182,7 +184,8 @@ class CategoriesRepository:
                     cluster_id, 
                     category_id, 
                     topic_name, 
-                    canonical_question
+                    canonical_question,
+                    interview_id
                 FROM "InterviewQuestion"
                 WHERE cluster_id = :cluster_id
                 ORDER BY company, id
@@ -204,7 +207,8 @@ class CategoriesRepository:
                 'cluster_id': row.cluster_id,
                 'category_id': row.category_id,
                 'topic_name': row.topic_name,
-                'canonical_question': row.canonical_question
+                'canonical_question': row.canonical_question,
+                'interview_id': row.interview_id
             })
         
         return questions
@@ -212,8 +216,9 @@ class CategoriesRepository:
     def search_questions(
         self,
         search_query: str,
-        category_id: Optional[str] = None,
-        company: Optional[str] = None,
+        category_ids: Optional[List[str]] = None,
+        cluster_ids: Optional[List[int]] = None,
+        companies: Optional[List[str]] = None,
         limit: int = 50,
         offset: int = 0
     ) -> List[Dict[str, Any]]:
@@ -226,7 +231,8 @@ class CategoriesRepository:
                 cluster_id, 
                 category_id, 
                 topic_name, 
-                canonical_question
+                canonical_question,
+                interview_id
             FROM "InterviewQuestion"
         """
         
@@ -235,16 +241,35 @@ class CategoriesRepository:
         
         # Обработка поискового запроса
         if search_query != '*':
-            conditions.append("LOWER(question_text) LIKE LOWER(:search_pattern)")
-            params['search_pattern'] = f'%{search_query}%'
+            # Проверка на специальный синтаксис interview:ID
+            if search_query.startswith('interview:'):
+                interview_id = search_query.replace('interview:', '')
+                conditions.append("interview_id = :interview_id")
+                params['interview_id'] = interview_id
+            else:
+                conditions.append("LOWER(question_text) LIKE LOWER(:search_pattern)")
+                params['search_pattern'] = f'%{search_query}%'
         
-        if category_id:
-            conditions.append("category_id = :category_id")
-            params['category_id'] = category_id
+        # Множественные категории
+        if category_ids and len(category_ids) > 0:
+            placeholders = ','.join([f':category_{i}' for i in range(len(category_ids))])
+            conditions.append(f"category_id IN ({placeholders})")
+            for i, category_id in enumerate(category_ids):
+                params[f'category_{i}'] = category_id
         
-        if company:
-            conditions.append("LOWER(company) = LOWER(:company)")
-            params['company'] = company
+        # Множественные кластеры
+        if cluster_ids and len(cluster_ids) > 0:
+            placeholders = ','.join([f':cluster_{i}' for i in range(len(cluster_ids))])
+            conditions.append(f"cluster_id IN ({placeholders})")
+            for i, cluster_id in enumerate(cluster_ids):
+                params[f'cluster_{i}'] = cluster_id
+        
+        # Множественные компании
+        if companies and len(companies) > 0:
+            placeholders = ','.join([f':company_{i}' for i in range(len(companies))])
+            conditions.append(f"LOWER(company) IN ({placeholders})")
+            for i, company in enumerate(companies):
+                params[f'company_{i}'] = company.lower()
         
         if conditions:
             query += " WHERE " + " AND ".join(conditions)
@@ -262,7 +287,8 @@ class CategoriesRepository:
                 'cluster_id': row.cluster_id,
                 'category_id': row.category_id,
                 'topic_name': row.topic_name,
-                'canonical_question': row.canonical_question
+                'canonical_question': row.canonical_question,
+                'interview_id': row.interview_id
             })
         
         return questions
@@ -270,8 +296,9 @@ class CategoriesRepository:
     def count_questions(
         self,
         search_query: str,
-        category_id: Optional[str] = None,
-        company: Optional[str] = None
+        category_ids: Optional[List[str]] = None,
+        cluster_ids: Optional[List[int]] = None,
+        companies: Optional[List[str]] = None
     ) -> int:
         """Подсчет количества вопросов для поиска"""
         query = """
@@ -284,16 +311,35 @@ class CategoriesRepository:
         
         # Обработка поискового запроса
         if search_query != '*':
-            conditions.append("LOWER(question_text) LIKE LOWER(:search_pattern)")
-            params['search_pattern'] = f'%{search_query}%'
+            # Проверка на специальный синтаксис interview:ID
+            if search_query.startswith('interview:'):
+                interview_id = search_query.replace('interview:', '')
+                conditions.append("interview_id = :interview_id")
+                params['interview_id'] = interview_id
+            else:
+                conditions.append("LOWER(question_text) LIKE LOWER(:search_pattern)")
+                params['search_pattern'] = f'%{search_query}%'
         
-        if category_id:
-            conditions.append("category_id = :category_id")
-            params['category_id'] = category_id
+        # Множественные категории
+        if category_ids and len(category_ids) > 0:
+            placeholders = ','.join([f':category_{i}' for i in range(len(category_ids))])
+            conditions.append(f"category_id IN ({placeholders})")
+            for i, category_id in enumerate(category_ids):
+                params[f'category_{i}'] = category_id
         
-        if company:
-            conditions.append("LOWER(company) = LOWER(:company)")
-            params['company'] = company
+        # Множественные кластеры
+        if cluster_ids and len(cluster_ids) > 0:
+            placeholders = ','.join([f':cluster_{i}' for i in range(len(cluster_ids))])
+            conditions.append(f"cluster_id IN ({placeholders})")
+            for i, cluster_id in enumerate(cluster_ids):
+                params[f'cluster_{i}'] = cluster_id
+        
+        # Множественные компании
+        if companies and len(companies) > 0:
+            placeholders = ','.join([f':company_{i}' for i in range(len(companies))])
+            conditions.append(f"LOWER(company) IN ({placeholders})")
+            for i, company in enumerate(companies):
+                params[f'company_{i}'] = company.lower()
         
         if conditions:
             query += " WHERE " + " AND ".join(conditions)
@@ -356,3 +402,52 @@ class CategoriesRepository:
         ).scalar()
         
         return result or 0
+    
+    def get_all_clusters(
+        self,
+        category_id: Optional[str] = None,
+        search: Optional[str] = None,
+        limit: int = 100
+    ) -> List[Dict[str, Any]]:
+        """Получить все кластеры с фильтрацией"""
+        query = """
+            SELECT 
+                id, 
+                name, 
+                category_id, 
+                keywords, 
+                questions_count, 
+                example_question
+            FROM "InterviewCluster"
+        """
+        
+        conditions = []
+        params = {'limit': limit}
+        
+        if category_id:
+            conditions.append("category_id = :category_id")
+            params['category_id'] = category_id
+        
+        if search and len(search.strip()) >= 2:
+            conditions.append("LOWER(name) LIKE LOWER(:search)")
+            params['search'] = f'%{search.strip()}%'
+        
+        if conditions:
+            query += " WHERE " + " AND ".join(conditions)
+        
+        query += " ORDER BY questions_count DESC, name ASC LIMIT :limit"
+        
+        result = self.session.execute(text(query), params).fetchall()
+        
+        clusters = []
+        for row in result:
+            clusters.append({
+                'id': row.id,
+                'name': row.name,
+                'category_id': row.category_id,
+                'keywords': row.keywords[:5] if row.keywords else [],  # Ограничиваем количество ключевых слов
+                'questions_count': row.questions_count,
+                'example_question': row.example_question
+            })
+        
+        return clusters
