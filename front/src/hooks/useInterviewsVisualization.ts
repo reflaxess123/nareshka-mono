@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import type { Node, Edge } from '@xyflow/react';
 
 interface CategoryData {
@@ -27,7 +27,11 @@ interface ClusterData {
 export const useInterviewsVisualization = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const [data, setData] = useState<{ nodes: Node[]; edges: Edge[] } | null>(null);
+  const [allData, setAllData] = useState<{
+    categories: CategoryData[];
+    clusterData: ClusterData;
+    categoryCompanies: Record<string, Set<string>>;
+  } | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -60,73 +64,20 @@ export const useInterviewsVisualization = () => {
           ...cat,
           clusters_count: clusterCounts[cat.id] || 0
         }));
-
-        // Трансформируем данные в формат ReactFlow
-        const nodes: Node[] = [];
-        const edges: Edge[] = [];
-
-        const centerX = 800;
-        const centerY = 500;
-        const rootWidth = 300;
-        const rootHeight = 200;
-
-        // Создаем корневой узел
-        nodes.push({
-          id: 'interviews-root',
-          type: 'interviewRoot',
-          position: { x: centerX - rootWidth/2, y: centerY - rootHeight/2 },
-          data: {
-            totalQuestions: categories.reduce((sum, cat) => sum + cat.questions_count, 0),
-            totalClusters: Object.values(clusterCounts).reduce((sum, count) => sum + count, 0),
-            totalCategories: categories.length
-          },
-          draggable: false,
+        
+        // Для упрощения не загружаем компании для каждой категории
+        // Фильтрация будет работать без предварительной загрузки
+        const emptyCategoryCompanies: Record<string, Set<string>> = {};
+        correctedCategories.forEach(cat => {
+          emptyCategoryCompanies[cat.id] = new Set();
         });
-
-        // Создаем узлы категорий
-        const categoryRadius = 520;
-        const sortedCategories = correctedCategories
-          .sort((a, b) => b.questions_count - a.questions_count);
-
-        sortedCategories.forEach((category, index) => {
-          const categoryWidth = 200;
-          const categoryHeight = 120;
-          
-          // Равномерное распределение по кругу
-          const angle = (index / sortedCategories.length) * 2 * Math.PI - Math.PI / 2;
-          const x = centerX + Math.cos(angle) * categoryRadius - categoryWidth/2;
-          const y = centerY + Math.sin(angle) * categoryRadius - categoryHeight/2;
-
-          nodes.push({
-            id: `category-${category.id}`,
-            type: 'interviewCategory',
-            position: { x, y },
-            data: {
-              id: category.id,
-              name: category.name,
-              questionsCount: category.questions_count,
-              clustersCount: category.clusters_count,
-              percentage: category.percentage
-            },
-            draggable: false,
-          });
-
-          // Создаем связь от корня к категории
-          edges.push({
-            id: `root-to-${category.id}`,
-            source: 'interviews-root',
-            target: `category-${category.id}`,
-            type: 'straight',
-            style: { 
-              stroke: '#61dafb', 
-              strokeWidth: 2,
-              opacity: 0.6
-            },
-            animated: false,
-          });
+        
+        setAllData({
+          categories: correctedCategories,
+          clusterData,
+          categoryCompanies: emptyCategoryCompanies
         });
-
-        setData({ nodes, edges });
+        
         setError(null);
       } catch (err) {
         console.error('Error loading interviews visualization:', err);
@@ -138,6 +89,91 @@ export const useInterviewsVisualization = () => {
 
     fetchData();
   }, []);
+  
+  // Создаем визуализацию
+  const data = useMemo(() => {
+    if (!allData) return null;
+    
+    const { categories, clusterData } = allData;
+    const filteredCategories = categories;
+    
+    // Трансформируем данные в формат ReactFlow
+    const nodes: Node[] = [];
+    const edges: Edge[] = [];
+
+    const centerX = 800;
+    const centerY = 500;
+    const rootWidth = 300;
+    const rootHeight = 200;
+    
+    // Подсчитываем кластеры для отфильтрованных категорий
+    const filteredClusterCounts: Record<string, number> = {};
+    if (clusterData.nodes) {
+      clusterData.nodes.forEach(cluster => {
+        if (filteredCategories.some(cat => cat.id === cluster.category_id)) {
+          filteredClusterCounts[cluster.category_id] = (filteredClusterCounts[cluster.category_id] || 0) + 1;
+        }
+      });
+    }
+
+    // Создаем корневой узел
+    nodes.push({
+      id: 'interviews-root',
+      type: 'interviewRoot',
+      position: { x: centerX - rootWidth/2, y: centerY - rootHeight/2 },
+      data: {
+        totalQuestions: filteredCategories.reduce((sum, cat) => sum + cat.questions_count, 0),
+        totalClusters: Object.values(filteredClusterCounts).reduce((sum, count) => sum + count, 0),
+        totalCategories: filteredCategories.length
+      },
+      draggable: false,
+    });
+
+    // Создаем узлы категорий
+    const categoryRadius = 520;
+    const sortedCategories = filteredCategories
+      .sort((a, b) => b.questions_count - a.questions_count);
+
+    sortedCategories.forEach((category, index) => {
+      const categoryWidth = 200;
+      const categoryHeight = 120;
+      
+      // Равномерное распределение по кругу
+      const angle = (index / sortedCategories.length) * 2 * Math.PI - Math.PI / 2;
+      const x = centerX + Math.cos(angle) * categoryRadius - categoryWidth/2;
+      const y = centerY + Math.sin(angle) * categoryRadius - categoryHeight/2;
+
+      nodes.push({
+        id: `category-${category.id}`,
+        type: 'interviewCategory',
+        position: { x, y },
+        data: {
+          id: category.id,
+          name: category.name,
+          questionsCount: category.questions_count,
+          clustersCount: category.clusters_count,
+          percentage: category.percentage
+        },
+        draggable: false,
+      });
+
+      // Создаем связь от корня к категории
+      edges.push({
+        id: `root-to-${category.id}`,
+        source: 'interviews-root',
+        target: `category-${category.id}`,
+        type: 'straight',
+        style: { 
+          stroke: '#61dafb', 
+          strokeWidth: 2,
+          opacity: 0.6
+        },
+        animated: false,
+      });
+    });
+
+    return { nodes, edges };
+  }, [allData]);
 
   return {
     data,

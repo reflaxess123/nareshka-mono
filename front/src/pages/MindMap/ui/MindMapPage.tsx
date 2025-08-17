@@ -21,6 +21,7 @@ import MindMapProgressSidebar from '../../../components/MindMapNodes/MindMapProg
 import TopicNode from '../../../components/MindMapNodes/TopicNode';
 import InterviewRootNode from '../../../components/mindmap/InterviewRootNode';
 import InterviewCategoryNode from '../../../components/mindmap/InterviewCategoryNode';
+import InterviewCategorySidebar from '../../../components/mindmap/InterviewCategorySidebar';
 import { useTaskDetails } from '../../../hooks/useMindMap';
 import { useInterviewsVisualization } from '../../../hooks/useInterviewsVisualization';
 import styles from './MindMapPage.module.scss';
@@ -78,7 +79,16 @@ const NewMindMapPage: React.FC = () => {
     null
   );
   const { task: theoreticalTaskDetail } = useTaskDetails(theoreticalTaskId);
-  
+
+  // Состояние для выбранной категории интервью
+  const [selectedCategory, setSelectedCategory] = useState<{
+    id: string;
+    name: string;
+    questionsCount: number;
+    clustersCount: number;
+    percentage: number;
+  } | null>(null);
+
   // Используем хук для данных интервью
   const interviewsData = useInterviewsVisualization();
 
@@ -100,7 +110,7 @@ const NewMindMapPage: React.FC = () => {
   );
 
   const mindMapData = mindMapResponse?.data as unknown as MindMapData | null;
-  
+
   // Выбираем данные и состояния в зависимости от режима
   const isInterviewsMode = currentTechnology === 'interviews';
   const loading = isInterviewsMode ? interviewsData.isLoading : mindMapLoading;
@@ -109,6 +119,7 @@ const NewMindMapPage: React.FC = () => {
 
   const handleTechnologyChange = useCallback((technology: TechnologyType) => {
     setCurrentTechnology(technology);
+    setSelectedCategory(null); // Сбрасываем выбранную категорию при смене технологии
     // Хук автоматически обновится при изменении параметров
   }, []);
 
@@ -116,12 +127,17 @@ const NewMindMapPage: React.FC = () => {
     // Обработка клика для interviews режима
     if (currentTechnology === 'interviews') {
       if (node.type === 'interviewCategory') {
-        // Можем показать детальную информацию о категории
-        console.log('Клик на категорию интервью:', node.data.name);
+        setSelectedCategory({
+          id: node.data.id as string,
+          name: node.data.name as string,
+          questionsCount: node.data.questionsCount as number,
+          clustersCount: node.data.clustersCount as number,
+          percentage: node.data.percentage as number
+        });
       }
       return;
     }
-    
+
     // Обычная обработка для других технологий
     if (node.type === 'topic' && node.data.topic_key) {
       const topicData: SelectedTopicData = {
@@ -227,6 +243,7 @@ const NewMindMapPage: React.FC = () => {
         />
       </div>
 
+
       <div
         style={{
           width: isSidebarOpen ? 'calc(100% - 400px)' : '100%',
@@ -296,6 +313,18 @@ const NewMindMapPage: React.FC = () => {
         onClose={() => setTheoreticalTaskId(null)}
         task={theoreticalTaskDetail}
       />
+
+      {currentTechnology === 'interviews' && selectedCategory && (
+        <InterviewCategorySidebar
+          isOpen={!!selectedCategory}
+          onClose={() => setSelectedCategory(null)}
+          categoryId={selectedCategory.id}
+          categoryName={selectedCategory.name}
+          questionsCount={selectedCategory.questionsCount}
+          clustersCount={selectedCategory.clustersCount}
+          percentage={selectedCategory.percentage}
+        />
+      )}
 
       <div className={styles.mobileNav}>
         <BottomNavBar />

@@ -237,3 +237,12 @@ sobes-data/analysis/cache/*.npy
 sobes-data/analysis/sobes-data/
 
 /sobes-data/
+/sobes-data/analysis/
+/sobes-data/datasets/
+/sobes-data/initial-data/
+/sobes-data/interviews/
+/sobes-data/scripts/
+/sobes-data/.env
+/sobes-data/interview_cleaner.log
+/sobes-data/requirements.txt
+/sobes-data/Записи_собеседований.txt

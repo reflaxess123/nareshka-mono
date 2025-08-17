@@ -18,7 +18,8 @@ class ClusterNode(BaseModel):
     category_id: str
     category_name: str
     questions_count: int
-    interview_penetration: float
+    interview_count: int  # Количество уникальных интервью
+    interview_penetration: float  # Процент от всех интервью
     keywords: List[str]
     example_question: str
     size: float
@@ -52,9 +53,11 @@ router = APIRouter(
     description="Возвращает узлы и связи для D3.js / ReactFlow графа"
 )
 async def get_cluster_constellation(
-    min_interview_count: int = Query(5, description="Минимальное количество интервью для кластера"),
+    min_interview_count: int = Query(1, description="Минимальное количество интервью для кластера"),
     min_link_weight: int = Query(3, description="Минимальный вес связи для отображения"),
     category_filter: List[str] | None = Query(default=None, description="Фильтр по категориям"),
+    category_id: str | None = Query(default=None, description="Конкретная категория для фильтрации"),
+    limit: int = Query(200, description="Максимальное количество кластеров"),
     session: Session = Depends(get_session),
     current_user = Depends(get_current_user_optional)
 ):
@@ -94,23 +97,27 @@ async def get_cluster_constellation(
             WHERE (
                 :no_filter = TRUE 
                 OR c.category_id = ANY(:category_filter)
+                OR (:single_category_id IS NOT NULL AND c.category_id = :single_category_id)
             )
             GROUP BY c.id, c.name, c.category_id, cat.name, c.keywords, c.questions_count, c.example_question
             HAVING COUNT(DISTINCT q.interview_id) >= :min_interview_count
         )
         SELECT * FROM cluster_stats
         ORDER BY interview_penetration DESC
+        LIMIT :limit
         """
     )
 
-    no_filter = category_filter is None or len(category_filter) == 0
+    no_filter = (category_filter is None or len(category_filter) == 0) and category_id is None
 
     clusters_result = session.execute(
         cluster_query,
         {
             "min_interview_count": min_interview_count,
-            "category_filter": category_filter if not no_filter else [],
+            "category_filter": category_filter if category_filter and len(category_filter) > 0 else [],
+            "single_category_id": category_id,
             "no_filter": no_filter,
+            "limit": limit,
         }
     ).fetchall()
 
@@ -152,6 +159,7 @@ async def get_cluster_constellation(
             category_id=cluster.category_id,
             category_name=cluster.category_name,
             questions_count=cluster.questions_count,
+            interview_count=cluster.interview_count,
             interview_penetration=float(cluster.interview_penetration),
             keywords=cluster.keywords if cluster.keywords else [],
             example_question=cluster.example_question or "",
@@ -195,44 +203,61 @@ async def get_cluster_constellation(
 @router.get("/cluster/{cluster_id}/questions")
 async def get_cluster_questions(
     cluster_id: int,
+    limit: int = Query(10, description="Максимальное количество вопросов"),
     session: Session = Depends(get_session)
 ):
     """Получение всех вопросов для кластера"""
+    
+    # Сначала получаем статистику кластера
+    stats_query = text(
+        """
+        SELECT 
+            c.name as cluster_name,
+            cat.name as category_name,
+            c.questions_count,
+            COUNT(DISTINCT q.interview_id) as unique_interviews,
+            COUNT(*) as total_questions_in_db
+        FROM "InterviewCluster" c
+        LEFT JOIN "InterviewQuestion" q ON c.id = q.cluster_id
+        LEFT JOIN "InterviewCategory" cat ON c.category_id = cat.id
+        WHERE c.id = :cluster_id
+        GROUP BY c.id, c.name, cat.name, c.questions_count
+        """
+    )
+    
+    stats_result = session.execute(stats_query, {"cluster_id": cluster_id}).fetchone()
+    if not stats_result:
+        return {"error": "Кластер не найден", "questions": []}
+    
+    # Затем получаем примеры вопросов
     query = text(
         """
         SELECT 
             q.question_text,
             q.company,
+            q.interview_id,
             ir.position,
             ir.company_name,
             ir.interview_date,
-            ir.duration_minutes,
-            c.name as cluster_name,
-            cat.name as category_name
+            ir.duration_minutes
         FROM "InterviewQuestion" q
         LEFT JOIN "InterviewRecord" ir ON q.interview_id = ir.id
-        LEFT JOIN "InterviewCluster" c ON q.cluster_id = c.id
-        LEFT JOIN "InterviewCategory" cat ON c.category_id = cat.id
         WHERE q.cluster_id = :cluster_id
         ORDER BY 
             CASE WHEN q.company IS NOT NULL THEN 0 ELSE 1 END,
             q.company ASC,
             q.question_text ASC
-        LIMIT 500
+        LIMIT :limit
         """
     )
-    result = session.execute(query, {"cluster_id": cluster_id}).fetchall()
-    if not result:
-        return {"error": "Кластер не найден", "questions": []}
-
-    cluster_name = result[0].cluster_name or "Неизвестный кластер"
-    category_name = result[0].category_name or "Неизвестная категория"
+    result = session.execute(query, {"cluster_id": cluster_id, "limit": limit}).fetchall()
 
     questions = []
     for row in result:
         questions.append({
             "question_text": row.question_text,
             "company": row.company,
+            "interview_id": row.interview_id,
             "position": row.position,
             "company_name": row.company_name,
             "interview_date": row.interview_date.isoformat() if row.interview_date else None,
@@ -241,9 +266,11 @@ async def get_cluster_questions(
 
     return {
         "cluster_id": cluster_id,
-        "cluster_name": cluster_name,
-        "category_name": category_name,
-        "total_questions": len(questions),
+        "cluster_name": stats_result.cluster_name,
+        "category_name": stats_result.category_name,
+        "total_questions": stats_result.questions_count,
+        "unique_interviews": stats_result.unique_interviews,
+        "total_questions_in_db": stats_result.total_questions_in_db,
         "questions": questions,
     }
 
