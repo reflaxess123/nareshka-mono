@@ -15,6 +15,7 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import React, { useCallback, useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { TaskDetailModal } from '../../../components/mindmap/TaskDetailModal';
 import CenterNode from '../../../components/MindMapNodes/CenterNode';
 import MindMapProgressSidebar from '../../../components/MindMapNodes/MindMapProgressSidebar';
@@ -67,20 +68,23 @@ const interviewNodeTypes: NodeTypes = {
 };
 
 const NewMindMapPage: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [selectedTopic, setSelectedTopic] = useState<SelectedTopicData | null>(
     null
   );
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [currentTechnology, setCurrentTechnology] =
-    useState<TechnologyType>('javascript');
   const [theoreticalTaskId, setTheoreticalTaskId] = useState<string | null>(
     null
   );
   const { task: theoreticalTaskDetail } = useTaskDetails(theoreticalTaskId);
 
+  // Получаем текущую технологию из URL параметров
+  const currentTechnology = (searchParams.get('tech') as TechnologyType) || 'javascript';
+  
   // Состояние для выбранной категории интервью
+  const selectedCategoryId = searchParams.get('category');
   const [selectedCategory, setSelectedCategory] = useState<{
     id: string;
     name: string;
@@ -118,22 +122,35 @@ const NewMindMapPage: React.FC = () => {
   const nodeTypes = isInterviewsMode ? interviewNodeTypes : defaultNodeTypes;
 
   const handleTechnologyChange = useCallback((technology: TechnologyType) => {
-    setCurrentTechnology(technology);
-    setSelectedCategory(null); // Сбрасываем выбранную категорию при смене технологии
-    // Хук автоматически обновится при изменении параметров
-  }, []);
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('tech', technology);
+    // Сбрасываем категорию при смене технологии
+    if (newParams.has('category')) {
+      newParams.delete('category');
+    }
+    setSearchParams(newParams);
+    setSelectedCategory(null);
+  }, [searchParams, setSearchParams]);
 
   const onNodeClick = useCallback((_event: React.MouseEvent, node: Node) => {
     // Обработка клика для interviews режима
     if (currentTechnology === 'interviews') {
       if (node.type === 'interviewCategory') {
-        setSelectedCategory({
+        const categoryData = {
           id: node.data.id as string,
           name: node.data.name as string,
           questionsCount: node.data.questionsCount as number,
           clustersCount: node.data.clustersCount as number,
           percentage: node.data.percentage as number
-        });
+        };
+        
+        // Обновляем URL с параметром category
+        const newParams = new URLSearchParams(searchParams);
+        newParams.set('tech', 'interviews');
+        newParams.set('category', categoryData.id);
+        setSearchParams(newParams);
+        
+        setSelectedCategory(categoryData);
       }
       return;
     }
@@ -150,7 +167,7 @@ const NewMindMapPage: React.FC = () => {
       setSelectedTopic(topicData);
       setIsSidebarOpen(true);
     }
-  }, [currentTechnology]);
+  }, [currentTechnology, searchParams, setSearchParams]);
 
   const handleCloseSidebar = useCallback(() => {
     setIsSidebarOpen(false);
@@ -161,6 +178,29 @@ const NewMindMapPage: React.FC = () => {
     // Переход к редактору кода
     window.location.href = `/code-editor?blockId=${taskId}`;
   }, []);
+
+  // Синхронизируем selectedCategory с URL параметром
+  useEffect(() => {
+    if (currentTechnology === 'interviews' && selectedCategoryId && interviewsData.data) {
+      // Находим данные категории из nodes
+      const categoryNode = interviewsData.data.nodes.find(
+        node => node.type === 'interviewCategory' && node.data.id === selectedCategoryId
+      );
+      
+      if (categoryNode && (!selectedCategory || selectedCategory.id !== selectedCategoryId)) {
+        setSelectedCategory({
+          id: categoryNode.data.id as string,
+          name: categoryNode.data.name as string,
+          questionsCount: categoryNode.data.questionsCount as number,
+          clustersCount: categoryNode.data.clustersCount as number,
+          percentage: categoryNode.data.percentage as number
+        });
+      }
+    } else if (!selectedCategoryId && selectedCategory) {
+      // Если в URL нет category, но в state есть - сбрасываем
+      setSelectedCategory(null);
+    }
+  }, [selectedCategoryId, currentTechnology, interviewsData.data]);
 
   // Обновляем nodes и edges при изменении данных
   useEffect(() => {
@@ -317,7 +357,16 @@ const NewMindMapPage: React.FC = () => {
       {currentTechnology === 'interviews' && selectedCategory && (
         <InterviewCategorySidebar
           isOpen={!!selectedCategory}
-          onClose={() => setSelectedCategory(null)}
+          onClose={() => {
+            // Удаляем category из URL при закрытии sidebar
+            const newParams = new URLSearchParams(searchParams);
+            if (newParams.has('category')) {
+              newParams.delete('category');
+            }
+            setSearchParams(newParams);
+            // НЕ вызываем setSelectedCategory(null) здесь - 
+            // useEffect сам сбросит state при изменении URL
+          }}
           categoryId={selectedCategory.id}
           categoryName={selectedCategory.name}
           questionsCount={selectedCategory.questionsCount}

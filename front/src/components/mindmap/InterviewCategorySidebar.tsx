@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import styles from './InterviewCategorySidebar.module.scss';
 
 interface ClusterInfo {
@@ -203,6 +204,19 @@ export const InterviewCategorySidebar: React.FC<InterviewCategorySidebarProps> =
                 <span className={styles.statValue}>{percentage.toFixed(1)}%</span>
                 <span className={styles.statLabel}>от всех</span>
               </div>
+            </div>
+          </div>
+
+          {/* Ссылка на полную базу вопросов */}
+          <div className={styles.viewAllLink}>
+            <Link 
+              to={`/questions-database?cat=${categoryId}`}
+              className={styles.viewAllButton}
+            >
+              📋 Посмотреть все {questionsCount.toLocaleString('ru-RU')} вопросов
+            </Link>
+            <div className={styles.viewAllHint}>
+              Перейти к полной базе данных с фильтрацией и поиском
             </div>
           </div>
         </div>
