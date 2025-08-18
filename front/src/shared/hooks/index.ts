@@ -5,3 +5,4 @@ export * from './useAuth';
 export * from './useContentBlocks';
 export { usePageTransition } from './usePageTransition';
 export { useRole } from './useRole';
+export { useUrlState, type FilterState } from './useUrlState';

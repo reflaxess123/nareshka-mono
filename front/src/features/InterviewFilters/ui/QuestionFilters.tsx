@@ -1,15 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronDown, ChevronUp, X, Search } from 'lucide-react';
+import { type FilterState } from '@/shared/hooks';
 import styles from './QuestionFilters.module.scss';
-
-// Интерфейсы
-export interface FilterState {
-  categories: string[];
-  clusters: number[];
-  companies: string[];
-  search: string;
-}
 
 interface Category {
   id: string;
@@ -38,12 +31,14 @@ interface Company {
 interface QuestionFiltersProps {
   filters: FilterState;
   onFiltersChange: (filters: FilterState) => void;
+  onReset?: () => void;
   className?: string;
 }
 
-export const QuestionFilters: React.FC<QuestionFiltersProps> = ({
+const QuestionFiltersComponent: React.FC<QuestionFiltersProps> = ({
   filters,
   onFiltersChange,
+  onReset,
   className,
 }) => {
   const [expandedSections, setExpandedSections] = useState({
@@ -157,15 +152,19 @@ export const QuestionFilters: React.FC<QuestionFiltersProps> = ({
   }, [filters, onFiltersChange]);
 
   const handleReset = useCallback(() => {
-    onFiltersChange({
-      categories: [],
-      clusters: [],
-      companies: [],
-      search: '',
-    });
+    if (onReset) {
+      onReset();
+    } else {
+      onFiltersChange({
+        categories: [],
+        clusters: [],
+        companies: [],
+        search: '',
+      });
+    }
     setClusterSearch('');
     setCompanySearch('');
-  }, [onFiltersChange]);
+  }, [onReset, onFiltersChange]);
 
   const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections((prev) => ({
@@ -353,3 +352,5 @@ export const QuestionFilters: React.FC<QuestionFiltersProps> = ({
     </div>
   );
 };
+
+export const QuestionFilters = React.memo(QuestionFiltersComponent);

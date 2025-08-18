@@ -231,18 +231,5 @@ NUL
 #sobes-data/datasets
 #sobes-data
 
-# BERTopic models and embeddings cache
-sobes-data/analysis/outputs_bertopic/bertopic_model/
-sobes-data/analysis/cache/*.npy
-sobes-data/analysis/sobes-data/
-
-/sobes-data/
-/sobes-data/analysis/
-/sobes-data/datasets/
-/sobes-data/initial-data/
-/sobes-data/interviews/
-/sobes-data/scripts/
-/sobes-data/.env
-/sobes-data/interview_cleaner.log
-/sobes-data/requirements.txt
-/sobes-data/Записи_собеседований.txt
+# Exclude entire sobes-data directory
+sobes-data/

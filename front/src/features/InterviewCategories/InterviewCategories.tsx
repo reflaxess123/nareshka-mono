@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Search, X } from 'lucide-react';
-import { QuestionFilters, type FilterState } from '@/features/InterviewFilters';
+import { QuestionFilters } from '@/features/InterviewFilters';
+import { useUrlState, type FilterState } from '@/shared/hooks';
 import styles from './InterviewCategories.module.scss';
 
 interface Question {
@@ -17,43 +18,19 @@ interface Question {
 
 
 export const InterviewCategories: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filters, setFilters] = useState<FilterState>({
-    categories: [],
-    clusters: [],
-    companies: [],
-    search: '',
-  });
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const { filters, currentPage, updateFilters, updatePage, resetFilters } = useUrlState();
+  const [totalPages, setTotalPages] = React.useState(1);
   const ITEMS_PER_PAGE = 50;
 
   // Helper functions
   const handleFiltersChange = useCallback((newFilters: FilterState) => {
-    setFilters(newFilters);
-    setCurrentPage(1);
-  }, []);
+    updateFilters(newFilters);
+  }, [updateFilters]);
 
-  const clearAllFilters = () => {
-    setFilters({
-      categories: [],
-      clusters: [],
-      companies: [],
-      search: '',
-    });
-    setSearchQuery('');
-    setCurrentPage(1);
-  };
+  const clearAllFilters = useCallback(() => {
+    resetFilters();
+  }, [resetFilters]);
   
-  // Загрузка общего количества компаний (для статистики)
-  const { data: totalCompaniesCount } = useQuery<number>({
-    queryKey: ['total-companies-count'],
-    queryFn: async () => {
-      const response = await fetch('/api/v2/interview-categories/companies/count');
-      if (!response.ok) throw new Error('Failed to fetch companies count');
-      return response.json();
-    }
-  });
 
   // Always fetch questions - всегда показываем вопросы
   const shouldFetchQuestions = true;
@@ -62,7 +39,7 @@ export const InterviewCategories: React.FC = () => {
     const params = new URLSearchParams();
     
     // Поисковый запрос
-    const searchTerm = filters.search || searchQuery;
+    const searchTerm = filters.search;
     if (searchTerm.length >= 2) {
       params.append('q', searchTerm);
     } else {
@@ -91,7 +68,7 @@ export const InterviewCategories: React.FC = () => {
 
   // Unified questions query with pagination
   const { data: questionsData, isLoading: questionsLoading } = useQuery<{questions: Question[], total: number}>({
-    queryKey: ['questions', filters, searchQuery, currentPage],
+    queryKey: ['questions', filters, currentPage],
     queryFn: async () => {
       const queryString = buildQuestionsQuery();
       const response = await fetch(`/api/v2/interview-categories/search/questions?${queryString}`);
@@ -119,14 +96,12 @@ export const InterviewCategories: React.FC = () => {
 
 
   // Handle search input
-  const handleSearchChange = (value: string) => {
-    setSearchQuery(value);
-    setFilters(prev => ({
-      ...prev,
+  const handleSearchChange = useCallback((value: string) => {
+    updateFilters({
+      ...filters,
       search: value
-    }));
-    setCurrentPage(1);
-  };
+    });
+  }, [filters, updateFilters]);
 
   // Handle question click - copy to clipboard
   const handleQuestionSelect = async (question: Question) => {
@@ -140,17 +115,14 @@ export const InterviewCategories: React.FC = () => {
   };
 
   // Filter by same interview
-  const handleShowSameInterview = (interviewId: string) => {
-    setFilters(prev => ({
-      ...prev,
+  const handleShowSameInterview = useCallback((interviewId: string) => {
+    updateFilters({
       categories: [],
       clusters: [],
       companies: [],
       search: `interview:${interviewId}`
-    }));
-    setSearchQuery(`interview:${interviewId}`);
-    setCurrentPage(1);
-  };
+    });
+  }, [updateFilters]);
 
   // Memoized interview counts for performance
   const interviewCounts = React.useMemo(() => {
@@ -177,11 +149,9 @@ export const InterviewCategories: React.FC = () => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Statistics
-  const totalCompanies = totalCompaniesCount || 0;
   
-  // Helper to generate filter tags for display
-  const getActiveFilterTags = () => {
+  // Helper to generate filter tags for display (memoized)
+  const activeFilterTags = React.useMemo(() => {
     const tags = [];
     
     if (filters.search) {
@@ -201,28 +171,28 @@ export const InterviewCategories: React.FC = () => {
     });
     
     return tags;
-  };
+  }, [filters]);
   
-  const activeFilterTags = getActiveFilterTags();
-  
-  const removeFilterTag = (tag: { type: string; value: string }) => {
-    setFilters(prev => {
-      switch (tag.type) {
-        case 'search':
-          setSearchQuery('');
-          return { ...prev, search: '' };
-        case 'category':
-          return { ...prev, categories: prev.categories.filter(id => id !== tag.value) };
-        case 'cluster':
-          return { ...prev, clusters: prev.clusters.filter(id => id.toString() !== tag.value) };
-        case 'company':
-          return { ...prev, companies: prev.companies.filter(name => name !== tag.value) };
-        default:
-          return prev;
-      }
-    });
-    setCurrentPage(1);
-  };
+  const removeFilterTag = useCallback((tag: { type: string; value: string }) => {
+    const newFilters = { ...filters };
+    
+    switch (tag.type) {
+      case 'search':
+        newFilters.search = '';
+        break;
+      case 'category':
+        newFilters.categories = newFilters.categories.filter(id => id !== tag.value);
+        break;
+      case 'cluster':
+        newFilters.clusters = newFilters.clusters.filter(id => id.toString() !== tag.value);
+        break;
+      case 'company':
+        newFilters.companies = newFilters.companies.filter(name => name !== tag.value);
+        break;
+    }
+    
+    updateFilters(newFilters);
+  }, [filters, updateFilters]);
 
   return (
     <div className={styles.container}>
@@ -234,11 +204,11 @@ export const InterviewCategories: React.FC = () => {
             id="question-search"
             type="text"
             placeholder="Поиск вопросов... (Ctrl+K)"
-            value={searchQuery}
+            value={filters.search}
             onChange={(e) => handleSearchChange(e.target.value)}
             className={styles.searchInput}
           />
-          {searchQuery && (
+          {filters.search && (
             <button
               onClick={() => handleSearchChange('')}
               className={styles.clearSearchButton}
@@ -271,32 +241,6 @@ export const InterviewCategories: React.FC = () => {
         </div>
       )}
       
-      {/* Statistics Bar */}
-      <div className={styles.statisticsBar}>
-        <div className={styles.statItem}>
-          <span className={styles.statValue}>
-            {totalQuestions.toLocaleString()}
-          </span>
-          <span className={styles.statLabel}>
-            {activeFilterTags.length > 0 || searchQuery ? 'найдено вопросов' : 'всего вопросов'}
-          </span>
-        </div>
-        {totalQuestions > 0 && (
-          <>
-            <div className={styles.statSeparator}>•</div>
-            <div className={styles.statItem}>
-              <span className={styles.statValue}>{currentPage}</span>
-              <span className={styles.statLabel}>из {totalPages}</span>
-            </div>
-          </>
-        )}
-        <div className={styles.statSeparator}>•</div>
-        <div className={styles.statSeparator}>•</div>
-        <div className={styles.statItem}>
-          <span className={styles.statValue}>{totalCompanies}</span>
-          <span className={styles.statLabel}>компаний</span>
-        </div>
-      </div>
 
       
 
@@ -371,7 +315,7 @@ export const InterviewCategories: React.FC = () => {
                   <div className={styles.paginationControls}>
                     <button
                       className={styles.paginationButton}
-                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                      onClick={() => updatePage(Math.max(1, currentPage - 1))}
                       disabled={currentPage === 1}
                     >
                       ← Предыдущая
@@ -394,7 +338,7 @@ export const InterviewCategories: React.FC = () => {
                           <button
                             key={pageNum}
                             className={`${styles.paginationButton} ${currentPage === pageNum ? styles.active : ''}`}
-                            onClick={() => setCurrentPage(pageNum)}
+                            onClick={() => updatePage(pageNum)}
                           >
                             {pageNum}
                           </button>
@@ -404,7 +348,7 @@ export const InterviewCategories: React.FC = () => {
                     
                     <button
                       className={styles.paginationButton}
-                      onClick={() => setCurrentPage(prev => Math.min(totalPages || 1, prev + 1))}
+                      onClick={() => updatePage(Math.min(totalPages || 1, currentPage + 1))}
                       disabled={currentPage === totalPages}
                     >
                       Следующая →
@@ -427,6 +371,7 @@ export const InterviewCategories: React.FC = () => {
             <QuestionFilters 
               filters={filters}
               onFiltersChange={handleFiltersChange}
+              onReset={clearAllFilters}
               className={styles.filters}
             />
           </div>
