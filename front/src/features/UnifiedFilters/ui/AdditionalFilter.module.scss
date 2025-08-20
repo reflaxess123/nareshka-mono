@@ -1,0 +1,72 @@
+.additionalFilter {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: var(--bg-secondary);
+  }
+}
+
+.checkbox {
+  width: 18px !important;
+  height: 18px !important;
+  accent-color: #3b82f6 !important;
+  cursor: pointer;
+  margin: 0 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-block !important;
+  appearance: auto !important;
+  
+  &:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+}
+
+.labelText {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.4;
+  user-select: none;
+}
+
+.icon {
+  font-size: 16px;
+}
+
+// Мобильная адаптивность
+@media (max-width: 768px) {
+  .checkboxLabel {
+    padding: 12px 8px;
+  }
+  
+  .labelText {
+    font-size: 15px;
+  }
+  
+  .checkbox {
+    width: 20px;
+    height: 20px;
+  }
+}

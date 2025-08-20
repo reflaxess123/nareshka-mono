@@ -1,0 +1,122 @@
+.activeFilterTags {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.tagsContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.tags {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background-color: var(--primary-color-alpha);
+  border: 1px solid var(--primary-color);
+  border-radius: 16px;
+  font-size: 12px;
+  color: var(--primary-color);
+  max-width: 200px;
+  
+  &:hover {
+    background-color: var(--primary-color-light);
+  }
+}
+
+.tagLabel {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+.removeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: var(--primary-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  
+  &:hover {
+    background-color: var(--primary-color);
+    color: white;
+  }
+  
+  &:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 1px;
+  }
+}
+
+.clearAllButton {
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid var(--text-tertiary);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  
+  &:hover {
+    background-color: var(--bg-secondary);
+    border-color: var(--text-secondary);
+    color: var(--text-primary);
+  }
+  
+  &:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+  }
+}
+
+// Мобильная адаптивность
+@media (max-width: 768px) {
+  .activeFilterTags {
+    padding: 8px 0;
+  }
+  
+  .tagsContainer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  
+  .tags {
+    justify-content: flex-start;
+  }
+  
+  .tag {
+    max-width: none;
+    font-size: 13px;
+    padding: 6px 10px;
+  }
+  
+  .clearAllButton {
+    align-self: flex-start;
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+}

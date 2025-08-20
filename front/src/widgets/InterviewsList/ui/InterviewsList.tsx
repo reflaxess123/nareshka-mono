@@ -1,13 +1,23 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { InterviewCard, InterviewSkeletonList } from '../../../entities/Interview';
-import { InterviewFilters, type InterviewFiltersType } from '../../../features/InterviewFilters';
 import { getInterviewsApiV2InterviewsGet } from '../../../shared/api/generated/api';
 import { useInfiniteScroll } from '../../../shared/hooks/useInfiniteScroll';
 import type { InterviewRecordResponseType } from '../../../shared/api/generated/api';
+import type { UnifiedFilterState } from '../../../features/UnifiedFilters';
+import { adaptToInterviewFilters } from '../../../features/UnifiedFilters';
 import styles from './InterviewsList.module.scss';
 
-export const InterviewsList: React.FC = () => {
-  const [filters, setFilters] = useState<InterviewFiltersType>({});
+interface InterviewsListProps {
+  filters: UnifiedFilterState;
+  onFiltersChange?: (filters: UnifiedFilterState) => void;
+  className?: string;
+}
+
+export const InterviewsList: React.FC<InterviewsListProps> = ({
+  filters,
+  onFiltersChange,
+  className,
+}) => {
   const [page, setPage] = useState(1);
   const [allInterviews, setAllInterviews] = useState<InterviewRecordResponseType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -28,12 +38,11 @@ export const InterviewsList: React.FC = () => {
         setIsLoadingMore(true);
       }
 
+      const adaptedFilters = adaptToInterviewFilters(filters);
       const response = await getInterviewsApiV2InterviewsGet({
         page: pageNum,
         limit,
-        companies: filters.companies,
-        search: filters.search,
-        has_audio: filters.has_audio,
+        ...adaptedFilters,
       });
 
       if (response && response.interviews) {
@@ -61,7 +70,7 @@ export const InterviewsList: React.FC = () => {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [filters.companies, filters.search, filters.has_audio, limit, isInitialLoad]);
+  }, [filters, limit, isInitialLoad]);
 
   // Initial load and filters change
   useEffect(() => {
@@ -85,14 +94,11 @@ export const InterviewsList: React.FC = () => {
     threshold: 200
   });
 
-  const handleFiltersChange = useCallback((newFilters: InterviewFiltersType) => {
-    setFilters(newFilters);
-  }, []);
 
 
   if (error) {
     return (
-      <div className={styles.container}>
+      <div className={`${styles.container} ${className || ''}`}>
         <div className={styles.error}>
           <h2>Ошибка загрузки данных</h2>
           <p>Не удалось загрузить список интервью. Попробуйте обновить страницу.</p>
@@ -104,11 +110,7 @@ export const InterviewsList: React.FC = () => {
   // Initial loading with skeleton (только при самой первой загрузке)
   if (isInitialLoad && isLoading) {
     return (
-      <div className={styles.container}>
-        <InterviewFilters
-          filters={filters}
-          onFiltersChange={handleFiltersChange}
-        />
+      <div className={`${styles.container} ${className || ''}`}>
         <div className={styles.grid}>
           <InterviewSkeletonList count={8} />
         </div>
@@ -118,12 +120,7 @@ export const InterviewsList: React.FC = () => {
 
   if (allInterviews.length === 0 && !isLoading && !isInitialLoad) {
     return (
-      <div className={styles.container}>
-        <InterviewFilters
-          filters={filters}
-          onFiltersChange={handleFiltersChange}
-          resultsCount={0}
-        />
+      <div className={`${styles.container} ${className || ''}`}>
         <div className={styles.empty}>
           <h2>Интервью не найдены</h2>
           <p>Попробуйте изменить параметры поиска или очистить фильтры.</p>
@@ -133,17 +130,16 @@ export const InterviewsList: React.FC = () => {
   }
 
   return (
-    <div className={styles.container}>
-      <InterviewFilters
-        filters={filters}
-        onFiltersChange={handleFiltersChange}
-        resultsCount={total}
-      />
-
+    <div className={`${styles.container} ${className || ''}`}>
       <div className={styles.resultsInfo}>
-        Показано {allInterviews.length} из {total} интервью
+        <span>📊 Показано {allInterviews.length} из {total.toLocaleString()} интервью</span>
         {isLoading && !isInitialLoad && (
-          <span className={styles.filterLoadingText}> • Загрузка...</span>
+          <span className={styles.filterLoadingText}>• Обновление...</span>
+        )}
+        {hasNextPage && !isLoading && (
+          <span style={{ color: 'var(--text-tertiary)', fontSize: '0.8rem' }}>
+            • Прокрутите для загрузки ещё
+          </span>
         )}
       </div>
 
@@ -168,7 +164,7 @@ export const InterviewsList: React.FC = () => {
       {/* Show "end of list" indicator when no more pages */}
       {!hasNextPage && allInterviews.length > 0 && (
         <div className={styles.endOfList}>
-          <p>Все интервью загружены</p>
+          <p>✅ Все интервью загружены ({total.toLocaleString()} всего)</p>
         </div>
       )}
     </div>

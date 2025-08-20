@@ -44,15 +44,6 @@ export const Sidebar = ({ children }: { children: React.ReactNode }) => {
           />
 
           <Link
-            text="Редактор кода"
-            className={styles.link}
-            icon={<Code size={24} />}
-            isParentHovered={isOpen}
-            to={AppRoutes.CODE_EDITOR}
-            variant="sidebar"
-          />
-
-          <Link
             text="Собеседования"
             className={styles.link}
             icon={<MessageSquare size={24} />}
@@ -76,6 +67,15 @@ export const Sidebar = ({ children }: { children: React.ReactNode }) => {
             icon={<Bird size={24} />}
             isParentHovered={isOpen}
             to={AppRoutes.TASKS}
+            variant="sidebar"
+          />
+
+          <Link
+            text="Редактор кода"
+            className={styles.link}
+            icon={<Code size={24} />}
+            isParentHovered={isOpen}
+            to={AppRoutes.CODE_EDITOR}
             variant="sidebar"
           />
         </div>

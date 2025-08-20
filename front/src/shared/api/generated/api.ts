@@ -320,6 +320,7 @@ export interface ClusterNodeType {
   category_id: string;
   category_name: string;
   questions_count: number;
+  interview_count: number;
   interview_penetration: number;
   keywords: string[];
   example_question: string;
@@ -991,6 +992,11 @@ export type QuestionResponseTypeTopicName = string | null;
 export type QuestionResponseTypeCanonicalQuestion = string | null;
 
 /**
+ * ID интервью
+ */
+export type QuestionResponseTypeInterviewId = string | null;
+
+/**
  * Модель ответа для вопроса
  */
 export interface QuestionResponseType {
@@ -1008,6 +1014,8 @@ export interface QuestionResponseType {
   topic_name?: QuestionResponseTypeTopicName;
   /** Канонический вопрос */
   canonical_question?: QuestionResponseTypeCanonicalQuestion;
+  /** ID интервью */
+  interview_id?: QuestionResponseTypeInterviewId;
 }
 
 /**
@@ -2248,13 +2256,17 @@ export type SearchQuestionsApiV2InterviewCategoriesSearchQuestionsGetParams = {
  */
 q: string;
 /**
- * Фильтр по ID категории
+ * Фильтр по ID категорий (множественный)
  */
-category_id?: string | null;
+category_ids?: string[] | null;
 /**
- * Фильтр по названию компании
+ * Фильтр по ID кластеров (множественный)
  */
-company?: string | null;
+cluster_ids?: number[] | null;
+/**
+ * Фильтр по названиям компаний (множественный)
+ */
+companies?: string[] | null;
 /**
  * Максимальное количество результатов
  * @minimum 1
@@ -2273,6 +2285,23 @@ export type GetTopCompaniesEndpointApiV2InterviewCategoriesCompaniesTopGetParams
  * Количество компаний в топе
  * @minimum 1
  * @maximum 100
+ */
+limit?: number;
+};
+
+export type GetAllClustersApiV2InterviewCategoriesClustersAllGetParams = {
+/**
+ * Фильтр по ID категории
+ */
+category_id?: string | null;
+/**
+ * Поиск по названию кластера
+ */
+search?: string | null;
+/**
+ * Максимальное количество кластеров
+ * @minimum 1
+ * @maximum 500
  */
 limit?: number;
 };
@@ -2308,6 +2337,21 @@ min_link_weight?: number;
  * Фильтр по категориям
  */
 category_filter?: string[] | null;
+/**
+ * Конкретная категория для фильтрации
+ */
+category_id?: string | null;
+/**
+ * Максимальное количество кластеров
+ */
+limit?: number;
+};
+
+export type GetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetParams = {
+/**
+ * Максимальное количество вопросов
+ */
+limit?: number;
 };
 
 export type GetTheoryCardsApiV2TheoryCardsGetParams = {
@@ -4665,6 +4709,96 @@ export function useGetTotalCompaniesCountApiV2InterviewCategoriesCompaniesCountG
 
 
 /**
+ * Возвращает список всех кластеров с возможностью фильтрации по категории
+ * @summary Получить все кластеры
+ */
+export const getAllClustersApiV2InterviewCategoriesClustersAllGet = (
+    params?: GetAllClustersApiV2InterviewCategoriesClustersAllGetParams,
+ signal?: AbortSignal
+) => {
+      
+      
+      return generatedApiClient<ClusterResponseType[]>(
+      {url: `/api/v2/interview-categories/clusters/all`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+  
+
+export const getGetAllClustersApiV2InterviewCategoriesClustersAllGetQueryKey = (params?: GetAllClustersApiV2InterviewCategoriesClustersAllGetParams,) => {
+    return [`/api/v2/interview-categories/clusters/all`, ...(params ? [params]: [])] as const;
+    }
+
+    
+export const getGetAllClustersApiV2InterviewCategoriesClustersAllGetQueryOptions = <TData = Awaited<ReturnType<typeof getAllClustersApiV2InterviewCategoriesClustersAllGet>>, TError = null | HTTPValidationErrorType | null>(params?: GetAllClustersApiV2InterviewCategoriesClustersAllGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllClustersApiV2InterviewCategoriesClustersAllGet>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAllClustersApiV2InterviewCategoriesClustersAllGetQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllClustersApiV2InterviewCategoriesClustersAllGet>>> = ({ signal }) => getAllClustersApiV2InterviewCategoriesClustersAllGet(params, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAllClustersApiV2InterviewCategoriesClustersAllGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAllClustersApiV2InterviewCategoriesClustersAllGetQueryResult = NonNullable<Awaited<ReturnType<typeof getAllClustersApiV2InterviewCategoriesClustersAllGet>>>
+export type GetAllClustersApiV2InterviewCategoriesClustersAllGetQueryError = null | HTTPValidationErrorType | null
+
+
+export function useGetAllClustersApiV2InterviewCategoriesClustersAllGet<TData = Awaited<ReturnType<typeof getAllClustersApiV2InterviewCategoriesClustersAllGet>>, TError = null | HTTPValidationErrorType | null>(
+ params: undefined |  GetAllClustersApiV2InterviewCategoriesClustersAllGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllClustersApiV2InterviewCategoriesClustersAllGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllClustersApiV2InterviewCategoriesClustersAllGet>>,
+          TError,
+          Awaited<ReturnType<typeof getAllClustersApiV2InterviewCategoriesClustersAllGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAllClustersApiV2InterviewCategoriesClustersAllGet<TData = Awaited<ReturnType<typeof getAllClustersApiV2InterviewCategoriesClustersAllGet>>, TError = null | HTTPValidationErrorType | null>(
+ params?: GetAllClustersApiV2InterviewCategoriesClustersAllGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllClustersApiV2InterviewCategoriesClustersAllGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllClustersApiV2InterviewCategoriesClustersAllGet>>,
+          TError,
+          Awaited<ReturnType<typeof getAllClustersApiV2InterviewCategoriesClustersAllGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAllClustersApiV2InterviewCategoriesClustersAllGet<TData = Awaited<ReturnType<typeof getAllClustersApiV2InterviewCategoriesClustersAllGet>>, TError = null | HTTPValidationErrorType | null>(
+ params?: GetAllClustersApiV2InterviewCategoriesClustersAllGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllClustersApiV2InterviewCategoriesClustersAllGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Получить все кластеры
+ */
+
+export function useGetAllClustersApiV2InterviewCategoriesClustersAllGet<TData = Awaited<ReturnType<typeof getAllClustersApiV2InterviewCategoriesClustersAllGet>>, TError = null | HTTPValidationErrorType | null>(
+ params?: GetAllClustersApiV2InterviewCategoriesClustersAllGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllClustersApiV2InterviewCategoriesClustersAllGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAllClustersApiV2InterviewCategoriesClustersAllGetQueryOptions(params,options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
  * Возвращает подробную информацию о категории с кластерами и примерами
  * @summary Получить детали категории
  */
@@ -4947,32 +5081,36 @@ export function useGetClusterConstellationApiV2ClusterVisualizationConstellation
  */
 export const getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet = (
     clusterId: number,
+    params?: GetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetParams,
  signal?: AbortSignal
 ) => {
       
       
       return generatedApiClient<unknown>(
-      {url: `/api/v2/cluster-visualization/cluster/${clusterId}/questions`, method: 'GET', signal
+      {url: `/api/v2/cluster-visualization/cluster/${clusterId}/questions`, method: 'GET',
+        params, signal
     },
       );
     }
   
 
-export const getGetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetQueryKey = (clusterId?: number,) => {
-    return [`/api/v2/cluster-visualization/cluster/${clusterId}/questions`] as const;
+export const getGetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetQueryKey = (clusterId?: number,
+    params?: GetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetParams,) => {
+    return [`/api/v2/cluster-visualization/cluster/${clusterId}/questions`, ...(params ? [params]: [])] as const;
     }
 
     
-export const getGetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetQueryOptions = <TData = Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError = null | HTTPValidationErrorType>(clusterId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError, TData>>, }
+export const getGetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetQueryOptions = <TData = Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError = null | HTTPValidationErrorType>(clusterId: number,
+    params?: GetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetQueryKey(clusterId);
+  const queryKey =  queryOptions?.queryKey ?? getGetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetQueryKey(clusterId,params);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>> = ({ signal }) => getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet(clusterId, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>> = ({ signal }) => getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet(clusterId,params, signal);
 
       
 
@@ -4986,7 +5124,8 @@ export type GetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestion
 
 
 export function useGetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet<TData = Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError = null | HTTPValidationErrorType>(
- clusterId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError, TData>> & Pick<
+ clusterId: number,
+    params: undefined |  GetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>,
           TError,
@@ -4996,7 +5135,8 @@ export function useGetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQ
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet<TData = Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError = null | HTTPValidationErrorType>(
- clusterId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError, TData>> & Pick<
+ clusterId: number,
+    params?: GetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>,
           TError,
@@ -5006,7 +5146,8 @@ export function useGetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQ
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet<TData = Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError = null | HTTPValidationErrorType>(
- clusterId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError, TData>>, }
+ clusterId: number,
+    params?: GetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -5014,11 +5155,12 @@ export function useGetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQ
  */
 
 export function useGetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet<TData = Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError = null | HTTPValidationErrorType>(
- clusterId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError, TData>>, }
+ clusterId: number,
+    params?: GetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError, TData>>, }
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetQueryOptions(clusterId,options)
+  const queryOptions = getGetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetQueryOptions(clusterId,params,options)
 
   const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

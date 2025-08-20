@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useGetInterviewDetailApiV2InterviewsInterviewIdGet } from '../../../shared/api/generated/api';
+import { useGetInterviewDetailApiV2InterviewsDetailInterviewIdGet } from '../../../shared/api/generated/api';
 import { MarkdownContent } from '../../../shared/components/MarkdownContent';
 import styles from './InterviewDetailPage.module.scss';
 
@@ -8,7 +8,7 @@ import styles from './InterviewDetailPage.module.scss';
 export const InterviewDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   
-  const { data: interview, isLoading, error } = useGetInterviewDetailApiV2InterviewsInterviewIdGet(
+  const { data: interview, isLoading, error } = useGetInterviewDetailApiV2InterviewsDetailInterviewIdGet(
     id!,
     {
       query: {

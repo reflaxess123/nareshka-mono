@@ -1,19 +1,7 @@
 .container {
-  width: 100vw;
-  max-width: 1200px;
-  min-width: 320px;
-  margin: 0 auto;
-  padding: calc(var(--navbar-height, 64px) + 20px) 20px 20px 20px; /* Отступ для навбара + дополнительный отступ */
-  box-sizing: border-box;
+  width: 100%;
+  min-height: 400px;
   position: relative;
-  
-  @media (min-width: 768px) {
-    width: calc(100vw - 40px);
-  }
-  
-  @media (min-width: 1240px) {
-    width: 1200px;
-  }
 }
 
 .error,
@@ -66,12 +54,17 @@
 }
 
 .resultsInfo {
-  margin-bottom: 20px;
-  color: #64748b;
-  font-size: 14px;
+  margin-bottom: 1.5rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--border-secondary);
 }
 
 .filterLoadingText {
@@ -92,8 +85,8 @@
 .grid {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 40px;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
   transition: opacity 0.3s ease;
 }
 
@@ -109,11 +102,13 @@
 
 .endOfList {
   text-align: center;
-  padding: 24px;
-  color: #64748b;
-  font-size: 14px;
-  border-top: 1px solid #e5e7eb;
-  margin-top: 20px;
+  padding: 1.5rem;
+  color: var(--text-tertiary);
+  font-size: 0.875rem;
+  border-top: 1px solid var(--border-secondary);
+  margin-top: 1.5rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
   
   p {
     margin: 0;
@@ -122,21 +117,19 @@
 }
 
 @media (max-width: 768px) {
-  .container {
-    padding: 16px;
+  .resultsInfo {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+    margin-bottom: 1rem;
   }
   
   .grid {
-    gap: 0;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
   }
   
-  .pagination {
-    gap: 4px;
-    
-    .pageButton {
-      padding: 6px 8px;
-      font-size: 12px;
-      min-width: 32px;
-    }
+  .endOfList {
+    padding: 1rem;
+    margin-top: 1rem;
   }
 }
