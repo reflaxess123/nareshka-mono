@@ -52,7 +52,6 @@ services:
     ports:
       - "4000:4000"
     volumes:
-      # Монтируем код для hot reload
       - "./back:/app"
       - "../files/backend-logs:/app/logs"
       - "../files/backend-uploads:/app/uploads"
