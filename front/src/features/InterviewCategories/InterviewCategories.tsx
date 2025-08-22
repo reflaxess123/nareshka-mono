@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Search, X } from 'lucide-react';
 import { QuestionFilters } from '@/features/InterviewFilters';
 import { useUrlState, type FilterState } from '@/shared/hooks';
+import { ImprovedQuestionsTable } from './ImprovedQuestionsTable';
 import styles from './InterviewCategories.module.scss';
 
 interface Question {
@@ -199,7 +200,7 @@ export const InterviewCategories: React.FC = () => {
       {/* Search Bar */}
       <div className={styles.searchSection}>
         <div className={styles.searchInputWrapper}>
-          <Search size={20} className={styles.searchIcon} />
+          <Search size={18} className={styles.searchIcon} />
           <input
             id="question-search"
             type="text"
@@ -213,7 +214,7 @@ export const InterviewCategories: React.FC = () => {
               onClick={() => handleSearchChange('')}
               className={styles.clearSearchButton}
             >
-              <X size={16} />
+              <X size={14} />
             </button>
           )}
         </div>
@@ -258,56 +259,14 @@ export const InterviewCategories: React.FC = () => {
           
           {questions.length > 0 && (
             <>
-              <table className={styles.dataTable}>
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Вопрос</th>
-                    <th>Компания</th>
-                    <th>Категория</th>
-                    <th>Интервью</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {questions.map((question, index) => (
-                    <tr 
-                      key={question.id}
-                      className={styles.tableRow}
-                      onClick={() => handleQuestionSelect(question)}
-                    >
-                      <td className={styles.numberCell}>#{((currentPage - 1) * ITEMS_PER_PAGE) + index + 1}</td>
-                      <td className={styles.questionCell}>
-                        <div className={styles.questionText}>{question.question_text}</div>
-                      </td>
-                      <td className={styles.companyCell}>{question.company || '-'}</td>
-                      <td className={styles.categoryCell}>{question.category_id || '-'}</td>
-                      <td className={styles.interviewCell}>
-                        {question.interview_id ? (
-                          <button
-                            className={styles.interviewButton}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleShowSameInterview(question.interview_id!);
-                            }}
-                            title={`${question.interview_id.replace('interview_', '').replace(/_(\d+)$/, (match, num) => ` - интервью ${parseInt(num) + 1}`).replace(/_/g, ' ')} (${interviewCounts[question.interview_id] || 1} вопросов)`}
-                          >
-                            <span className={styles.interviewName}>
-                              {question.interview_id
-                                .replace('interview_', '')
-                                .replace(/_(\d+)$/, (match, num) => ` - интервью ${parseInt(num) + 1}`)
-                                .replace(/_/g, ' ')
-                              }
-                            </span>
-                            <span className={styles.interviewCount}>
-                              {interviewCounts[question.interview_id] || 1} вопр.
-                            </span>
-                          </button>
-                        ) : '-'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <ImprovedQuestionsTable
+                questions={questions}
+                currentPage={currentPage}
+                itemsPerPage={ITEMS_PER_PAGE}
+                onQuestionSelect={handleQuestionSelect}
+                onShowSameInterview={handleShowSameInterview}
+                interviewCounts={interviewCounts}
+              />
               
               {/* Pagination */}
               {questions.length > 0 && (

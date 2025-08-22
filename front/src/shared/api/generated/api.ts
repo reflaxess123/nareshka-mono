@@ -2128,6 +2128,22 @@ export interface AppFeaturesTheoryDtoResponsesTheoryStatsResponseType {
   studyProgress: number;
 }
 
+export type GetLogBufferApiLogsBufferGetParams = {
+limit?: number;
+level?: string;
+since?: string;
+};
+
+export type GetRecentLogsApiLogsRecentGetParams = {
+seconds?: number;
+level?: string;
+};
+
+export type TailLogsApiLogsTailGetParams = {
+lines?: number;
+level?: string;
+};
+
 export type GetContentBlocksApiV2ContentBlocksGetParams = {
 /**
  * Номер страницы
@@ -3104,6 +3120,365 @@ export function useGetBrowserLogsStatsApiBrowserLogsStatsGet<TData = Awaited<Ret
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetBrowserLogsStatsApiBrowserLogsStatsGetQueryOptions(options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
+ * HTML страница для просмотра логов в реальном времени
+ * @summary Log Viewer
+ */
+export const logViewerApiLogsViewerGet = (
+    
+ signal?: AbortSignal
+) => {
+      
+      
+      return generatedApiClient<unknown>(
+      {url: `/api/logs/viewer`, method: 'GET', signal
+    },
+      );
+    }
+  
+
+export const getLogViewerApiLogsViewerGetQueryKey = () => {
+    return [`/api/logs/viewer`] as const;
+    }
+
+    
+export const getLogViewerApiLogsViewerGetQueryOptions = <TData = Awaited<ReturnType<typeof logViewerApiLogsViewerGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof logViewerApiLogsViewerGet>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getLogViewerApiLogsViewerGetQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof logViewerApiLogsViewerGet>>> = ({ signal }) => logViewerApiLogsViewerGet(signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof logViewerApiLogsViewerGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type LogViewerApiLogsViewerGetQueryResult = NonNullable<Awaited<ReturnType<typeof logViewerApiLogsViewerGet>>>
+export type LogViewerApiLogsViewerGetQueryError = unknown
+
+
+export function useLogViewerApiLogsViewerGet<TData = Awaited<ReturnType<typeof logViewerApiLogsViewerGet>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof logViewerApiLogsViewerGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof logViewerApiLogsViewerGet>>,
+          TError,
+          Awaited<ReturnType<typeof logViewerApiLogsViewerGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useLogViewerApiLogsViewerGet<TData = Awaited<ReturnType<typeof logViewerApiLogsViewerGet>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof logViewerApiLogsViewerGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof logViewerApiLogsViewerGet>>,
+          TError,
+          Awaited<ReturnType<typeof logViewerApiLogsViewerGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useLogViewerApiLogsViewerGet<TData = Awaited<ReturnType<typeof logViewerApiLogsViewerGet>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof logViewerApiLogsViewerGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Log Viewer
+ */
+
+export function useLogViewerApiLogsViewerGet<TData = Awaited<ReturnType<typeof logViewerApiLogsViewerGet>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof logViewerApiLogsViewerGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getLogViewerApiLogsViewerGetQueryOptions(options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
+ * API для получения последних логов из буфера
+ * @summary Get Log Buffer
+ */
+export const getLogBufferApiLogsBufferGet = (
+    params?: GetLogBufferApiLogsBufferGetParams,
+ signal?: AbortSignal
+) => {
+      
+      
+      return generatedApiClient<unknown>(
+      {url: `/api/logs/buffer`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+  
+
+export const getGetLogBufferApiLogsBufferGetQueryKey = (params?: GetLogBufferApiLogsBufferGetParams,) => {
+    return [`/api/logs/buffer`, ...(params ? [params]: [])] as const;
+    }
+
+    
+export const getGetLogBufferApiLogsBufferGetQueryOptions = <TData = Awaited<ReturnType<typeof getLogBufferApiLogsBufferGet>>, TError = HTTPValidationErrorType>(params?: GetLogBufferApiLogsBufferGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLogBufferApiLogsBufferGet>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetLogBufferApiLogsBufferGetQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getLogBufferApiLogsBufferGet>>> = ({ signal }) => getLogBufferApiLogsBufferGet(params, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getLogBufferApiLogsBufferGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetLogBufferApiLogsBufferGetQueryResult = NonNullable<Awaited<ReturnType<typeof getLogBufferApiLogsBufferGet>>>
+export type GetLogBufferApiLogsBufferGetQueryError = HTTPValidationErrorType
+
+
+export function useGetLogBufferApiLogsBufferGet<TData = Awaited<ReturnType<typeof getLogBufferApiLogsBufferGet>>, TError = HTTPValidationErrorType>(
+ params: undefined |  GetLogBufferApiLogsBufferGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLogBufferApiLogsBufferGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getLogBufferApiLogsBufferGet>>,
+          TError,
+          Awaited<ReturnType<typeof getLogBufferApiLogsBufferGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetLogBufferApiLogsBufferGet<TData = Awaited<ReturnType<typeof getLogBufferApiLogsBufferGet>>, TError = HTTPValidationErrorType>(
+ params?: GetLogBufferApiLogsBufferGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLogBufferApiLogsBufferGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getLogBufferApiLogsBufferGet>>,
+          TError,
+          Awaited<ReturnType<typeof getLogBufferApiLogsBufferGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetLogBufferApiLogsBufferGet<TData = Awaited<ReturnType<typeof getLogBufferApiLogsBufferGet>>, TError = HTTPValidationErrorType>(
+ params?: GetLogBufferApiLogsBufferGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLogBufferApiLogsBufferGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Log Buffer
+ */
+
+export function useGetLogBufferApiLogsBufferGet<TData = Awaited<ReturnType<typeof getLogBufferApiLogsBufferGet>>, TError = HTTPValidationErrorType>(
+ params?: GetLogBufferApiLogsBufferGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLogBufferApiLogsBufferGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetLogBufferApiLogsBufferGetQueryOptions(params,options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
+ * Получить логи за последние N секунд (для Claude Code)
+ * @summary Get Recent Logs
+ */
+export const getRecentLogsApiLogsRecentGet = (
+    params?: GetRecentLogsApiLogsRecentGetParams,
+ signal?: AbortSignal
+) => {
+      
+      
+      return generatedApiClient<unknown>(
+      {url: `/api/logs/recent`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+  
+
+export const getGetRecentLogsApiLogsRecentGetQueryKey = (params?: GetRecentLogsApiLogsRecentGetParams,) => {
+    return [`/api/logs/recent`, ...(params ? [params]: [])] as const;
+    }
+
+    
+export const getGetRecentLogsApiLogsRecentGetQueryOptions = <TData = Awaited<ReturnType<typeof getRecentLogsApiLogsRecentGet>>, TError = HTTPValidationErrorType>(params?: GetRecentLogsApiLogsRecentGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRecentLogsApiLogsRecentGet>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetRecentLogsApiLogsRecentGetQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getRecentLogsApiLogsRecentGet>>> = ({ signal }) => getRecentLogsApiLogsRecentGet(params, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getRecentLogsApiLogsRecentGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetRecentLogsApiLogsRecentGetQueryResult = NonNullable<Awaited<ReturnType<typeof getRecentLogsApiLogsRecentGet>>>
+export type GetRecentLogsApiLogsRecentGetQueryError = HTTPValidationErrorType
+
+
+export function useGetRecentLogsApiLogsRecentGet<TData = Awaited<ReturnType<typeof getRecentLogsApiLogsRecentGet>>, TError = HTTPValidationErrorType>(
+ params: undefined |  GetRecentLogsApiLogsRecentGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRecentLogsApiLogsRecentGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getRecentLogsApiLogsRecentGet>>,
+          TError,
+          Awaited<ReturnType<typeof getRecentLogsApiLogsRecentGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRecentLogsApiLogsRecentGet<TData = Awaited<ReturnType<typeof getRecentLogsApiLogsRecentGet>>, TError = HTTPValidationErrorType>(
+ params?: GetRecentLogsApiLogsRecentGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRecentLogsApiLogsRecentGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getRecentLogsApiLogsRecentGet>>,
+          TError,
+          Awaited<ReturnType<typeof getRecentLogsApiLogsRecentGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRecentLogsApiLogsRecentGet<TData = Awaited<ReturnType<typeof getRecentLogsApiLogsRecentGet>>, TError = HTTPValidationErrorType>(
+ params?: GetRecentLogsApiLogsRecentGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRecentLogsApiLogsRecentGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Recent Logs
+ */
+
+export function useGetRecentLogsApiLogsRecentGet<TData = Awaited<ReturnType<typeof getRecentLogsApiLogsRecentGet>>, TError = HTTPValidationErrorType>(
+ params?: GetRecentLogsApiLogsRecentGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRecentLogsApiLogsRecentGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetRecentLogsApiLogsRecentGetQueryOptions(params,options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
+ * Аналог команды tail для логов (для Claude Code)
+ * @summary Tail Logs
+ */
+export const tailLogsApiLogsTailGet = (
+    params?: TailLogsApiLogsTailGetParams,
+ signal?: AbortSignal
+) => {
+      
+      
+      return generatedApiClient<unknown>(
+      {url: `/api/logs/tail`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+  
+
+export const getTailLogsApiLogsTailGetQueryKey = (params?: TailLogsApiLogsTailGetParams,) => {
+    return [`/api/logs/tail`, ...(params ? [params]: [])] as const;
+    }
+
+    
+export const getTailLogsApiLogsTailGetQueryOptions = <TData = Awaited<ReturnType<typeof tailLogsApiLogsTailGet>>, TError = HTTPValidationErrorType>(params?: TailLogsApiLogsTailGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tailLogsApiLogsTailGet>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getTailLogsApiLogsTailGetQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof tailLogsApiLogsTailGet>>> = ({ signal }) => tailLogsApiLogsTailGet(params, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof tailLogsApiLogsTailGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type TailLogsApiLogsTailGetQueryResult = NonNullable<Awaited<ReturnType<typeof tailLogsApiLogsTailGet>>>
+export type TailLogsApiLogsTailGetQueryError = HTTPValidationErrorType
+
+
+export function useTailLogsApiLogsTailGet<TData = Awaited<ReturnType<typeof tailLogsApiLogsTailGet>>, TError = HTTPValidationErrorType>(
+ params: undefined |  TailLogsApiLogsTailGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof tailLogsApiLogsTailGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof tailLogsApiLogsTailGet>>,
+          TError,
+          Awaited<ReturnType<typeof tailLogsApiLogsTailGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTailLogsApiLogsTailGet<TData = Awaited<ReturnType<typeof tailLogsApiLogsTailGet>>, TError = HTTPValidationErrorType>(
+ params?: TailLogsApiLogsTailGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tailLogsApiLogsTailGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof tailLogsApiLogsTailGet>>,
+          TError,
+          Awaited<ReturnType<typeof tailLogsApiLogsTailGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTailLogsApiLogsTailGet<TData = Awaited<ReturnType<typeof tailLogsApiLogsTailGet>>, TError = HTTPValidationErrorType>(
+ params?: TailLogsApiLogsTailGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tailLogsApiLogsTailGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Tail Logs
+ */
+
+export function useTailLogsApiLogsTailGet<TData = Awaited<ReturnType<typeof tailLogsApiLogsTailGet>>, TError = HTTPValidationErrorType>(
+ params?: TailLogsApiLogsTailGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tailLogsApiLogsTailGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getTailLogsApiLogsTailGetQueryOptions(params,options)
 
   const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

@@ -212,6 +212,188 @@
         }
       }
     },
+    "/api/logs/viewer": {
+      "get": {
+        "tags": [
+          "Logs"
+        ],
+        "summary": "Log Viewer",
+        "description": "HTML страница для просмотра логов в реальном времени",
+        "operationId": "log_viewer_api_logs_viewer_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/logs/buffer": {
+      "get": {
+        "tags": [
+          "Logs"
+        ],
+        "summary": "Get Log Buffer",
+        "description": "API для получения последних логов из буфера",
+        "operationId": "get_log_buffer_api_logs_buffer_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 100,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Level"
+            }
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Since"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/logs/recent": {
+      "get": {
+        "tags": [
+          "Logs"
+        ],
+        "summary": "Get Recent Logs",
+        "description": "Получить логи за последние N секунд (для Claude Code)",
+        "operationId": "get_recent_logs_api_logs_recent_get",
+        "parameters": [
+          {
+            "name": "seconds",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 30,
+              "title": "Seconds"
+            }
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Level"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/logs/tail": {
+      "get": {
+        "tags": [
+          "Logs"
+        ],
+        "summary": "Tail Logs",
+        "description": "Аналог команды tail для логов (для Claude Code)",
+        "operationId": "tail_logs_api_logs_tail_get",
+        "parameters": [
+          {
+            "name": "lines",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "title": "Lines"
+            }
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Level"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v2/content/blocks": {
       "get": {
         "tags": [
@@ -802,52 +984,6 @@
         }
       }
     },
-    "/api/v2/interviews/{interview_id}": {
-      "get": {
-        "tags": [
-          "interviews"
-        ],
-        "summary": "Получить детали интервью",
-        "description": "Возвращает полную информацию об интервью включая полный текст",
-        "operationId": "get_interview_detail_api_v2_interviews__interview_id__get",
-        "parameters": [
-          {
-            "name": "interview_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Interview Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InterviewDetailResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v2/interviews/company/{company_name}/stats": {
       "get": {
         "tags": [
@@ -940,6 +1076,863 @@
           },
           "404": {
             "description": "Not found"
+          }
+        }
+      }
+    },
+    "/api/v2/interviews/top-companies": {
+      "get": {
+        "tags": [
+          "interviews"
+        ],
+        "summary": "Получить топ компаний",
+        "description": "Возвращает список компаний с наибольшим количеством вопросов",
+        "operationId": "get_top_companies_api_v2_interviews_top_companies_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Количество компаний в топе",
+              "default": 20,
+              "title": "Limit"
+            },
+            "description": "Количество компаний в топе"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CompanyResponse"
+                  },
+                  "title": "Response Get Top Companies Api V2 Interviews Top Companies Get"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/interviews/detail/{interview_id}": {
+      "get": {
+        "tags": [
+          "interviews"
+        ],
+        "summary": "Получить детали интервью",
+        "description": "Возвращает полную информацию об интервью включая полный текст",
+        "operationId": "get_interview_detail_api_v2_interviews_detail__interview_id__get",
+        "parameters": [
+          {
+            "name": "interview_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Interview Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterviewDetailResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/interview-categories/": {
+      "get": {
+        "tags": [
+          "interview-categories"
+        ],
+        "summary": "Получить список категорий",
+        "description": "Возвращает все категории вопросов интервью с статистикой",
+        "operationId": "get_categories_api_v2_interview_categories__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryResponse"
+                  },
+                  "type": "array",
+                  "title": "Response Get Categories Api V2 Interview Categories  Get"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v2/interview-categories/statistics": {
+      "get": {
+        "tags": [
+          "interview-categories"
+        ],
+        "summary": "Получить статистику категоризации",
+        "description": "Возвращает общую статистику по категоризации вопросов",
+        "operationId": "get_statistics_api_v2_interview_categories_statistics_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoriesStatisticsResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v2/interview-categories/cluster/{cluster_id}/questions": {
+      "get": {
+        "tags": [
+          "interview-categories"
+        ],
+        "summary": "Получить вопросы кластера",
+        "description": "Возвращает список вопросов определенного кластера",
+        "operationId": "get_cluster_questions_api_v2_interview_categories_cluster__cluster_id__questions_get",
+        "parameters": [
+          {
+            "name": "cluster_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "description": "ID кластера",
+              "title": "Cluster Id"
+            },
+            "description": "ID кластера"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Номер страницы",
+              "default": 1,
+              "title": "Page"
+            },
+            "description": "Номер страницы"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "description": "Количество вопросов на странице",
+              "default": 50,
+              "title": "Limit"
+            },
+            "description": "Количество вопросов на странице"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QuestionResponse"
+                  },
+                  "title": "Response Get Cluster Questions Api V2 Interview Categories Cluster  Cluster Id  Questions Get"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/interview-categories/search/questions": {
+      "get": {
+        "tags": [
+          "interview-categories"
+        ],
+        "summary": "Поиск вопросов",
+        "description": "Полнотекстовый поиск по вопросам интервью с фильтрацией и пагинацией",
+        "operationId": "search_questions_api_v2_interview_categories_search_questions_get",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Поисковый запрос (минимум 1 символ, * для всех)",
+              "title": "Q"
+            },
+            "description": "Поисковый запрос (минимум 1 символ, * для всех)"
+          },
+          {
+            "name": "category_ids",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Фильтр по ID категорий (множественный)",
+              "title": "Category Ids"
+            },
+            "description": "Фильтр по ID категорий (множественный)"
+          },
+          {
+            "name": "cluster_ids",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Фильтр по ID кластеров (множественный)",
+              "title": "Cluster Ids"
+            },
+            "description": "Фильтр по ID кластеров (множественный)"
+          },
+          {
+            "name": "companies",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Фильтр по названиям компаний (множественный)",
+              "title": "Companies"
+            },
+            "description": "Фильтр по названиям компаний (множественный)"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "description": "Максимальное количество результатов",
+              "default": 50,
+              "title": "Limit"
+            },
+            "description": "Максимальное количество результатов"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Смещение для пагинации",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Смещение для пагинации"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionsListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/interview-categories/companies/top": {
+      "get": {
+        "tags": [
+          "interview-categories"
+        ],
+        "summary": "Получить топ компаний",
+        "description": "Возвращает список компаний с наибольшим количеством вопросов",
+        "operationId": "get_top_companies_endpoint_api_v2_interview_categories_companies_top_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Количество компаний в топе",
+              "default": 20,
+              "title": "Limit"
+            },
+            "description": "Количество компаний в топе"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CompanyResponse"
+                  },
+                  "title": "Response Get Top Companies Endpoint Api V2 Interview Categories Companies Top Get"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/interview-categories/companies/count": {
+      "get": {
+        "tags": [
+          "interview-categories"
+        ],
+        "summary": "Получить общее количество компаний",
+        "description": "Возвращает общее количество уникальных компаний в базе данных",
+        "operationId": "get_total_companies_count_api_v2_interview_categories_companies_count_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "title": "Response Get Total Companies Count Api V2 Interview Categories Companies Count Get"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/v2/interview-categories/clusters/all": {
+      "get": {
+        "tags": [
+          "interview-categories"
+        ],
+        "summary": "Получить все кластеры",
+        "description": "Возвращает список всех кластеров с возможностью фильтрации по категории",
+        "operationId": "get_all_clusters_api_v2_interview_categories_clusters_all_get",
+        "parameters": [
+          {
+            "name": "category_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Фильтр по ID категории",
+              "title": "Category Id"
+            },
+            "description": "Фильтр по ID категории"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Поиск по названию кластера",
+              "title": "Search"
+            },
+            "description": "Поиск по названию кластера"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "description": "Максимальное количество кластеров",
+              "default": 100,
+              "title": "Limit"
+            },
+            "description": "Максимальное количество кластеров"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ClusterResponse"
+                  },
+                  "title": "Response Get All Clusters Api V2 Interview Categories Clusters All Get"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/interview-categories/{category_id}": {
+      "get": {
+        "tags": [
+          "interview-categories"
+        ],
+        "summary": "Получить детали категории",
+        "description": "Возвращает подробную информацию о категории с кластерами и примерами",
+        "operationId": "get_category_detail_api_v2_interview_categories__category_id__get",
+        "parameters": [
+          {
+            "name": "category_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "ID категории (например: javascript_core)",
+              "title": "Category Id"
+            },
+            "description": "ID категории (например: javascript_core)"
+          },
+          {
+            "name": "limit_questions",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "description": "Количество примеров вопросов",
+              "default": 10,
+              "title": "Limit Questions"
+            },
+            "description": "Количество примеров вопросов"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryDetailResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/companies/top": {
+      "get": {
+        "tags": [
+          "companies"
+        ],
+        "summary": "Получить топ компаний",
+        "description": "Возвращает список компаний с наибольшим количеством вопросов",
+        "operationId": "get_top_companies_api_v2_companies_top_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Количество компаний в топе",
+              "default": 20,
+              "title": "Limit"
+            },
+            "description": "Количество компаний в топе"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CompanyResponse"
+                  },
+                  "title": "Response Get Top Companies Api V2 Companies Top Get"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/cluster-visualization/constellation": {
+      "get": {
+        "tags": [
+          "visualization"
+        ],
+        "summary": "Получить данные для визуализации созвездия кластеров",
+        "description": "Возвращает узлы и связи для D3.js / ReactFlow графа",
+        "operationId": "get_cluster_constellation_api_v2_cluster_visualization_constellation_get",
+        "parameters": [
+          {
+            "name": "min_interview_count",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "description": "Минимальное количество интервью для кластера",
+              "default": 1,
+              "title": "Min Interview Count"
+            },
+            "description": "Минимальное количество интервью для кластера"
+          },
+          {
+            "name": "min_link_weight",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "description": "Минимальный вес связи для отображения",
+              "default": 3,
+              "title": "Min Link Weight"
+            },
+            "description": "Минимальный вес связи для отображения"
+          },
+          {
+            "name": "category_filter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Фильтр по категориям",
+              "title": "Category Filter"
+            },
+            "description": "Фильтр по категориям"
+          },
+          {
+            "name": "category_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Конкретная категория для фильтрации",
+              "title": "Category Id"
+            },
+            "description": "Конкретная категория для фильтрации"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "description": "Максимальное количество кластеров",
+              "default": 200,
+              "title": "Limit"
+            },
+            "description": "Максимальное количество кластеров"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClusterConstellationResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/cluster-visualization/cluster/{cluster_id}/questions": {
+      "get": {
+        "tags": [
+          "visualization"
+        ],
+        "summary": "Get Cluster Questions",
+        "description": "Получение всех вопросов для кластера",
+        "operationId": "get_cluster_questions_api_v2_cluster_visualization_cluster__cluster_id__questions_get",
+        "parameters": [
+          {
+            "name": "cluster_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Cluster Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "description": "Максимальное количество вопросов",
+              "default": 10,
+              "title": "Limit"
+            },
+            "description": "Максимальное количество вопросов"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
           }
         }
       }
@@ -3733,6 +4726,22 @@
           }
         }
       }
+    },
+    "/api/test-companies": {
+      "get": {
+        "summary": "Get Top Companies Simple",
+        "operationId": "get_top_companies_simple_api_test_companies_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -3756,7 +4765,6 @@
           },
           "monthly_stats": {
             "items": {
-              "additionalProperties": true,
               "type": "object"
             },
             "type": "array",
@@ -3906,7 +4914,6 @@
           "metadata": {
             "anyOf": [
               {
-                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -3988,6 +4995,111 @@
           "RELEARNING"
         ],
         "title": "CardState"
+      },
+      "CategoriesStatisticsResponse": {
+        "properties": {
+          "total_questions": {
+            "type": "integer",
+            "title": "Total Questions",
+            "description": "Всего вопросов"
+          },
+          "categorized_questions": {
+            "type": "integer",
+            "title": "Categorized Questions",
+            "description": "Категоризировано вопросов"
+          },
+          "total_categories": {
+            "type": "integer",
+            "title": "Total Categories",
+            "description": "Всего категорий"
+          },
+          "total_clusters": {
+            "type": "integer",
+            "title": "Total Clusters",
+            "description": "Всего кластеров"
+          },
+          "categorization_rate": {
+            "type": "number",
+            "title": "Categorization Rate",
+            "description": "Процент категоризации"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_questions",
+          "categorized_questions",
+          "total_categories",
+          "total_clusters",
+          "categorization_rate"
+        ],
+        "title": "CategoriesStatisticsResponse",
+        "description": "Статистика по категориям",
+        "example": {
+          "categorization_rate": 77.9,
+          "categorized_questions": 6649,
+          "total_categories": 13,
+          "total_clusters": 182,
+          "total_questions": 8532
+        }
+      },
+      "CategoryDetailResponse": {
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/CategoryResponse",
+            "description": "Информация о категории"
+          },
+          "clusters": {
+            "items": {
+              "$ref": "#/components/schemas/ClusterResponse"
+            },
+            "type": "array",
+            "title": "Clusters",
+            "description": "Кластеры категории"
+          },
+          "sample_questions": {
+            "items": {
+              "$ref": "#/components/schemas/QuestionResponse"
+            },
+            "type": "array",
+            "title": "Sample Questions",
+            "description": "Примеры вопросов"
+          }
+        },
+        "type": "object",
+        "required": [
+          "category",
+          "clusters",
+          "sample_questions"
+        ],
+        "title": "CategoryDetailResponse",
+        "description": "Детальная информация о категории",
+        "example": {
+          "category": {
+            "clusters_count": 60,
+            "id": "javascript_core",
+            "name": "JavaScript Core",
+            "percentage": 24.4,
+            "questions_count": 2082
+          },
+          "clusters": [
+            {
+              "category_id": "javascript_core",
+              "id": 25,
+              "keywords": [
+                "closure"
+              ],
+              "name": "Замыкания",
+              "questions_count": 38
+            }
+          ],
+          "sample_questions": [
+            {
+              "company": "Яндекс",
+              "id": "q123",
+              "question_text": "Что такое замыкание?"
+            }
+          ]
+        }
       },
       "CategoryProgressResponse": {
         "properties": {
@@ -4249,6 +5361,288 @@
         "title": "CategoryProgressUpdateRequest",
         "description": "Запрос на обновление прогресса по категории"
       },
+      "CategoryResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "ID категории"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Название категории"
+          },
+          "questions_count": {
+            "type": "integer",
+            "title": "Questions Count",
+            "description": "Количество вопросов"
+          },
+          "clusters_count": {
+            "type": "integer",
+            "title": "Clusters Count",
+            "description": "Количество кластеров"
+          },
+          "percentage": {
+            "type": "number",
+            "title": "Percentage",
+            "description": "Процент от общего числа вопросов"
+          },
+          "color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color",
+            "description": "Цвет категории для UI"
+          },
+          "icon": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Icon",
+            "description": "Иконка категории"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "questions_count",
+          "clusters_count",
+          "percentage"
+        ],
+        "title": "CategoryResponse",
+        "description": "Модель ответа для категории",
+        "example": {
+          "clusters_count": 60,
+          "color": "#f7df1e",
+          "icon": "javascript",
+          "id": "javascript_core",
+          "name": "JavaScript Core",
+          "percentage": 24.4,
+          "questions_count": 2082
+        }
+      },
+      "ClusterConstellationResponse": {
+        "properties": {
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/ClusterNode"
+            },
+            "type": "array",
+            "title": "Nodes"
+          },
+          "links": {
+            "items": {
+              "$ref": "#/components/schemas/ClusterLink"
+            },
+            "type": "array",
+            "title": "Links"
+          },
+          "categories": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Categories"
+          },
+          "stats": {
+            "type": "object",
+            "title": "Stats"
+          }
+        },
+        "type": "object",
+        "required": [
+          "nodes",
+          "links",
+          "categories",
+          "stats"
+        ],
+        "title": "ClusterConstellationResponse"
+      },
+      "ClusterLink": {
+        "properties": {
+          "source": {
+            "type": "integer",
+            "title": "Source"
+          },
+          "target": {
+            "type": "integer",
+            "title": "Target"
+          },
+          "weight": {
+            "type": "integer",
+            "title": "Weight"
+          },
+          "strength": {
+            "type": "number",
+            "title": "Strength"
+          }
+        },
+        "type": "object",
+        "required": [
+          "source",
+          "target",
+          "weight",
+          "strength"
+        ],
+        "title": "ClusterLink"
+      },
+      "ClusterNode": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "category_id": {
+            "type": "string",
+            "title": "Category Id"
+          },
+          "category_name": {
+            "type": "string",
+            "title": "Category Name"
+          },
+          "questions_count": {
+            "type": "integer",
+            "title": "Questions Count"
+          },
+          "interview_count": {
+            "type": "integer",
+            "title": "Interview Count"
+          },
+          "interview_penetration": {
+            "type": "number",
+            "title": "Interview Penetration"
+          },
+          "keywords": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Keywords"
+          },
+          "example_question": {
+            "type": "string",
+            "title": "Example Question"
+          },
+          "size": {
+            "type": "number",
+            "title": "Size"
+          },
+          "top_companies": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Top Companies"
+          },
+          "difficulty_distribution": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Difficulty Distribution"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "category_id",
+          "category_name",
+          "questions_count",
+          "interview_count",
+          "interview_penetration",
+          "keywords",
+          "example_question",
+          "size",
+          "top_companies",
+          "difficulty_distribution"
+        ],
+        "title": "ClusterNode"
+      },
+      "ClusterResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id",
+            "description": "ID кластера"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Название кластера"
+          },
+          "category_id": {
+            "type": "string",
+            "title": "Category Id",
+            "description": "ID категории"
+          },
+          "keywords": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Keywords",
+            "description": "Ключевые слова"
+          },
+          "questions_count": {
+            "type": "integer",
+            "title": "Questions Count",
+            "description": "Количество вопросов"
+          },
+          "example_question": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Example Question",
+            "description": "Пример вопроса"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "category_id",
+          "keywords",
+          "questions_count"
+        ],
+        "title": "ClusterResponse",
+        "description": "Модель ответа для кластера",
+        "example": {
+          "category_id": "javascript_core",
+          "example_question": "Что такое замыкание в JavaScript?",
+          "id": 25,
+          "keywords": [
+            "closure",
+            "scope",
+            "замыкание",
+            "область",
+            "видимости"
+          ],
+          "name": "Замыкания и область видимости",
+          "questions_count": 38
+        }
+      },
       "CodeExecutionRequest": {
         "properties": {
           "sourceCode": {
@@ -4482,6 +5876,31 @@
         ],
         "title": "CompaniesListResponse",
         "description": "Список компаний"
+      },
+      "CompanyResponse": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Название компании"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count",
+            "description": "Количество вопросов"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "count"
+        ],
+        "title": "CompanyResponse",
+        "description": "Модель ответа для компании",
+        "example": {
+          "count": 723,
+          "name": "Сбер"
+        }
       },
       "CompanyStatsResponse": {
         "properties": {
@@ -4830,7 +6249,6 @@
           "metadata": {
             "anyOf": [
               {
-                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -4895,7 +6313,6 @@
           "metadata": {
             "anyOf": [
               {
-                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -4917,7 +6334,6 @@
       "ContentStatsResponse": {
         "properties": {
           "categories": {
-            "additionalProperties": true,
             "type": "object",
             "title": "Categories"
           },
@@ -5000,7 +6416,6 @@
           },
           "languageStats": {
             "items": {
-              "additionalProperties": true,
               "type": "object"
             },
             "type": "array",
@@ -5421,7 +6836,6 @@
           "overall_progress": {
             "anyOf": [
               {
-                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -5460,7 +6874,6 @@
             "title": "Target"
           },
           "style": {
-            "additionalProperties": true,
             "type": "object",
             "title": "Style"
           },
@@ -5498,7 +6911,6 @@
             "title": "Position"
           },
           "data": {
-            "additionalProperties": true,
             "type": "object",
             "title": "Data"
           }
@@ -5528,7 +6940,6 @@
             "title": "Structure Type"
           },
           "metadata": {
-            "additionalProperties": true,
             "type": "object",
             "title": "Metadata"
           }
@@ -5823,6 +7234,158 @@
         "title": "ProgressStatsResponse",
         "description": "Статистика прогресса"
       },
+      "QuestionResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "ID вопроса"
+          },
+          "question_text": {
+            "type": "string",
+            "title": "Question Text",
+            "description": "Текст вопроса"
+          },
+          "company": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company",
+            "description": "Компания"
+          },
+          "cluster_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cluster Id",
+            "description": "ID кластера"
+          },
+          "category_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category Id",
+            "description": "ID категории"
+          },
+          "topic_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic Name",
+            "description": "Название топика"
+          },
+          "canonical_question": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Canonical Question",
+            "description": "Канонический вопрос"
+          },
+          "interview_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interview Id",
+            "description": "ID интервью"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "question_text"
+        ],
+        "title": "QuestionResponse",
+        "description": "Модель ответа для вопроса",
+        "example": {
+          "canonical_question": "Что такое замыкание?",
+          "category_id": "javascript_core",
+          "cluster_id": 25,
+          "company": "Яндекс",
+          "id": "q123",
+          "interview_id": "interview_Яндекс_001",
+          "question_text": "Объясните, что такое замыкание в JavaScript",
+          "topic_name": "Замыкания и область видимости"
+        }
+      },
+      "QuestionsListResponse": {
+        "properties": {
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/QuestionResponse"
+            },
+            "type": "array",
+            "title": "Questions",
+            "description": "Список вопросов"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "description": "Общее количество вопросов"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page",
+            "description": "Текущая страница"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit",
+            "description": "Количество на странице"
+          },
+          "has_next": {
+            "type": "boolean",
+            "title": "Has Next",
+            "description": "Есть ли следующая страница"
+          }
+        },
+        "type": "object",
+        "required": [
+          "questions",
+          "total",
+          "page",
+          "limit",
+          "has_next"
+        ],
+        "title": "QuestionsListResponse",
+        "description": "Список вопросов с пагинацией",
+        "example": {
+          "has_next": true,
+          "limit": 50,
+          "page": 1,
+          "questions": [],
+          "total": 100
+        }
+      },
       "RecentActivityResponse": {
         "properties": {
           "user_id": {
@@ -5873,7 +7436,6 @@
           "metadata": {
             "anyOf": [
               {
-                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -5951,7 +7513,6 @@
         "properties": {
           "categories": {
             "items": {
-              "additionalProperties": true,
               "type": "object"
             },
             "type": "array",
@@ -6230,7 +7791,6 @@
             "title": "Data"
           },
           "pagination": {
-            "additionalProperties": true,
             "type": "object",
             "title": "Pagination"
           }
@@ -6651,7 +8211,6 @@
             "title": "Cards"
           },
           "pagination": {
-            "additionalProperties": true,
             "type": "object",
             "title": "Pagination"
           }
@@ -6668,7 +8227,6 @@
         "properties": {
           "categories": {
             "items": {
-              "additionalProperties": true,
               "type": "object"
             },
             "type": "array",
@@ -6724,7 +8282,6 @@
           "progress": {
             "anyOf": [
               {
-                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -7211,17 +8768,14 @@
             "title": "Reviewedtheorycards"
           },
           "contentProgress": {
-            "additionalProperties": true,
             "type": "object",
             "title": "Contentprogress"
           },
           "theoryProgress": {
-            "additionalProperties": true,
             "type": "object",
             "title": "Theoryprogress"
           },
           "overallProgress": {
-            "additionalProperties": true,
             "type": "object",
             "title": "Overallprogress"
           }
@@ -7659,7 +9213,6 @@
           "metadata": {
             "anyOf": [
               {
-                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -7748,7 +9301,6 @@
           "metadata": {
             "anyOf": [
               {
-                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -7900,7 +9452,6 @@
           "metadata": {
             "anyOf": [
               {
-                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -8013,7 +9564,6 @@
           "metadata": {
             "anyOf": [
               {
-                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -8042,7 +9592,6 @@
       "app__features__stats__dto__responses__TheoryStatsResponse": {
         "properties": {
           "categories": {
-            "additionalProperties": true,
             "type": "object",
             "title": "Categories"
           },

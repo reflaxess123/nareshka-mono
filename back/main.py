@@ -17,6 +17,7 @@ from app.shared.di import setup_di_container
 from app.features.admin.api.admin_router import router as admin_router
 from app.features.auth.api.auth_router import router as auth_router
 from app.features.browser_logs.api.browser_logs_router import router as browser_logs_router
+from app.features.logs.api.logs_router import router as logs_router, setup_websocket_logging
 from app.features.code_editor.api import router as code_editor_router
 from app.features.content.api import router as content_router
 from app.features.interviews.api.interviews_router import router as interviews_router
@@ -39,6 +40,7 @@ logger = get_logger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     setup_di_container()
+    setup_websocket_logging()  # Инициализируем WebSocket логирование
     logger.info("🚀 Приложение запущено", extra={"event": "startup"})
     yield
     logger.info("🔒 Приложение остановлено", extra={"event": "shutdown"})
@@ -65,6 +67,7 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 app.include_router(auth_router, prefix="/api/v2")
 app.include_router(browser_logs_router)
+app.include_router(logs_router)
 app.include_router(content_router, prefix="/api/v2")
 app.include_router(interviews_router, prefix="/api/v2")
 app.include_router(categories_router, prefix="/api/v2")

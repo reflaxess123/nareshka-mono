@@ -26,11 +26,11 @@ def generate_openapi(output_file: str = "openapi.json") -> None:
         with open(output_file, "w", encoding="utf-8") as f:
             json.dump(openapi_schema, f, ensure_ascii=False, indent=2)
 
-        print(f"✅ OpenAPI спецификация успешно сгенерирована: {output_file}")
-        print(f"📊 Найдено {len(openapi_schema.get('paths', {}))} endpoints")
+        print(f"[OK] OpenAPI спецификация успешно сгенерирована: {output_file}")
+        print(f"[INFO] Найдено {len(openapi_schema.get('paths', {}))} endpoints")
 
     except Exception as e:
-        print(f"❌ Ошибка генерации OpenAPI: {e}")
+        print(f"[ERROR] Ошибка генерации OpenAPI: {e}")
         sys.exit(1)
 
 
@@ -49,4 +49,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

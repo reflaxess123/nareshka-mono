@@ -1,0 +1,448 @@
+@use '../../app/styles/variables' as vars;
+
+.improvedTable {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: transparent;
+}
+
+.questionRow {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+  overflow: hidden;
+  border-left: 3px solid transparent;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.08);
+    border-left-color: var(--accent-primary);
+    
+    .copyIcon {
+      opacity: 0.7;
+    }
+  }
+
+  &.hovered {
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  &.copied {
+    background: rgba(16, 185, 129, 0.08);
+    border-left-color: rgb(16, 185, 129);
+    animation: copiedPulse 0.3s ease;
+  }
+}
+
+@keyframes copiedPulse {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(4px); }
+  100% { transform: translateX(0); }
+}
+
+.mainRow {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  gap: 12px;
+  cursor: pointer;
+  min-height: auto;
+}
+
+.leftSection {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.index {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.3);
+  font-weight: 400;
+  min-width: 40px;
+
+  svg {
+    opacity: 0.4;
+    width: 12px;
+    height: 12px;
+  }
+}
+
+.expandButton {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  svg {
+    transition: transform 0.2s;
+    
+    &.rotated {
+      transform: rotate(90deg);
+    }
+  }
+}
+
+.questionContent {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.questionText {
+  flex: 1;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.9);
+  word-wrap: break-word;
+  font-weight: 400;
+  max-width: 60%;
+}
+
+.inlineMetadata {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.companyBadge,
+.categoryBadge,
+.interviewBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 6px;
+  border-radius: 3px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  transition: all 0.15s;
+  white-space: nowrap;
+  height: 20px;
+
+  svg {
+    flex-shrink: 0;
+    width: 10px;
+    height: 10px;
+  }
+}
+
+.companyBadge {
+  background: rgba(99, 102, 241, 0.12);
+  color: rgba(129, 140, 248, 1);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+}
+
+.categoryBadge {
+  border: 1px solid;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.interviewBadge {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(217, 70, 239, 0.08));
+  color: rgba(167, 139, 250, 1);
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  cursor: pointer;
+  position: relative;
+  padding: 3px 8px;
+  max-width: 200px;
+  
+  .interviewText {
+    font-size: 0.65rem;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    display: inline-block;
+    max-width: 180px;
+  }
+  
+  .interviewCount {
+    font-size: 0.6rem;
+    color: rgba(217, 70, 239, 1);
+    font-weight: 600;
+  }
+
+  &:hover {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(217, 70, 239, 0.15));
+    border-color: rgba(139, 92, 246, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(139, 92, 246, 0.2);
+  }
+}
+
+@keyframes slideRight {
+  from { right: -12px; }
+  to { right: -14px; }
+}
+
+.rightSection {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.copyIndicator {
+  width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.copyIcon {
+  color: rgba(255, 255, 255, 0.2);
+  transition: all 0.15s;
+  opacity: 0.3;
+  width: 14px;
+  height: 14px;
+}
+
+.copiedText {
+  color: rgb(16, 185, 129);
+  font-size: 0.65rem;
+  font-weight: 600;
+  animation: fadeIn 0.2s;
+  white-space: nowrap;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.expandedInfo {
+  padding: 0 16px 16px 76px;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 200px;
+  }
+}
+
+.metadataGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.metadataItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+
+  svg {
+    color: rgba(255, 255, 255, 0.4);
+    flex-shrink: 0;
+  }
+
+  .label {
+    color: rgba(255, 255, 255, 0.5);
+    min-width: 80px;
+  }
+
+  .value {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+  }
+}
+
+.interviewLink {
+  background: none;
+  border: none;
+  color: rgba(236, 72, 153, 0.9);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+
+  &:hover {
+    color: rgba(236, 72, 153, 1);
+    transform: translateX(2px);
+
+    .badge {
+      background: rgba(236, 72, 153, 0.2);
+    }
+  }
+
+  .badge {
+    background: rgba(236, 72, 153, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    transition: all 0.2s;
+  }
+}
+
+// Режимы отображения
+.compact {
+  .mainRow {
+    padding: 8px 12px;
+    min-height: 44px;
+  }
+
+  .questionText {
+    font-size: 0.875rem;
+  }
+
+  .index {
+    font-size: 0.75rem;
+    min-width: 40px;
+  }
+}
+
+.comfortable {
+  // Стандартные стили
+}
+
+.expanded {
+  // Используется другая структура
+}
+
+// Группированный вид
+.expandedView {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.interviewGroup {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.interviewHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+
+  .count {
+    margin-left: auto;
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 400;
+  }
+}
+
+.groupQuestions {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.groupedQuestion {
+  display: flex;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .questionNumber {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.875rem;
+    min-width: 32px;
+  }
+
+  .questionText {
+    flex: 1;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+}
+
+// Адаптивность
+@media (max-width: 768px) {
+  .mainRow {
+    padding: 10px 12px;
+  }
+
+  .questionText {
+    font-size: 0.875rem;
+  }
+
+  .copyIndicator {
+    width: auto;
+  }
+
+  .expandedInfo {
+    padding-left: 12px;
+  }
+
+  .metadataGrid {
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .inlineMetadata {
+    margin-top: 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .index {
+    min-width: auto;
+    
+    span {
+      display: none;
+    }
+  }
+
+  .companyBadge,
+  .categoryBadge,
+  .interviewBadge {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+  }
+}

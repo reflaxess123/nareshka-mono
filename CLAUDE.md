@@ -43,7 +43,7 @@ alembic revision --autogenerate -m "описание" # Создание миг�
 ### Быстрый старт разработки
 ```bash
 # Windows - запуск frontend + backend с hot reload
-start-dev-simple.bat
+start.bat
 
 # Docker Compose - полный стек с PostgreSQL/Redis
 docker-compose -f docker-compose.dev.yml up
