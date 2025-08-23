@@ -270,18 +270,6 @@ export const ContentFilters = ({
 
   return (
     <div className={`${styles.contentFilters} ${className || ''}`}>
-      {hasActiveFilters() && (
-        <div className={styles.resetSection}>
-          <Button
-            onClick={handleReset}
-            variant={ButtonVariant.SECONDARY}
-            className={styles.resetButton}
-          >
-            <X size={16} />
-            Сбросить фильтры
-          </Button>
-        </div>
-      )}
 
       <div className={styles.filterSection}>
         <button

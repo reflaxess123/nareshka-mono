@@ -369,7 +369,6 @@ export const UnifiedFilters: React.FC<UnifiedFiltersProps> = ({
             onToggle={() => toggleSection('categories')}
           >
             <div className={styles.checkboxGroup}>
-              <div className={styles.filterLabel}>Основные категории</div>
               {practiceCategories?.categories?.map((category: PracticeCategory) => {
                 const translatedName = translateMainCategory(category.name);
                 const isChecked = filters.categories?.includes(category.name) || false;
@@ -386,31 +385,37 @@ export const UnifiedFilters: React.FC<UnifiedFiltersProps> = ({
                   </label>
                 );
               })}
-
-              {/* Подкатегории */}
-              {filters.categories?.length && filters.categories.length > 0 && (
-                <div style={{ marginTop: '1rem' }}>
-                  <div className={styles.filterLabel}>Подкатегории</div>
-                  {getAvailableSubCategories().map((subCategory: string) => {
-                    const translatedName = translateSubCategory(subCategory);
-                    const isChecked = filters.subCategories?.includes(subCategory) || false;
-
-                    return (
-                      <label key={subCategory} className={styles.checkboxLabel}>
-                        <input
-                          type="checkbox"
-                          checked={isChecked}
-                          onChange={(e) => handlePracticeSubCategoryToggle(subCategory, e.target.checked)}
-                          className={styles.checkbox}
-                        />
-                        <span className={styles.labelText}>{translatedName}</span>
-                      </label>
-                    );
-                  })}
-                </div>
-              )}
             </div>
           </FilterSection>
+
+          {/* Подкатегории - отдельная секция */}
+          {filters.categories?.length && filters.categories.length > 0 && (
+            <FilterSection
+              title="Подтемы"
+              icon="🏷️"
+              isExpanded={expandedSections.clusters}
+              onToggle={() => toggleSection('clusters')}
+            >
+              <div className={styles.checkboxGroup}>
+                {getAvailableSubCategories().map((subCategory: string) => {
+                  const translatedName = translateSubCategory(subCategory);
+                  const isChecked = filters.subCategories?.includes(subCategory) || false;
+
+                  return (
+                    <label key={subCategory} className={styles.checkboxLabel}>
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={(e) => handlePracticeSubCategoryToggle(subCategory, e.target.checked)}
+                        className={styles.checkbox}
+                      />
+                      <span className={styles.labelText}>{translatedName}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </FilterSection>
+          )}
 
           {/* Компании */}
           <FilterSection
@@ -493,18 +498,6 @@ export const UnifiedFilters: React.FC<UnifiedFiltersProps> = ({
         </FilterSection>
       )}
 
-      {/* Кнопка сброса внизу */}
-      {activeFilters && (
-        <div className={styles.resetSection}>
-          <button
-            onClick={handleReset}
-            className={styles.resetButton}
-          >
-            <X size={16} />
-            Сбросить фильтры
-          </button>
-        </div>
-      )}
 
       {/* Модал подписки */}
       <Modal

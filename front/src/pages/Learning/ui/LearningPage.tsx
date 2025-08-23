@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Search, X, BookOpen, HelpCircle, Briefcase, GraduationCap, Filter, ArrowUpDown } from 'lucide-react';
+import { Search, X, BookOpen, HelpCircle, Briefcase, GraduationCap, ArrowUpDown } from 'lucide-react';
 import { PageWrapper } from '@/shared/components/PageWrapper/ui/PageWrapper';
 import { Text, TextAlign, TextSize, TextWeight } from '@/shared/components/Text';
 import { UnifiedFilters } from '@/features/UnifiedFilters';
@@ -8,7 +8,6 @@ import { UniversalContentList } from '@/widgets/UniversalContentList';
 import { CONTENT_TYPE_CONFIG, type ContentType } from '@/shared/types/learning';
 import styles from './LearningPage.module.scss';
 
-// Иконки для табов
 const TAB_ICONS: Record<ContentType, React.ReactNode> = {
   interviews: <Briefcase size={18} />,
   questions: <HelpCircle size={18} />,
@@ -29,7 +28,7 @@ export const LearningPage: React.FC = () => {
     addToSearchHistory,
     setSorting
   } = useLearningStore();
-  
+
   // Фиксированный режим отображения - только список
   const viewMode = 'list';
 
@@ -253,7 +252,7 @@ export const LearningPage: React.FC = () => {
               <ArrowUpDown size={20} />
               <span>Сортировка</span>
             </button>
-            
+
             {showSortOptions && (
               <div className={styles.sortDropdown}>
                 {getSortOptions().map(option => (
@@ -297,8 +296,8 @@ export const LearningPage: React.FC = () => {
               <span key={company} className={styles.filterTag}>
                 🏢 {company}
                 <button onClick={() => {
-                  updateFilters({ 
-                    companies: filters.companies?.filter(c => c !== company) 
+                  updateFilters({
+                    companies: filters.companies?.filter(c => c !== company)
                   });
                 }}>
                   <X size={12} />
@@ -309,20 +308,14 @@ export const LearningPage: React.FC = () => {
               <span key={category} className={styles.filterTag}>
                 📁 {category}
                 <button onClick={() => {
-                  updateFilters({ 
-                    categories: filters.categories?.filter(c => c !== category) 
+                  updateFilters({
+                    categories: filters.categories?.filter(c => c !== category)
                   });
                 }}>
                   <X size={12} />
                 </button>
               </span>
             ))}
-            <button 
-              className={styles.clearAllFilters}
-              onClick={resetFilters}
-            >
-              Очистить все
-            </button>
           </div>
         )}
 

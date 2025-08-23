@@ -3,7 +3,7 @@ import { AppRoutes } from '@/app/providers/router';
 import { isAdmin } from '@/entities/User/model/types';
 import { Link } from '@/shared/components/Link';
 import { useAppDispatch, useAuth } from '@/shared/hooks';
-import { Bird, Code, Map, Shield, MessageSquare, Database } from 'lucide-react';
+import { Bird, Code, Map, Shield, MessageSquare, Database, GraduationCap } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { toggleSidebar } from '../model/slice/sidebarSlice';
 import styles from './Sidebar.module.scss';
@@ -40,6 +40,15 @@ export const Sidebar = ({ children }: { children: React.ReactNode }) => {
             icon={<Map size={24} />}
             isParentHovered={isOpen}
             to={AppRoutes.MINDMAP}
+            variant="sidebar"
+          />
+
+          <Link
+            text="Обучение"
+            className={styles.link}
+            icon={<GraduationCap size={24} />}
+            isParentHovered={isOpen}
+            to={AppRoutes.LEARNING}
             variant="sidebar"
           />
 
