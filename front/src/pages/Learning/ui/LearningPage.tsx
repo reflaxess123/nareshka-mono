@@ -183,10 +183,6 @@ export const LearningPage: React.FC = () => {
                 >
                   <span className={styles.tabIcon}>{TAB_ICONS[type]}</span>
                   <span className={styles.tabLabel}>{config.label}</span>
-                  <span className={styles.tabBadge}>
-                    {type === 'questions' && '8.5K'}
-                    {type === 'interviews' && '500+'}
-                  </span>
                 </button>
               );
             })}
@@ -280,44 +276,6 @@ export const LearningPage: React.FC = () => {
             )}
           </div>
         </div>
-
-        {/* Active Filters Tags */}
-        {(filters.search || filters.companies?.length || filters.categories?.length) && (
-          <div className={styles.activeFilters}>
-            {filters.search && (
-              <span className={styles.filterTag}>
-                🔍 {filters.search}
-                <button onClick={() => updateFilters({ search: undefined })}>
-                  <X size={12} />
-                </button>
-              </span>
-            )}
-            {filters.companies?.map(company => (
-              <span key={company} className={styles.filterTag}>
-                🏢 {company}
-                <button onClick={() => {
-                  updateFilters({
-                    companies: filters.companies?.filter(c => c !== company)
-                  });
-                }}>
-                  <X size={12} />
-                </button>
-              </span>
-            ))}
-            {filters.categories?.map(category => (
-              <span key={category} className={styles.filterTag}>
-                📁 {category}
-                <button onClick={() => {
-                  updateFilters({
-                    categories: filters.categories?.filter(c => c !== category)
-                  });
-                }}>
-                  <X size={12} />
-                </button>
-              </span>
-            ))}
-          </div>
-        )}
 
         {/* Main Content Area */}
         <div className={styles.mainContent}>

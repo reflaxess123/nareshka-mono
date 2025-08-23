@@ -40,7 +40,8 @@ export interface LearningFilters {
   clusters?: string[];
   subCategories?: string[];
   difficulty?: string[];
-  hasAudio?: boolean;
+  has_audio?: boolean;
+  hasAudio?: boolean; // deprecated, use has_audio
   onlyCompleted?: boolean;
   onlyUnstudied?: boolean;
 }
@@ -135,7 +136,8 @@ export interface LearningSearchRequest {
   clusters?: string[];
   subCategories?: string[];
   difficulty?: string[];
-  hasAudio?: boolean;
+  has_audio?: boolean;
+  hasAudio?: boolean; // deprecated, use has_audio
   onlyCompleted?: boolean;
   onlyUnstudied?: boolean;
   page?: number;

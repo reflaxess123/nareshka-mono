@@ -51,9 +51,9 @@
 
 .cardHeader {
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
 }
 
 .typeLabel {
@@ -61,188 +61,67 @@
   align-items: center;
   gap: 0.375rem;
   padding: 0.375rem 0.75rem;
-  border-radius: 20px;
-  color: white;
+  border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 600;
+  color: white;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-
-  svg {
-    width: 14px;
-    height: 14px;
-  }
 }
 
-.audioBadge,
-.completedBadge {
+.typeIcon {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--bg-tertiary);
-
-  svg {
-    width: 14px;
-    height: 14px;
-  }
-}
-
-.audioBadge {
-  color: var(--primary-color);
-  background: var(--bg-primary);
-  border: 1px solid var(--primary-color);
-}
-
-.completedBadge {
-  color: var(--success-color);
-  background: var(--bg-success);
-  border: 1px solid var(--success-color);
 }
 
 .cardBody {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
 }
 
 .title {
-  color: var(--text-primary);
   font-size: 1rem;
   font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
   line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .description {
-  color: var(--text-secondary);
   font-size: 0.875rem;
+  color: var(--text-secondary);
   line-height: 1.5;
+  margin-bottom: 0.75rem;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .meta {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.75rem;
   margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-light);
 }
 
 .metaItem {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 0.25rem;
-  color: var(--text-tertiary);
   font-size: 0.8rem;
+  color: var(--text-tertiary);
 
   svg {
     width: 14px;
     height: 14px;
-  }
-}
-
-.difficulty {
-  font-size: 0.8rem;
-  font-weight: 500;
-}
-
-.completed {
-  color: var(--success-color);
-  font-size: 0.8rem;
-  font-weight: 500;
-}
-
-.hasAudio {
-  color: var(--primary-color);
-  font-size: 0.8rem;
-}
-
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.375rem;
-  margin-top: 0.5rem;
-}
-
-.tag {
-  padding: 0.25rem 0.5rem;
-  background: var(--bg-tertiary);
-  border-radius: 12px;
-  color: var(--text-secondary);
-  font-size: 0.75rem;
-}
-
-.moreTag {
-  padding: 0.25rem 0.5rem;
-  background: var(--bg-primary);
-  border-radius: 12px;
-  color: var(--text-tertiary);
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-.cardFooter {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border-primary);
-}
-
-.primaryAction {
-  flex: 1;
-  padding: 0.625rem 1rem;
-  background: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: var(--primary-dark);
-    transform: translateY(-1px);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-}
-
-.secondaryAction {
-  padding: 0.625rem;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-primary);
-  border-radius: 8px;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &:hover {
-    background: var(--bg-hover);
-    color: var(--text-primary);
-    border-color: var(--primary-color);
-  }
-
-  svg {
-    width: 16px;
-    height: 16px;
   }
 }
 
@@ -256,11 +135,29 @@
   transition: all 0.2s ease;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
 
   &:hover {
     background: var(--bg-hover);
     border-color: var(--primary-color);
+    transform: translateX(4px);
+  }
+
+  // Цветовые варианты для разных типов
+  &.interviews:hover {
+    border-color: #3B82F6;
+  }
+
+  &.questions:hover {
+    border-color: #10B981;
+  }
+
+  &.practice:hover {
+    border-color: #F59E0B;
+  }
+
+  &.theory:hover {
+    border-color: #8B5CF6;
   }
 }
 
@@ -272,19 +169,14 @@
 }
 
 .typeIndicator {
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
   flex-shrink: 0;
   color: white;
-
-  svg {
-    width: 20px;
-    height: 20px;
-  }
 }
 
 .listContent {
@@ -292,66 +184,85 @@
   min-width: 0;
 
   .title {
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.375rem;
   }
 
   .description {
     margin-bottom: 0.5rem;
+    -webkit-line-clamp: 2;
   }
 
   .meta {
-    margin-top: 0;
+    border-top: none;
+    padding-top: 0;
+    margin-top: 0.5rem;
   }
 }
 
-.interviewTag {
+.completed {
+  color: var(--success-color);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.hasAudio {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: var(--primary-alpha);
+  color: var(--primary-color);
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
   margin-top: 0.5rem;
-  
-  .interviewBadge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    padding: 0.25rem 0.5rem;
-    background: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.2);
-    border-radius: 4px;
-    font-size: 0.75rem;
-    color: #3B82F6;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    
-    &:hover {
-      background: rgba(59, 130, 246, 0.15);
-      border-color: rgba(59, 130, 246, 0.3);
-      transform: translateY(-1px);
-    }
-    
-    svg {
-      width: 12px;
-      height: 12px;
-    }
-    
-    span {
-      font-weight: 500;
-      
-      .interviewCount {
-        font-weight: 400;
-        opacity: 0.8;
-        color: inherit;
-      }
-    }
+}
+
+.tag {
+  padding: 0.25rem 0.5rem;
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.difficulty {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+
+  &.easy {
+    background: var(--success-alpha);
+    color: var(--success-color);
+  }
+
+  &.medium {
+    background: var(--warning-alpha);
+    color: var(--warning-color);
+  }
+
+  &.hard {
+    background: var(--error-alpha);
+    color: var(--error-color);
   }
 }
 
 .listActions {
   display: flex;
+  align-items: center;
   gap: 0.5rem;
-  flex-shrink: 0;
 }
 
 .actionBtn {
   padding: 0.5rem;
-  background: var(--bg-tertiary);
+  background: transparent;
   border: 1px solid var(--border-primary);
   border-radius: 6px;
   color: var(--text-secondary);
@@ -360,13 +271,129 @@
 
   &:hover {
     background: var(--bg-hover);
-    color: var(--text-primary);
     border-color: var(--primary-color);
+    color: var(--primary-color);
   }
 
   svg {
     width: 16px;
     height: 16px;
+  }
+}
+
+// Interview tag styles для вопросов
+.interviewTag {
+  margin-top: 0.5rem;
+}
+
+.interviewBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-secondary);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: var(--bg-hover);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+  }
+
+  svg {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+.interviewCount {
+  font-weight: 600;
+  color: var(--text-tertiary);
+}
+
+// Question specific styles
+.questionCard {
+  position: relative;
+}
+
+.questionText {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  padding: 0.75rem;
+  border-radius: 6px;
+  margin-bottom: 0.75rem;
+}
+
+.clusterBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: var(--accent-alpha);
+  color: var(--accent-color);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+// Code block styles for practice
+.codePreview {
+  background: var(--bg-tertiary);
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+  overflow: hidden;
+  max-height: 100px;
+}
+
+.codeLanguage {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: var(--primary-alpha);
+  color: var(--primary-color);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+// Progress indicator
+.progressIndicator {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+.progressBar {
+  width: 60px;
+  height: 4px;
+  background: var(--bg-tertiary);
+  border-radius: 2px;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    display: block;
+    height: 100%;
+    background: var(--success-color);
+    border-radius: 2px;
+    width: var(--progress, 0%);
   }
 }
 
@@ -395,32 +422,20 @@
   flex: 1;
   min-width: 0;
 
-  .typeIcon {
-    color: var(--text-tertiary);
-    display: flex;
-    align-items: center;
-  }
-
   .title {
+    margin: 0;
     font-size: 0.875rem;
-    font-weight: 500;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    -webkit-line-clamp: 1;
   }
 }
 
 .compactRight {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  flex-shrink: 0;
-
-  .metaItem {
-    font-size: 0.75rem;
-  }
+  gap: 0.5rem;
 }
 
+// Copy button for questions
 .copyBtn {
   padding: 0.375rem;
   background: transparent;
@@ -438,5 +453,165 @@
   svg {
     width: 14px;
     height: 14px;
+  }
+}
+
+// Стили для превью контента при наведении
+.contentPreview {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  margin-top: 0.5rem;
+  animation: fadeInScale 0.2s ease-out;
+  pointer-events: none;
+}
+
+.previewContent {
+  background: var(--bg-secondary);
+  border: 2px solid var(--primary-color);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  max-height: 400px;
+  overflow: hidden;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 50px;
+    width: 16px;
+    height: 16px;
+    background: var(--bg-secondary);
+    border-left: 2px solid var(--primary-color);
+    border-top: 2px solid var(--primary-color);
+    transform: rotate(45deg);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: linear-gradient(to bottom, transparent, var(--bg-secondary));
+    pointer-events: none;
+  }
+}
+
+.previewHeader {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.previewText {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+
+  // Кастомный скроллбар
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--bg-tertiary);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-secondary);
+    border-radius: 3px;
+
+    &:hover {
+      background: var(--primary-color);
+    }
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// Позиционирование для list view
+.cardList {
+  position: relative;
+  z-index: 1;
+  
+  &:hover {
+    z-index: 9998;
+  }
+}
+
+// Стили для ответов теории
+.theoryAnswer {
+  margin-top: 0.75rem;
+  padding: 1rem;
+  background: var(--bg-tertiary);
+  border-radius: 8px;
+  border-left: 3px solid var(--primary-color);
+}
+
+.answerLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+.answerContent {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  
+  p {
+    margin: 0.5rem 0;
+  }
+  
+  strong, b {
+    color: var(--primary-color);
+    font-weight: 600;
+  }
+  
+  code {
+    background: var(--bg-secondary);
+    padding: 0.125rem 0.25rem;
+    border-radius: 3px;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.85em;
+  }
+  
+  pre {
+    background: var(--bg-secondary);
+    padding: 0.75rem;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 0.5rem 0;
+  }
+  
+  ul, ol {
+    margin-left: 1.5rem;
+    margin-top: 0.5rem;
   }
 }

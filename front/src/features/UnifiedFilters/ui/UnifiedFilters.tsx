@@ -96,7 +96,7 @@ export const UnifiedFilters: React.FC<UnifiedFiltersProps> = ({
   // Загрузка данных компаний для интервью и вопросов с количеством вопросов
   const { data: companiesData, isLoading: companiesLoading } = 
     useGetTopCompaniesApiV2InterviewsTopCompaniesGet(
-      { limit: 100 },
+      { limit: 400 }, // Загружаем все компании (380+)
       {
         query: {
           enabled: type === 'interviews' || type === 'questions',
@@ -498,6 +498,16 @@ export const UnifiedFilters: React.FC<UnifiedFiltersProps> = ({
         </FilterSection>
       )}
 
+
+      {/* Кнопка сброса фильтров */}
+      {activeFilters && (
+        <button 
+          className={styles.resetButton}
+          onClick={handleReset}
+        >
+          ✕ Сбросить фильтры
+        </button>
+      )}
 
       {/* Модал подписки */}
       <Modal

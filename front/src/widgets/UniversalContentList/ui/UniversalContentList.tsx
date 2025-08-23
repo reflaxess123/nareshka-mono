@@ -61,7 +61,7 @@ export const UniversalContentList: React.FC<UniversalContentListProps> = ({
             limit,
             companies: filters.companies,
             search: filters.search,
-            has_audio: filters.hasAudio
+            has_audio: filters.has_audio
           });
           
           if (response && response.interviews) {
@@ -305,9 +305,6 @@ export const UniversalContentList: React.FC<UniversalContentListProps> = ({
         <span>📊 Показано {items.length} из {total.toLocaleString()}</span>
         {isLoading && !isInitialLoad && (
           <span className={styles.loadingText}>• Обновление...</span>
-        )}
-        {hasNextPage && !isLoading && (
-          <span className={styles.moreText}>• Прокрутите для загрузки ещё</span>
         )}
       </div>
 

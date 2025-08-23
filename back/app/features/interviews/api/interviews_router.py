@@ -150,7 +150,7 @@ async def get_top_companies(
     limit: int = Query(
         20, 
         ge=1, 
-        le=100, 
+        le=500,  # Увеличиваем лимит до 500 для получения всех компаний
         description="Количество компаний в топе"
     ),
     session: Session = Depends(get_session),
