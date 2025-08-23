@@ -63,10 +63,16 @@ const Visualization = lazy(() =>
     default: module.default,
   }))
 );
+const Learning = lazy(() =>
+  import('@/pages/Learning').then((module) => ({
+    default: module.LearningPage,
+  }))
+);
 
 export enum AppRoutes {
   HOME = '/',
   GET_STARTED = '/get-started',
+  LEARNING = '/learning',
   TASKS = '/tasks',
   INTERVIEWS = '/interviews',
   QUESTIONS_DATABASE = '/questions-database',
@@ -85,6 +91,7 @@ export enum AppRoutes {
 export const routeConfig: AppRoute[] = [
   { path: AppRoutes.HOME, element: <Home /> },
   { path: AppRoutes.GET_STARTED, element: <GetStarted /> },
+  { path: AppRoutes.LEARNING, element: <Learning /> },
   { path: AppRoutes.TASKS, element: <Tasks /> },
   { path: AppRoutes.INTERVIEWS, element: <Interviews /> },
   { path: AppRoutes.QUESTIONS_DATABASE, element: <QuestionsDatabase /> },

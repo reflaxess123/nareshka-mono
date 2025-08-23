@@ -1,0 +1,234 @@
+@import '@/app/styles/variables.scss';
+@import '@/app/styles/helpers/mixins.scss';
+
+// Миксин для анимации скелетона
+@mixin skeleton-animation {
+  background: linear-gradient(
+    90deg,
+    var(--bg-tertiary) 0%,
+    var(--bg-hover) 50%,
+    var(--bg-tertiary) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+// Скелетон для карточек
+.skeleton {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  border: 1px solid var(--border-primary);
+  padding: 1.25rem;
+  height: 280px;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+
+  .typeLabel {
+    width: 100px;
+    height: 24px;
+    border-radius: 12px;
+    @include skeleton-animation;
+  }
+
+  .badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    @include skeleton-animation;
+  }
+}
+
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  .title {
+    width: 80%;
+    height: 20px;
+    border-radius: 4px;
+    @include skeleton-animation;
+  }
+
+  .description {
+    width: 100%;
+    height: 48px;
+    border-radius: 4px;
+    @include skeleton-animation;
+  }
+
+  .meta {
+    display: flex;
+    gap: 1rem;
+    margin-top: auto;
+
+    .metaItem {
+      width: 80px;
+      height: 16px;
+      border-radius: 4px;
+      @include skeleton-animation;
+    }
+  }
+}
+
+.footer {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-primary);
+
+  .primaryAction {
+    flex: 1;
+    height: 36px;
+    border-radius: 8px;
+    @include skeleton-animation;
+  }
+
+  .secondaryAction {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    @include skeleton-animation;
+  }
+}
+
+// Скелетон для списка
+.skeletonList {
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--border-primary);
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 80px;
+
+  .listLeft {
+    display: flex;
+    gap: 1rem;
+    flex: 1;
+
+    .icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      @include skeleton-animation;
+    }
+
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      .title {
+        width: 200px;
+        height: 18px;
+        border-radius: 4px;
+        @include skeleton-animation;
+      }
+
+      .description {
+        width: 300px;
+        height: 14px;
+        border-radius: 4px;
+        @include skeleton-animation;
+      }
+
+      .meta {
+        display: flex;
+        gap: 0.75rem;
+
+        .metaItem {
+          width: 60px;
+          height: 14px;
+          border-radius: 4px;
+          @include skeleton-animation;
+        }
+      }
+    }
+  }
+
+  .actions {
+    display: flex;
+    gap: 0.5rem;
+
+    .action {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      @include skeleton-animation;
+    }
+  }
+}
+
+// Скелетон для компактного вида
+.skeletonCompact {
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  border: 1px solid var(--border-primary);
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 48px;
+
+  .compactLeft {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+
+    .icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      @include skeleton-animation;
+    }
+
+    .title {
+      width: 250px;
+      height: 16px;
+      border-radius: 4px;
+      @include skeleton-animation;
+    }
+  }
+
+  .compactRight {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    .meta {
+      width: 100px;
+      height: 14px;
+      border-radius: 4px;
+      @include skeleton-animation;
+    }
+
+    .action {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      @include skeleton-animation;
+    }
+  }
+}

@@ -1,0 +1,191 @@
+@import '@/app/styles/variables.scss';
+@import '@/app/styles/helpers/mixins.scss';
+
+.container {
+  width: 100%;
+}
+
+// Results info bar
+.resultsInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+
+  span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .loadingText {
+    color: var(--primary-color);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  .moreText {
+    color: var(--text-tertiary);
+    font-style: italic;
+  }
+}
+
+// Grid layouts
+.grid {
+  display: grid;
+  gap: 1rem;
+  transition: opacity 0.3s ease;
+
+  &.cards {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &.list {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  &.compact {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  &.gridLoading {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+}
+
+// Sentinel for infinite scroll
+.sentinel {
+  height: 1px;
+  margin-top: 1rem;
+}
+
+// Empty state
+.empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  border: 2px dashed var(--border-primary);
+
+  .emptyIcon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.8;
+  }
+
+  h2 {
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .clearFiltersButton {
+    padding: 0.75rem 1.5rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.25);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+// Error state
+.error {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: var(--bg-danger);
+  border-radius: 12px;
+  border: 2px solid var(--error-color);
+
+  h2 {
+    color: var(--error-color);
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    color: var(--text-primary);
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .retryButton {
+    padding: 0.75rem 1.5rem;
+    background: var(--error-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: var(--error-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(var(--error-rgb), 0.25);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+// End of list indicator
+.endOfList {
+  text-align: center;
+  padding: 2rem;
+  margin-top: 2rem;
+  background: var(--bg-success);
+  border-radius: 8px;
+  border: 1px solid var(--success-color);
+
+  p {
+    color: var(--success-color);
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+}
+
+// Animations
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

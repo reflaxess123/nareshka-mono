@@ -110,7 +110,7 @@ class ContentBlockRepository:
 
             task = Task(
                 id=block.id,
-                title=block.title,
+                title=block.blockTitle,
                 content=self._unescape_text_content(block.content),
                 category=block.category,
                 company=block.company,

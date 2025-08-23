@@ -306,7 +306,7 @@ class TaskRepository:
             task = Task(
                 id=block.id,
                 item_type="content_block",
-                title=block.file.webdavPath.split("/")[-1] if block.file else "Без названия",
+                title=block.blockTitle,
                 description=self._unescape_text_content(block.textContent),
                 main_category=block.file.mainCategory if block.file else "",
                 sub_category=block.file.subCategory if block.file else None,

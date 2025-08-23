@@ -3,6 +3,7 @@ export interface UnifiedFilterState {
   companies?: string[];
   has_audio?: boolean;
   categories?: string[];
+  subCategories?: string[];
   clusters?: number[];
   // Дополнительные фильтры для интервью
   difficulty?: ('easy' | 'medium' | 'hard')[];
@@ -13,6 +14,9 @@ export interface UnifiedFilterState {
   seniority?: ('junior' | 'middle' | 'senior' | 'lead')[];
   interview_format?: ('online' | 'offline' | 'hybrid')[];
   technologies?: string[];
+  // Фильтры для practice и theory
+  onlyCompleted?: boolean;
+  onlyUnstudied?: boolean;
 }
 
 export interface FilterSectionProps {
@@ -25,7 +29,7 @@ export interface FilterSectionProps {
 }
 
 export interface UnifiedFiltersProps {
-  type: 'interviews' | 'questions' | 'tasks';
+  type: 'interviews' | 'questions' | 'practice' | 'theory';
   filters: UnifiedFilterState;
   onFiltersChange: (filters: UnifiedFilterState) => void;
   resultsCount?: number;
@@ -50,4 +54,4 @@ export interface ActiveFilterTag {
   value: string | number;
 }
 
-export type FilterType = 'interviews' | 'questions' | 'tasks';
+export type FilterType = 'interviews' | 'questions' | 'practice' | 'theory';
