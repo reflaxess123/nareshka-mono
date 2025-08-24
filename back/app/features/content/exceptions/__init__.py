@@ -2,17 +2,14 @@
 
 from app.features.content.exceptions.content_exceptions import (
     ContentError,
-    ContentNotFoundError,
     ContentFileError,
+    ContentNotFoundError,
     ContentValidationError,
 )
 
 __all__ = [
     "ContentError",
     "ContentNotFoundError",
-    "ContentFileError", 
+    "ContentFileError",
     "ContentValidationError",
-] 
-
-
-
+]

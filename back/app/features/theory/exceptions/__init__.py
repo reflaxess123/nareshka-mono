@@ -1,11 +1,11 @@
 """Исключения theory feature"""
 
 from .theory_exceptions import (
-    TheoryError,
-    TheoryCardNotFoundError,
-    TheoryProgressError,
     InvalidProgressActionError,
     InvalidReviewRatingError,
+    TheoryCardNotFoundError,
+    TheoryError,
+    TheoryProgressError,
     TheoryValidationError,
 )
 
@@ -16,7 +16,4 @@ __all__ = [
     "InvalidProgressActionError",
     "InvalidReviewRatingError",
     "TheoryValidationError",
-] 
-
-
-
+]

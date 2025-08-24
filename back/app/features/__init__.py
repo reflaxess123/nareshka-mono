@@ -1,4 +1,3 @@
-# Features package - Feature-First architecture 
-
+# Features package - Feature-First architecture
 
 

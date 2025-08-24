@@ -1,6 +1,7 @@
 """Request DTOs для code_editor feature"""
 
 from typing import Optional
+
 from pydantic import BaseModel, Field
 
 from app.shared.entities.enums import CodeLanguage
@@ -52,6 +53,4 @@ class TestCaseCreateRequest(BaseModel):
     weight: float = Field(default=1.0, description="Вес тест-кейса")
     timeoutSeconds: int = Field(default=5, description="Таймаут выполнения")
     isActive: bool = Field(default=True, description="Активен ли тест-кейс")
-    orderIndex: int = Field(default=0, description="Порядок выполнения") 
-
-
+    orderIndex: int = Field(default=0, description="Порядок выполнения")

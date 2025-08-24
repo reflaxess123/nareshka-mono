@@ -11,12 +11,12 @@ from uuid import uuid4
 from sqlalchemy import and_, asc, desc, func, or_
 from sqlalchemy.orm import Session, joinedload
 
-from app.shared.entities.content import ContentBlock, ContentFile
-from app.shared.models.content_models import UserContentProgress
 from app.features.content.exceptions.content_exceptions import (
     ContentBlockNotFoundError,
     ContentFileNotFoundError,
 )
+from app.shared.entities.content import ContentBlock, ContentFile
+from app.shared.models.content_models import UserContentProgress
 
 
 class ContentRepository:
@@ -54,7 +54,7 @@ class ContentRepository:
 
         # Подсчет общего количества
         total = query.count()
-        
+
         # Получение данных с пагинацией
         files = query.order_by(ContentFile.webdavPath).offset(offset).limit(limit).all()
 
@@ -143,23 +143,19 @@ class ContentRepository:
             .filter(ContentBlock.id == block_id)
             .first()
         )
-        
+
         if not block:
             raise ContentBlockNotFoundError(block_id)
-            
+
         return block
 
     async def get_content_file_by_id(self, file_id: str) -> ContentFile:
         """Получение файла контента по ID"""
-        file = (
-            self.session.query(ContentFile)
-            .filter(ContentFile.id == file_id)
-            .first()
-        )
-        
+        file = self.session.query(ContentFile).filter(ContentFile.id == file_id).first()
+
         if not file:
             raise ContentFileNotFoundError(file_id)
-            
+
         return file
 
     async def get_content_categories(self) -> List[str]:
@@ -273,7 +269,7 @@ class ContentRepository:
             createdAt=datetime.utcnow(),
             updatedAt=datetime.utcnow(),
         )
-        
+
         self.session.add(content_file)
         return content_file
 
@@ -313,8 +309,6 @@ class ContentRepository:
             createdAt=datetime.utcnow(),
             updatedAt=datetime.utcnow(),
         )
-        
+
         self.session.add(content_block)
-        return content_block 
-
-
+        return content_block

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 import psycopg2
-from app.config.settings import settings
+
+from app.core.settings import settings
 
 
 def check_users_and_progress():
@@ -28,21 +29,23 @@ def check_users_and_progress():
             print(f"  ID: {user[0]}, Email: {user[1]}, Role: {user[3]}")
 
         # 2. Проверяем прогресс пользователей
-        cursor.execute('''
+        cursor.execute("""
             SELECT "userId", "blockId", "solvedCount", "createdAt", "updatedAt" 
             FROM "UserContentProgress" 
             ORDER BY "createdAt" DESC 
             LIMIT 10
-        ''')
+        """)
         progress_records = cursor.fetchall()
 
         print(f"\n📊 Найдено записей прогресса: {len(progress_records)}")
         for progress in progress_records:
             user_id, block_id, solved_count, created_at, updated_at = progress
-            print(f"  UserID: {user_id}, BlockID: {block_id}, SolvedCount: {solved_count}, Updated: {updated_at}")
+            print(
+                f"  UserID: {user_id}, BlockID: {block_id}, SolvedCount: {solved_count}, Updated: {updated_at}"
+            )
 
         # 3. Проверяем общую статистику по пользователям
-        cursor.execute('''
+        cursor.execute("""
             SELECT 
                 u.id,
                 u.email,
@@ -52,27 +55,29 @@ def check_users_and_progress():
             LEFT JOIN "UserContentProgress" p ON u.id = p."userId"
             GROUP BY u.id, u.email
             ORDER BY total_solved DESC NULLS LAST
-        ''')
+        """)
         stats = cursor.fetchall()
 
-        print(f"\n📈 Статистика пользователей:")
+        print("\n📈 Статистика пользователей:")
         for stat in stats:
             user_id, email, blocks_count, total_solved = stat
             print(f"  {email}: {blocks_count or 0} блоков, {total_solved or 0} решений")
 
         # 4. Найдем первого пользователя с прогрессом для тестирования
-        cursor.execute('''
+        cursor.execute("""
             SELECT DISTINCT "userId", u.email
             FROM "UserContentProgress" p
             JOIN "User" u ON u.id = p."userId"
             LIMIT 1
-        ''')
+        """)
         test_user = cursor.fetchone()
-        
+
         if test_user:
-            print(f"\n🧪 Тестовый пользователь: ID={test_user[0]}, Email={test_user[1]}")
+            print(
+                f"\n🧪 Тестовый пользователь: ID={test_user[0]}, Email={test_user[1]}"
+            )
         else:
-            print(f"\n⚠️ Нет пользователей с прогрессом для тестирования")
+            print("\n⚠️ Нет пользователей с прогрессом для тестирования")
 
         cursor.close()
         conn.close()
@@ -82,4 +87,4 @@ def check_users_and_progress():
 
 
 if __name__ == "__main__":
-    check_users_and_progress() 
+    check_users_and_progress()

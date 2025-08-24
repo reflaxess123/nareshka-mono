@@ -64,6 +64,3 @@ class ValidationResultDTO(BaseModel):
     passedTests: int
     failedTests: int
     results: List[dict]
-
-
-

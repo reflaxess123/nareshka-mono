@@ -49,7 +49,7 @@ class Task(BaseModel):
     progress_percentage: float = 0.0
     order_in_file: int = 0
     current_user_solved_count: int = 0  # Количество решений пользователя
-    
+
     # Дополнительные поля для content_block
     file_id: Optional[str] = None
     file_path: Optional[str] = None
@@ -59,7 +59,7 @@ class Task(BaseModel):
     is_code_foldable: Optional[bool] = None
     code_fold_title: Optional[str] = None
     extracted_urls: List[str] = []
-    
+
     created_at: datetime
     updated_at: datetime
 
@@ -146,5 +146,3 @@ class Task(BaseModel):
             created_at=card.createdAt,
             updated_at=card.updatedAt,
         )
-
-

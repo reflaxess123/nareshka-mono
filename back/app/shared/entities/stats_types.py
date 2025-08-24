@@ -55,5 +55,3 @@ class RoadmapStats(BaseModel):
     completed_categories: int
     in_progress_categories: int
     overall_progress_percentage: float
-
-

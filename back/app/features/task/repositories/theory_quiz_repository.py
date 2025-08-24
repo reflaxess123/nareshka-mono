@@ -1,13 +1,13 @@
 """Репозиторий для работы с теоретическими тестами"""
 
+import logging
 from typing import List, Optional, Tuple
-from sqlalchemy import asc, func, or_
-from sqlalchemy.orm import Session, joinedload
+
+from sqlalchemy import asc
+from sqlalchemy.orm import Session
 
 from app.shared.entities.task_types import Task
 from app.shared.models.theory_models import TheoryCard, UserTheoryProgress
-
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -27,12 +27,9 @@ class TheoryQuizRepository:
         offset: Optional[int] = None,
     ) -> Tuple[List[Task], int]:
         """Получить теоретические тесты с фильтрацией"""
-        
+
         # Базовый запрос для теоретических карточек
-        query = (
-            self.session.query(TheoryCard)
-            .filter(TheoryCard.is_deleted == False)
-        )
+        query = self.session.query(TheoryCard).filter(TheoryCard.is_deleted == False)
 
         # Фильтрация по категории
         if category:
@@ -70,9 +67,7 @@ class TheoryQuizRepository:
                 )
             )
             user_progress_records = progress_query.all()
-            user_progress = {
-                up.theory_card_id: up for up in user_progress_records
-            }
+            user_progress = {up.theory_card_id: up for up in user_progress_records}
 
         # Преобразование в объекты Task
         tasks = []
@@ -97,9 +92,13 @@ class TheoryQuizRepository:
                 attempts_count=progress.attempts_count if progress else 0,
                 # Дополнительные поля для теоретических тестов
                 question=card.question,
-                answer_options=card.answer_options if hasattr(card, 'answer_options') else [],
-                correct_answer=card.correct_answer if hasattr(card, 'correct_answer') else None,
-                explanation=card.explanation if hasattr(card, 'explanation') else None,
+                answer_options=card.answer_options
+                if hasattr(card, "answer_options")
+                else [],
+                correct_answer=card.correct_answer
+                if hasattr(card, "correct_answer")
+                else None,
+                explanation=card.explanation if hasattr(card, "explanation") else None,
             )
             tasks.append(task)
 

@@ -3,16 +3,16 @@
 """
 
 from .pagination import (
-    PaginationParams,
-    PaginatedResponse,
-    PaginationHelper,
-    PaginationDep,
-    SortingParams,
     FilterParams,
     PaginatedQueryBuilder,
+    PaginatedResponse,
+    PaginationDep,
+    PaginationHelper,
+    PaginationParams,
+    SortingParams,
+    create_filter_dependency,
     create_pagination_dependency,
     create_sorting_dependency,
-    create_filter_dependency
 )
 
 __all__ = [
@@ -25,5 +25,5 @@ __all__ = [
     "PaginatedQueryBuilder",
     "create_pagination_dependency",
     "create_sorting_dependency",
-    "create_filter_dependency"
+    "create_filter_dependency",
 ]

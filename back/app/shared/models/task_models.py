@@ -81,5 +81,3 @@ class TaskSolution(Base):
         Index("idx_tasksolution_userid_blockid", "userId", "blockId", unique=True),
         Index("idx_tasksolution_solvedat", "solvedAt"),
     )
-
-

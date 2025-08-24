@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 class OverallProgressResponse(BaseModel):
     """Общий прогресс пользователя"""
-    
+
     totalItems: int
     completedItems: int
     percentage: float
@@ -20,7 +20,7 @@ class OverallProgressResponse(BaseModel):
 
 class UserStatsOverviewResponse(BaseModel):
     """Общая статистика пользователя"""
-    
+
     userId: int
     totalContentBlocks: int
     solvedContentBlocks: int
@@ -36,7 +36,7 @@ class UserStatsOverviewResponse(BaseModel):
 
 class ContentBlockStatsResponse(BaseModel):
     """Статистика контентного блока"""
-    
+
     id: str
     title: str
     solveCount: int
@@ -48,7 +48,7 @@ class ContentBlockStatsResponse(BaseModel):
 
 class TheoryCardStatsResponse(BaseModel):
     """Статистика теоретической карточки"""
-    
+
     id: str
     question: str
     reviewCount: int
@@ -62,7 +62,7 @@ class TheoryCardStatsResponse(BaseModel):
 
 class SubCategoryContentStatsResponse(BaseModel):
     """Статистика подкатегории контента"""
-    
+
     total: int
     solved: int
     percentage: float
@@ -75,7 +75,7 @@ class SubCategoryContentStatsResponse(BaseModel):
 
 class SubCategoryTheoryStatsResponse(BaseModel):
     """Статистика подкатегории теории"""
-    
+
     total: int
     reviewed: int
     percentage: float
@@ -88,7 +88,7 @@ class SubCategoryTheoryStatsResponse(BaseModel):
 
 class CategoryContentStatsResponse(BaseModel):
     """Статистика категории контента"""
-    
+
     total: int
     solved: int
     percentage: float
@@ -101,7 +101,7 @@ class CategoryContentStatsResponse(BaseModel):
 
 class CategoryTheoryStatsResponse(BaseModel):
     """Статистика категории теории"""
-    
+
     total: int
     reviewed: int
     percentage: float
@@ -114,7 +114,7 @@ class CategoryTheoryStatsResponse(BaseModel):
 
 class ContentStatsResponse(BaseModel):
     """Детальная статистика по контенту"""
-    
+
     categories: Dict[str, Any]
     totalBlocks: int
     solvedBlocks: int
@@ -126,7 +126,7 @@ class ContentStatsResponse(BaseModel):
 
 class TheoryStatsResponse(BaseModel):
     """Детальная статистика по теории"""
-    
+
     categories: Dict[str, Any]
     totalCards: int
     reviewedCards: int
@@ -138,7 +138,7 @@ class TheoryStatsResponse(BaseModel):
 
 class ItemStatsResponse(BaseModel):
     """Статистика элементов"""
-    
+
     total: int
     completed: int
 
@@ -148,7 +148,7 @@ class ItemStatsResponse(BaseModel):
 
 class SubCategoryRoadmapResponse(BaseModel):
     """Roadmap подкатегории"""
-    
+
     name: str
     contentProgress: int
     theoryProgress: int
@@ -160,7 +160,7 @@ class SubCategoryRoadmapResponse(BaseModel):
 
 class CategoryRoadmapResponse(BaseModel):
     """Roadmap категории"""
-    
+
     name: str
     contentProgress: int
     theoryProgress: int
@@ -175,7 +175,7 @@ class CategoryRoadmapResponse(BaseModel):
 
 class RoadmapStatsResponse(BaseModel):
     """Roadmap статистика по категориям"""
-    
+
     categories: List[Dict[str, Any]]
 
     class Config:
@@ -184,11 +184,9 @@ class RoadmapStatsResponse(BaseModel):
 
 class StatsHealthResponse(BaseModel):
     """Ответ health check для статистики"""
-    
+
     status: str
     module: str
 
     class Config:
-        from_attributes = True 
-
-
+        from_attributes = True

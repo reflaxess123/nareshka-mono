@@ -3,48 +3,55 @@ Interviews API Router
 Endpoints для работы с интервью - повторяет паттерн content_router.py
 """
 
-from typing import Optional, List
-from fastapi import APIRouter, Depends, Query, HTTPException
+from typing import List, Optional
+
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
-from app.features.interviews.services.interview_service import InterviewService
-from app.features.interviews.dto.responses import (
-    InterviewsListResponse,
-    InterviewDetailResponse, 
-    AnalyticsResponse,
-    CompanyStatsResponse,
-    CompaniesListResponse
-)
 from app.features.interviews.dto.categories_responses import CompanyResponse
+from app.features.interviews.dto.responses import (
+    AnalyticsResponse,
+    CompaniesListResponse,
+    CompanyStatsResponse,
+    InterviewDetailResponse,
+    InterviewsListResponse,
+)
 from app.features.interviews.services.categories_service import CategoriesService
-from app.shared.dependencies import get_current_user_optional
+from app.features.interviews.services.interview_service import InterviewService
 from app.shared.database import get_session
+from app.shared.dependencies import get_current_user_optional
 
 router = APIRouter(
-    prefix="/interviews", 
+    prefix="/interviews",
     tags=["interviews"],
-    responses={404: {"description": "Not found"}}
+    responses={404: {"description": "Not found"}},
 )
 
 
 @router.get(
-    "/", 
+    "/",
     response_model=InterviewsListResponse,
     summary="Получить список интервью",
-    description="Возвращает список интервью с поддержкой фильтрации по компании и пагинации"
+    description="Возвращает список интервью с поддержкой фильтрации по компании и пагинации",
 )
 async def get_interviews(
     page: int = Query(1, ge=1, description="Номер страницы"),
     limit: int = Query(20, ge=1, le=100, description="Количество записей на странице"),
-    company: Optional[str] = Query(None, description="Фильтр по названию компании (устарел, используйте companies)"),
-    companies: Optional[List[str]] = Query(None, description="Фильтр по списку компаний"),
+    company: Optional[str] = Query(
+        None, description="Фильтр по названию компании (устарел, используйте companies)"
+    ),
+    companies: Optional[List[str]] = Query(
+        None, description="Фильтр по списку компаний"
+    ),
     search: Optional[str] = Query(None, description="Поиск по содержимому интервью"),
-    has_audio: Optional[bool] = Query(None, description="Фильтр по наличию аудио/видео записи"),
+    has_audio: Optional[bool] = Query(
+        None, description="Фильтр по наличию аудио/видео записи"
+    ),
     session: Session = Depends(get_session),
-    current_user = Depends(get_current_user_optional)
+    current_user=Depends(get_current_user_optional),
 ):
     """Получение списка интервью с фильтрацией и пагинацией
-    
+
     - **page**: Номер страницы (начинается с 1)
     - **limit**: Количество записей на странице (максимум 100)
     - **company**: Название компании для фильтрации (устарел)
@@ -52,67 +59,57 @@ async def get_interviews(
     - **search**: Поиск по тексту интервью
     """
     service = InterviewService(session)
-    
+
     # Поддержка как старого формата (company), так и нового (companies)
     companies_filter = None
     if companies:
         companies_filter = companies
     elif company:
         companies_filter = [company]
-    
-    filters = {
-        "companies": companies_filter,
-        "search": search,
-        "has_audio": has_audio
-    }
-    
-    return service.get_interviews_list(
-        page=page,
-        limit=limit,
-        filters=filters
-    )
 
+    filters = {"companies": companies_filter, "search": search, "has_audio": has_audio}
 
+    return service.get_interviews_list(page=page, limit=limit, filters=filters)
 
 
 @router.get(
-    "/company/{company_name}/stats", 
+    "/company/{company_name}/stats",
     response_model=CompanyStatsResponse,
     summary="Статистика по компании",
-    description="Возвращает подробную статистику по интервью конкретной компании"
+    description="Возвращает подробную статистику по интервью конкретной компании",
 )
 async def get_company_stats(
     company_name: str,
     session: Session = Depends(get_session),
-    current_user = Depends(get_current_user_optional)
+    current_user=Depends(get_current_user_optional),
 ):
     """Статистика по конкретной компании
-    
+
     Включает:
     - Общее количество интервью
     - Средняя продолжительность
     """
     service = InterviewService(session)
     stats = service.get_company_statistics(company_name)
-    
+
     if not stats:
         raise HTTPException(status_code=404, detail="Company not found")
-    
+
     return stats
 
 
 @router.get(
-    "/analytics/overview", 
+    "/analytics/overview",
     response_model=AnalyticsResponse,
     summary="Общая аналитика",
-    description="Возвращает сводную аналитику по всем интервью в системе"
+    description="Возвращает сводную аналитику по всем интервью в системе",
 )
 async def get_analytics_overview(
     session: Session = Depends(get_session),
-    current_user = Depends(get_current_user_optional)
+    current_user=Depends(get_current_user_optional),
 ):
     """Общая аналитика по всем интервью
-    
+
     Включает:
     - Общее количество интервью и компаний
     - Топ компании по количеству интервью
@@ -126,14 +123,14 @@ async def get_analytics_overview(
     "/companies/list",
     response_model=CompaniesListResponse,
     summary="Список компаний",
-    description="Возвращает список всех компаний для использования в фильтрах"
+    description="Возвращает список всех компаний для использования в фильтрах",
 )
 async def get_companies_list(
     session: Session = Depends(get_session),
-    current_user = Depends(get_current_user_optional)
+    current_user=Depends(get_current_user_optional),
 ):
     """Список всех компаний для фильтров
-    
+
     Возвращает массив названий компаний, присутствующих в базе данных интервью
     """
     service = InterviewService(session)
@@ -144,21 +141,21 @@ async def get_companies_list(
     "/top-companies",
     response_model=List[CompanyResponse],
     summary="Получить топ компаний",
-    description="Возвращает список компаний с наибольшим количеством вопросов"
+    description="Возвращает список компаний с наибольшим количеством вопросов",
 )
 async def get_top_companies(
     limit: int = Query(
-        20, 
-        ge=1, 
+        20,
+        ge=1,
         le=500,  # Увеличиваем лимит до 500 для получения всех компаний
-        description="Количество компаний в топе"
+        description="Количество компаний в топе",
     ),
     session: Session = Depends(get_session),
-    current_user = Depends(get_current_user_optional)
+    current_user=Depends(get_current_user_optional),
 ) -> List[CompanyResponse]:
     """
     Получить топ компаний по количеству вопросов
-    
+
     Возвращает список компаний, отсортированный по убыванию количества
     вопросов от каждой компании.
     """
@@ -167,18 +164,18 @@ async def get_top_companies(
 
 
 @router.get(
-    "/detail/{interview_id}", 
+    "/detail/{interview_id}",
     response_model=InterviewDetailResponse,
     summary="Получить детали интервью",
-    description="Возвращает полную информацию об интервью включая полный текст"
+    description="Возвращает полную информацию об интервью включая полный текст",
 )
 async def get_interview_detail(
     interview_id: str,
     session: Session = Depends(get_session),
-    current_user = Depends(get_current_user_optional)
+    current_user=Depends(get_current_user_optional),
 ):
     """Получение детальной информации об интервью
-    
+
     Возвращает полную информацию об интервью включая:
     - Полный текст интервью
     - Все метаданные
@@ -187,9 +184,8 @@ async def get_interview_detail(
     """
     service = InterviewService(session)
     interview = service.get_interview_by_id(interview_id)
-    
+
     if not interview:
         raise HTTPException(status_code=404, detail="Interview not found")
-    
-    return interview
 
+    return interview

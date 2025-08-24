@@ -1,22 +1,15 @@
-from typing import List
-
 from sqlalchemy import (
-    ARRAY,
-    JSON,
-    Boolean,
     Column,
     DateTime,
     ForeignKey,
     Index,
     Integer,
     String,
-    Text,
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from app.shared.database.connection import Base
-
 
 # Модели ContentFile и ContentBlock перенесены в app.shared.entities.content
 # Оставлено для совместимости, не использовать в основной архитектуре.
@@ -49,5 +42,3 @@ class UserContentProgress(Base):
 
     class Config:
         from_attributes = True
-
-

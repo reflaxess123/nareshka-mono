@@ -12,7 +12,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, Query
 
-from app.features.content.services.content_service import ContentService
+from app.core.logging import get_logger
 from app.features.content.dto.requests import ProgressAction
 from app.features.content.dto.responses import (
     ContentBlockResponse,
@@ -22,15 +22,15 @@ from app.features.content.dto.responses import (
     ContentSubcategoriesResponse,
     UserContentProgressResponse,
 )
+from app.features.content.repositories.content_repository import ContentRepository
+from app.features.content.services.content_service import ContentService
+from app.shared.database import get_session
 from app.shared.dependencies import (
     get_current_user_optional,
     get_current_user_required,
 )
-from app.shared.database import get_session
-from app.features.content.repositories.content_repository import ContentRepository
-from app.shared.models.user_models import User
 from app.shared.dto import PaginatedResponse
-from app.core.logging import get_logger
+from app.shared.models.user_models import User
 
 logger = get_logger(__name__)
 
@@ -69,7 +69,7 @@ async def get_content_blocks(
             "limit": limit,
             "user_id": current_user.id if current_user else None,
             "search_query": q,
-        }
+        },
     )
 
     user_id = current_user.id if current_user else None
@@ -107,7 +107,7 @@ async def get_content_files(
     """Получение списка файлов контента с пагинацией"""
     logger.info(
         "Getting content files",
-        extra={"page": page, "limit": limit, "main_category": mainCategory}
+        extra={"page": page, "limit": limit, "main_category": mainCategory},
     )
 
     files, total = await content_service.get_content_files(
@@ -137,8 +137,7 @@ async def get_content_categories(
     "/categories/{category}/subcategories", response_model=ContentSubcategoriesResponse
 )
 async def get_content_subcategories(
-    category: str, 
-    content_service: ContentService = Depends(get_content_service)
+    category: str, content_service: ContentService = Depends(get_content_service)
 ):
     """Получение списка подкатегорий для указанной категории"""
     logger.info(f"Getting subcategories for category: {category}")
@@ -157,7 +156,7 @@ async def get_content_block(
     """Получение блока контента по ID"""
     logger.info(
         f"Getting content block: {block_id}",
-        extra={"user_id": current_user.id if current_user else None}
+        extra={"user_id": current_user.id if current_user else None},
     )
 
     user_id = current_user.id if current_user else None
@@ -181,7 +180,7 @@ async def update_content_block_progress(
     """Обновление прогресса пользователя по блоку"""
     logger.info(
         f"Updating progress for block: {block_id}",
-        extra={"user_id": current_user.id, "action": action_data.action}
+        extra={"user_id": current_user.id, "action": action_data.action},
     )
 
     progress = await content_service.update_content_block_progress(
@@ -195,6 +194,4 @@ async def update_content_block_progress(
         userId=progress.userId,
         blockId=progress.blockId,
         solvedCount=progress.solvedCount,
-    ) 
-
-
+    )

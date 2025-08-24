@@ -1,38 +1,37 @@
 """Task Feature"""
 
 # Models
-from app.shared.models.task_models import TaskAttempt, TaskSolution
-
 # DTOs
 from app.features.task.dto.requests import (
     TaskAttemptCreateRequest,
     TaskSolutionCreateRequest,
 )
 from app.features.task.dto.responses import (
+    TaskAttemptResponse,
+    TaskCategoriesResponse,
+    TaskCategoryResponse,
+    TaskCompaniesResponse,
+    TaskCompanyResponse,
     TaskResponse,
     TasksListResponse,
-    TaskCategoryResponse,
-    TaskCategoriesResponse,
-    TaskCompanyResponse,
-    TaskCompaniesResponse,
-    TaskAttemptResponse,
     TaskSolutionResponse,
 )
 
-# Services
-from app.features.task.services.task_service import TaskService
+# Exceptions
+from app.features.task.exceptions.task_exceptions import (
+    TaskAttemptError,
+    TaskError,
+    TaskNotFoundError,
+    TaskSolutionError,
+    TaskValidationError,
+)
 
 # Repository
 from app.features.task.repositories.task_repository import TaskRepository
 
-# Exceptions
-from app.features.task.exceptions.task_exceptions import (
-    TaskError,
-    TaskNotFoundError,
-    TaskValidationError,
-    TaskAttemptError,
-    TaskSolutionError,
-)
+# Services
+from app.features.task.services.task_service import TaskService
+from app.shared.models.task_models import TaskAttempt, TaskSolution
 
 # Router импортируется напрямую в main.py для избежания циклических импортов
 
@@ -46,7 +45,7 @@ __all__ = [
     # DTOs Responses
     "TaskResponse",
     "TasksListResponse",
-    "TaskCategoryResponse", 
+    "TaskCategoryResponse",
     "TaskCategoriesResponse",
     "TaskCompanyResponse",
     "TaskCompaniesResponse",
@@ -62,8 +61,4 @@ __all__ = [
     "TaskValidationError",
     "TaskAttemptError",
     "TaskSolutionError",
-
-] 
-
-
-
+]

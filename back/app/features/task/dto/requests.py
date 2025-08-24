@@ -14,9 +14,11 @@ class TaskAttemptCreateRequest(BaseModel):
     language: str = Field(..., description="Язык программирования")
     isSuccessful: bool = Field(default=False, description="Успешность попытки")
     attemptNumber: int = Field(..., description="Номер попытки")
-    
+
     executionTimeMs: Optional[int] = Field(None, description="Время выполнения в мс")
-    memoryUsedMB: Optional[float] = Field(None, description="Использованная память в МБ")
+    memoryUsedMB: Optional[float] = Field(
+        None, description="Использованная память в МБ"
+    )
     errorMessage: Optional[str] = Field(None, description="Сообщение об ошибке")
     stderr: Optional[str] = Field(None, description="Вывод stderr")
     durationMinutes: Optional[int] = Field(None, description="Время решения в минутах")
@@ -55,6 +57,4 @@ class TaskFilterRequest(BaseModel):
     companies: Optional[list[str]] = Field(None, description="Компании")
 
     class Config:
-        from_attributes = True 
-
-
+        from_attributes = True

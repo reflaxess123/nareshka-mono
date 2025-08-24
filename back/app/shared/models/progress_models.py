@@ -52,5 +52,3 @@ class UserCategoryProgress(Base):
             unique=True,
         ),
     )
-
-

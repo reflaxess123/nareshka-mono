@@ -37,5 +37,3 @@ class UserTheoryProgress(BaseModel):
     due_date: Optional[datetime] = None
     created_at: datetime
     updated_at: datetime
-
-

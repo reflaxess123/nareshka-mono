@@ -2,11 +2,13 @@
 Cluster Visualization API Router (feature: visualization)
 Endpoints для визуализации кластеров в виде созвездий
 """
-from typing import List, Dict, Any
+
+from typing import Any, Dict, List
+
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy.orm import Session
-from sqlalchemy import text
 from pydantic import BaseModel
+from sqlalchemy import text
+from sqlalchemy.orm import Session
 
 from app.shared.database import get_session
 from app.shared.dependencies import get_current_user_optional
@@ -26,11 +28,13 @@ class ClusterNode(BaseModel):
     top_companies: List[str]
     difficulty_distribution: Dict[str, float]
 
+
 class ClusterLink(BaseModel):
     source: int
     target: int
     weight: int
     strength: float
+
 
 class ClusterConstellationResponse(BaseModel):
     nodes: List[ClusterNode]
@@ -42,7 +46,7 @@ class ClusterConstellationResponse(BaseModel):
 router = APIRouter(
     prefix="/cluster-visualization",
     tags=["visualization"],
-    responses={404: {"description": "Not found"}}
+    responses={404: {"description": "Not found"}},
 )
 
 
@@ -50,16 +54,24 @@ router = APIRouter(
     "/constellation",
     response_model=ClusterConstellationResponse,
     summary="Получить данные для визуализации созвездия кластеров",
-    description="Возвращает узлы и связи для D3.js / ReactFlow графа"
+    description="Возвращает узлы и связи для D3.js / ReactFlow графа",
 )
 async def get_cluster_constellation(
-    min_interview_count: int = Query(1, description="Минимальное количество интервью для кластера"),
-    min_link_weight: int = Query(3, description="Минимальный вес связи для отображения"),
-    category_filter: List[str] | None = Query(default=None, description="Фильтр по категориям"),
-    category_id: str | None = Query(default=None, description="Конкретная категория для фильтрации"),
+    min_interview_count: int = Query(
+        1, description="Минимальное количество интервью для кластера"
+    ),
+    min_link_weight: int = Query(
+        3, description="Минимальный вес связи для отображения"
+    ),
+    category_filter: List[str] | None = Query(
+        default=None, description="Фильтр по категориям"
+    ),
+    category_id: str | None = Query(
+        default=None, description="Конкретная категория для фильтрации"
+    ),
     limit: int = Query(200, description="Максимальное количество кластеров"),
     session: Session = Depends(get_session),
-    current_user = Depends(get_current_user_optional)
+    current_user=Depends(get_current_user_optional),
 ):
     """Получение данных для визуализации созвездия кластеров"""
     # 1) Кластеры и их метрики
@@ -108,17 +120,21 @@ async def get_cluster_constellation(
         """
     )
 
-    no_filter = (category_filter is None or len(category_filter) == 0) and category_id is None
+    no_filter = (
+        category_filter is None or len(category_filter) == 0
+    ) and category_id is None
 
     clusters_result = session.execute(
         cluster_query,
         {
             "min_interview_count": min_interview_count,
-            "category_filter": category_filter if category_filter and len(category_filter) > 0 else [],
+            "category_filter": category_filter
+            if category_filter and len(category_filter) > 0
+            else [],
             "single_category_id": category_id,
             "no_filter": no_filter,
             "limit": limit,
-        }
+        },
     ).fetchall()
 
     # 2) Связи между кластерами (через пары из массива кластеров в интервью)
@@ -145,44 +161,52 @@ async def get_cluster_constellation(
         """
     )
 
-    links_result = session.execute(links_query, {"min_link_weight": min_link_weight}).fetchall()
+    links_result = session.execute(
+        links_query, {"min_link_weight": min_link_weight}
+    ).fetchall()
 
     # 3) Формируем узлы
     nodes: List[ClusterNode] = []
     cluster_ids = set()
-    max_questions = max([r.questions_count for r in clusters_result]) if clusters_result else 1
+    max_questions = (
+        max([r.questions_count for r in clusters_result]) if clusters_result else 1
+    )
     for cluster in clusters_result:
         cluster_ids.add(cluster.id)
-        nodes.append(ClusterNode(
-            id=cluster.id,
-            name=cluster.name,
-            category_id=cluster.category_id,
-            category_name=cluster.category_name,
-            questions_count=cluster.questions_count,
-            interview_count=cluster.interview_count,
-            interview_penetration=float(cluster.interview_penetration),
-            keywords=cluster.keywords if cluster.keywords else [],
-            example_question=cluster.example_question or "",
-            size=cluster.questions_count / max_questions,
-            top_companies=cluster.top_companies if cluster.top_companies else [],
-            difficulty_distribution={
-                "junior": float(cluster.junior_pct),
-                "middle": float(cluster.middle_pct),
-                "senior": float(cluster.senior_pct)
-            }
-        ))
+        nodes.append(
+            ClusterNode(
+                id=cluster.id,
+                name=cluster.name,
+                category_id=cluster.category_id,
+                category_name=cluster.category_name,
+                questions_count=cluster.questions_count,
+                interview_count=cluster.interview_count,
+                interview_penetration=float(cluster.interview_penetration),
+                keywords=cluster.keywords if cluster.keywords else [],
+                example_question=cluster.example_question or "",
+                size=cluster.questions_count / max_questions,
+                top_companies=cluster.top_companies if cluster.top_companies else [],
+                difficulty_distribution={
+                    "junior": float(cluster.junior_pct),
+                    "middle": float(cluster.middle_pct),
+                    "senior": float(cluster.senior_pct),
+                },
+            )
+        )
 
     # 4) Формируем связи
     links: List[ClusterLink] = []
     max_weight = max([l.shared_interviews for l in links_result]) if links_result else 1
     for link in links_result:
         if link.c1 in cluster_ids and link.c2 in cluster_ids:
-            links.append(ClusterLink(
-                source=link.c1,
-                target=link.c2,
-                weight=link.shared_interviews,
-                strength=link.shared_interviews / max_weight
-            ))
+            links.append(
+                ClusterLink(
+                    source=link.c1,
+                    target=link.c2,
+                    weight=link.shared_interviews,
+                    strength=link.shared_interviews / max_weight,
+                )
+            )
 
     # 5) Категории
     categories_rows = session.execute(text('SELECT id, name FROM "InterviewCategory"'))
@@ -192,22 +216,26 @@ async def get_cluster_constellation(
     stats = {
         "total_clusters": len(nodes),
         "total_links": len(links),
-        "avg_penetration": (sum(n.interview_penetration for n in nodes) / len(nodes)) if nodes else 0,
+        "avg_penetration": (sum(n.interview_penetration for n in nodes) / len(nodes))
+        if nodes
+        else 0,
         "max_cluster_size": max([n.questions_count for n in nodes]) if nodes else 0,
         "strongest_link": max([l.weight for l in links]) if links else 0,
     }
 
-    return ClusterConstellationResponse(nodes=nodes, links=links, categories=categories, stats=stats)
+    return ClusterConstellationResponse(
+        nodes=nodes, links=links, categories=categories, stats=stats
+    )
 
 
 @router.get("/cluster/{cluster_id}/questions")
 async def get_cluster_questions(
     cluster_id: int,
     limit: int = Query(10, description="Максимальное количество вопросов"),
-    session: Session = Depends(get_session)
+    session: Session = Depends(get_session),
 ):
     """Получение всех вопросов для кластера"""
-    
+
     # Сначала получаем статистику кластера
     stats_query = text(
         """
@@ -224,11 +252,11 @@ async def get_cluster_questions(
         GROUP BY c.id, c.name, cat.name, c.questions_count
         """
     )
-    
+
     stats_result = session.execute(stats_query, {"cluster_id": cluster_id}).fetchone()
     if not stats_result:
         return {"error": "Кластер не найден", "questions": []}
-    
+
     # Затем получаем примеры вопросов
     query = text(
         """
@@ -250,19 +278,25 @@ async def get_cluster_questions(
         LIMIT :limit
         """
     )
-    result = session.execute(query, {"cluster_id": cluster_id, "limit": limit}).fetchall()
+    result = session.execute(
+        query, {"cluster_id": cluster_id, "limit": limit}
+    ).fetchall()
 
     questions = []
     for row in result:
-        questions.append({
-            "question_text": row.question_text,
-            "company": row.company,
-            "interview_id": row.interview_id,
-            "position": row.position,
-            "company_name": row.company_name,
-            "interview_date": row.interview_date.isoformat() if row.interview_date else None,
-            "duration_minutes": row.duration_minutes,
-        })
+        questions.append(
+            {
+                "question_text": row.question_text,
+                "company": row.company,
+                "interview_id": row.interview_id,
+                "position": row.position,
+                "company_name": row.company_name,
+                "interview_date": row.interview_date.isoformat()
+                if row.interview_date
+                else None,
+                "duration_minutes": row.duration_minutes,
+            }
+        )
 
     return {
         "cluster_id": cluster_id,
@@ -273,4 +307,3 @@ async def get_cluster_questions(
         "total_questions_in_db": stats_result.total_questions_in_db,
         "questions": questions,
     }
-

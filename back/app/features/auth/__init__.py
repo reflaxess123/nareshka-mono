@@ -8,33 +8,31 @@ Auth Feature - Аутентификация и управление пользо
 """
 
 from app.shared.models.user_models import User
-from .repositories.user_repository import UserRepository
-from .repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
-from .services.auth_service import AuthService
+
 # Router импортируется напрямую в main.py для избежания циклических импортов
 from .dto.auth_dto import (
     LoginRequest,
-    RegisterRequest,
     LoginResponse,
-    RegisterResponse,
-    UserResponse,
     LogoutResponse,
-    TokenData
+    RegisterRequest,
+    RegisterResponse,
+    TokenData,
+    UserResponse,
 )
+from .repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
+from .repositories.user_repository import UserRepository
+from .services.auth_service import AuthService
 
 __all__ = [
     "User",
-    "UserRepository", 
+    "UserRepository",
     "SQLAlchemyUserRepository",
     "AuthService",
     "LoginRequest",
     "RegisterRequest",
-    "LoginResponse", 
+    "LoginResponse",
     "RegisterResponse",
     "UserResponse",
     "LogoutResponse",
-    "TokenData"
-] 
-
-
-
+    "TokenData",
+]

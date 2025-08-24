@@ -170,6 +170,3 @@ class TestCasesResponseDTO(BaseModel):
     publicTests: int
     hiddenTests: int
     lastGenerated: Optional[datetime] = None
-
-
-

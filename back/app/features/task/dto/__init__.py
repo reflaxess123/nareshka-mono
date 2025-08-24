@@ -2,19 +2,19 @@
 
 from .requests import (
     TaskAttemptCreateRequest,
-    TaskSolutionCreateRequest,
     TaskFilterRequest,
+    TaskSolutionCreateRequest,
 )
 from .responses import (
+    FileResponse,
+    TaskAttemptResponse,
+    TaskCategoriesResponse,
+    TaskCategoryResponse,
+    TaskCompaniesResponse,
+    TaskCompanyResponse,
     TaskResponse,
     TasksListResponse,
-    TaskCategoryResponse,
-    TaskCategoriesResponse,
-    TaskCompanyResponse,
-    TaskCompaniesResponse,
-    TaskAttemptResponse,
     TaskSolutionResponse,
-    FileResponse,
 )
 
 __all__ = [
@@ -32,7 +32,4 @@ __all__ = [
     "TaskAttemptResponse",
     "TaskSolutionResponse",
     "FileResponse",
-] 
-
-
-
+]

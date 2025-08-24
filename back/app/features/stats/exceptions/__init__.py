@@ -1,20 +1,17 @@
 """Исключения stats feature"""
 
 from .stats_exceptions import (
-    StatsError,
+    StatsAggregationError,
     StatsCalculationError,
     StatsDataNotFoundError,
-    StatsAggregationError,
+    StatsError,
     StatsPermissionError,
 )
 
 __all__ = [
     "StatsError",
-    "StatsCalculationError", 
+    "StatsCalculationError",
     "StatsDataNotFoundError",
     "StatsAggregationError",
     "StatsPermissionError",
-] 
-
-
-
+]

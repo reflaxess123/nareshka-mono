@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 
-import asyncio
-from sqlalchemy.orm import Session
-from app.shared.database import get_session
 from app.features.interviews.services.categories_service import CategoriesService
+from app.shared.database import get_session
+
 
 def test_companies():
     session_gen = get_session()
@@ -11,18 +10,20 @@ def test_companies():
     try:
         service = CategoriesService(session)
         companies = service.get_top_companies(limit=5)
-        print(f'Found {len(companies)} companies:')
+        print(f"Found {len(companies)} companies:")
         for company in companies:
-            print(f'  {company.name}: {company.count}')
+            print(f"  {company.name}: {company.count}")
     except Exception as e:
-        print(f'Error: {e}')
+        print(f"Error: {e}")
         import traceback
+
         traceback.print_exc()
     finally:
         try:
             next(session_gen)  # Close session
         except StopIteration:
             pass
+
 
 if __name__ == "__main__":
     test_companies()

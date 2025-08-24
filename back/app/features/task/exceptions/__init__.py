@@ -1,13 +1,13 @@
 """Исключения task feature"""
 
 from .task_exceptions import (
-    TaskError,
-    TaskNotFoundError,
-    TaskValidationError,
     TaskAttemptError,
-    TaskSolutionError,
     TaskCodeExecutionError,
+    TaskError,
     TaskInvalidLanguageError,
+    TaskNotFoundError,
+    TaskSolutionError,
+    TaskValidationError,
 )
 
 __all__ = [
@@ -18,7 +18,4 @@ __all__ = [
     "TaskSolutionError",
     "TaskCodeExecutionError",
     "TaskInvalidLanguageError",
-] 
-
-
-
+]

@@ -5,8 +5,6 @@ import uuid
 from datetime import datetime
 from typing import List, Optional
 
-from app.features.code_editor.repositories.code_editor_repository import CodeEditorRepository
-from app.features.code_editor.services.enhanced_code_executor_service import EnhancedCodeExecutorService
 from app.features.code_editor.dto.requests import (
     CodeExecutionRequest,
     UserCodeSolutionCreateRequest,
@@ -14,26 +12,31 @@ from app.features.code_editor.dto.requests import (
     ValidationRequest,
 )
 from app.features.code_editor.dto.responses import (
-    SupportedLanguageResponse,
     CodeExecutionResponse,
-    UserCodeSolutionResponse,
     ExecutionStatsResponse,
+    HealthResponse,
+    SupportedLanguageResponse,
+    TestCaseExecutionResponse,
     TestCaseResponse,
     TestCasesResponse,
+    UserCodeSolutionResponse,
     ValidationResultResponse,
-    TestCaseExecutionResponse,
-    HealthResponse,
 )
-from app.shared.models.code_execution_models import (
-    CodeExecution,
-    UserCodeSolution,
-)
-from app.shared.entities.enums import CodeLanguage, ExecutionStatus
 from app.features.code_editor.exceptions.code_editor_exceptions import (
-    UnsupportedLanguageError,
     CodeExecutionError,
-    UnsafeCodeError,
     SolutionNotFoundError,
+    UnsafeCodeError,
+    UnsupportedLanguageError,
+)
+from app.features.code_editor.repositories.code_editor_repository import (
+    CodeEditorRepository,
+)
+from app.features.code_editor.services.enhanced_code_executor_service import (
+    EnhancedCodeExecutorService,
+)
+from app.shared.entities.enums import CodeLanguage
+from app.shared.models.code_execution_models import (
+    UserCodeSolution,
 )
 
 logger = logging.getLogger(__name__)
@@ -49,10 +52,10 @@ class CodeEditorService:
     async def get_supported_languages(self) -> List[SupportedLanguageResponse]:
         """Получение списка поддерживаемых языков"""
         logger.info("Получение поддерживаемых языков")
-        
+
         try:
             languages = await self.code_editor_repository.get_supported_languages()
-            
+
             return [
                 SupportedLanguageResponse(
                     id=lang.id,
@@ -66,7 +69,7 @@ class CodeEditorService:
                 )
                 for lang in languages
             ]
-            
+
         except Exception as e:
             logger.error(f"Ошибка при получении языков: {e}")
             raise
@@ -76,7 +79,7 @@ class CodeEditorService:
     ) -> CodeExecutionResponse:
         """Создание задачи на выполнение кода"""
         logger.info(f"Выполнение кода на языке {request.language}")
-        
+
         try:
             # Проверяем, что язык поддерживается
             try:
@@ -91,7 +94,9 @@ class CodeEditorService:
                 raise UnsafeCodeError("Код содержит потенциально опасные конструкции")
 
             # Получаем настройки языка
-            language = await self.code_editor_repository.get_language_by_enum(language_enum)
+            language = await self.code_editor_repository.get_language_by_enum(
+                language_enum
+            )
             if not language:
                 raise UnsupportedLanguageError(request.language)
 
@@ -103,7 +108,7 @@ class CodeEditorService:
                 user_id=user_id,
                 block_id=request.blockId,
             )
-            
+
             created_execution = execution_result
 
             return CodeExecutionResponse(
@@ -136,13 +141,15 @@ class CodeEditorService:
     ) -> CodeExecutionResponse:
         """Получение результата выполнения"""
         logger.info(f"Получение результата выполнения {execution_id}")
-        
+
         try:
-            execution = await self.code_editor_repository.get_execution_by_id(execution_id)
-            
+            execution = await self.code_editor_repository.get_execution_by_id(
+                execution_id
+            )
+
             if not execution:
                 raise CodeExecutionError(execution_id, "Выполнение не найдено")
-                
+
             # Проверяем права доступа если указан пользователь
             if user_id and execution.userId != user_id:
                 raise CodeExecutionError(execution_id, "Нет доступа к этому выполнению")
@@ -181,7 +188,7 @@ class CodeEditorService:
     ) -> List[CodeExecutionResponse]:
         """Получение истории выполнений пользователя"""
         logger.info(f"Получение истории выполнений пользователя {user_id}")
-        
+
         try:
             executions = await self.code_editor_repository.get_user_executions(
                 user_id, block_id, limit, offset
@@ -217,19 +224,25 @@ class CodeEditorService:
         self, solution_data: UserCodeSolutionCreateRequest, user_id: int
     ) -> UserCodeSolutionResponse:
         """Сохранение решения пользователя"""
-        logger.info(f"Сохранение решения пользователя {user_id} для блока {solution_data.blockId}")
-        
+        logger.info(
+            f"Сохранение решения пользователя {user_id} для блока {solution_data.blockId}"
+        )
+
         try:
             # Получаем язык
-            language = await self.code_editor_repository.get_language_by_enum(solution_data.language)
+            language = await self.code_editor_repository.get_language_by_enum(
+                solution_data.language
+            )
             if not language:
                 raise UnsupportedLanguageError(solution_data.language.value)
 
             # Проверяем существующее решение
-            existing_solutions = await self.code_editor_repository.get_user_solutions_for_block(
-                user_id, solution_data.blockId
+            existing_solutions = (
+                await self.code_editor_repository.get_user_solutions_for_block(
+                    user_id, solution_data.blockId
+                )
             )
-            
+
             # Если есть решение для этого языка, обновляем его
             existing_solution = None
             for sol in existing_solutions:
@@ -241,8 +254,12 @@ class CodeEditorService:
                 existing_solution.sourceCode = solution_data.sourceCode
                 existing_solution.isCompleted = solution_data.isCompleted
                 existing_solution.updatedAt = datetime.now()
-                
-                updated_solution = await self.code_editor_repository.update_user_solution(existing_solution)
+
+                updated_solution = (
+                    await self.code_editor_repository.update_user_solution(
+                        existing_solution
+                    )
+                )
                 solution = updated_solution
             else:
                 # Создаем новое решение
@@ -257,8 +274,10 @@ class CodeEditorService:
                     createdAt=datetime.now(),
                     updatedAt=datetime.now(),
                 )
-                
-                solution = await self.code_editor_repository.create_user_solution(solution)
+
+                solution = await self.code_editor_repository.create_user_solution(
+                    solution
+                )
 
             return UserCodeSolutionResponse(
                 id=solution.id,
@@ -285,7 +304,7 @@ class CodeEditorService:
     ) -> List[UserCodeSolutionResponse]:
         """Получение решений пользователя для блока"""
         logger.info(f"Получение решений пользователя {user_id} для блока {block_id}")
-        
+
         try:
             solutions = await self.code_editor_repository.get_user_solutions_for_block(
                 user_id, block_id
@@ -317,13 +336,13 @@ class CodeEditorService:
     ) -> UserCodeSolutionResponse:
         """Обновление решения пользователя"""
         logger.info(f"Обновление решения {solution_id}")
-        
+
         try:
             solution = await self.code_editor_repository.get_solution_by_id(solution_id)
-            
+
             if not solution:
                 raise SolutionNotFoundError(solution_id)
-                
+
             if solution.userId != user_id:
                 raise SolutionNotFoundError(solution_id, user_id)
 
@@ -332,10 +351,12 @@ class CodeEditorService:
                 solution.sourceCode = update_data.sourceCode
             if update_data.isCompleted is not None:
                 solution.isCompleted = update_data.isCompleted
-                
+
             solution.updatedAt = datetime.now()
 
-            updated_solution = await self.code_editor_repository.update_user_solution(solution)
+            updated_solution = await self.code_editor_repository.update_user_solution(
+                solution
+            )
 
             return UserCodeSolutionResponse(
                 id=updated_solution.id,
@@ -360,15 +381,15 @@ class CodeEditorService:
     async def get_execution_stats(self, user_id: int) -> ExecutionStatsResponse:
         """Получение статистики выполнений пользователя"""
         logger.info(f"Получение статистики выполнений для пользователя {user_id}")
-        
+
         try:
             stats = await self.code_editor_repository.get_execution_stats(user_id)
 
             return ExecutionStatsResponse(
-                totalExecutions=stats['totalExecutions'],
-                successfulExecutions=stats['successfulExecutions'],
-                averageExecutionTime=stats['averageExecutionTime'],
-                languageStats=stats['languageStats'],
+                totalExecutions=stats["totalExecutions"],
+                successfulExecutions=stats["successfulExecutions"],
+                averageExecutionTime=stats["averageExecutionTime"],
+                languageStats=stats["languageStats"],
             )
 
         except Exception as e:
@@ -380,9 +401,11 @@ class CodeEditorService:
     ) -> TestCasesResponse:
         """Получение тест-кейсов для блока"""
         logger.info(f"Получение тест-кейсов для блока {block_id}")
-        
+
         try:
-            test_cases = await self.code_editor_repository.get_test_cases_for_block(block_id)
+            test_cases = await self.code_editor_repository.get_test_cases_for_block(
+                block_id
+            )
 
             # Фильтруем публичные тест-кейсы для неавторизованных пользователей
             if not user_id:
@@ -435,10 +458,12 @@ class CodeEditorService:
     ) -> ValidationResultResponse:
         """Валидация решения против тест-кейсов"""
         logger.info(f"Валидация решения для блока {block_id}")
-        
+
         try:
             # Получаем тест-кейсы
-            test_cases = await self.code_editor_repository.get_test_cases_for_block(block_id)
+            test_cases = await self.code_editor_repository.get_test_cases_for_block(
+                block_id
+            )
             if not test_cases:
                 logger.warning(f"Нет тест-кейсов для блока {block_id}")
                 return ValidationResultResponse(
@@ -454,7 +479,9 @@ class CodeEditorService:
                 )
 
             # Получаем язык
-            language = await self.code_editor_repository.get_language_by_enum(validation_request.language)
+            language = await self.code_editor_repository.get_language_by_enum(
+                validation_request.language
+            )
             if not language:
                 raise UnsupportedLanguageError(validation_request.language.value)
 
@@ -466,14 +493,16 @@ class CodeEditorService:
             for test_case in test_cases:
                 try:
                     # Выполняем код с входными данными тест-кейса
-                    execution_result = await self.code_editor_repository.execute_code_with_language(
-                        validation_request.sourceCode, language, test_case.input
+                    execution_result = (
+                        await self.code_editor_repository.execute_code_with_language(
+                            validation_request.sourceCode, language, test_case.input
+                        )
                     )
-                    
-                    actual_output = execution_result.get('stdout', '').strip()
+
+                    actual_output = execution_result.get("stdout", "").strip()
                     expected_output = test_case.expectedOutput.strip()
                     passed = actual_output == expected_output
-                    
+
                     if passed:
                         passed_tests += 1
 
@@ -484,8 +513,10 @@ class CodeEditorService:
                         expectedOutput=expected_output,
                         actualOutput=actual_output,
                         passed=passed,
-                        executionTimeMs=execution_result.get('execution_time_ms'),
-                        errorMessage=execution_result.get('stderr') if not passed else None,
+                        executionTimeMs=execution_result.get("execution_time_ms"),
+                        errorMessage=execution_result.get("stderr")
+                        if not passed
+                        else None,
                     )
                     test_results.append(test_result)
 
@@ -505,7 +536,9 @@ class CodeEditorService:
             # Вычисляем финальный score
             if total_weight > 0:
                 weighted_score = sum(
-                    tc.weight for tc, result in zip(test_cases, test_results) if result.passed
+                    tc.weight
+                    for tc, result in zip(test_cases, test_results)
+                    if result.passed
                 )
                 score = (weighted_score / total_weight) * 100
             else:
@@ -534,16 +567,16 @@ class CodeEditorService:
     async def get_health_status(self) -> HealthResponse:
         """Получение статуса здоровья модуля"""
         logger.info("Проверка здоровья code_editor модуля")
-        
+
         try:
             # Проверяем доступность языков
             languages = await self.code_editor_repository.get_supported_languages()
-            
+
             # Проверяем общее количество выполнений (для статистики)
             # Здесь можно добавить более сложные проверки
-            
+
             status = "healthy" if len(languages) > 0 else "unhealthy"
-            
+
             return HealthResponse(
                 status=status,
                 module="code_editor",
@@ -558,5 +591,4 @@ class CodeEditorService:
                 module="code_editor",
                 supportedLanguages=0,
                 totalExecutions=0,
-            ) 
-
+            )

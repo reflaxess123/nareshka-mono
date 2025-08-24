@@ -1,18 +1,17 @@
 """Репозиторий для работы с попытками решения и решениями задач"""
 
+import logging
+from datetime import datetime
 from typing import List, Optional
 from uuid import uuid4
-from datetime import datetime
 
 from sqlalchemy.orm import Session
 
-from app.shared.models.task_models import TaskAttempt, TaskSolution
 from app.features.task.exceptions.task_exceptions import (
     TaskAttemptError,
     TaskSolutionError,
 )
-
-import logging
+from app.shared.models.task_models import TaskAttempt, TaskSolution
 
 logger = logging.getLogger(__name__)
 
@@ -42,20 +41,27 @@ class TaskAttemptRepository:
                 language=language,
                 created_at=datetime.utcnow(),
             )
-            
+
             self.session.add(attempt)
             self.session.commit()
             self.session.refresh(attempt)
-            
-            logger.info(f"Created task attempt", 
-                       user_id=user_id, task_id=task_id, attempt_id=attempt.id)
-            
+
+            logger.info(
+                "Created task attempt",
+                user_id=user_id,
+                task_id=task_id,
+                attempt_id=attempt.id,
+            )
+
             return attempt
-            
+
         except Exception as e:
             self.session.rollback()
-            logger.error(f"Failed to create task attempt: {str(e)}", 
-                        user_id=user_id, task_id=task_id)
+            logger.error(
+                f"Failed to create task attempt: {str(e)}",
+                user_id=user_id,
+                task_id=task_id,
+            )
             raise TaskAttemptError(f"Не удалось создать попытку решения: {str(e)}")
 
     def create_task_solution(
@@ -85,21 +91,28 @@ class TaskAttemptRepository:
                 test_results=test_results,
                 created_at=datetime.utcnow(),
             )
-            
+
             self.session.add(solution)
             self.session.commit()
             self.session.refresh(solution)
-            
-            logger.info(f"Created task solution", 
-                       user_id=user_id, task_id=task_id, solution_id=solution.id, 
-                       is_correct=is_correct)
-            
+
+            logger.info(
+                "Created task solution",
+                user_id=user_id,
+                task_id=task_id,
+                solution_id=solution.id,
+                is_correct=is_correct,
+            )
+
             return solution
-            
+
         except Exception as e:
             self.session.rollback()
-            logger.error(f"Failed to create task solution: {str(e)}", 
-                        user_id=user_id, task_id=task_id)
+            logger.error(
+                f"Failed to create task solution: {str(e)}",
+                user_id=user_id,
+                task_id=task_id,
+            )
             raise TaskSolutionError(f"Не удалось создать решение: {str(e)}")
 
     def get_user_task_attempts(
@@ -111,18 +124,18 @@ class TaskAttemptRepository:
     ) -> List[TaskAttempt]:
         """Получить попытки решения пользователя"""
         query = self.session.query(TaskAttempt).filter(TaskAttempt.user_id == user_id)
-        
+
         if task_id is not None:
             query = query.filter(TaskAttempt.task_id == task_id)
-            
+
         if task_type is not None:
             query = query.filter(TaskAttempt.task_type == task_type)
-            
+
         query = query.order_by(TaskAttempt.created_at.desc())
-        
+
         if limit is not None:
             query = query.limit(limit)
-            
+
         return query.all()
 
     def get_user_task_solutions(
@@ -135,21 +148,21 @@ class TaskAttemptRepository:
     ) -> List[TaskSolution]:
         """Получить решения пользователя"""
         query = self.session.query(TaskSolution).filter(TaskSolution.user_id == user_id)
-        
+
         if task_id is not None:
             query = query.filter(TaskSolution.task_id == task_id)
-            
+
         if task_type is not None:
             query = query.filter(TaskSolution.task_type == task_type)
-            
+
         if only_correct:
             query = query.filter(TaskSolution.is_correct == True)
-            
+
         query = query.order_by(TaskSolution.created_at.desc())
-        
+
         if limit is not None:
             query = query.limit(limit)
-            
+
         return query.all()
 
     def get_user_solution_stats(self, user_id: int) -> dict:
@@ -159,22 +172,24 @@ class TaskAttemptRepository:
             .filter(TaskAttempt.user_id == user_id)
             .count()
         )
-        
+
         total_solutions = (
             self.session.query(TaskSolution)
             .filter(TaskSolution.user_id == user_id)
             .count()
         )
-        
+
         correct_solutions = (
             self.session.query(TaskSolution)
             .filter(TaskSolution.user_id == user_id)
             .filter(TaskSolution.is_correct == True)
             .count()
         )
-        
-        success_rate = (correct_solutions / total_solutions * 100) if total_solutions > 0 else 0
-        
+
+        success_rate = (
+            (correct_solutions / total_solutions * 100) if total_solutions > 0 else 0
+        )
+
         return {
             "total_attempts": total_attempts,
             "total_solutions": total_solutions,
@@ -190,19 +205,22 @@ class TaskAttemptRepository:
             .filter(TaskAttempt.user_id == user_id)
             .first()
         )
-        
+
         if not attempt:
             return False
-            
+
         try:
             self.session.delete(attempt)
             self.session.commit()
-            logger.info(f"Deleted task attempt", attempt_id=attempt_id, user_id=user_id)
+            logger.info("Deleted task attempt", attempt_id=attempt_id, user_id=user_id)
             return True
         except Exception as e:
             self.session.rollback()
-            logger.error(f"Failed to delete task attempt: {str(e)}", 
-                        attempt_id=attempt_id, user_id=user_id)
+            logger.error(
+                f"Failed to delete task attempt: {str(e)}",
+                attempt_id=attempt_id,
+                user_id=user_id,
+            )
             return False
 
     def delete_task_solution(self, solution_id: str, user_id: int) -> bool:
@@ -213,17 +231,22 @@ class TaskAttemptRepository:
             .filter(TaskSolution.user_id == user_id)
             .first()
         )
-        
+
         if not solution:
             return False
-            
+
         try:
             self.session.delete(solution)
             self.session.commit()
-            logger.info(f"Deleted task solution", solution_id=solution_id, user_id=user_id)
+            logger.info(
+                "Deleted task solution", solution_id=solution_id, user_id=user_id
+            )
             return True
         except Exception as e:
             self.session.rollback()
-            logger.error(f"Failed to delete task solution: {str(e)}", 
-                        solution_id=solution_id, user_id=user_id)
+            logger.error(
+                f"Failed to delete task solution: {str(e)}",
+                solution_id=solution_id,
+                user_id=user_id,
+            )
             return False

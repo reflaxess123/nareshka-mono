@@ -7,14 +7,14 @@ from uuid import uuid4
 from sqlalchemy import and_, asc, desc, func, or_
 from sqlalchemy.orm import Session
 
+from app.features.theory.exceptions.theory_exceptions import (
+    TheoryCardNotFoundError,
+    TheoryProgressError,
+)
 from app.shared.entities.enums import CardState
 from app.shared.models.theory_models import (
     TheoryCard,
     UserTheoryProgress,
-)
-from app.features.theory.exceptions.theory_exceptions import (
-    TheoryCardNotFoundError,
-    TheoryProgressError,
 )
 
 
@@ -100,11 +100,7 @@ class TheoryRepository:
 
     async def get_theory_card_by_id(self, card_id: str) -> Optional[TheoryCard]:
         """Получение теоретической карточки по ID"""
-        card = (
-            self.session.query(TheoryCard)
-            .filter(TheoryCard.id == card_id)
-            .first()
-        )
+        card = self.session.query(TheoryCard).filter(TheoryCard.id == card_id).first()
         return card
 
     async def get_theory_categories(self) -> List[Dict[str, Any]]:
@@ -224,7 +220,9 @@ class TheoryRepository:
             .filter(
                 UserTheoryProgress.userId == user_id,
                 UserTheoryProgress.dueDate <= current_time,
-                UserTheoryProgress.cardState.in_([CardState.LEARNING, CardState.REVIEW]),
+                UserTheoryProgress.cardState.in_(
+                    [CardState.LEARNING, CardState.REVIEW]
+                ),
             )
             .order_by(UserTheoryProgress.dueDate)
             .limit(limit)
@@ -286,7 +284,9 @@ class TheoryRepository:
             .filter(
                 UserTheoryProgress.userId == user_id,
                 UserTheoryProgress.dueDate <= current_time,
-                UserTheoryProgress.cardState.in_([CardState.LEARNING, CardState.REVIEW]),
+                UserTheoryProgress.cardState.in_(
+                    [CardState.LEARNING, CardState.REVIEW]
+                ),
             )
             .scalar()
         )
@@ -306,7 +306,9 @@ class TheoryRepository:
             "studiedCards": studied_cards or 0,
             "dueCards": due_cards or 0,
             "averageEaseFactor": float(avg_ease_factor or 2.5),
-            "studyProgress": (studied_cards / total_cards * 100) if total_cards > 0 else 0,
+            "studyProgress": (studied_cards / total_cards * 100)
+            if total_cards > 0
+            else 0,
         }
 
     async def reset_card_progress(self, user_id: int, card_id: str) -> bool:
@@ -321,7 +323,4 @@ class TheoryRepository:
             return True
         except Exception as e:
             self.session.rollback()
-            raise TheoryProgressError(f"Ошибка при сбросе прогресса: {str(e)}") 
-
-
-
+            raise TheoryProgressError(f"Ошибка при сбросе прогресса: {str(e)}")

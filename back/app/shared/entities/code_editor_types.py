@@ -91,5 +91,3 @@ class ExecutionStats(BaseModel):
     average_execution_time_ms: float
     languages_used: List[str]
     success_rate: float
-
-

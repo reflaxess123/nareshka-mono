@@ -4,7 +4,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from app.shared.entities.enums import CardState
 
@@ -28,7 +28,7 @@ class TheoryCardResponse(BaseModel):
     class Config:
         from_attributes = True
         populate_by_name = True
-        
+
     def model_dump(self, **kwargs):
         """Переопределяем model_dump для возврата camelCase"""
         return super().model_dump(**kwargs)
@@ -78,11 +78,8 @@ class TheoryCardsListResponse(BaseModel):
             "hasNext": page * limit < total,
             "hasPrev": page > 1,
         }
-        
-        return cls(
-            cards=cards,
-            pagination=pagination
-        )
+
+        return cls(cards=cards, pagination=pagination)
 
 
 class TheoryCategoriesResponse(BaseModel):
@@ -123,6 +120,4 @@ class DueCardsResponse(BaseModel):
     total: int
 
     class Config:
-        from_attributes = True 
-
-
+        from_attributes = True

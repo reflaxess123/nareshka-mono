@@ -1,4 +1,1 @@
-"""Admin API module""" 
-
-
-
+"""Admin API module"""

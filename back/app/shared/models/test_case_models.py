@@ -106,5 +106,3 @@ class TestValidationResult(Base):
             unique=True,
         ),
     )
-
-

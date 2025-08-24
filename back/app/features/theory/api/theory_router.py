@@ -5,18 +5,18 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
-from app.features.theory.services.theory_service import TheoryService
-from app.shared.database import get_session
 from app.features.theory.dto.requests import ProgressAction, ReviewRating
 from app.features.theory.dto.responses import (
+    DueCardsResponse,
     TheoryCardResponse,
     TheoryCardsListResponse,
     TheoryCategoriesResponse,
     TheoryStatsResponse,
     TheorySubcategoriesResponse,
     UserTheoryProgressResponse,
-    DueCardsResponse,
 )
+from app.features.theory.services.theory_service import TheoryService
+from app.shared.database import get_session
 from app.shared.dependencies import (
     get_current_user_optional,
     get_current_user_required,
@@ -28,6 +28,7 @@ router = APIRouter(prefix="/theory", tags=["Theory"])
 def get_theory_service(db: Session = Depends(get_session)) -> TheoryService:
     """Зависимость для получения сервиса theory"""
     from app.features.theory.repositories.theory_repository import TheoryRepository
+
     theory_repository = TheoryRepository(db)
     return TheoryService(theory_repository)
 
@@ -79,8 +80,7 @@ async def get_theory_categories(
     "/categories/{category}/subcategories", response_model=TheorySubcategoriesResponse
 )
 async def get_theory_subcategories(
-    category: str, 
-    theory_service: TheoryService = Depends(get_theory_service)
+    category: str, theory_service: TheoryService = Depends(get_theory_service)
 ):
     """Получение списка подкатегорий для категории"""
     subcategories = await theory_service.get_theory_subcategories(category)
@@ -184,22 +184,20 @@ async def reset_theory_card_progress(
 async def test_camel_case():
     """Тестовый endpoint для проверки camelCase"""
     from datetime import datetime
-    
+
     test_data = {
-        'id': 'test-id',
-        'ankiGuid': 'test-anki-guid',
-        'cardType': 'test-card-type',
-        'deck': 'test-deck',
-        'category': 'test-category',
-        'subCategory': 'test-sub-category',
-        'questionBlock': 'test-question-block',
-        'answerBlock': 'test-answer-block',
-        'tags': ['tag1', 'tag2'],
-        'orderIndex': 1,
-        'createdAt': datetime.now(),
-        'updatedAt': datetime.now()
+        "id": "test-id",
+        "ankiGuid": "test-anki-guid",
+        "cardType": "test-card-type",
+        "deck": "test-deck",
+        "category": "test-category",
+        "subCategory": "test-sub-category",
+        "questionBlock": "test-question-block",
+        "answerBlock": "test-answer-block",
+        "tags": ["tag1", "tag2"],
+        "orderIndex": 1,
+        "createdAt": datetime.now(),
+        "updatedAt": datetime.now(),
     }
-    
-    return TheoryCardResponse(**test_data) 
 
-
+    return TheoryCardResponse(**test_data)

@@ -3,20 +3,20 @@
 """
 
 from .inter_module_adapter import (
-    TaskProviderProtocol,
-    ContentProviderProtocol,
-    UserProviderProtocol,
-    TaskInfo,
-    ContentInfo,
-    UserInfo,
-    TaskAdapter,
     ContentAdapter,
-    UserAdapter,
-    InterModuleFacade,
-    get_inter_module_facade,
-    TaskRepositoryProvider,
+    ContentInfo,
+    ContentProviderProtocol,
     ContentRepositoryProvider,
-    setup_inter_module_adapters
+    InterModuleFacade,
+    TaskAdapter,
+    TaskInfo,
+    TaskProviderProtocol,
+    TaskRepositoryProvider,
+    UserAdapter,
+    UserInfo,
+    UserProviderProtocol,
+    get_inter_module_facade,
+    setup_inter_module_adapters,
 )
 
 __all__ = [
@@ -33,5 +33,5 @@ __all__ = [
     "get_inter_module_facade",
     "TaskRepositoryProvider",
     "ContentRepositoryProvider",
-    "setup_inter_module_adapters"
+    "setup_inter_module_adapters",
 ]

@@ -3,13 +3,15 @@ Interview Universe API router for Sigma.js visualization (Fixed version)
 Uses raw SQL queries like the working cluster_visualization_router
 """
 
-from typing import Optional, List, Literal, Dict, Any
+from typing import Any, Dict, List, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.orm import Session
-from sqlalchemy import text
 from pydantic import BaseModel
+from sqlalchemy import text
+from sqlalchemy.orm import Session
 
 from app.shared.database import get_session
+
 
 # Pydantic models for response
 class UniverseNode(BaseModel):
@@ -26,11 +28,13 @@ class UniverseNode(BaseModel):
     x: Optional[float] = None
     y: Optional[float] = None
 
+
 class UniverseEdge(BaseModel):
     source: int
     target: int
     weight: int
     strength: float
+
 
 class CategoryInfo(BaseModel):
     id: str
@@ -39,6 +43,7 @@ class CategoryInfo(BaseModel):
     questions_count: int
     clusters_count: int
     percentage: float
+
 
 class UniverseStats(BaseModel):
     totalQuestions: int
@@ -49,11 +54,13 @@ class UniverseStats(BaseModel):
     avgInterviewPenetration: float
     totalEdges: int = 0
 
+
 class UniverseGraphResponse(BaseModel):
     nodes: List[UniverseNode]
     edges: List[UniverseEdge]
     categories: Dict[str, CategoryInfo]
     stats: UniverseStats
+
 
 class ClusterDetailsResponse(BaseModel):
     id: int
@@ -63,6 +70,7 @@ class ClusterDetailsResponse(BaseModel):
     questions: Optional[List[Dict[str, Any]]] = None
     relatedClusters: List[Dict[str, Any]]
     topCompanies: List[Dict[str, Any]]
+
 
 router = APIRouter(
     prefix="/interview-universe",
@@ -75,21 +83,25 @@ def get_universe_graph(
     db: Session = Depends(get_session),
     limit: int = Query(50, ge=1, le=200, description="Number of clusters to return"),
     offset: int = Query(0, ge=0, description="Offset for pagination"),
-    min_interview_count: int = Query(5, ge=1, description="Minimum interviews per cluster"),
+    min_interview_count: int = Query(
+        5, ge=1, description="Minimum interviews per cluster"
+    ),
     min_link_weight: int = Query(3, ge=1, description="Minimum weight for edges"),
     categories: Optional[str] = Query(None, description="Comma-separated category IDs"),
     companies: Optional[str] = Query(None, description="Comma-separated company names"),
-    min_penetration: Optional[float] = Query(None, ge=0, le=100, description="Minimum penetration %"),
+    min_penetration: Optional[float] = Query(
+        None, ge=0, le=100, description="Minimum penetration %"
+    ),
 ):
     """
     Get graph data for Interview Universe visualization.
     Returns nodes (clusters) and edges (relationships) optimized for Sigma.js.
     """
-    
+
     # Parse filter parameters
     category_filter = categories.split(",") if categories else None
     company_filter = companies.split(",") if companies else None
-    
+
     # Get total interview count for penetration calculation
     total_interviews_query = text("""
         SELECT COUNT(DISTINCT interview_id) as total
@@ -98,7 +110,7 @@ def get_universe_graph(
     """)
     total_result = db.execute(total_interviews_query).fetchone()
     total_interviews = total_result.total if total_result else 893
-    
+
     # Build cluster query with filters
     cluster_query = text("""
         WITH cluster_stats AS (
@@ -147,11 +159,11 @@ def get_universe_graph(
         ORDER BY interview_penetration DESC
         LIMIT :limit OFFSET :offset
     """)
-    
+
     # Execute cluster query
     no_category_filter = category_filter is None
     no_penetration_filter = min_penetration is None
-    
+
     clusters_result = db.execute(
         cluster_query,
         {
@@ -163,33 +175,35 @@ def get_universe_graph(
             "no_penetration_filter": no_penetration_filter,
             "limit": limit,
             "offset": offset,
-        }
+        },
     ).fetchall()
-    
+
     # Build nodes
     nodes = []
     cluster_ids = []
-    
+
     for cluster in clusters_result:
         cluster_ids.append(cluster.id)
-        
-        nodes.append(UniverseNode(
-            id=cluster.id,
-            name=cluster.name,
-            category_id=cluster.category_id,
-            category_name=cluster.category_name,
-            questions_count=cluster.questions_count,
-            interview_penetration=float(cluster.interview_penetration),
-            keywords=cluster.keywords or [],
-            example_question=cluster.example_question,
-            top_companies=cluster.top_companies or [],
-            difficulty_distribution={
-                "junior": float(cluster.junior_pct),
-                "middle": float(cluster.middle_pct),
-                "senior": float(cluster.senior_pct),
-            },
-        ))
-    
+
+        nodes.append(
+            UniverseNode(
+                id=cluster.id,
+                name=cluster.name,
+                category_id=cluster.category_id,
+                category_name=cluster.category_name,
+                questions_count=cluster.questions_count,
+                interview_penetration=float(cluster.interview_penetration),
+                keywords=cluster.keywords or [],
+                example_question=cluster.example_question,
+                top_companies=cluster.top_companies or [],
+                difficulty_distribution={
+                    "junior": float(cluster.junior_pct),
+                    "middle": float(cluster.middle_pct),
+                    "senior": float(cluster.senior_pct),
+                },
+            )
+        )
+
     # Build edges (relationships between clusters)
     edges = []
     if len(cluster_ids) > 1:
@@ -216,33 +230,34 @@ def get_universe_graph(
             ORDER BY weight DESC
             LIMIT 100
         """)
-        
+
         edge_result = db.execute(
-            edge_query,
-            {"cluster_ids": cluster_ids, "min_weight": min_link_weight}
+            edge_query, {"cluster_ids": cluster_ids, "min_weight": min_link_weight}
         )
-        
+
         max_weight = 1
         edge_list = edge_result.fetchall()
         if edge_list:
             max_weight = max([e.weight for e in edge_list])
-            
+
         for edge_row in edge_list:
-            edges.append(UniverseEdge(
-                source=edge_row.source,
-                target=edge_row.target,
-                weight=edge_row.weight,
-                strength=min(edge_row.weight / max_weight, 1.0),
-            ))
-    
+            edges.append(
+                UniverseEdge(
+                    source=edge_row.source,
+                    target=edge_row.target,
+                    weight=edge_row.weight,
+                    strength=min(edge_row.weight / max_weight, 1.0),
+                )
+            )
+
     # Get categories
     category_query = text("""
         SELECT id, name, color, questions_count, clusters_count, percentage
         FROM "InterviewCategory"
     """)
-    
+
     category_result = db.execute(category_query).fetchall()
-    
+
     categories = {
         cat.id: CategoryInfo(
             id=cat.id,
@@ -254,7 +269,7 @@ def get_universe_graph(
         )
         for cat in category_result
     }
-    
+
     # Calculate stats
     stats = UniverseStats(
         totalQuestions=8532,
@@ -265,7 +280,7 @@ def get_universe_graph(
         avgInterviewPenetration=25.5,
         totalEdges=len(edges),
     )
-    
+
     return UniverseGraphResponse(
         nodes=nodes,
         edges=edges,
@@ -279,12 +294,14 @@ def get_cluster_details(
     cluster_id: int,
     db: Session = Depends(get_session),
     include_questions: bool = Query(True, description="Include question list"),
-    question_limit: int = Query(100, ge=1, le=500, description="Max questions to return"),
+    question_limit: int = Query(
+        100, ge=1, le=500, description="Max questions to return"
+    ),
 ):
     """
     Get detailed information about a specific cluster including all questions.
     """
-    
+
     # Get cluster info
     cluster_query = text("""
         SELECT id, name, category_id, questions_count
@@ -292,10 +309,10 @@ def get_cluster_details(
         WHERE id = :cluster_id
     """)
     cluster = db.execute(cluster_query, {"cluster_id": cluster_id}).fetchone()
-    
+
     if not cluster:
         raise HTTPException(status_code=404, detail="Cluster not found")
-    
+
     # Get questions if requested
     questions = []
     if include_questions:
@@ -305,12 +322,11 @@ def get_cluster_details(
             WHERE cluster_id = :cluster_id
             LIMIT :limit
         """)
-        
+
         question_result = db.execute(
-            question_query, 
-            {"cluster_id": cluster_id, "limit": question_limit}
+            question_query, {"cluster_id": cluster_id, "limit": question_limit}
         ).fetchall()
-        
+
         questions = [
             {
                 "id": q.id,
@@ -320,7 +336,7 @@ def get_cluster_details(
             }
             for q in question_result
         ]
-    
+
     # Get related clusters
     related_query = text("""
         WITH related AS (
@@ -354,7 +370,7 @@ def get_cluster_details(
         FROM related r
         JOIN "InterviewCluster" c ON c.id = r.related_id
     """)
-    
+
     related_result = db.execute(related_query, {"cluster_id": cluster_id}).fetchall()
     related_clusters = [
         {
@@ -365,7 +381,7 @@ def get_cluster_details(
         }
         for r in related_result
     ]
-    
+
     # Get top companies
     company_query = text("""
         SELECT company, COUNT(*) as count
@@ -375,17 +391,19 @@ def get_cluster_details(
         ORDER BY count DESC
         LIMIT 10
     """)
-    
+
     company_result = db.execute(company_query, {"cluster_id": cluster_id}).fetchall()
     top_companies = [
         {
             "name": c.company,
             "count": c.count,
-            "percentage": round(c.count * 100 / cluster.questions_count, 1) if cluster.questions_count > 0 else 0,
+            "percentage": round(c.count * 100 / cluster.questions_count, 1)
+            if cluster.questions_count > 0
+            else 0,
         }
         for c in company_result
     ]
-    
+
     return ClusterDetailsResponse(
         id=cluster.id,
         name=cluster.name,

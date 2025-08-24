@@ -15,9 +15,11 @@ from typing import Any, Dict, List, Optional
 import docker
 from docker.errors import ContainerError, ImageNotFound
 
+from app.features.code_editor.repositories.code_editor_repository import (
+    CodeEditorRepository,
+)
 from app.shared.entities.code_editor_types import CodeExecution, SupportedLanguage
 from app.shared.entities.enums import CodeLanguage, ExecutionStatus
-from app.features.code_editor.repositories.code_editor_repository import CodeEditorRepository
 
 logger = logging.getLogger(__name__)
 
@@ -394,5 +396,3 @@ class CodeExecutorService:
         return await self.code_editor_repository.get_user_executions(
             user_id, block_id, limit, offset
         )
-
-

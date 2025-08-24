@@ -1,6 +1,7 @@
 """Response DTOs для mindmap feature"""
 
 from typing import Any, Dict, List, Optional
+
 from pydantic import BaseModel
 
 
@@ -146,6 +147,4 @@ class HealthResponse(BaseModel):
     """Ответ health check"""
 
     status: str
-    module: str 
-
-
+    module: str

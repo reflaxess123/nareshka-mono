@@ -2,14 +2,14 @@
 
 from .requests import ProgressAction, ReviewRating
 from .responses import (
-    TheoryCardResponse,
-    UserTheoryProgressResponse,
-    TheoryCardWithProgressResponse,
-    TheoryCardsListResponse,
-    TheoryCategoriesResponse,
-    TheorySubcategoriesResponse,
-    TheoryStatsResponse,
     DueCardsResponse,
+    TheoryCardResponse,
+    TheoryCardsListResponse,
+    TheoryCardWithProgressResponse,
+    TheoryCategoriesResponse,
+    TheoryStatsResponse,
+    TheorySubcategoriesResponse,
+    UserTheoryProgressResponse,
 )
 
 __all__ = [
@@ -19,13 +19,10 @@ __all__ = [
     # Responses
     "TheoryCardResponse",
     "UserTheoryProgressResponse",
-    "TheoryCardWithProgressResponse", 
+    "TheoryCardWithProgressResponse",
     "TheoryCardsListResponse",
     "TheoryCategoriesResponse",
     "TheorySubcategoriesResponse",
     "TheoryStatsResponse",
     "DueCardsResponse",
-] 
-
-
-
+]

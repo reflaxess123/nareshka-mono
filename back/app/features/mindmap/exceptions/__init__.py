@@ -2,17 +2,14 @@
 
 from app.features.mindmap.exceptions.mindmap_exceptions import (
     MindMapError,
+    TaskNotFoundError,
     TechnologyNotSupportedError,
     TopicNotFoundError,
-    TaskNotFoundError,
 )
 
 __all__ = [
     "MindMapError",
-    "TechnologyNotSupportedError", 
+    "TechnologyNotSupportedError",
     "TopicNotFoundError",
     "TaskNotFoundError",
-] 
-
-
-
+]

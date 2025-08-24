@@ -75,11 +75,8 @@ class TasksListResponse(BaseModel):
             "hasNext": page * limit < total,
             "hasPrev": page > 1,
         }
-        
-        return cls(
-            data=tasks,
-            pagination=pagination
-        )
+
+        return cls(data=tasks, pagination=pagination)
 
 
 class TaskCategoryResponse(BaseModel):
@@ -161,6 +158,4 @@ class TaskSolutionResponse(BaseModel):
     updatedAt: datetime
 
     class Config:
-        from_attributes = True 
-
-
+        from_attributes = True

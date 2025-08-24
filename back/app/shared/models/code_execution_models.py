@@ -112,5 +112,3 @@ class UserCodeSolution(Base):
         Index("idx_usercodesolution_blockid", "blockId"),
         Index("idx_usercodesolution_userid_blockid", "userId", "blockId", unique=True),
     )
-
-

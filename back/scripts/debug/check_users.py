@@ -2,7 +2,7 @@
 
 import psycopg2
 
-from app.config.settings import settings
+from app.core.settings import settings
 
 
 def check_users():
@@ -39,4 +39,3 @@ def check_users():
 
 if __name__ == "__main__":
     check_users()
-

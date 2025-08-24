@@ -10,13 +10,12 @@ Code Editor Feature
 """
 
 # Router импортируется напрямую в main.py для избежания циклических импортов
+from app.features.code_editor.repositories.code_editor_repository import (
+    CodeEditorRepository,
+)
 from app.features.code_editor.services.code_editor_service import CodeEditorService
-from app.features.code_editor.repositories.code_editor_repository import CodeEditorRepository
 
 __all__ = [
-    "CodeEditorService", 
+    "CodeEditorService",
     "CodeEditorRepository",
-] 
-
-
-
+]

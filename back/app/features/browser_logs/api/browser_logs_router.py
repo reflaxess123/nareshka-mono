@@ -4,7 +4,6 @@ from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 
-from app.shared.dependencies import get_db_session
 from app.shared.logging.api_logger import get_logger
 
 logger = get_logger(__name__)
@@ -52,7 +51,7 @@ async def receive_browser_logs(logs_data: BrowserLogsRequest):
             f"Received browser logs: {len(logs_data.console_logs)} console logs, "
             f"{len(logs_data.network_logs)} network logs"
         )
-        
+
         # Обрабатываем console логи
         for log_entry in logs_data.console_logs:
             logger.info(
@@ -61,10 +60,10 @@ async def receive_browser_logs(logs_data: BrowserLogsRequest):
                     "browser_url": log_entry.url,
                     "user_id": log_entry.user_id,
                     "timestamp": log_entry.timestamp,
-                    "metadata": log_entry.metadata
-                }
+                    "metadata": log_entry.metadata,
+                },
             )
-            
+
             # Если это ошибка - логируем с высоким приоритетом
             if log_entry.level == "error":
                 logger.error(
@@ -72,10 +71,10 @@ async def receive_browser_logs(logs_data: BrowserLogsRequest):
                     extra={
                         "stack_trace": log_entry.stack_trace,
                         "url": log_entry.url,
-                        "user_id": log_entry.user_id
-                    }
+                        "user_id": log_entry.user_id,
+                    },
                 )
-        
+
         # Обрабатываем network логи
         for network_entry in logs_data.network_logs:
             if network_entry.error_message:
@@ -83,27 +82,27 @@ async def receive_browser_logs(logs_data: BrowserLogsRequest):
                     f"Network Error: {network_entry.method} {network_entry.url} - {network_entry.error_message}",
                     extra={
                         "status_code": network_entry.status_code,
-                        "user_id": network_entry.user_id
-                    }
+                        "user_id": network_entry.user_id,
+                    },
                 )
-        
+
         # TODO: Сохранить в базу данных если нужно
         # await save_to_database(logs_data)
-        
+
         return {
             "status": "success",
             "message": "Browser logs received and processed",
             "processed": {
                 "console_logs": len(logs_data.console_logs),
-                "network_logs": len(logs_data.network_logs)
-            }
+                "network_logs": len(logs_data.network_logs),
+            },
         }
-        
+
     except Exception as e:
         logger.error(f"Error processing browser logs: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to process browser logs"
+            detail="Failed to process browser logs",
         )
 
 
@@ -113,7 +112,7 @@ async def browser_logs_health():
     return {
         "status": "healthy",
         "service": "browser-logs",
-        "timestamp": datetime.utcnow()
+        "timestamp": datetime.utcnow(),
     }
 
 
@@ -125,5 +124,5 @@ async def get_browser_logs_stats():
         "total_logs": 0,
         "error_count": 0,
         "warning_count": 0,
-        "last_updated": datetime.utcnow()
+        "last_updated": datetime.utcnow(),
     }

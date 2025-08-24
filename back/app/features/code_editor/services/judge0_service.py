@@ -8,12 +8,15 @@ import logging
 import os
 import time
 import uuid
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 import httpx
-from app.features.code_editor.repositories.code_editor_repository import CodeEditorRepository
-from app.shared.models.code_execution_models import CodeExecution, SupportedLanguage
+
+from app.features.code_editor.repositories.code_editor_repository import (
+    CodeEditorRepository,
+)
 from app.shared.entities.enums import ExecutionStatus
+from app.shared.models.code_execution_models import CodeExecution, SupportedLanguage
 
 logger = logging.getLogger(__name__)
 
@@ -78,6 +81,7 @@ class Judge0Service:
 
         # Создаем объект CodeExecution (используем модель БД)
         from datetime import datetime
+
         execution = CodeExecution()
         execution.id = execution_id
         execution.userId = user_id
@@ -101,7 +105,9 @@ class Judge0Service:
             judge0_language_id = self._get_judge0_language_id(language.language.value)
             if judge0_language_id is None:
                 execution.status = ExecutionStatus.ERROR
-                execution.errorMessage = f"Language {language.language.value} not supported by Judge0"
+                execution.errorMessage = (
+                    f"Language {language.language.value} not supported by Judge0"
+                )
                 execution.executionTimeMs = int((time.time() - start_time) * 1000)
                 execution.completedAt = datetime.now()
                 await self.code_editor_repository.save_execution(execution)
@@ -121,7 +127,7 @@ class Judge0Service:
 
             # Ждем результат выполнения
             result = await self._wait_for_result(submission_token)
-            
+
             # Обновляем объект выполнения
             execution.status = result["status"]
             execution.stdout = result.get("stdout")
@@ -129,7 +135,9 @@ class Judge0Service:
             execution.exitCode = result.get("exitCode")
             execution.executionTimeMs = int((time.time() - start_time) * 1000)
             execution.memoryUsedMB = result.get("memoryUsedMB")
-            execution.containerLogs = f"Judge0 execution completed with token {submission_token}"
+            execution.containerLogs = (
+                f"Judge0 execution completed with token {submission_token}"
+            )
             execution.errorMessage = result.get("errorMessage")
             execution.completedAt = datetime.now()
 
@@ -169,7 +177,7 @@ class Judge0Service:
         try:
             # Кодируем исходный код в base64
             encoded_source = base64.b64encode(source_code.encode()).decode()
-            
+
             # Подготавливаем данные для отправки
             submission_data = {
                 "source_code": encoded_source,
@@ -180,24 +188,28 @@ class Judge0Service:
             # Подготавливаем заголовки
             headers = {"Content-Type": "application/json"}
             if self.api_key and "rapidapi.com" in self.base_url:
-                headers.update({
-                    "X-RapidAPI-Key": self.api_key,
-                    "X-RapidAPI-Host": self.rapidapi_host
-                })
+                headers.update(
+                    {
+                        "X-RapidAPI-Key": self.api_key,
+                        "X-RapidAPI-Host": self.rapidapi_host,
+                    }
+                )
 
             async with httpx.AsyncClient(timeout=self.timeout) as client:
                 response = await client.post(
                     f"{self.base_url}/submissions",
                     json=submission_data,
                     params={"wait": "false"},  # Асинхронное выполнение
-                    headers=headers
+                    headers=headers,
                 )
-                
+
                 if response.status_code == 201:
                     result = response.json()
                     return result.get("token")
                 else:
-                    logger.error(f"Judge0 submission failed: {response.status_code} - {response.text}")
+                    logger.error(
+                        f"Judge0 submission failed: {response.status_code} - {response.text}"
+                    )
                     return None
 
         except Exception as e:
@@ -215,7 +227,7 @@ class Judge0Service:
             Словарь с результатами выполнения
         """
         wait_start = time.time()
-        
+
         while time.time() - wait_start < self.max_wait_time:
             try:
                 # Подготавливаем заголовки для RapidAPI
@@ -223,33 +235,32 @@ class Judge0Service:
                 if self.api_key and "rapidapi.com" in self.base_url:
                     headers = {
                         "X-RapidAPI-Key": self.api_key,
-                        "X-RapidAPI-Host": self.rapidapi_host
+                        "X-RapidAPI-Host": self.rapidapi_host,
                     }
 
                 async with httpx.AsyncClient(timeout=self.timeout) as client:
                     response = await client.get(
-                        f"{self.base_url}/submissions/{token}",
-                        headers=headers
+                        f"{self.base_url}/submissions/{token}", headers=headers
                     )
-                    
+
                     if response.status_code == 200:
                         result = response.json()
                         status_id = result.get("status", {}).get("id", 0)
-                        
+
                         # Status IDs: 1-2 = в очереди/обработке, 3 = выполнено, 4+ = различные ошибки
                         if status_id > 2:  # Выполнение завершено
                             return self._parse_judge0_result(result)
-                    
+
                     # Ждем перед следующей проверкой
                     await self._async_sleep(1)
-                    
+
             except Exception as e:
                 logger.error(f"Error checking Judge0 result: {str(e)}")
                 return {
                     "status": ExecutionStatus.ERROR,
                     "errorMessage": f"Error checking result: {str(e)}",
                 }
-        
+
         # Таймаут
         return {
             "status": ExecutionStatus.ERROR,
@@ -268,23 +279,23 @@ class Judge0Service:
         """
         status_info = judge0_result.get("status", {})
         status_id = status_info.get("id", 0)
-        
+
         # Декодируем base64 данные
         stdout = None
         stderr = None
-        
+
         if judge0_result.get("stdout"):
             try:
                 stdout = base64.b64decode(judge0_result["stdout"]).decode("utf-8")
             except Exception:
                 stdout = judge0_result["stdout"]  # Fallback to raw data
-        
+
         if judge0_result.get("stderr"):
             try:
                 stderr = base64.b64decode(judge0_result["stderr"]).decode("utf-8")
             except Exception:
                 stderr = judge0_result["stderr"]  # Fallback to raw data
-        
+
         # Преобразуем статус Judge0 в наш ExecutionStatus
         if status_id == 3:  # Accepted
             status = ExecutionStatus.SUCCESS
@@ -307,19 +318,22 @@ class Judge0Service:
             "stdout": stdout,
             "stderr": stderr,
             "exitCode": 0 if status_id == 3 else 1,
-            "memoryUsedMB": judge0_result.get("memory", 0) / 1024 if judge0_result.get("memory") else None,  # KB to MB
+            "memoryUsedMB": judge0_result.get("memory", 0) / 1024
+            if judge0_result.get("memory")
+            else None,  # KB to MB
             "errorMessage": error_message,
         }
 
     async def _async_sleep(self, seconds: float):
         """Асинхронный sleep"""
         import asyncio
+
         await asyncio.sleep(seconds)
 
     async def get_supported_languages(self) -> List[Dict[str, Any]]:
         """
         Получает список поддерживаемых языков из Judge0 API
-        
+
         Returns:
             Список языков с их ID и информацией
         """
@@ -329,15 +343,14 @@ class Judge0Service:
             if self.api_key and "rapidapi.com" in self.base_url:
                 headers = {
                     "X-RapidAPI-Key": self.api_key,
-                    "X-RapidAPI-Host": self.rapidapi_host
+                    "X-RapidAPI-Host": self.rapidapi_host,
                 }
 
             async with httpx.AsyncClient(timeout=self.timeout) as client:
                 response = await client.get(
-                    f"{self.base_url}/languages",
-                    headers=headers
+                    f"{self.base_url}/languages", headers=headers
                 )
-                
+
                 if response.status_code == 200:
                     languages = response.json()
                     # Фильтруем только те языки, которые мы поддерживаем
@@ -345,18 +358,22 @@ class Judge0Service:
                     for lang in languages:
                         for our_lang, judge0_id in self.language_mapping.items():
                             if lang.get("id") == judge0_id:
-                                supported.append({
-                                    "name": our_lang.lower(),
-                                    "judge0_id": judge0_id,
-                                    "judge0_name": lang.get("name"),
-                                    "version": lang.get("version", ""),
-                                })
+                                supported.append(
+                                    {
+                                        "name": our_lang.lower(),
+                                        "judge0_id": judge0_id,
+                                        "judge0_name": lang.get("name"),
+                                        "version": lang.get("version", ""),
+                                    }
+                                )
                                 break
                     return supported
                 else:
-                    logger.error(f"Failed to get Judge0 languages: {response.status_code}")
+                    logger.error(
+                        f"Failed to get Judge0 languages: {response.status_code}"
+                    )
                     return []
-                    
+
         except Exception as e:
             logger.error(f"Error getting Judge0 languages: {str(e)}")
             return []

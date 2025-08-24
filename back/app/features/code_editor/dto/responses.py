@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from typing import Any, Dict, List, Optional
+
 from pydantic import BaseModel
 
 from app.shared.entities.enums import CodeLanguage, ExecutionStatus
@@ -143,6 +144,4 @@ class HealthResponse(BaseModel):
     status: str
     module: str
     supportedLanguages: int
-    totalExecutions: int 
-
-
+    totalExecutions: int

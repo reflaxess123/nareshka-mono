@@ -3,34 +3,30 @@ Progress Exceptions
 """
 
 from .progress_exceptions import (
-    # Progress Data
-    ProgressNotFoundError,
-    AttemptNotFoundError,
-    SolutionNotFoundError,
-    
-    # Validation
-    InvalidProgressDataError,
-    InvalidAttemptDataError,
-    InvalidSolutionDataError,
-    InvalidTaskIdError,
-    InvalidCategoryError,
-    
-    # Business Logic
-    ProgressUpdateError,
+    # Analytics
+    AnalyticsError,
     AttemptCreationError,
-    SolutionCreationError,
+    AttemptNotFoundError,
     CategoryProgressError,
     ContentProgressError,
-    
     # Constraints
     DuplicateAttemptError,
     DuplicateSolutionError,
+    InvalidAttemptDataError,
+    InvalidCategoryError,
+    # Validation
+    InvalidProgressDataError,
+    InvalidSolutionDataError,
+    InvalidTaskIdError,
     ProgressConflictError,
-    
-    # Analytics
-    AnalyticsError,
+    # Progress Data
+    ProgressNotFoundError,
+    # Business Logic
+    ProgressUpdateError,
+    ReportGenerationError,
+    SolutionCreationError,
+    SolutionNotFoundError,
     StatisticsError,
-    ReportGenerationError
 )
 
 __all__ = [
@@ -38,31 +34,24 @@ __all__ = [
     "ProgressNotFoundError",
     "AttemptNotFoundError",
     "SolutionNotFoundError",
-    
     # Validation
     "InvalidProgressDataError",
     "InvalidAttemptDataError",
     "InvalidSolutionDataError",
     "InvalidTaskIdError",
     "InvalidCategoryError",
-    
     # Business Logic
     "ProgressUpdateError",
     "AttemptCreationError",
     "SolutionCreationError",
     "CategoryProgressError",
     "ContentProgressError",
-    
     # Constraints
     "DuplicateAttemptError",
     "DuplicateSolutionError",
     "ProgressConflictError",
-    
     # Analytics
     "AnalyticsError",
     "StatisticsError",
-    "ReportGenerationError"
-] 
-
-
-
+    "ReportGenerationError",
+]

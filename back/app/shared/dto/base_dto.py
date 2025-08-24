@@ -193,6 +193,3 @@ class DTOMigrationHelper:
         result = response_dict.copy()
         result.update(legacy_fields)
         return result
-
-
-

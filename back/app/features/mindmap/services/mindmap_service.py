@@ -2,31 +2,31 @@
 
 import logging
 import math
-from typing import Any, Dict, List, Optional
+from typing import Optional
 
-from app.features.mindmap.repositories.mindmap_repository import MindMapRepository
 from app.features.mindmap.dto.responses import (
-    MindMapResponse,
-    MindMapDataResponse,
-    MindMapNodeResponse,
-    MindMapEdgeResponse,
-    TechnologiesResponse,
-    TechnologiesDataResponse,
-    TechnologyConfigResponse,
-    TopicTasksResponse,
-    TopicResponse,
-    TaskResponse,
-    TaskProgressResponse,
-    TopicStatsResponse,
-    TaskDetailResponseWrapper,
-    TaskDetailResponse,
     HealthResponse,
+    MindMapDataResponse,
+    MindMapEdgeResponse,
+    MindMapNodeResponse,
+    MindMapResponse,
+    TaskDetailResponse,
+    TaskDetailResponseWrapper,
+    TaskProgressResponse,
+    TaskResponse,
+    TechnologiesDataResponse,
+    TechnologiesResponse,
+    TechnologyConfigResponse,
+    TopicResponse,
+    TopicStatsResponse,
+    TopicTasksResponse,
 )
 from app.features.mindmap.exceptions.mindmap_exceptions import (
+    TaskNotFoundError,
     TechnologyNotSupportedError,
     TopicNotFoundError,
-    TaskNotFoundError,
 )
+from app.features.mindmap.repositories.mindmap_repository import MindMapRepository
 
 logger = logging.getLogger(__name__)
 
@@ -45,8 +45,10 @@ class MindMapService:
         topic_filter: Optional[str] = None,
     ) -> MindMapResponse:
         """Генерация данных для mindmap"""
-        logger.info(f"Генерация mindmap для технологии {technology}, пользователь: {user_id}")
-        
+        logger.info(
+            f"Генерация mindmap для технологии {technology}, пользователь: {user_id}"
+        )
+
         try:
             # Получаем центральный узел технологии
             tech_center = self.mindmap_repository.get_technology_center(technology)
@@ -56,7 +58,9 @@ class MindMapService:
             # Получаем общий прогресс пользователя если авторизован
             overall_progress = None
             if user_id:
-                overall_progress = self.mindmap_repository.get_overall_progress(user_id, technology)
+                overall_progress = self.mindmap_repository.get_overall_progress(
+                    user_id, technology
+                )
 
             # Получаем топики для технологии
             all_topics = self.mindmap_repository.get_technology_topics(technology)
@@ -64,7 +68,9 @@ class MindMapService:
             # Применяем фильтры
             active_topics = all_topics
             if topic_filter:
-                active_topics = [topic for topic in all_topics if topic["key"] == topic_filter]
+                active_topics = [
+                    topic for topic in all_topics if topic["key"] == topic_filter
+                ]
 
             # Создаем узлы и связи
             nodes = []
@@ -153,8 +159,10 @@ class MindMapService:
                 "filters_applied": bool(difficulty_filter or topic_filter),
             }
 
-            logger.info(f"Mindmap сгенерирован: {len(nodes)} узлов, {len(edges)} связей")
-            
+            logger.info(
+                f"Mindmap сгенерирован: {len(nodes)} узлов, {len(edges)} связей"
+            )
+
             return MindMapResponse(
                 success=True,
                 data=mindmap_data,
@@ -171,10 +179,10 @@ class MindMapService:
     def get_available_technologies(self) -> TechnologiesResponse:
         """Получить доступные технологии"""
         logger.info("Получение доступных технологий")
-        
+
         try:
             tech_list = self.mindmap_repository.get_available_technologies()
-            
+
             # Получаем конфигурации для каждой технологии
             configs = {}
             for tech in tech_list:
@@ -208,10 +216,12 @@ class MindMapService:
     ) -> TopicTasksResponse:
         """Получить топик с задачами"""
         logger.info(f"Получение задач для топика {topic_key}, технология {technology}")
-        
+
         try:
             # Получаем конфигурацию топика
-            topic_config = self.mindmap_repository.get_topic_config(topic_key, technology)
+            topic_config = self.mindmap_repository.get_topic_config(
+                topic_key, technology
+            )
             if not topic_config:
                 raise TopicNotFoundError(topic_key, technology)
 
@@ -258,7 +268,9 @@ class MindMapService:
             # Получаем статистику
             stats = None
             if user_id:
-                stats_data = self.mindmap_repository.get_topic_stats(topic_key, technology, user_id)
+                stats_data = self.mindmap_repository.get_topic_stats(
+                    topic_key, technology, user_id
+                )
                 if stats_data:
                     stats = TopicStatsResponse(
                         totalTasks=stats_data["totalTasks"],
@@ -280,10 +292,12 @@ class MindMapService:
             logger.error(f"Ошибка при получении задач топика: {e}")
             raise
 
-    def get_task_detail(self, task_id: str, user_id: Optional[int] = None) -> TaskDetailResponseWrapper:
+    def get_task_detail(
+        self, task_id: str, user_id: Optional[int] = None
+    ) -> TaskDetailResponseWrapper:
         """Получить детали задачи"""
         logger.info(f"Получение деталей задачи {task_id}")
-        
+
         try:
             task_data = self.mindmap_repository.get_task_by_id(task_id, user_id)
             if not task_data:
@@ -319,13 +333,13 @@ class MindMapService:
     def get_health_status(self) -> HealthResponse:
         """Получить статус здоровья модуля"""
         logger.info("Проверка здоровья mindmap модуля")
-        
+
         try:
             # Проверяем доступность технологий
             technologies = self.mindmap_repository.get_available_technologies()
-            
+
             status = "healthy" if len(technologies) > 0 else "unhealthy"
-            
+
             return HealthResponse(
                 status=status,
                 module="mindmap",
@@ -336,6 +350,4 @@ class MindMapService:
             return HealthResponse(
                 status="unhealthy",
                 module="mindmap",
-            ) 
-
-
+            )

@@ -7,11 +7,13 @@ import logging
 import os
 from typing import Optional
 
-from app.features.code_editor.repositories.code_editor_repository import CodeEditorRepository
+from app.features.code_editor.repositories.code_editor_repository import (
+    CodeEditorRepository,
+)
 from app.features.code_editor.services.code_executor_service import CodeExecutorService
 from app.features.code_editor.services.judge0_service import Judge0Service
-from app.shared.models.code_execution_models import CodeExecution, SupportedLanguage
 from app.shared.entities.enums import ExecutionStatus
+from app.shared.models.code_execution_models import CodeExecution, SupportedLanguage
 
 logger = logging.getLogger(__name__)
 
@@ -23,11 +25,15 @@ class EnhancedCodeExecutorService:
         self.code_editor_repository = code_editor_repository
         self.docker_service = CodeExecutorService(code_editor_repository)
         self.judge0_service = Judge0Service(code_editor_repository)
-        
+
         # Настройки из переменных окружения
         self.use_judge0 = os.getenv("USE_JUDGE0", "false").lower() == "true"
-        self.fallback_to_judge0 = os.getenv("FALLBACK_TO_JUDGE0", "true").lower() == "true"
-        self.preferred_method = os.getenv("CODE_EXECUTOR_METHOD", "docker").lower()  # docker | judge0 | auto
+        self.fallback_to_judge0 = (
+            os.getenv("FALLBACK_TO_JUDGE0", "true").lower() == "true"
+        )
+        self.preferred_method = os.getenv(
+            "CODE_EXECUTOR_METHOD", "docker"
+        ).lower()  # docker | judge0 | auto
 
     async def execute_code(
         self,
@@ -50,13 +56,15 @@ class EnhancedCodeExecutorService:
         Returns:
             CodeExecution объект с результатами выполнения
         """
-        logger.info(f"Starting enhanced code execution for language {language.language}")
-        
+        logger.info(
+            f"Starting enhanced code execution for language {language.language}"
+        )
+
         # Определяем метод выполнения
         execution_method = self._choose_execution_method(language)
-        
+
         logger.info(f"Using execution method: {execution_method}")
-        
+
         try:
             if execution_method == "judge0":
                 return await self._execute_with_judge0(
@@ -66,7 +74,7 @@ class EnhancedCodeExecutorService:
                 return await self._execute_with_docker(
                     source_code, language, stdin, user_id, block_id
                 )
-                
+
         except Exception as e:
             logger.error(f"Enhanced code execution failed: {str(e)}")
             # В случае ошибки пытаемся использовать fallback метод
@@ -78,7 +86,7 @@ class EnhancedCodeExecutorService:
                     )
                 except Exception as fallback_error:
                     logger.error(f"Judge0 fallback also failed: {str(fallback_error)}")
-            
+
             # Если все методы не сработали, возвращаем ошибку
             return self._create_error_execution(
                 source_code, language, stdin, user_id, block_id, str(e)
@@ -99,21 +107,25 @@ class EnhancedCodeExecutorService:
             return "judge0"
         elif self.preferred_method == "docker":
             return "docker"
-        
+
         # Автоматический выбор
         if self.preferred_method == "auto":
             # Judge0 поддерживает больше языков
             if self.judge0_service.is_language_supported(language.language.value):
                 # Используем Judge0 для языков, которые лучше поддерживаются там
                 preferred_judge0_languages = [
-                    "swift", "kotlin", "scala", "dart", "typescript"
+                    "swift",
+                    "kotlin",
+                    "scala",
+                    "dart",
+                    "typescript",
                 ]
                 if language.language.value.lower() in preferred_judge0_languages:
                     return "judge0"
-            
+
             # По умолчанию используем Docker
             return "docker"
-        
+
         # По умолчанию Docker
         return "docker"
 
@@ -158,12 +170,12 @@ class EnhancedCodeExecutorService:
         stdin: Optional[str] = None,
         user_id: Optional[int] = None,
         block_id: Optional[str] = None,
-        error_message: str = "Execution failed"
+        error_message: str = "Execution failed",
     ) -> CodeExecution:
         """Создает объект CodeExecution с ошибкой"""
         import uuid
         from datetime import datetime
-        
+
         execution = CodeExecution()
         execution.id = str(uuid.uuid4())
         execution.userId = user_id
@@ -181,7 +193,7 @@ class EnhancedCodeExecutorService:
         execution.errorMessage = error_message
         execution.createdAt = datetime.now()
         execution.completedAt = datetime.now()
-        
+
         return execution
 
     async def get_supported_languages(self):
@@ -192,9 +204,17 @@ class EnhancedCodeExecutorService:
         """Получает выполнение по ID"""
         return await self.docker_service.get_execution_by_id(execution_id)
 
-    async def get_user_executions(self, user_id: int, block_id: Optional[str] = None, limit: int = 20, offset: int = 0):
+    async def get_user_executions(
+        self,
+        user_id: int,
+        block_id: Optional[str] = None,
+        limit: int = 20,
+        offset: int = 0,
+    ):
         """Получает историю выполнений пользователя"""
-        return await self.docker_service.get_user_executions(user_id, block_id, limit, offset)
+        return await self.docker_service.get_user_executions(
+            user_id, block_id, limit, offset
+        )
 
     def validate_code_safety(self, source_code: str, language):
         """Проверяет безопасность кода"""

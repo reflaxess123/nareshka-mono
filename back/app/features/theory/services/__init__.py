@@ -4,7 +4,4 @@ from .theory_service import TheoryService
 
 __all__ = [
     "TheoryService",
-] 
-
-
-
+]

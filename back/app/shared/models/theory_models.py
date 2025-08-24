@@ -84,5 +84,3 @@ class UserTheoryProgress(Base):
         Index("idx_usertheoryprogress_cardstate", "cardState"),
         Index("idx_usertheoryprogress_userid_cardid", "userId", "cardId", unique=True),
     )
-
-

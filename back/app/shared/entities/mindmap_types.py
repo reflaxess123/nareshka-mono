@@ -106,5 +106,3 @@ class MindMapResponse(BaseModel):
     active_topics: int = 0
     applied_filters: Dict[str, Any] = {}
     overall_progress: Optional[Dict[str, Any]] = None
-
-

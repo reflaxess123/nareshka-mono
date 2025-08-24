@@ -77,5 +77,3 @@ class UserPathProgress(Base):
         Index("idx_userpathprogress_userid_pathid", "userId", "pathId", unique=True),
         Index("idx_userpathprogress_lastactivity", "lastActivity"),
     )
-
-

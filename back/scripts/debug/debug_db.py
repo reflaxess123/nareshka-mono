@@ -4,7 +4,7 @@ import logging
 
 import psycopg2
 
-from app.config.settings import settings
+from app.core.settings import settings
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -141,4 +141,3 @@ def check_database_connection():  # noqa: PLR0912, PLR0915
 
 if __name__ == "__main__":
     check_database_connection()
-

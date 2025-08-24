@@ -1,25 +1,20 @@
 """Репозиторий для работы с ментальными картами"""
 
 import logging
-from typing import Any, Dict, List, Optional
 from abc import ABC, abstractmethod
+from typing import Any, Dict, List, Optional
 
-from sqlalchemy import and_, func
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from app.shared.entities.content import ContentBlock, ContentFile
-from app.shared.models.content_models import UserContentProgress
 from app.features.mindmap.config import (
     get_available_technologies,
     get_technology_center,
     get_technology_topics,
     get_topic_config,
 )
-from app.features.mindmap.exceptions.mindmap_exceptions import (
-    TechnologyNotSupportedError,
-    TopicNotFoundError,
-    TaskNotFoundError,
-)
+from app.shared.entities.content import ContentBlock, ContentFile
+from app.shared.models.content_models import UserContentProgress
 
 logger = logging.getLogger(__name__)
 
@@ -38,32 +33,48 @@ class MindMapRepositoryInterface(ABC):
         pass
 
     @abstractmethod
-    def get_topic_config(self, topic_key: str, technology: str) -> Optional[Dict[str, Any]]:
+    def get_topic_config(
+        self, topic_key: str, technology: str
+    ) -> Optional[Dict[str, Any]]:
         """Получить конфигурацию топика"""
         pass
 
     @abstractmethod
-    def get_overall_progress(self, user_id: int, technology: str) -> Optional[Dict[str, Any]]:
+    def get_overall_progress(
+        self, user_id: int, technology: str
+    ) -> Optional[Dict[str, Any]]:
         """Получить общий прогресс пользователя по технологии"""
         pass
 
     @abstractmethod
-    def get_topic_progress(self, user_id: int, topic_key: str, technology: str) -> Optional[Dict[str, Any]]:
+    def get_topic_progress(
+        self, user_id: int, topic_key: str, technology: str
+    ) -> Optional[Dict[str, Any]]:
         """Получить прогресс пользователя по теме"""
         pass
 
     @abstractmethod
-    def get_topic_tasks(self, topic_key: str, technology: str, user_id: Optional[int] = None, difficulty_filter: Optional[str] = None) -> List[Dict[str, Any]]:
+    def get_topic_tasks(
+        self,
+        topic_key: str,
+        technology: str,
+        user_id: Optional[int] = None,
+        difficulty_filter: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
         """Получить задачи для топика"""
         pass
 
     @abstractmethod
-    def get_task_by_id(self, task_id: str, user_id: Optional[int] = None) -> Optional[Dict[str, Any]]:
+    def get_task_by_id(
+        self, task_id: str, user_id: Optional[int] = None
+    ) -> Optional[Dict[str, Any]]:
         """Получить задачу по ID"""
         pass
 
     @abstractmethod
-    def get_topic_stats(self, topic_key: str, technology: str, user_id: Optional[int] = None) -> Optional[Dict[str, Any]]:
+    def get_topic_stats(
+        self, topic_key: str, technology: str, user_id: Optional[int] = None
+    ) -> Optional[Dict[str, Any]]:
         """Получить статистику по топику"""
         pass
 
@@ -82,7 +93,7 @@ class MindMapRepository(MindMapRepositoryInterface):
     def get_technology_center(self, technology: str) -> Optional[Dict[str, Any]]:
         """Получить центральный узел технологии"""
         logger.info(f"Получение центра технологии: {technology}")
-        
+
         config = get_technology_center(technology)
         if not config:
             logger.warning(f"Технология не найдена: {technology}")
@@ -100,7 +111,7 @@ class MindMapRepository(MindMapRepositoryInterface):
     def get_technology_topics(self, technology: str) -> List[Dict[str, Any]]:
         """Получить все топики для технологии"""
         logger.info(f"Получение топиков для технологии: {technology}")
-        
+
         topics_config = get_technology_topics(technology)
         if not topics_config:
             logger.warning(f"Топики не найдены для технологии: {technology}")
@@ -123,12 +134,14 @@ class MindMapRepository(MindMapRepositoryInterface):
         logger.info(f"Найдено {len(topics)} топиков для технологии {technology}")
         return topics
 
-    def get_topic_config(self, topic_key: str, technology: str) -> Optional[Dict[str, Any]]:
+    def get_topic_config(
+        self, topic_key: str, technology: str
+    ) -> Optional[Dict[str, Any]]:
         """Получить конфигурацию топика"""
         logger.info(f"Получение конфигурации топика: {topic_key} для {technology}")
-        
+
         config = get_topic_config(topic_key, technology)
-        
+
         if not config:
             logger.warning(f"Конфигурация топика не найдена: {topic_key}")
             return None
@@ -144,10 +157,14 @@ class MindMapRepository(MindMapRepositoryInterface):
             "technology": technology,
         }
 
-    def get_overall_progress(self, user_id: int, technology: str) -> Optional[Dict[str, Any]]:
+    def get_overall_progress(
+        self, user_id: int, technology: str
+    ) -> Optional[Dict[str, Any]]:
         """Получить общий прогресс пользователя по технологии"""
-        logger.info(f"Получение общего прогресса пользователя {user_id} по технологии {technology}")
-        
+        logger.info(
+            f"Получение общего прогресса пользователя {user_id} по технологии {technology}"
+        )
+
         try:
             tech_center = self.get_technology_center(technology)
             if not tech_center:
@@ -182,26 +199,38 @@ class MindMapRepository(MindMapRepositoryInterface):
                 or 0
             )
 
-            completion_rate = (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0.0
+            completion_rate = (
+                (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0.0
+            )
 
             progress = {
                 "totalTasks": total_tasks,
                 "completedTasks": completed_tasks,
                 "completionRate": round(completion_rate, 1),
-                "status": "completed" if completion_rate == 100 else "in_progress" if completion_rate > 0 else "not_started"
+                "status": "completed"
+                if completion_rate == 100
+                else "in_progress"
+                if completion_rate > 0
+                else "not_started",
             }
 
-            logger.info(f"Общий прогресс пользователя {user_id}: {completed_tasks}/{total_tasks} ({completion_rate:.1f}%)")
+            logger.info(
+                f"Общий прогресс пользователя {user_id}: {completed_tasks}/{total_tasks} ({completion_rate:.1f}%)"
+            )
             return progress
 
         except Exception as e:
             logger.error(f"Ошибка при получении общего прогресса: {e}")
             return None
 
-    def get_topic_progress(self, user_id: int, topic_key: str, technology: str) -> Optional[Dict[str, Any]]:
+    def get_topic_progress(
+        self, user_id: int, topic_key: str, technology: str
+    ) -> Optional[Dict[str, Any]]:
         """Получить прогресс пользователя по теме"""
-        logger.info(f"Получение прогресса по топику {topic_key} для пользователя {user_id}")
-        
+        logger.info(
+            f"Получение прогресса по топику {topic_key} для пользователя {user_id}"
+        )
+
         try:
             topic_config = self.get_topic_config(topic_key, technology)
             if not topic_config:
@@ -239,26 +268,40 @@ class MindMapRepository(MindMapRepositoryInterface):
                 or 0
             )
 
-            completion_rate = (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0.0
+            completion_rate = (
+                (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0.0
+            )
 
             progress = {
                 "totalTasks": total_tasks,
                 "completedTasks": completed_tasks,
                 "completionRate": round(completion_rate, 1),
-                "status": "completed" if completion_rate == 100 else "in_progress" if completion_rate > 0 else "not_started"
+                "status": "completed"
+                if completion_rate == 100
+                else "in_progress"
+                if completion_rate > 0
+                else "not_started",
             }
 
-            logger.info(f"Прогресс по топику {topic_key}: {completed_tasks}/{total_tasks} ({completion_rate:.1f}%)")
+            logger.info(
+                f"Прогресс по топику {topic_key}: {completed_tasks}/{total_tasks} ({completion_rate:.1f}%)"
+            )
             return progress
 
         except Exception as e:
             logger.error(f"Ошибка при получении прогресса по топику: {e}")
             return None
 
-    def get_topic_tasks(self, topic_key: str, technology: str, user_id: Optional[int] = None, difficulty_filter: Optional[str] = None) -> List[Dict[str, Any]]:
+    def get_topic_tasks(
+        self,
+        topic_key: str,
+        technology: str,
+        user_id: Optional[int] = None,
+        difficulty_filter: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
         """Получить задачи для топика"""
         logger.info(f"Получение задач для топика {topic_key}, технология {technology}")
-        
+
         try:
             topic_config = self.get_topic_config(topic_key, technology)
             if not topic_config:
@@ -267,8 +310,10 @@ class MindMapRepository(MindMapRepositoryInterface):
 
             main_category = topic_config["main_category"]
             sub_category = topic_config["sub_category"]
-            
-            logger.info(f"Поиск задач для категории: {main_category}, подкатегории: {sub_category}")
+
+            logger.info(
+                f"Поиск задач для категории: {main_category}, подкатегории: {sub_category}"
+            )
 
             # Используем простой join как в content_repository с func.lower()
             results = (
@@ -281,37 +326,37 @@ class MindMapRepository(MindMapRepositoryInterface):
                 )
                 .all()
             )
-            
+
             logger.info(f"Найдено {len(results)} блоков для топика {topic_key}")
-            
+
             tasks = []
             for content_block in results:
-                    # Получаем прогресс если пользователь указан
-                    progress = None
-                    if user_id:
-                        user_progress = (
-                            self.session.query(UserContentProgress)
-                            .filter(
-                                UserContentProgress.userId == user_id,
-                                UserContentProgress.blockId == content_block.id,
-                            )
-                            .first()
+                # Получаем прогресс если пользователь указан
+                progress = None
+                if user_id:
+                    user_progress = (
+                        self.session.query(UserContentProgress)
+                        .filter(
+                            UserContentProgress.userId == user_id,
+                            UserContentProgress.blockId == content_block.id,
                         )
-                        
-                        if user_progress:
-                            progress = {
-                                "solvedCount": user_progress.solvedCount,
-                                "isCompleted": user_progress.solvedCount > 0,
-                            }
+                        .first()
+                    )
 
-                    task = {
-                        "id": str(content_block.id),
-                        "title": content_block.blockTitle or f"Задача {content_block.id}",
-                        "description": content_block.textContent or "",
-                        "hasCode": bool(content_block.codeContent),
-                        "progress": progress,
-                    }
-                    tasks.append(task)
+                    if user_progress:
+                        progress = {
+                            "solvedCount": user_progress.solvedCount,
+                            "isCompleted": user_progress.solvedCount > 0,
+                        }
+
+                task = {
+                    "id": str(content_block.id),
+                    "title": content_block.blockTitle or f"Задача {content_block.id}",
+                    "description": content_block.textContent or "",
+                    "hasCode": bool(content_block.codeContent),
+                    "progress": progress,
+                }
+                tasks.append(task)
 
             logger.info(f"Найдено {len(tasks)} задач для топика {topic_key}")
             return tasks
@@ -320,10 +365,12 @@ class MindMapRepository(MindMapRepositoryInterface):
             logger.error(f"Ошибка при получении задач для топика: {e}")
             return []
 
-    def get_task_by_id(self, task_id: str, user_id: Optional[int] = None) -> Optional[Dict[str, Any]]:
+    def get_task_by_id(
+        self, task_id: str, user_id: Optional[int] = None
+    ) -> Optional[Dict[str, Any]]:
         """Получить задачу по ID"""
         logger.info(f"Получение задачи по ID: {task_id}")
-        
+
         try:
             content_block = (
                 self.session.query(ContentBlock)
@@ -346,7 +393,7 @@ class MindMapRepository(MindMapRepositoryInterface):
                     )
                     .first()
                 )
-                
+
                 if user_progress:
                     progress = {
                         "solvedCount": user_progress.solved_count,
@@ -370,10 +417,12 @@ class MindMapRepository(MindMapRepositoryInterface):
             logger.error(f"Ошибка при получении задачи: {e}")
             return None
 
-    def get_topic_stats(self, topic_key: str, technology: str, user_id: Optional[int] = None) -> Optional[Dict[str, Any]]:
+    def get_topic_stats(
+        self, topic_key: str, technology: str, user_id: Optional[int] = None
+    ) -> Optional[Dict[str, Any]]:
         """Получить статистику по топику"""
         logger.info(f"Получение статистики по топику {topic_key}")
-        
+
         try:
             topic_config = self.get_topic_config(topic_key, technology)
             if not topic_config:
@@ -405,14 +454,17 @@ class MindMapRepository(MindMapRepositoryInterface):
                         UserContentProgress.userId == user_id,
                         UserContentProgress.solvedCount > 0,
                         ContentBlock.codeContent.isnot(None),
-                        func.lower(ContentFile.mainCategory) == func.lower(main_category),
+                        func.lower(ContentFile.mainCategory)
+                        == func.lower(main_category),
                         func.lower(ContentFile.subCategory) == func.lower(sub_category),
                     )
                     .scalar()
                     or 0
                 )
 
-            completion_rate = (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0.0
+            completion_rate = (
+                (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0.0
+            )
 
             stats = {
                 "totalTasks": total_tasks,
@@ -420,7 +472,9 @@ class MindMapRepository(MindMapRepositoryInterface):
                 "completionRate": round(completion_rate, 1),
             }
 
-            logger.info(f"Статистика топика {topic_key}: {completed_tasks}/{total_tasks}")
+            logger.info(
+                f"Статистика топика {topic_key}: {completed_tasks}/{total_tasks}"
+            )
             return stats
 
         except Exception as e:
@@ -430,14 +484,11 @@ class MindMapRepository(MindMapRepositoryInterface):
     def get_available_technologies(self) -> List[str]:
         """Получить список доступных технологий"""
         logger.info("Получение списка доступных технологий")
-        
+
         try:
             technologies = get_available_technologies()
             logger.info(f"Найдено {len(technologies)} технологий")
             return technologies
         except Exception as e:
             logger.error(f"Ошибка при получении технологий: {e}")
-            return [] 
-
-
-
+            return []

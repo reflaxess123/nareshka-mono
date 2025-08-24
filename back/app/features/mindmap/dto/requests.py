@@ -1,6 +1,7 @@
 """Request DTOs для mindmap feature"""
 
 from typing import Optional
+
 from pydantic import BaseModel, Field
 
 
@@ -21,6 +22,4 @@ class TopicTasksRequest(BaseModel):
     technology: str = Field(default="javascript", description="Технология")
     difficulty_filter: Optional[str] = Field(
         default=None, description="Фильтр по сложности"
-    ) 
-
-
+    )

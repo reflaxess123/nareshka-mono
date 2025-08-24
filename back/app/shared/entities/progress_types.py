@@ -105,5 +105,3 @@ class TestValidationResult(BaseModel):
     execution_time_ms: Optional[int] = None
     error_message: Optional[str] = None
     created_at: datetime
-
-

@@ -42,8 +42,3 @@ class GracefulDegradation:
             },
         )
         return default_value
-
-
-
-
-

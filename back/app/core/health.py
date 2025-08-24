@@ -4,15 +4,12 @@ Provides endpoints and utilities for health monitoring.
 """
 
 from datetime import datetime
-from typing import Dict, Any
+from typing import Any, Dict
 
-from app.core.settings import Settings
 from app.core.logging import get_logger
+from app.core.settings import settings
 
 logger = get_logger(__name__)
-settings = Settings()
-
-
 
 
 async def quick_health_check() -> Dict[str, Any]:
@@ -21,14 +18,12 @@ async def quick_health_check() -> Dict[str, Any]:
         return {
             "status": "ok",
             "timestamp": datetime.now().isoformat(),
-            "environment": settings.app_environment
+            "environment": settings.app_environment,
         }
     except Exception as e:
         logger.error("Quick health check failed", extra={"error": str(e)})
         return {
             "status": "error",
             "timestamp": datetime.now().isoformat(),
-            "error": str(e)
-        } 
-
-
+            "error": str(e),
+        }

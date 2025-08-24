@@ -3,74 +3,59 @@
 """
 
 from .auth_exceptions import (
-    # Аутентификация
-    InvalidCredentialsError,
-    UserNotFoundError,
     AccountDeactivatedError,
-    
+    AdminAccessRequiredError,
     # Регистрация
     EmailAlreadyExistsError,
-    UsernameAlreadyExistsError,
-    
-    # Валидация
-    WeakPasswordError,
-    InvalidEmailError,
-    InvalidUsernameError,
-    
-    # Токены
-    TokenError,
-    InvalidTokenError,
-    TokenExpiredError,
-    TokenNotProvidedError,
-    
     # Авторизация
     InsufficientPermissionsError,
-    AdminAccessRequiredError,
-    
+    # Аутентификация
+    InvalidCredentialsError,
+    InvalidEmailError,
+    InvalidResetTokenError,
+    InvalidTokenError,
+    InvalidUsernameError,
     # Сброс пароля
     PasswordResetError,
-    InvalidResetTokenError,
-    ResetTokenExpiredError,
-    
+    ProfileNotFoundError,
     # Профиль
     ProfileUpdateError,
-    ProfileNotFoundError
+    ResetTokenExpiredError,
+    # Токены
+    TokenError,
+    TokenExpiredError,
+    TokenNotProvidedError,
+    UsernameAlreadyExistsError,
+    UserNotFoundError,
+    # Валидация
+    WeakPasswordError,
 )
 
 __all__ = [
     # Аутентификация
     "InvalidCredentialsError",
-    "UserNotFoundError", 
+    "UserNotFoundError",
     "AccountDeactivatedError",
-    
     # Регистрация
     "EmailAlreadyExistsError",
     "UsernameAlreadyExistsError",
-    
     # Валидация
     "WeakPasswordError",
     "InvalidEmailError",
     "InvalidUsernameError",
-    
     # Токены
     "TokenError",
     "InvalidTokenError",
     "TokenExpiredError",
     "TokenNotProvidedError",
-    
     # Авторизация
     "InsufficientPermissionsError",
     "AdminAccessRequiredError",
-    
     # Сброс пароля
     "PasswordResetError",
     "InvalidResetTokenError",
     "ResetTokenExpiredError",
-    
     # Профиль
     "ProfileUpdateError",
-    "ProfileNotFoundError"
-] 
-
-
-
+    "ProfileNotFoundError",
+]

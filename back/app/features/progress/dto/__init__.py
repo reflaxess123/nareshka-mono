@@ -3,28 +3,27 @@ Progress DTOs
 """
 
 from .requests import (
+    CategoryProgressUpdateRequest,
+    ContentProgressUpdateRequest,
+    ProgressAnalyticsRequest,
     TaskAttemptCreateRequest,
     TaskSolutionCreateRequest,
-    ContentProgressUpdateRequest,
-    CategoryProgressUpdateRequest,
-    ProgressAnalyticsRequest,
-    UserStatsUpdateRequest
+    UserStatsUpdateRequest,
 )
-
 from .responses import (
-    TaskAttemptResponse,
-    TaskSolutionResponse,
+    AttemptHistoryResponse,
     CategoryProgressResponse,
-    ContentProgressResponse,
-    UserProgressSummaryResponse,
     CategoryProgressSummaryResponse,
+    ContentProgressResponse,
     GroupedCategoryProgressResponse,
     ProgressAnalyticsResponse,
-    RecentActivityResponse,
-    UserDetailedProgressResponse,
     ProgressStatsResponse,
+    RecentActivityResponse,
+    TaskAttemptResponse,
     TaskProgressListResponse,
-    AttemptHistoryResponse
+    TaskSolutionResponse,
+    UserDetailedProgressResponse,
+    UserProgressSummaryResponse,
 )
 
 __all__ = [
@@ -35,7 +34,6 @@ __all__ = [
     "CategoryProgressUpdateRequest",
     "ProgressAnalyticsRequest",
     "UserStatsUpdateRequest",
-    
     # Responses
     "TaskAttemptResponse",
     "TaskSolutionResponse",
@@ -49,8 +47,5 @@ __all__ = [
     "UserDetailedProgressResponse",
     "ProgressStatsResponse",
     "TaskProgressListResponse",
-    "AttemptHistoryResponse"
-] 
-
-
-
+    "AttemptHistoryResponse",
+]

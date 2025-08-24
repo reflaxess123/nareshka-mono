@@ -1,14 +1,19 @@
 """Сервис для агрегации задач из разных источников"""
 
+import logging
 from typing import List, Optional, Tuple
+
 from sqlalchemy.orm import Session
 
-from app.shared.entities.task_types import Task
-from app.features.task.repositories.content_block_repository import ContentBlockRepository
+from app.features.task.dto.responses import (
+    TaskCategoryResponse as TaskCategory,
+    TaskCompanyResponse as TaskCompany,
+)
+from app.features.task.repositories.content_block_repository import (
+    ContentBlockRepository,
+)
 from app.features.task.repositories.theory_quiz_repository import TheoryQuizRepository
-from app.features.task.dto.responses import TaskCategoryResponse as TaskCategory, TaskCompanyResponse as TaskCompany
-
-import logging
+from app.shared.entities.task_types import Task
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +38,7 @@ class TaskAggregatorService:
         offset: Optional[int] = None,
     ) -> Tuple[List[Task], int]:
         """Получить задачи из всех источников с унифицированной фильтрацией и сортировкой"""
-        
+
         all_tasks = []
         total_count = 0
 
@@ -72,12 +77,18 @@ class TaskAggregatorService:
         end_idx = start_idx + limit if limit else len(sorted_tasks)
         paginated_tasks = sorted_tasks[start_idx:end_idx]
 
-        logger.info(f"Retrieved {len(paginated_tasks)} tasks out of {total_count} total",
-                   user_id=user_id, category=category, task_type=task_type)
+        logger.info(
+            f"Retrieved {len(paginated_tasks)} tasks out of {total_count} total",
+            user_id=user_id,
+            category=category,
+            task_type=task_type,
+        )
 
         return paginated_tasks, total_count
 
-    def _sort_tasks(self, tasks: List[Task], sort_by: str, sort_order: str) -> List[Task]:
+    def _sort_tasks(
+        self, tasks: List[Task], sort_by: str, sort_order: str
+    ) -> List[Task]:
         """Сортировка списка заданий"""
 
         def get_sort_key(task: Task):
@@ -98,7 +109,7 @@ class TaskAggregatorService:
                 sort_key = task.progress_percentage or 0
             elif sort_by == "completed":
                 sort_key = 1 if task.is_completed else 0
-            
+
             return sort_key
 
         reverse = sort_order == "desc"
@@ -106,17 +117,17 @@ class TaskAggregatorService:
 
     def get_task_categories(self) -> List[TaskCategory]:
         """Получить все категории задач из всех источников"""
-        
+
         # Получаем категории из блоков контента
         content_categories = self.content_block_repo.get_content_block_categories()
-        
+
         # Получаем категории из теоретических тестов
         theory_categories = self.theory_quiz_repo.get_theory_quiz_categories()
-        
+
         # Объединяем и убираем дубликаты
         all_categories = list(set(content_categories + theory_categories))
         all_categories.sort()
-        
+
         # Подсчитываем количество задач в каждой категории
         categories_with_counts = []
         for category in all_categories:
@@ -124,38 +135,36 @@ class TaskAggregatorService:
             content_tasks, content_count = self.content_block_repo.get_content_blocks(
                 category=category, limit=0
             )
-            
+
             # Подсчет для теоретических тестов
             theory_tasks, theory_count = self.theory_quiz_repo.get_theory_quizzes(
                 category=category, limit=0
             )
-            
+
             total_count = content_count + theory_count
-            
+
             categories_with_counts.append(
                 TaskCategory(name=category, count=total_count)
             )
-        
+
         return categories_with_counts
 
     def get_task_companies(self) -> List[TaskCompany]:
         """Получить все компании из задач (только из блоков контента)"""
-        
+
         # Только блоки контента имеют компании
         companies = self.content_block_repo.get_content_block_companies()
         companies.sort()
-        
+
         # Подсчитываем количество задач для каждой компании
         companies_with_counts = []
         for company in companies:
             content_tasks, content_count = self.content_block_repo.get_content_blocks(
                 company=company, limit=0
             )
-            
-            companies_with_counts.append(
-                TaskCompany(name=company, count=content_count)
-            )
-        
+
+            companies_with_counts.append(TaskCompany(name=company, count=content_count))
+
         return companies_with_counts
 
     def search_tasks(
@@ -165,10 +174,10 @@ class TaskAggregatorService:
         limit: int = 50,
     ) -> List[Task]:
         """Поиск задач по всем источникам"""
-        
+
         if not search_query or len(search_query.strip()) < 2:
             return []
-        
+
         all_tasks, _ = self.get_tasks(
             user_id=user_id,
             search=search_query.strip(),
@@ -176,5 +185,5 @@ class TaskAggregatorService:
             sort_by="title",
             sort_order="asc",
         )
-        
+
         return all_tasks

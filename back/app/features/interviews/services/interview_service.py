@@ -1,15 +1,18 @@
 """Сервис для работы с интервью"""
 
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
+
 from sqlalchemy.orm import Session
 
-from app.features.interviews.repositories.interview_repository import InterviewRepository
 from app.features.interviews.dto.responses import (
-    InterviewsListResponse,
+    AnalyticsResponse,
+    CompanyStatsResponse,
     InterviewDetailResponse,
     InterviewRecordResponse,
-    CompanyStatsResponse,
-    AnalyticsResponse
+    InterviewsListResponse,
+)
+from app.features.interviews.repositories.interview_repository import (
+    InterviewRepository,
 )
 
 
@@ -20,10 +23,7 @@ class InterviewService:
         self.repository = InterviewRepository(session)
 
     def get_interviews_list(
-        self,
-        page: int = 1,
-        limit: int = 20,
-        filters: Optional[Dict[str, Any]] = None
+        self, page: int = 1, limit: int = 20, filters: Optional[Dict[str, Any]] = None
     ) -> InterviewsListResponse:
         """Получение списка интервью с пагинацией"""
         interviews, total = self.repository.get_interviews(page, limit, filters)
@@ -43,13 +43,15 @@ class InterviewService:
             page=page,
             limit=limit,
             has_next=has_next,
-            has_prev=has_prev
+            has_prev=has_prev,
         )
 
-    def get_interview_by_id(self, interview_id: str) -> Optional[InterviewDetailResponse]:
+    def get_interview_by_id(
+        self, interview_id: str
+    ) -> Optional[InterviewDetailResponse]:
         """Получение детальной информации об интервью"""
         interview = self.repository.get_interview_by_id(interview_id)
-        
+
         if not interview:
             return None
 
@@ -59,11 +61,12 @@ class InterviewService:
         """Получение списка компаний"""
         return self.repository.get_companies_list()
 
-
-    def get_company_statistics(self, company_name: str) -> Optional[CompanyStatsResponse]:
+    def get_company_statistics(
+        self, company_name: str
+    ) -> Optional[CompanyStatsResponse]:
         """Получение статистики по компании"""
         stats = self.repository.get_company_statistics(company_name)
-        
+
         if not stats:
             return None
 

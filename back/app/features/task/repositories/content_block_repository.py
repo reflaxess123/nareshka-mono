@@ -1,14 +1,14 @@
 """Репозиторий для работы с блоками контента"""
 
+import logging
 from typing import List, Optional, Tuple
-from sqlalchemy import asc, func, or_
+
+from sqlalchemy import asc, or_
 from sqlalchemy.orm import Session, joinedload
 
-from app.shared.entities.content import ContentBlock, ContentFile
-from app.shared.models.content_models import UserContentProgress
+from app.shared.entities.content import ContentBlock
 from app.shared.entities.task_types import Task
-
-import logging
+from app.shared.models.content_models import UserContentProgress
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ class ContentBlockRepository:
         offset: Optional[int] = None,
     ) -> Tuple[List[Task], int]:
         """Получить блоки контента с фильтрацией"""
-        
+
         # Базовый запрос с загрузкой связанных данных
         query = (
             self.session.query(ContentBlock)
@@ -86,9 +86,7 @@ class ContentBlockRepository:
                 )
             )
             user_progress_records = progress_query.all()
-            user_progress = {
-                up.content_block_id: up for up in user_progress_records
-            }
+            user_progress = {up.content_block_id: up for up in user_progress_records}
 
         # Преобразование в объекты Task
         tasks = []
@@ -99,14 +97,16 @@ class ContentBlockRepository:
             files = []
             if block.files:
                 for file in block.files:
-                    files.append({
-                        "id": file.id,
-                        "filename": file.filename,
-                        "content": self._unescape_text_content(file.content),
-                        "language": self._map_language(file.language),
-                        "type": file.type,
-                        "order_in_block": file.order_in_block,
-                    })
+                    files.append(
+                        {
+                            "id": file.id,
+                            "filename": file.filename,
+                            "content": self._unescape_text_content(file.content),
+                            "language": self._map_language(file.language),
+                            "type": file.type,
+                            "order_in_block": file.order_in_block,
+                        }
+                    )
 
             task = Task(
                 id=block.id,
@@ -133,7 +133,7 @@ class ContentBlockRepository:
         """Маппинг языков программирования для корректного отображения"""
         if not language:
             return None
-        
+
         language_mapping = {
             "js": "javascript",
             "ts": "typescript",
@@ -159,7 +159,7 @@ class ContentBlockRepository:
             "md": "markdown",
             "dockerfile": "dockerfile",
         }
-        
+
         return language_mapping.get(language.lower(), language)
 
     def get_content_block_categories(self) -> List[str]:

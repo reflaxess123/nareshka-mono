@@ -15,12 +15,12 @@ from typing import Dict, List, Optional
 
 import aiohttp
 
-from app.features.code_editor.dto.test_case_dto import TestCaseAIGenerate
 from app.core.logging import get_logger
-from app.shared.entities.progress_types import TestCase
+from app.features.code_editor.dto.test_case_dto import TestCaseAIGenerate
 from app.features.content.repositories.content_repository import ContentRepository
 from app.features.task.repositories.task_repository import TaskRepository
 from app.shared.entities.content import ContentBlock
+from app.shared.entities.progress_types import TestCase
 
 logger = get_logger(__name__)
 
@@ -486,5 +486,3 @@ Return ONLY the JSON array, no additional text or markdown formatting.
             )
             * 100,
         }
-
-

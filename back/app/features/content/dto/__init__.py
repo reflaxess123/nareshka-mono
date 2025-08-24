@@ -17,12 +17,9 @@ __all__ = [
     "ProgressAction",
     # Responses
     "ContentBlockResponse",
-    "ContentBlocksListResponse", 
+    "ContentBlocksListResponse",
     "ContentCategoriesResponse",
     "ContentFilesListResponse",
     "ContentSubcategoriesResponse",
     "UserContentProgressResponse",
-] 
-
-
-
+]

@@ -3,19 +3,22 @@
 import logging
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy.orm import Session
 
-from app.features.task.services.task_service import TaskService
-from app.shared.database import get_session
-from app.features.task.dto.requests import TaskAttemptCreateRequest, TaskSolutionCreateRequest
+from app.features.task.dto.requests import (
+    TaskAttemptCreateRequest,
+    TaskSolutionCreateRequest,
+)
 from app.features.task.dto.responses import (
-    TasksListResponse,
+    TaskAttemptResponse,
     TaskCategoriesResponse,
     TaskCompaniesResponse,
-    TaskAttemptResponse,
+    TasksListResponse,
     TaskSolutionResponse,
 )
+from app.features.task.services.task_service import TaskService
+from app.shared.database import get_session
 from app.shared.dependencies import (
     get_current_user_optional,
     get_current_user_required,
@@ -29,6 +32,7 @@ router = APIRouter(prefix="/tasks", tags=["Tasks"])
 def get_task_service(db: Session = Depends(get_session)) -> TaskService:
     """Зависимость для получения сервиса task"""
     from app.features.task.repositories.task_repository import TaskRepository
+
     task_repository = TaskRepository(db)
     return TaskService(task_repository)
 
@@ -62,18 +66,21 @@ async def get_task_items(
 ):
     """Получение объединенного списка задач (content blocks + quiz карточки)"""
     user_id = current_user.id if current_user else None
-    
+
     # 🔍 ENHANCED DEBUG LOGGING
     session_id = request.cookies.get("session_id")
-    logger.info(f"🔍 DEBUG: get_task_items called", extra={
-        "current_user": current_user is not None,
-        "user_id": user_id,
-        "user_email": current_user.email if current_user else None,
-        "session_id": session_id[:10] + "..." if session_id else None,
-        "cookies": dict(request.cookies),
-        "page": page,
-        "limit": limit
-    })
+    logger.info(
+        "🔍 DEBUG: get_task_items called",
+        extra={
+            "current_user": current_user is not None,
+            "user_id": user_id,
+            "user_email": current_user.email if current_user else None,
+            "session_id": session_id[:10] + "..." if session_id else None,
+            "cookies": dict(request.cookies),
+            "page": page,
+            "limit": limit,
+        },
+    )
 
     # Объединяем companies и companiesList
     final_companies = list(companiesList) if companiesList else []
@@ -96,22 +103,25 @@ async def get_task_items(
         companies=final_companies if final_companies else None,
         user_id=user_id,
     )
-    
+
     # 🔍 DEBUG: Log result details
     if result.data:
         sample_tasks = result.data[:3]  # First 3 tasks
-        logger.info(f"🔍 DEBUG: Returning {len(result.data)} tasks", extra={
-            "user_id": user_id,
-            "sample_progress": [
-                {
-                    "task_id": task.id[:10] + "...",
-                    "title": task.title[:20] + "...",
-                    "currentUserSolvedCount": task.currentUserSolvedCount
-                }
-                for task in sample_tasks
-            ]
-        })
-    
+        logger.info(
+            f"🔍 DEBUG: Returning {len(result.data)} tasks",
+            extra={
+                "user_id": user_id,
+                "sample_progress": [
+                    {
+                        "task_id": task.id[:10] + "...",
+                        "title": task.title[:20] + "...",
+                        "currentUserSolvedCount": task.currentUserSolvedCount,
+                    }
+                    for task in sample_tasks
+                ],
+            },
+        )
+
     return result
 
 
@@ -135,6 +145,7 @@ async def get_companies(
 
 
 # Дополнительные endpoints для работы с попытками и решениями
+
 
 @router.post("/attempts", response_model=TaskAttemptResponse)
 async def create_task_attempt(
@@ -185,6 +196,4 @@ async def get_user_task_solutions(
     task_service: TaskService = Depends(get_task_service),
 ):
     """Получение решений пользователя"""
-    return await task_service.get_user_task_solutions(current_user.id, blockId) 
-
-
+    return await task_service.get_user_task_solutions(current_user.id, blockId)

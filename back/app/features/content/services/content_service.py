@@ -9,8 +9,7 @@ Content Service - бизнес-логика для работы с контен�
 
 from typing import List, Optional, Tuple
 
-from app.features.content.repositories.content_repository import ContentRepository
-from app.shared.models.content_models import UserContentProgress as ContentBlockProgress
+from app.core.logging import get_logger
 from app.features.content.dto.requests import ProgressAction
 from app.features.content.dto.responses import (
     ContentBlockResponse,
@@ -18,10 +17,10 @@ from app.features.content.dto.responses import (
     ContentFileResponse,
 )
 from app.features.content.exceptions.content_exceptions import (
-    ContentBlockNotFoundError,
     InvalidProgressActionError,
 )
-from app.core.logging import get_logger
+from app.features.content.repositories.content_repository import ContentRepository
+from app.shared.models.content_models import UserContentProgress as ContentBlockProgress
 
 logger = get_logger(__name__)
 
@@ -49,7 +48,7 @@ class ContentService:
                 "main_category": main_category,
                 "sub_category": sub_category,
                 "webdav_path": webdav_path,
-            }
+            },
         )
 
         files, total = await self.content_repository.get_content_files(
@@ -99,7 +98,7 @@ class ContentService:
                 "user_id": user_id,
                 "search_query": search_query,
                 "sort_by": sort_by,
-            }
+            },
         )
 
         blocks, total = await self.content_repository.get_content_blocks(
@@ -121,7 +120,7 @@ class ContentService:
                 progress = await self.content_repository.get_user_content_progress(
                     user_id, block.id
                 )
-                
+
                 # Создаем response с прогрессом
                 block_response = ContentBlockWithProgressResponse(
                     id=block.id,
@@ -142,9 +141,9 @@ class ContentService:
                     rawBlockContentHash=block.rawBlockContentHash,
                     userProgress=progress.solvedCount if progress else 0,
                 )
-                
+
                 # Добавляем информацию о файле если доступна
-                if hasattr(block, 'file') and block.file:
+                if hasattr(block, "file") and block.file:
                     block_response.file = ContentFileResponse(
                         id=block.file.id,
                         createdAt=block.file.createdAt,
@@ -154,10 +153,12 @@ class ContentService:
                         subCategory=block.file.subCategory,
                         lastFileHash=block.file.lastFileHash,
                     )
-                
+
                 block_responses.append(block_response)
-            
-            logger.info(f"Retrieved {len(block_responses)} content blocks with progress (total: {total})")
+
+            logger.info(
+                f"Retrieved {len(block_responses)} content blocks with progress (total: {total})"
+            )
             return block_responses, total
         else:
             # Без прогресса пользователя
@@ -181,9 +182,9 @@ class ContentService:
                     companies=block.companies,
                     rawBlockContentHash=block.rawBlockContentHash,
                 )
-                
+
                 # Добавляем информацию о файле если доступна
-                if hasattr(block, 'file') and block.file:
+                if hasattr(block, "file") and block.file:
                     block_response.file = ContentFileResponse(
                         id=block.file.id,
                         createdAt=block.file.createdAt,
@@ -193,10 +194,12 @@ class ContentService:
                         subCategory=block.file.subCategory,
                         lastFileHash=block.file.lastFileHash,
                     )
-                
+
                 block_responses.append(block_response)
-            
-            logger.info(f"Retrieved {len(block_responses)} content blocks (total: {total})")
+
+            logger.info(
+                f"Retrieved {len(block_responses)} content blocks (total: {total})"
+            )
             return block_responses, total
 
     async def get_content_block_by_id(
@@ -213,7 +216,7 @@ class ContentService:
             progress = await self.content_repository.get_user_content_progress(
                 user_id, block_id
             )
-            
+
             response = ContentBlockWithProgressResponse(
                 id=block.id,
                 createdAt=block.createdAt,
@@ -254,7 +257,7 @@ class ContentService:
             )
 
         # Добавляем информацию о файле
-        if hasattr(block, 'file') and block.file:
+        if hasattr(block, "file") and block.file:
             response.file = ContentFileResponse(
                 id=block.file.id,
                 createdAt=block.file.createdAt,
@@ -271,18 +274,20 @@ class ContentService:
     async def get_content_categories(self) -> List[str]:
         """Получение списка всех основных категорий контента"""
         logger.debug("Getting content categories")
-        
+
         categories = await self.content_repository.get_content_categories()
-        
+
         logger.info(f"Retrieved {len(categories)} content categories")
         return categories
 
     async def get_content_subcategories(self, category: str) -> List[str]:
         """Получение списка подкатегорий для указанной категории"""
         logger.debug(f"Getting subcategories for category: {category}")
-        
-        subcategories = await self.content_repository.get_content_subcategories(category)
-        
+
+        subcategories = await self.content_repository.get_content_subcategories(
+            category
+        )
+
         logger.info(f"Retrieved {len(subcategories)} subcategories for '{category}'")
         return subcategories
 
@@ -318,17 +323,17 @@ class ContentService:
 
         logger.info(
             f"Updated content progress: {current_count} -> {new_count}",
-            extra={"user_id": user_id, "block_id": block_id, "action": action.action}
+            extra={"user_id": user_id, "block_id": block_id, "action": action.action},
         )
-        
+
         return progress
 
     async def get_user_total_solved_count(self, user_id: int) -> int:
         """Получение общего количества решенных блоков пользователем"""
         logger.debug(f"Getting total solved count for user: {user_id}")
-        
+
         count = await self.content_repository.get_user_total_solved_count(user_id)
-        
+
         logger.info(f"User {user_id} has solved {count} content blocks")
         return count
 
@@ -337,6 +342,4 @@ class ContentService:
         """Утилитарная функция для обработки экранированных символов в тексте"""
         if not text:
             return text
-        return text.replace("\\n", "\n").replace("\\t", "\t") 
-
-
+        return text.replace("\\n", "\n").replace("\\t", "\t")

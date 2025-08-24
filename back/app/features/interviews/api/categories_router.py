@@ -3,34 +3,34 @@ Categories API Router - роутер для работы с категориям
 """
 
 from typing import List, Optional
-from fastapi import APIRouter, Depends, Query, Path, HTTPException
+
+from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from sqlalchemy.orm import Session
 
-from app.shared.database import get_session
-from app.shared.dependencies import get_current_user_optional
-from app.features.interviews.services.categories_service import CategoriesService
 from app.features.interviews.dto.categories_responses import (
-    CategoryResponse,
+    CategoriesStatisticsResponse,
     CategoryDetailResponse,
+    CategoryResponse,
     ClusterResponse,
+    CompanyResponse,
     QuestionResponse,
     QuestionsListResponse,
-    CategoriesStatisticsResponse,
-    CompanyResponse
 )
 from app.features.interviews.exceptions.interview_exceptions import (
     CategoryNotFoundError,
-    ClusterNotFoundError
+    ClusterNotFoundError,
 )
-
+from app.features.interviews.services.categories_service import CategoriesService
+from app.shared.database import get_session
+from app.shared.dependencies import get_current_user_optional
 
 router = APIRouter(
     prefix="/interview-categories",
     tags=["interview-categories"],
     responses={
         404: {"description": "Not found"},
-        500: {"description": "Internal server error"}
-    }
+        500: {"description": "Internal server error"},
+    },
 )
 
 
@@ -38,15 +38,15 @@ router = APIRouter(
     "/",
     response_model=List[CategoryResponse],
     summary="Получить список категорий",
-    description="Возвращает все категории вопросов интервью с статистикой"
+    description="Возвращает все категории вопросов интервью с статистикой",
 )
 def get_categories(
     session: Session = Depends(get_session),
-    current_user=Depends(get_current_user_optional)
+    current_user=Depends(get_current_user_optional),
 ) -> List[CategoryResponse]:
     """
     Получить все категории вопросов
-    
+
     Возвращает список всех категорий с информацией о количестве вопросов,
     кластеров и процентном соотношении.
     """
@@ -58,15 +58,15 @@ def get_categories(
     "/statistics",
     response_model=CategoriesStatisticsResponse,
     summary="Получить статистику категоризации",
-    description="Возвращает общую статистику по категоризации вопросов"
+    description="Возвращает общую статистику по категоризации вопросов",
 )
 def get_statistics(
     session: Session = Depends(get_session),
-    current_user=Depends(get_current_user_optional)
+    current_user=Depends(get_current_user_optional),
 ) -> CategoriesStatisticsResponse:
     """
     Получить общую статистику
-    
+
     Возвращает информацию о количестве вопросов, категорий,
     кластеров и проценте категоризации.
     """
@@ -78,33 +78,26 @@ def get_statistics(
     "/cluster/{cluster_id}/questions",
     response_model=List[QuestionResponse],
     summary="Получить вопросы кластера",
-    description="Возвращает список вопросов определенного кластера"
+    description="Возвращает список вопросов определенного кластера",
 )
 def get_cluster_questions(
     cluster_id: int = Path(..., description="ID кластера"),
     page: int = Query(1, ge=1, description="Номер страницы"),
-    limit: int = Query(
-        50, 
-        ge=1, 
-        le=200, 
-        description="Количество вопросов на странице"
-    ),
+    limit: int = Query(50, ge=1, le=200, description="Количество вопросов на странице"),
     session: Session = Depends(get_session),
-    current_user=Depends(get_current_user_optional)
+    current_user=Depends(get_current_user_optional),
 ) -> List[QuestionResponse]:
     """
     Получить вопросы определенного кластера
-    
+
     Возвращает список всех вопросов, относящихся к указанному кластеру,
     с поддержкой пагинации.
     """
     service = CategoriesService(session)
-    
+
     try:
         return service.get_cluster_questions(
-            cluster_id=cluster_id,
-            page=page,
-            limit=limit
+            cluster_id=cluster_id, page=page, limit=limit
         )
     except ClusterNotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))
@@ -114,74 +107,56 @@ def get_cluster_questions(
     "/search/questions",
     response_model=QuestionsListResponse,
     summary="Поиск вопросов",
-    description="Полнотекстовый поиск по вопросам интервью с фильтрацией и пагинацией"
+    description="Полнотекстовый поиск по вопросам интервью с фильтрацией и пагинацией",
 )
 def search_questions(
     q: str = Query(
-        ..., 
-        min_length=1, 
-        description="Поисковый запрос (минимум 1 символ, * для всех)"
+        ..., min_length=1, description="Поисковый запрос (минимум 1 символ, * для всех)"
     ),
     category_ids: Optional[List[str]] = Query(
-        None, 
-        description="Фильтр по ID категорий (множественный)"
+        None, description="Фильтр по ID категорий (множественный)"
     ),
     cluster_ids: Optional[List[int]] = Query(
-        None, 
-        description="Фильтр по ID кластеров (множественный)"
+        None, description="Фильтр по ID кластеров (множественный)"
     ),
     companies: Optional[List[str]] = Query(
-        None, 
-        description="Фильтр по названиям компаний (множественный)"
+        None, description="Фильтр по названиям компаний (множественный)"
     ),
     limit: int = Query(
-        50, 
-        ge=1, 
-        le=500, 
-        description="Максимальное количество результатов"
+        50, ge=1, le=500, description="Максимальное количество результатов"
     ),
-    offset: int = Query(
-        0, 
-        ge=0, 
-        description="Смещение для пагинации"
-    ),
+    offset: int = Query(0, ge=0, description="Смещение для пагинации"),
     session: Session = Depends(get_session),
-    current_user=Depends(get_current_user_optional)
+    current_user=Depends(get_current_user_optional),
 ) -> QuestionsListResponse:
     """
     Поиск вопросов по тексту
-    
+
     Выполняет полнотекстовый поиск по вопросам с возможностью фильтрации
     по категории и компании.
     """
     service = CategoriesService(session)
-    
+
     return service.search_questions(
         search_query=q,
         category_ids=category_ids,
         cluster_ids=cluster_ids,
         companies=companies,
         limit=limit,
-        offset=offset
+        offset=offset,
     )
-
 
 
 @router.get(
     "/companies/top",
     response_model=List[CompanyResponse],
     summary="Получить топ компаний",
-    description="Возвращает список компаний с наибольшим количеством вопросов"
+    description="Возвращает список компаний с наибольшим количеством вопросов",
 )
 def get_top_companies_endpoint(
-    limit: int = Query(
-        20, 
-        ge=1, 
-        le=100, 
-        description="Количество компаний в топе"
-    ),
+    limit: int = Query(20, ge=1, le=100, description="Количество компаний в топе"),
     session: Session = Depends(get_session),
-    current_user=Depends(get_current_user_optional)
+    current_user=Depends(get_current_user_optional),
 ) -> List[CompanyResponse]:
     service = CategoriesService(session)
     return service.get_top_companies(limit=limit)
@@ -191,11 +166,11 @@ def get_top_companies_endpoint(
     "/companies/count",
     response_model=int,
     summary="Получить общее количество компаний",
-    description="Возвращает общее количество уникальных компаний в базе данных"
+    description="Возвращает общее количество уникальных компаний в базе данных",
 )
 def get_total_companies_count(
     session: Session = Depends(get_session),
-    current_user=Depends(get_current_user_optional)
+    current_user=Depends(get_current_user_optional),
 ) -> int:
     service = CategoriesService(session)
     return service.get_total_companies_count()
@@ -205,71 +180,56 @@ def get_total_companies_count(
     "/clusters/all",
     response_model=List[ClusterResponse],
     summary="Получить все кластеры",
-    description="Возвращает список всех кластеров с возможностью фильтрации по категории"
+    description="Возвращает список всех кластеров с возможностью фильтрации по категории",
 )
 def get_all_clusters(
-    category_id: Optional[str] = Query(
-        None, 
-        description="Фильтр по ID категории"
-    ),
-    search: Optional[str] = Query(
-        None,
-        description="Поиск по названию кластера"
-    ),
+    category_id: Optional[str] = Query(None, description="Фильтр по ID категории"),
+    search: Optional[str] = Query(None, description="Поиск по названию кластера"),
     limit: int = Query(
-        100, 
-        ge=1, 
-        le=500, 
-        description="Максимальное количество кластеров"
+        100, ge=1, le=500, description="Максимальное количество кластеров"
     ),
     session: Session = Depends(get_session),
-    current_user=Depends(get_current_user_optional)
+    current_user=Depends(get_current_user_optional),
 ) -> List[ClusterResponse]:
     """
     Получить все кластеры
-    
+
     Возвращает список всех кластеров с возможностью фильтрации по категории
     и поиска по названию.
     """
     service = CategoriesService(session)
-    return service.get_all_clusters(
-        category_id=category_id,
-        search=search,
-        limit=limit
-    )
+    return service.get_all_clusters(category_id=category_id, search=search, limit=limit)
 
 
 @router.get(
     "/{category_id}",
     response_model=CategoryDetailResponse,
     summary="Получить детали категории",
-    description="Возвращает подробную информацию о категории с кластерами и примерами"
+    description="Возвращает подробную информацию о категории с кластерами и примерами",
 )
 def get_category_detail(
-    category_id: str = Path(..., description="ID категории (например: javascript_core)"),
+    category_id: str = Path(
+        ..., description="ID категории (например: javascript_core)"
+    ),
     limit_questions: int = Query(
-        10, 
-        ge=1, 
-        le=50, 
-        description="Количество примеров вопросов"
+        10, ge=1, le=50, description="Количество примеров вопросов"
     ),
     session: Session = Depends(get_session),
-    current_user=Depends(get_current_user_optional)
+    current_user=Depends(get_current_user_optional),
 ) -> CategoryDetailResponse:
     """
     Получить детальную информацию о категории
-    
+
     Возвращает полную информацию о категории, включая:
     - Основную информацию о категории
     - Список всех кластеров категории
     - Примеры вопросов из категории
     """
     service = CategoriesService(session)
-    
+
     try:
         return service.get_category_detail(
-            category_id=category_id,
-            limit_questions=limit_questions
+            category_id=category_id, limit_questions=limit_questions
         )
     except CategoryNotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))

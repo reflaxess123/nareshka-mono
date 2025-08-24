@@ -107,5 +107,3 @@ class BulkDeleteResult(BaseModel):
     deleted_count: int
     error_count: int
     errors: List[str] = []
-
-

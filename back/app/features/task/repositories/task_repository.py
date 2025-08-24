@@ -1,23 +1,25 @@
 """Репозиторий для работы с заданиями - DEPRECATED - используйте TaskAggregatorService"""
 
+import html
+import logging
+from datetime import datetime
 from typing import List, Optional, Tuple
 from uuid import uuid4
-from datetime import datetime
 
-from sqlalchemy import asc, func, or_
+from sqlalchemy import func, or_
 from sqlalchemy.orm import Session, joinedload
 
-from app.shared.entities.task_types import Task
-from app.shared.entities.progress_types import TaskAttempt, TaskSolution
-from app.features.task.dto.responses import TaskCategoryResponse as TaskCategory, TaskCompanyResponse as TaskCompany
-from app.features.task.services.task_aggregator_service import TaskAggregatorService
+from app.features.task.dto.responses import (
+    TaskCategoryResponse as TaskCategory,
+    TaskCompanyResponse as TaskCompany,
+)
 from app.features.task.repositories.task_attempt_repository import TaskAttemptRepository
+from app.features.task.services.task_aggregator_service import TaskAggregatorService
 from app.shared.entities.content import ContentBlock, ContentFile
-from app.shared.models.theory_models import TheoryCard, UserTheoryProgress
+from app.shared.entities.progress_types import TaskAttempt, TaskSolution
+from app.shared.entities.task_types import Task
 from app.shared.models.content_models import UserContentProgress
-
-import logging
-import html
+from app.shared.models.theory_models import TheoryCard, UserTheoryProgress
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +38,7 @@ class TaskRepository:
         self._attempt_repo = TaskAttemptRepository(session)
 
     # Методы делегируются к новым сервисам для обратной совместимости
-    
+
     def get_tasks(
         self,
         user_id: Optional[int] = None,
@@ -61,23 +63,23 @@ class TaskRepository:
             limit=limit,
             offset=offset,
         )
-    
+
     def get_task_categories(self) -> List[TaskCategory]:
         """DEPRECATED: Используйте TaskAggregatorService.get_task_categories()"""
         return self._aggregator.get_task_categories()
-    
+
     def get_task_companies(self) -> List[TaskCompany]:
         """DEPRECATED: Используйте TaskAggregatorService.get_task_companies()"""
         return self._aggregator.get_task_companies()
-    
+
     async def create_task_attempt(self, user_id: int, **attempt_data) -> TaskAttempt:
         """DEPRECATED: Используйте TaskAttemptRepository.create_task_attempt()"""
         # Извлекаем нужные параметры из attempt_data
-        task_id = attempt_data.get('task_id') or attempt_data.get('blockId')
-        task_type = attempt_data.get('task_type', 'content_block')
-        code = attempt_data.get('code', '')
-        language = attempt_data.get('language', '')
-        
+        task_id = attempt_data.get("task_id") or attempt_data.get("blockId")
+        task_type = attempt_data.get("task_type", "content_block")
+        code = attempt_data.get("code", "")
+        language = attempt_data.get("language", "")
+
         return self._attempt_repo.create_task_attempt(
             user_id=user_id,
             task_id=task_id,
@@ -85,19 +87,19 @@ class TaskRepository:
             code=code,
             language=language,
         )
-    
+
     async def create_task_solution(self, user_id: int, **solution_data) -> TaskSolution:
         """DEPRECATED: Используйте TaskAttemptRepository.create_task_solution()"""
         # Извлекаем нужные параметры из solution_data
-        task_id = solution_data.get('task_id') or solution_data.get('blockId')
-        task_type = solution_data.get('task_type', 'content_block')
-        code = solution_data.get('code', '')
-        language = solution_data.get('language', '')
-        is_correct = solution_data.get('is_correct', False)
-        execution_time = solution_data.get('execution_time')
-        memory_usage = solution_data.get('memory_usage')
-        test_results = solution_data.get('test_results')
-        
+        task_id = solution_data.get("task_id") or solution_data.get("blockId")
+        task_type = solution_data.get("task_type", "content_block")
+        code = solution_data.get("code", "")
+        language = solution_data.get("language", "")
+        is_correct = solution_data.get("is_correct", False)
+        execution_time = solution_data.get("execution_time")
+        memory_usage = solution_data.get("memory_usage")
+        test_results = solution_data.get("test_results")
+
         return self._attempt_repo.create_task_solution(
             user_id=user_id,
             task_id=task_id,
@@ -109,16 +111,24 @@ class TaskRepository:
             memory_usage=memory_usage,
             test_results=test_results,
         )
-    
-    async def get_user_task_attempts(self, user_id: int, block_id: Optional[str] = None) -> List[TaskAttempt]:
+
+    async def get_user_task_attempts(
+        self, user_id: int, block_id: Optional[str] = None
+    ) -> List[TaskAttempt]:
         """DEPRECATED: Используйте TaskAttemptRepository.get_user_task_attempts()"""
         task_id = int(block_id) if block_id and block_id.isdigit() else None
-        return self._attempt_repo.get_user_task_attempts(user_id=user_id, task_id=task_id)
-    
-    async def get_user_task_solutions(self, user_id: int, block_id: Optional[str] = None) -> List[TaskSolution]:
+        return self._attempt_repo.get_user_task_attempts(
+            user_id=user_id, task_id=task_id
+        )
+
+    async def get_user_task_solutions(
+        self, user_id: int, block_id: Optional[str] = None
+    ) -> List[TaskSolution]:
         """DEPRECATED: Используйте TaskAttemptRepository.get_user_task_solutions()"""
         task_id = int(block_id) if block_id and block_id.isdigit() else None
-        return self._attempt_repo.get_user_task_solutions(user_id=user_id, task_id=task_id)
+        return self._attempt_repo.get_user_task_solutions(
+            user_id=user_id, task_id=task_id
+        )
 
     async def get_tasks(
         self,
@@ -180,7 +190,7 @@ class TaskRepository:
         user_id: Optional[int] = None,
     ) -> List[Task]:
         """Получение контентных блоков как заданий"""
-        
+
         query = (
             self.session.query(ContentBlock)
             .join(ContentFile)
@@ -235,28 +245,33 @@ class TaskRepository:
                     self.session.query(UserContentProgress)
                     .filter(
                         UserContentProgress.userId == user_id,
-                        UserContentProgress.blockId.in_(block_ids)
+                        UserContentProgress.blockId.in_(block_ids),
                     )
                     .all()
                 )
                 user_progress = {p.blockId: p.solvedCount for p in progress_records}
-                logger.info(f"🔍 DEBUG: Found progress records: {len(progress_records)}, progress_dict: {user_progress}")
-                
+                logger.info(
+                    f"🔍 DEBUG: Found progress records: {len(progress_records)}, progress_dict: {user_progress}"
+                )
+
                 # Дополнительное логирование для отладки
                 if progress_records:
                     sample_progress = progress_records[:3]
-                    logger.info(f"🔍 DEBUG: Sample progress records", extra={
-                        "user_id": user_id,
-                        "sample_records": [
-                            {
-                                "userId": p.userId,
-                                "blockId": p.blockId[:10] + "...",
-                                "solvedCount": p.solvedCount,
-                                "createdAt": str(p.createdAt)
-                            }
-                            for p in sample_progress
-                        ]
-                    })
+                    logger.info(
+                        "🔍 DEBUG: Sample progress records",
+                        extra={
+                            "user_id": user_id,
+                            "sample_records": [
+                                {
+                                    "userId": p.userId,
+                                    "blockId": p.blockId[:10] + "...",
+                                    "solvedCount": p.solvedCount,
+                                    "createdAt": str(p.createdAt),
+                                }
+                                for p in sample_progress
+                            ],
+                        },
+                    )
                 else:
                     # Проверим, есть ли вообще записи для этого пользователя
                     total_user_progress = (
@@ -264,9 +279,11 @@ class TaskRepository:
                         .filter(UserContentProgress.userId == user_id)
                         .count()
                     )
-                    logger.info(f"🔍 DEBUG: No progress found for current blocks, but user has {total_user_progress} total progress records")
+                    logger.info(
+                        f"🔍 DEBUG: No progress found for current blocks, but user has {total_user_progress} total progress records"
+                    )
         else:
-            logger.info(f"🔍 DEBUG: user_id is None, skipping progress loading")
+            logger.info("🔍 DEBUG: user_id is None, skipping progress loading")
 
         # Преобразуем в Task
         tasks = []
@@ -275,7 +292,7 @@ class TaskRepository:
             language_mapping = {
                 "js": "JAVASCRIPT",
                 "javascript": "JAVASCRIPT",
-                "ts": "TYPESCRIPT", 
+                "ts": "TYPESCRIPT",
                 "typescript": "TYPESCRIPT",
                 "py": "PYTHON",
                 "python": "PYTHON",
@@ -289,20 +306,21 @@ class TaskRepository:
                 "ruby": "RUBY",
                 "rb": "RUBY",
             }
-            
+
             # Преобразуем язык программирования
             code_language = None
             if block.codeLanguage:
                 mapped_lang = language_mapping.get(block.codeLanguage.lower())
                 if mapped_lang:
                     from app.shared.entities.enums import CodeLanguage
+
                     try:
                         code_language = CodeLanguage(mapped_lang)
                     except ValueError:
                         code_language = None
-            
+
             solved_count = user_progress.get(block.id, 0)
-            
+
             task = Task(
                 id=block.id,
                 item_type="content_block",
@@ -339,7 +357,7 @@ class TaskRepository:
         user_id: Optional[int] = None,
     ) -> List[Task]:
         """Получение теоретических квизов как заданий"""
-        
+
         query = self.session.query(TheoryCard).filter(
             or_(
                 TheoryCard.category.ilike("%QUIZ%"),
@@ -424,7 +442,7 @@ class TaskRepository:
 
     async def get_task_categories(self) -> List[TaskCategory]:
         """Получение списка категорий заданий с подкатегориями и статистикой"""
-        
+
         # Категории из content blocks
         content_categories = (
             self.session.query(
@@ -457,7 +475,7 @@ class TaskRepository:
 
         # Объединяем категории
         categories_dict = {}
-        
+
         # Обрабатываем content categories
         for main_cat, sub_cat, count in content_categories:
             if main_cat not in categories_dict:
@@ -496,7 +514,7 @@ class TaskRepository:
         sub_categories: Optional[List[str]] = None,
     ) -> List[TaskCompany]:
         """Получение списка компаний из заданий с количеством"""
-        
+
         query = (
             self.session.query(ContentBlock)
             .join(ContentFile)
@@ -531,12 +549,10 @@ class TaskRepository:
         return companies
 
     # Методы для работы с TaskAttempt и TaskSolution
-    
-    async def create_task_attempt(
-        self, user_id: int, **attempt_data
-    ) -> TaskAttempt:
+
+    async def create_task_attempt(self, user_id: int, **attempt_data) -> TaskAttempt:
         """Создание попытки решения задачи"""
-        
+
         attempt = TaskAttempt(
             id=str(uuid4()),
             userId=user_id,
@@ -544,7 +560,7 @@ class TaskRepository:
             updatedAt=datetime.utcnow(),
             **attempt_data,
         )
-        
+
         try:
             self.session.add(attempt)
             self.session.commit()
@@ -554,11 +570,9 @@ class TaskRepository:
             self.session.rollback()
             raise TaskAttemptError(f"Ошибка при создании попытки: {str(e)}")
 
-    async def create_task_solution(
-        self, user_id: int, **solution_data
-    ) -> TaskSolution:
+    async def create_task_solution(self, user_id: int, **solution_data) -> TaskSolution:
         """Создание решения задачи"""
-        
+
         solution = TaskSolution(
             id=str(uuid4()),
             userId=user_id,
@@ -566,7 +580,7 @@ class TaskRepository:
             updatedAt=datetime.utcnow(),
             **solution_data,
         )
-        
+
         try:
             self.session.add(solution)
             self.session.commit()
@@ -580,25 +594,25 @@ class TaskRepository:
         self, user_id: int, block_id: Optional[str] = None
     ) -> List[TaskAttempt]:
         """Получение попыток пользователя"""
-        
+
         query = self.session.query(TaskAttempt).filter(TaskAttempt.userId == user_id)
-        
+
         if block_id:
             query = query.filter(TaskAttempt.blockId == block_id)
-            
+
         return query.order_by(TaskAttempt.createdAt.desc()).all()
 
     async def get_user_task_solutions(
         self, user_id: int, block_id: Optional[str] = None
     ) -> List[TaskSolution]:
         """Получение решений пользователя"""
-        
+
         query = self.session.query(TaskSolution).filter(TaskSolution.userId == user_id)
-        
+
         if block_id:
             query = query.filter(TaskSolution.blockId == block_id)
-            
-        return query.order_by(TaskSolution.solvedAt.desc()).all() 
+
+        return query.order_by(TaskSolution.solvedAt.desc()).all()
 
     def _unescape_text_content(self, text):
         if text is None:
@@ -607,10 +621,9 @@ class TaskRepository:
 
     def _sort_tasks(self, tasks, sort_by, sort_order):
         reverse = sort_order.lower() == "desc"
+
         def sort_key(t):
             value = t.get(sort_by) if isinstance(t, dict) else getattr(t, sort_by, None)
             return (value is None, value)
+
         return sorted(tasks, key=sort_key, reverse=reverse)
-
-
-

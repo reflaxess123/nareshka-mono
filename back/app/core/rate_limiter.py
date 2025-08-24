@@ -1,16 +1,15 @@
 """Rate limiting система с slowapi"""
 
-from typing import Optional, Dict, Any
-from fastapi import Request, HTTPException
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
-from slowapi.errors import RateLimitExceeded
-from slowapi.middleware import SlowAPIMiddleware
-import redis
-from functools import wraps
+from typing import Any, Dict, Optional
 
-from app.core.settings import settings
+import redis
+from fastapi import HTTPException, Request
+from slowapi import Limiter
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
+
 from app.core.logging import get_logger
+from app.core.settings import settings
 
 logger = get_logger(__name__)
 
@@ -18,7 +17,7 @@ try:
     redis_client = redis.from_url(
         settings.redis_url,
         max_connections=settings.redis_max_connections,
-        decode_responses=True
+        decode_responses=True,
     )
     redis_client.ping()
     logger.info("Redis connected for rate limiting")
@@ -37,7 +36,7 @@ def get_user_id_from_request(request: Request) -> str:
             return get_remote_address(request)
         except Exception:
             pass
-    
+
     # Fallback на IP адрес
     return get_remote_address(request)
 
@@ -51,20 +50,16 @@ if redis_client:
     limiter = Limiter(
         key_func=get_user_id_from_request,
         storage_uri=settings.redis_url,
-        default_limits=["1000/minute", "10000/hour", "50000/day"]
+        default_limits=["1000/minute", "10000/hour", "50000/day"],
     )
 else:
     limiter = Limiter(
         key_func=get_user_id_from_request,
-        default_limits=["1000/minute", "10000/hour", "50000/day"]
+        default_limits=["1000/minute", "10000/hour", "50000/day"],
     )
 
 
-ADMIN_WHITELIST = {
-    "admin@nareshka.com",
-    "127.0.0.1",
-    "localhost"
-}
+ADMIN_WHITELIST = {"admin@nareshka.com", "127.0.0.1", "localhost"}
 
 
 def is_whitelisted(request: Request) -> bool:
@@ -72,16 +67,11 @@ def is_whitelisted(request: Request) -> bool:
     ip = get_remote_address(request)
     if ip in ADMIN_WHITELIST:
         return True
-    
+
     api_key = get_api_key_from_request(request)
     if api_key and api_key == settings.proxyapi_key:
         return True
-    
-    try:
-        pass
-    except Exception:
-        pass
-    
+
     return False
 
 
@@ -93,7 +83,7 @@ def create_rate_limit_response(request: Request, response: Any) -> Dict[str, Any
         "retry_after": getattr(response, "retry_after", 60),
         "limit": getattr(response, "limit", "1000/minute"),
         "remaining": getattr(response, "remaining", 0),
-        "reset": getattr(response, "reset", None)
+        "reset": getattr(response, "reset", None),
     }
 
 
@@ -104,22 +94,16 @@ def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded):
         ip=get_remote_address(request),
         path=request.url.path,
         method=request.method,
-        limit=exc.detail
+        limit=exc.detail,
     )
-    
+
     response_data = create_rate_limit_response(request, exc)
-    
+
     raise HTTPException(
         status_code=429,
         detail=response_data,
-        headers={"Retry-After": str(getattr(exc, "retry_after", 60))}
+        headers={"Retry-After": str(getattr(exc, "retry_after", 60))},
     )
-
-
-
-
-
-
 
 
 def get_rate_limiter() -> Limiter:
@@ -128,8 +112,6 @@ def get_rate_limiter() -> Limiter:
 
 
 __all__ = [
-    'limiter',
-    'get_rate_limiter',
-] 
-
-
+    "limiter",
+    "get_rate_limiter",
+]

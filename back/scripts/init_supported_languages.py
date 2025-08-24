@@ -3,8 +3,8 @@
 Скрипт для инициализации поддерживаемых языков программирования
 """
 
-import sys
 import os
+import sys
 from pathlib import Path
 
 # Добавляем корневую директорию в PYTHONPATH
@@ -16,9 +16,10 @@ os.chdir(str(back_dir))
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
 from app.core.settings import settings
-from app.shared.models.code_execution_models import SupportedLanguage
 from app.shared.database.models import BaseModel
+from app.shared.models.code_execution_models import SupportedLanguage
 
 # Создаем подключение к БД
 database_url = settings.database_url
@@ -28,21 +29,22 @@ if database_url.startswith("postgres://"):
 engine = create_engine(database_url, pool_pre_ping=True, pool_recycle=300)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+
 def init_supported_languages():
     """Инициализация поддерживаемых языков программирования"""
-    
+
     # Создаем таблицы если их нет
     BaseModel.metadata.create_all(bind=engine)
-    
+
     session = SessionLocal()
-    
+
     try:
         # Проверяем, есть ли уже языки в БД
         existing_count = session.query(SupportedLanguage).count()
         if existing_count > 0:
             print(f"В базе уже есть {existing_count} языков. Пропускаем инициализацию.")
             return
-        
+
         # Список поддерживаемых языков
         languages_data = [
             {
@@ -53,7 +55,7 @@ def init_supported_languages():
                 "fileExtension": ".py",
                 "timeoutSeconds": 30,
                 "memoryLimitMB": 128,
-                "isEnabled": True
+                "isEnabled": True,
             },
             {
                 "id": "javascript",
@@ -63,7 +65,7 @@ def init_supported_languages():
                 "fileExtension": ".js",
                 "timeoutSeconds": 30,
                 "memoryLimitMB": 128,
-                "isEnabled": True
+                "isEnabled": True,
             },
             {
                 "id": "java",
@@ -73,7 +75,7 @@ def init_supported_languages():
                 "fileExtension": ".java",
                 "timeoutSeconds": 45,
                 "memoryLimitMB": 256,
-                "isEnabled": True
+                "isEnabled": True,
             },
             {
                 "id": "cpp",
@@ -83,7 +85,7 @@ def init_supported_languages():
                 "fileExtension": ".cpp",
                 "timeoutSeconds": 30,
                 "memoryLimitMB": 128,
-                "isEnabled": True
+                "isEnabled": True,
             },
             {
                 "id": "c",
@@ -93,7 +95,7 @@ def init_supported_languages():
                 "fileExtension": ".c",
                 "timeoutSeconds": 30,
                 "memoryLimitMB": 128,
-                "isEnabled": True
+                "isEnabled": True,
             },
             {
                 "id": "go",
@@ -103,7 +105,7 @@ def init_supported_languages():
                 "fileExtension": ".go",
                 "timeoutSeconds": 30,
                 "memoryLimitMB": 128,
-                "isEnabled": True
+                "isEnabled": True,
             },
             {
                 "id": "rust",
@@ -113,28 +115,29 @@ def init_supported_languages():
                 "fileExtension": ".rs",
                 "timeoutSeconds": 45,
                 "memoryLimitMB": 256,
-                "isEnabled": True
-            }
+                "isEnabled": True,
+            },
         ]
-        
+
         # Добавляем языки в БД
         for lang_data in languages_data:
             language = SupportedLanguage(**lang_data)
             session.add(language)
-        
+
         session.commit()
         print(f"✅ Успешно добавлено {len(languages_data)} поддерживаемых языков")
-        
+
         # Выводим список добавленных языков
         for lang_data in languages_data:
             print(f"  - {lang_data['name']} ({lang_data['version']})")
-            
+
     except Exception as e:
         session.rollback()
         print(f"❌ Ошибка при инициализации языков: {e}")
         raise
     finally:
         session.close()
+
 
 if __name__ == "__main__":
     print("🚀 Инициализация поддерживаемых языков программирования...")

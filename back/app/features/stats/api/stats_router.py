@@ -1,24 +1,22 @@
 """API роутер для работы со статистикой"""
 
-from typing import Optional
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.features.stats.services.stats_service import StatsService
-from app.shared.database import get_session
 from app.features.stats.dto.responses import (
-    UserStatsOverviewResponse,
     ContentStatsResponse,
-    TheoryStatsResponse,
     RoadmapStatsResponse,
     StatsHealthResponse,
+    TheoryStatsResponse,
+    UserStatsOverviewResponse,
 )
-from app.shared.dependencies import get_current_user_required
 from app.features.stats.exceptions.stats_exceptions import (
-    StatsDataNotFoundError,
     StatsCalculationError,
+    StatsDataNotFoundError,
 )
+from app.features.stats.services.stats_service import StatsService
+from app.shared.database import get_session
+from app.shared.dependencies import get_current_user_required
 
 router = APIRouter(prefix="/stats", tags=["Stats"])
 
@@ -26,6 +24,7 @@ router = APIRouter(prefix="/stats", tags=["Stats"])
 def get_stats_service(db: Session = Depends(get_session)) -> StatsService:
     """Зависимость для получения сервиса stats"""
     from app.features.stats.repositories.stats_repository import StatsRepository
+
     stats_repository = StatsRepository(db)
     return StatsService(stats_repository)
 
@@ -144,6 +143,7 @@ async def health_check(
 
 # Дополнительные endpoints для расширенной аналитики
 
+
 @router.get("/summary")
 async def get_user_progress_summary(
     current_user=Depends(get_current_user_required),
@@ -173,6 +173,4 @@ async def get_category_comparison(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to get category comparison: {str(e)}",
-        ) 
-
-
+        )

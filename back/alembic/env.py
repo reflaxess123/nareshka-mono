@@ -9,23 +9,21 @@ from alembic import context
 # Добавляем корневую директорию в путь
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
-from app.config.settings import settings
+from app.core.settings import settings
 
 # Добавляем импорт всех моделей чтобы alembic видел их
 # Используем новые shared модели
 from app.shared.database import Base
 from app.shared.entities import *  # noqa: F403
-from app.shared.entities.interview import InterviewRecord, InterviewAnalytics  # Новые модели
+from app.shared.models.code_execution_models import *  # noqa: F403
+from app.shared.models.content_models import *  # noqa: F403
+from app.shared.models.learning_path_models import *  # noqa: F403
 
 # Импортируем существующие модели
-from app.shared.models.progress_models import UserCategoryProgress
-from app.shared.models.user_models import *  # noqa: F403
 from app.shared.models.task_models import *  # noqa: F403
-from app.shared.models.content_models import *  # noqa: F403
-from app.shared.models.theory_models import *  # noqa: F403
-from app.shared.models.learning_path_models import *  # noqa: F403
-from app.shared.models.code_execution_models import *  # noqa: F403
 from app.shared.models.test_case_models import *  # noqa: F403
+from app.shared.models.theory_models import *  # noqa: F403
+from app.shared.models.user_models import *  # noqa: F403
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -100,5 +98,3 @@ if context.is_offline_mode():
     run_migrations_offline()
 else:
     run_migrations_online()
-
-

@@ -2,11 +2,13 @@
 
 from datetime import datetime
 from typing import List, Optional
+
 from pydantic import BaseModel
 
 
 class InterviewRecordResponse(BaseModel):
     """Ответ с данными интервью"""
+
     id: str
     company_name: str
     interview_date: datetime
@@ -21,6 +23,7 @@ class InterviewRecordResponse(BaseModel):
 
 class InterviewDetailResponse(BaseModel):
     """Детальный ответ с полным контентом"""
+
     id: str
     company_name: str
     interview_date: datetime
@@ -37,6 +40,7 @@ class InterviewDetailResponse(BaseModel):
 
 class InterviewsListResponse(BaseModel):
     """Список интервью с пагинацией"""
+
     interviews: List[InterviewRecordResponse]
     total: int
     page: int
@@ -47,6 +51,7 @@ class InterviewsListResponse(BaseModel):
 
 class CompanyStatsResponse(BaseModel):
     """Статистика по компании"""
+
     company_name: str
     total_interviews: int
     avg_duration: Optional[int]
@@ -54,13 +59,13 @@ class CompanyStatsResponse(BaseModel):
 
 class CompaniesListResponse(BaseModel):
     """Список компаний"""
+
     companies: List[str]
-
-
 
 
 class AnalyticsResponse(BaseModel):
     """Общая аналитика"""
+
     total_interviews: int
     total_companies: int
     top_companies: List[CompanyStatsResponse]

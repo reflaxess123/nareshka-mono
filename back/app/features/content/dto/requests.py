@@ -4,16 +4,16 @@ Content Feature Request DTOs
 Модели запросов для API endpoints контента.
 """
 
-from pydantic import BaseModel, Field, validator
 from typing import Literal
+
+from pydantic import BaseModel, Field, validator
 
 
 class ProgressAction(BaseModel):
     """Действие для обновления прогресса пользователя по контенту"""
 
     action: Literal["increment", "decrement"] = Field(
-        ..., 
-        description="Тип действия: increment (увеличить) или decrement (уменьшить)"
+        ..., description="Тип действия: increment (увеличить) или decrement (уменьшить)"
     )
 
     @validator("action")
@@ -26,7 +26,7 @@ class ProgressAction(BaseModel):
 
 class ContentBlockCreateRequest(BaseModel):
     """Запрос на создание блока контента (для админки)"""
-    
+
     fileId: str = Field(..., description="ID файла")
     pathTitles: list[str] = Field(..., description="Путь заголовков")
     blockTitle: str = Field(..., min_length=1, description="Заголовок блока")
@@ -41,7 +41,7 @@ class ContentBlockCreateRequest(BaseModel):
 
 class ContentBlockUpdateRequest(BaseModel):
     """Запрос на обновление блока контента (для админки)"""
-    
+
     pathTitles: list[str] | None = Field(None, description="Путь заголовков")
     blockTitle: str | None = Field(None, min_length=1, description="Заголовок блока")
     blockLevel: int | None = Field(None, ge=0, description="Уровень вложенности")
@@ -55,7 +55,7 @@ class ContentBlockUpdateRequest(BaseModel):
 
 class ContentFileCreateRequest(BaseModel):
     """Запрос на создание файла контента (для админки)"""
-    
+
     webdavPath: str = Field(..., min_length=1, description="Путь в WebDAV")
     mainCategory: str = Field(..., min_length=1, description="Основная категория")
     subCategory: str = Field(..., min_length=1, description="Подкатегория")
@@ -63,9 +63,9 @@ class ContentFileCreateRequest(BaseModel):
 
 class ContentFileUpdateRequest(BaseModel):
     """Запрос на обновление файла контента (для админки)"""
-    
+
     webdavPath: str | None = Field(None, min_length=1, description="Путь в WebDAV")
-    mainCategory: str | None = Field(None, min_length=1, description="Основная категория")
-    subCategory: str | None = Field(None, min_length=1, description="Подкатегория") 
-
-
+    mainCategory: str | None = Field(
+        None, min_length=1, description="Основная категория"
+    )
+    subCategory: str | None = Field(None, min_length=1, description="Подкатегория")

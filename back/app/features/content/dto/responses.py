@@ -5,9 +5,10 @@ Content Feature Response DTOs
 """
 
 from typing import List, Optional
+
 from pydantic import BaseModel, Field
 
-from app.shared.dto import StringIdentifiedResponse, PaginatedResponse
+from app.shared.dto import PaginatedResponse, StringIdentifiedResponse
 
 
 class ContentFileResponse(StringIdentifiedResponse):
@@ -33,10 +34,14 @@ class ContentBlockResponse(StringIdentifiedResponse):
     codeContent: Optional[str] = Field(None, description="Код в блоке")
     codeLanguage: Optional[str] = Field(None, description="Язык программирования кода")
     isCodeFoldable: bool = Field(False, description="Можно ли свернуть код")
-    codeFoldTitle: Optional[str] = Field(None, description="Заголовок для свернутого кода")
+    codeFoldTitle: Optional[str] = Field(
+        None, description="Заголовок для свернутого кода"
+    )
 
     # Metadata
-    extractedUrls: List[str] = Field(default_factory=list, description="Извлеченные URL")
+    extractedUrls: List[str] = Field(
+        default_factory=list, description="Извлеченные URL"
+    )
     companies: List[str] = Field(default_factory=list, description="Связанные компании")
     rawBlockContentHash: Optional[str] = Field(None, description="Хэш содержимого")
 
@@ -82,6 +87,4 @@ class ContentSubcategoriesResponse(BaseModel):
 
 # Типизированные пагинированные ответы
 ContentBlocksListResponse = PaginatedResponse[ContentBlockResponse]
-ContentFilesListResponse = PaginatedResponse[ContentFileResponse] 
-
-
+ContentFilesListResponse = PaginatedResponse[ContentFileResponse]

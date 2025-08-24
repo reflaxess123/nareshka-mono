@@ -2,12 +2,14 @@
 Pydantic schemas for Interview Universe visualization
 """
 
-from typing import Optional, List, Dict, Any
+from typing import Any, Dict, List, Optional
+
 from pydantic import BaseModel, Field
 
 
 class UniverseNode(BaseModel):
     """Node representation for graph visualization"""
+
     id: int
     name: str
     category_id: str
@@ -18,7 +20,7 @@ class UniverseNode(BaseModel):
     example_question: Optional[str] = None
     top_companies: List[str]
     difficulty_distribution: Dict[str, float]
-    
+
     # Optional layout coordinates
     x: Optional[float] = None
     y: Optional[float] = None
@@ -26,6 +28,7 @@ class UniverseNode(BaseModel):
 
 class UniverseEdge(BaseModel):
     """Edge representation for graph connections"""
+
     source: int
     target: int
     weight: int
@@ -34,6 +37,7 @@ class UniverseEdge(BaseModel):
 
 class CategoryInfo(BaseModel):
     """Category information"""
+
     id: str
     name: str
     color: str
@@ -44,6 +48,7 @@ class CategoryInfo(BaseModel):
 
 class UniverseStats(BaseModel):
     """Statistics for the universe visualization"""
+
     totalQuestions: int
     totalClusters: int
     totalCategories: int
@@ -55,6 +60,7 @@ class UniverseStats(BaseModel):
 
 class UniverseGraphResponse(BaseModel):
     """Response for universe graph endpoint"""
+
     nodes: List[UniverseNode]
     edges: List[UniverseEdge]
     categories: Dict[str, CategoryInfo]
@@ -63,6 +69,7 @@ class UniverseGraphResponse(BaseModel):
 
 class QuestionInfo(BaseModel):
     """Question information for cluster details"""
+
     id: str
     text: str
     company: Optional[str]
@@ -72,6 +79,7 @@ class QuestionInfo(BaseModel):
 
 class RelatedCluster(BaseModel):
     """Related cluster information"""
+
     id: int
     name: str
     sharedQuestions: int
@@ -80,6 +88,7 @@ class RelatedCluster(BaseModel):
 
 class CompanyStats(BaseModel):
     """Company statistics for a cluster"""
+
     name: str
     count: int
     percentage: float
@@ -87,6 +96,7 @@ class CompanyStats(BaseModel):
 
 class ClusterDetailsResponse(BaseModel):
     """Response for cluster details endpoint"""
+
     id: int
     name: str
     category: str

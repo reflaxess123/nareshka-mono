@@ -58,7 +58,6 @@ async def logout(
     if session_id:
         auth_service.delete_session(session_id)
 
-    # Удаляем cookie
     response.delete_cookie(key="session_id")
 
     return LogoutResponse(message="Successfully logged out")
@@ -79,6 +78,4 @@ async def get_current_user_info(
         "totalTasksSolved": user.totalTasksSolved,
         "createdAt": user.createdAt,
         "lastActivityDate": user.lastActivityDate,
-    } 
-
-
+    }

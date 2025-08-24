@@ -18,6 +18,4 @@ class ReviewRating(BaseModel):
     rating: str = Field(..., description="again, hard, good, easy")
 
     class Config:
-        from_attributes = True 
-
-
+        from_attributes = True

@@ -4,7 +4,4 @@ from .stats_router import router
 
 __all__ = [
     "router",
-] 
-
-
-
+]

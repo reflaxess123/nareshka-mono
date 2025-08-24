@@ -2,37 +2,37 @@
 
 # DTOs
 from app.features.stats.dto.responses import (
-    UserStatsOverviewResponse,
-    ContentStatsResponse,
-    TheoryStatsResponse,
-    RoadmapStatsResponse,
-    OverallProgressResponse,
     ContentBlockStatsResponse,
-    TheoryCardStatsResponse,
+    ContentStatsResponse,
+    OverallProgressResponse,
+    RoadmapStatsResponse,
     StatsHealthResponse,
+    TheoryCardStatsResponse,
+    TheoryStatsResponse,
+    UserStatsOverviewResponse,
 )
 
-# Services
-from app.features.stats.services.stats_service import StatsService
+# Exceptions
+from app.features.stats.exceptions.stats_exceptions import (
+    StatsAggregationError,
+    StatsCalculationError,
+    StatsDataNotFoundError,
+    StatsError,
+    StatsPermissionError,
+)
 
 # Repository
 from app.features.stats.repositories.stats_repository import StatsRepository
 
-# Exceptions
-from app.features.stats.exceptions.stats_exceptions import (
-    StatsError,
-    StatsCalculationError,
-    StatsDataNotFoundError,
-    StatsAggregationError,
-    StatsPermissionError,
-)
+# Services
+from app.features.stats.services.stats_service import StatsService
 
 # Router импортируется напрямую в main.py для избежания циклических импортов
 
 __all__ = [
     # DTOs Responses
     "UserStatsOverviewResponse",
-    "ContentStatsResponse", 
+    "ContentStatsResponse",
     "TheoryStatsResponse",
     "RoadmapStatsResponse",
     "OverallProgressResponse",
@@ -49,8 +49,4 @@ __all__ = [
     "StatsDataNotFoundError",
     "StatsAggregationError",
     "StatsPermissionError",
-
-] 
-
-
-
+]
