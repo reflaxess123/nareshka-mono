@@ -26,6 +26,32 @@ import type {
 } from '@tanstack/react-query';
 
 import { generatedApiClient } from '../generated-mutator';
+/**
+ * System statistics
+ */
+export type AdminStatsResponseTypeSystem = SystemStatsResponseType | null;
+
+/**
+ * Error message if any
+ */
+export type AdminStatsResponseTypeError = string | null;
+
+/**
+ * Complete admin dashboard statistics
+ */
+export interface AdminStatsResponseType {
+  /** User statistics */
+  users: UserStatsResponseType;
+  /** Content statistics */
+  content: AppFeaturesAdminDtoResponsesContentStatsResponseType;
+  /** Progress statistics */
+  progress: AppFeaturesAdminDtoResponsesProgressStatsResponseType;
+  /** System statistics */
+  system?: AdminStatsResponseTypeSystem;
+  /** Error message if any */
+  error?: AdminStatsResponseTypeError;
+}
+
 export type AnalyticsResponseTypeMonthlyStatsItem = { [key: string]: unknown };
 
 /**
@@ -73,41 +99,6 @@ export interface AttemptHistoryResponseType {
   first_success_attempt?: AttemptHistoryResponseTypeFirstSuccessAttempt;
   /** Финальное решение */
   solution?: AttemptHistoryResponseTypeSolution;
-}
-
-export type BrowserLogEntryTypeUrl = string | null;
-
-export type BrowserLogEntryTypeUserId = number | null;
-
-export type BrowserLogEntryTypeStackTrace = string | null;
-
-export type BrowserLogEntryTypeMetadataAnyOf = { [key: string]: unknown };
-
-export type BrowserLogEntryTypeMetadata = BrowserLogEntryTypeMetadataAnyOf | null;
-
-export interface BrowserLogEntryType {
-  level: string;
-  message: string;
-  timestamp: string;
-  url?: BrowserLogEntryTypeUrl;
-  user_id?: BrowserLogEntryTypeUserId;
-  source?: string;
-  stack_trace?: BrowserLogEntryTypeStackTrace;
-  metadata?: BrowserLogEntryTypeMetadata;
-}
-
-export type BrowserLogsRequestTypePageUrl = string | null;
-
-export type BrowserLogsRequestTypeUserAgent = string | null;
-
-export type BrowserLogsRequestTypeSessionId = string | null;
-
-export interface BrowserLogsRequestType {
-  console_logs?: BrowserLogEntryType[];
-  network_logs?: NetworkLogEntryType[];
-  page_url?: BrowserLogsRequestTypePageUrl;
-  user_agent?: BrowserLogsRequestTypeUserAgent;
-  session_id?: BrowserLogsRequestTypeSessionId;
 }
 
 export type CardStateType = typeof CardStateType[keyof typeof CardStateType];
@@ -649,18 +640,6 @@ export interface ContentProgressUpdateRequestType {
   metadata?: ContentProgressUpdateRequestTypeMetadata;
 }
 
-export type ContentStatsResponseTypeCategories = { [key: string]: unknown };
-
-/**
- * Детальная статистика по контенту
- */
-export interface ContentStatsResponseType {
-  categories: ContentStatsResponseTypeCategories;
-  totalBlocks: number;
-  solvedBlocks: number;
-  averageSolveCount: number;
-}
-
 /**
  * Ответ со списком подкатегорий контента
  */
@@ -701,6 +680,33 @@ export const ExecutionStatusType = {
   TIMEOUT: 'TIMEOUT',
   MEMORY_LIMIT: 'MEMORY_LIMIT',
 } as const;
+
+export type ExternalLogEntryTypeUrl = string | null;
+
+export type ExternalLogEntryTypeUserId = number | null;
+
+export type ExternalLogEntryTypeMetadataAnyOf = { [key: string]: unknown };
+
+export type ExternalLogEntryTypeMetadata = ExternalLogEntryTypeMetadataAnyOf | null;
+
+export interface ExternalLogEntryType {
+  level: string;
+  message: string;
+  source: string;
+  timestamp?: string;
+  url?: ExternalLogEntryTypeUrl;
+  user_id?: ExternalLogEntryTypeUserId;
+  metadata?: ExternalLogEntryTypeMetadata;
+}
+
+export type ExternalLogsRequestTypeSourceInfoAnyOf = {[key: string]: string};
+
+export type ExternalLogsRequestTypeSourceInfo = ExternalLogsRequestTypeSourceInfoAnyOf | null;
+
+export interface ExternalLogsRequestType {
+  logs: ExternalLogEntryType[];
+  source_info?: ExternalLogsRequestTypeSourceInfo;
+}
 
 export type FileResponseTypeSubCategory = string | null;
 
@@ -872,31 +878,6 @@ export interface MindMapResponseType {
   metadata: MindMapResponseTypeMetadata;
 }
 
-export type NetworkLogEntryTypeStatusCode = number | null;
-
-export type NetworkLogEntryTypeRequestHeadersAnyOf = {[key: string]: string};
-
-export type NetworkLogEntryTypeRequestHeaders = NetworkLogEntryTypeRequestHeadersAnyOf | null;
-
-export type NetworkLogEntryTypeResponseHeadersAnyOf = {[key: string]: string};
-
-export type NetworkLogEntryTypeResponseHeaders = NetworkLogEntryTypeResponseHeadersAnyOf | null;
-
-export type NetworkLogEntryTypeErrorMessage = string | null;
-
-export type NetworkLogEntryTypeUserId = number | null;
-
-export interface NetworkLogEntryType {
-  url: string;
-  method: string;
-  status_code?: NetworkLogEntryTypeStatusCode;
-  timestamp: string;
-  request_headers?: NetworkLogEntryTypeRequestHeaders;
-  response_headers?: NetworkLogEntryTypeResponseHeaders;
-  error_message?: NetworkLogEntryTypeErrorMessage;
-  user_id?: NetworkLogEntryTypeUserId;
-}
-
 export interface PaginatedResponseContentBlockResponseType {
   items: ContentBlockResponseType[];
   pagination: PaginationInfoType;
@@ -939,31 +920,6 @@ export interface ProgressAnalyticsResponseType {
   most_difficult_tasks: string[];
   /** Время генерации отчета */
   generated_at: string;
-}
-
-/**
- * Темп улучшения
- */
-export type ProgressStatsResponseTypeImprovementRate = string | null;
-
-/**
- * Статистика прогресса
- */
-export interface ProgressStatsResponseType {
-  /** Период статистики */
-  period: string;
-  /** Решенных задач */
-  tasks_solved: number;
-  /** Потраченных часов */
-  time_spent_hours: number;
-  /** Процент успеха */
-  success_rate: string;
-  /** Темп улучшения */
-  improvement_rate?: ProgressStatsResponseTypeImprovementRate;
-  /** Дней подряд */
-  streak_days: number;
-  /** Активных категорий */
-  categories_active: number;
 }
 
 /**
@@ -1124,6 +1080,33 @@ export interface SupportedLanguageResponseType {
   timeoutSeconds: number;
   memoryLimitMB: number;
   isEnabled: boolean;
+}
+
+/**
+ * System uptime in seconds
+ */
+export type SystemStatsResponseTypeUptimeSeconds = number | null;
+
+/**
+ * Memory usage in MB
+ */
+export type SystemStatsResponseTypeMemoryUsageMB = number | null;
+
+/**
+ * Active database connections
+ */
+export type SystemStatsResponseTypeDatabaseConnections = number | null;
+
+/**
+ * System health and performance statistics
+ */
+export interface SystemStatsResponseType {
+  /** System uptime in seconds */
+  uptimeSeconds?: SystemStatsResponseTypeUptimeSeconds;
+  /** Memory usage in MB */
+  memoryUsageMB?: SystemStatsResponseTypeMemoryUsageMB;
+  /** Active database connections */
+  databaseConnections?: SystemStatsResponseTypeDatabaseConnections;
 }
 
 /**
@@ -1500,6 +1483,14 @@ export interface UserProgressSummaryResponseType {
   registration_date: string;
 }
 
+export type UserResponseTypeUsername = string | null;
+
+export type UserResponseTypeFirstName = string | null;
+
+export type UserResponseTypeLastName = string | null;
+
+export type UserResponseTypeFullName = string | null;
+
 export type UserResponseTypeLastActivityDate = string | null;
 
 /**
@@ -1510,7 +1501,14 @@ export interface UserResponseType {
   createdAt: string;
   updatedAt: string;
   email: string;
+  username?: UserResponseTypeUsername;
+  first_name?: UserResponseTypeFirstName;
+  last_name?: UserResponseTypeLastName;
+  full_name?: UserResponseTypeFullName;
+  display_name: string;
   role: UserRoleType;
+  is_active?: boolean;
+  is_verified?: boolean;
   totalTasksSolved: number;
   lastActivityDate: UserResponseTypeLastActivityDate;
 }
@@ -1545,6 +1543,20 @@ export interface UserStatsOverviewResponseType {
   overallProgress: UserStatsOverviewResponseTypeOverallProgress;
 }
 
+/**
+ * Statistics about users
+ */
+export interface UserStatsResponseType {
+  /** Total number of users */
+  total: number;
+  /** Number of admin users */
+  admins: number;
+  /** Number of regular users */
+  regularUsers: number;
+  /** Number of guest users */
+  guests: number;
+}
+
 export type UserTheoryProgressResponseTypeDueDate = string | null;
 
 export type UserTheoryProgressResponseTypeLastReviewDate = string | null;
@@ -1567,6 +1579,21 @@ export interface UserTheoryProgressResponseType {
   lastReviewDate?: UserTheoryProgressResponseTypeLastReviewDate;
   createdAt: string;
   updatedAt: string;
+}
+
+/**
+ * Pagination info
+ */
+export type UsersListResponseTypePagination = { [key: string]: unknown };
+
+/**
+ * Response for admin users list
+ */
+export interface UsersListResponseType {
+  /** List of users */
+  items: UserResponseType[];
+  /** Pagination info */
+  pagination: UsersListResponseTypePagination;
 }
 
 export type ValidationErrorTypeLocItem = string | number;
@@ -1607,6 +1634,28 @@ export interface ValidationResultResponseType {
   score: number;
   validatedAt: string;
   testResults: TestCaseExecutionResponseType[];
+}
+
+/**
+ * Statistics about content
+ */
+export interface AppFeaturesAdminDtoResponsesContentStatsResponseType {
+  /** Total number of content files */
+  totalFiles: number;
+  /** Total number of content blocks */
+  totalBlocks: number;
+  /** Total number of theory cards */
+  totalTheoryCards: number;
+}
+
+/**
+ * Statistics about user progress
+ */
+export interface AppFeaturesAdminDtoResponsesProgressStatsResponseType {
+  /** Total content progress records */
+  totalContentProgress: number;
+  /** Total theory progress records */
+  totalTheoryProgress: number;
 }
 
 /**
@@ -1770,6 +1819,31 @@ export interface AppFeaturesProgressDtoRequestsTaskSolutionCreateRequestType {
 }
 
 /**
+ * Темп улучшения
+ */
+export type AppFeaturesProgressDtoResponsesProgressStatsResponseTypeImprovementRate = string | null;
+
+/**
+ * Статистика прогресса
+ */
+export interface AppFeaturesProgressDtoResponsesProgressStatsResponseType {
+  /** Период статистики */
+  period: string;
+  /** Решенных задач */
+  tasks_solved: number;
+  /** Потраченных часов */
+  time_spent_hours: number;
+  /** Процент успеха */
+  success_rate: string;
+  /** Темп улучшения */
+  improvement_rate?: AppFeaturesProgressDtoResponsesProgressStatsResponseTypeImprovementRate;
+  /** Дней подряд */
+  streak_days: number;
+  /** Активных категорий */
+  categories_active: number;
+}
+
+/**
  * Исходный код решения
  */
 export type AppFeaturesProgressDtoResponsesTaskAttemptResponseTypeSourceCode = string | null;
@@ -1901,6 +1975,18 @@ export interface AppFeaturesProgressDtoResponsesTaskSolutionResponseType {
   updated_at: string;
   /** Дополнительные данные */
   metadata?: AppFeaturesProgressDtoResponsesTaskSolutionResponseTypeMetadata;
+}
+
+export type AppFeaturesStatsDtoResponsesContentStatsResponseTypeCategories = { [key: string]: unknown };
+
+/**
+ * Детальная статистика по контенту
+ */
+export interface AppFeaturesStatsDtoResponsesContentStatsResponseType {
+  categories: AppFeaturesStatsDtoResponsesContentStatsResponseTypeCategories;
+  totalBlocks: number;
+  solvedBlocks: number;
+  averageSolveCount: number;
 }
 
 export type AppFeaturesStatsDtoResponsesTheoryStatsResponseTypeCategories = { [key: string]: unknown };
@@ -2602,6 +2688,11 @@ technology?: string;
 difficulty_filter?: string | null;
 };
 
+export type GetUsersApiV2AdminUsersGetParams = {
+page?: number;
+limit?: number;
+};
+
 /**
  * Вход пользователя
  * @summary Login
@@ -2876,250 +2967,6 @@ export function useGetCurrentUserInfoApiV2AuthMeGet<TData = Awaited<ReturnType<t
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetCurrentUserInfoApiV2AuthMeGetQueryOptions(options)
-
-  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
-
-  return query;
-}
-
-
-
-
-/**
- * Endpoint for receiving browser logs from Browser Tools MCP server
- * @summary Receive Browser Logs
- */
-export const receiveBrowserLogsApiBrowserLogsPost = (
-    browserLogsRequestType: BrowserLogsRequestType,
- signal?: AbortSignal
-) => {
-      
-      
-      return generatedApiClient<unknown>(
-      {url: `/api/browser-logs/`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: browserLogsRequestType, signal
-    },
-      );
-    }
-  
-
-
-export const getReceiveBrowserLogsApiBrowserLogsPostMutationOptions = <TError = HTTPValidationErrorType,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof receiveBrowserLogsApiBrowserLogsPost>>, TError,{data: BrowserLogsRequestType}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof receiveBrowserLogsApiBrowserLogsPost>>, TError,{data: BrowserLogsRequestType}, TContext> => {
-
-const mutationKey = ['receiveBrowserLogsApiBrowserLogsPost'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof receiveBrowserLogsApiBrowserLogsPost>>, {data: BrowserLogsRequestType}> = (props) => {
-          const {data} = props ?? {};
-
-          return  receiveBrowserLogsApiBrowserLogsPost(data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ReceiveBrowserLogsApiBrowserLogsPostMutationResult = NonNullable<Awaited<ReturnType<typeof receiveBrowserLogsApiBrowserLogsPost>>>
-    export type ReceiveBrowserLogsApiBrowserLogsPostMutationBody = BrowserLogsRequestType
-    export type ReceiveBrowserLogsApiBrowserLogsPostMutationError = HTTPValidationErrorType
-
-    /**
- * @summary Receive Browser Logs
- */
-export const useReceiveBrowserLogsApiBrowserLogsPost = <TError = HTTPValidationErrorType,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof receiveBrowserLogsApiBrowserLogsPost>>, TError,{data: BrowserLogsRequestType}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof receiveBrowserLogsApiBrowserLogsPost>>,
-        TError,
-        {data: BrowserLogsRequestType},
-        TContext
-      > => {
-
-      const mutationOptions = getReceiveBrowserLogsApiBrowserLogsPostMutationOptions(options);
-
-      return useMutation(mutationOptions , queryClient);
-    }
-    
-/**
- * Health check for browser logs endpoint
- * @summary Browser Logs Health
- */
-export const browserLogsHealthApiBrowserLogsHealthGet = (
-    
- signal?: AbortSignal
-) => {
-      
-      
-      return generatedApiClient<unknown>(
-      {url: `/api/browser-logs/health`, method: 'GET', signal
-    },
-      );
-    }
-  
-
-export const getBrowserLogsHealthApiBrowserLogsHealthGetQueryKey = () => {
-    return [`/api/browser-logs/health`] as const;
-    }
-
-    
-export const getBrowserLogsHealthApiBrowserLogsHealthGetQueryOptions = <TData = Awaited<ReturnType<typeof browserLogsHealthApiBrowserLogsHealthGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof browserLogsHealthApiBrowserLogsHealthGet>>, TError, TData>>, }
-) => {
-
-const {query: queryOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getBrowserLogsHealthApiBrowserLogsHealthGetQueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof browserLogsHealthApiBrowserLogsHealthGet>>> = ({ signal }) => browserLogsHealthApiBrowserLogsHealthGet(signal);
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof browserLogsHealthApiBrowserLogsHealthGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type BrowserLogsHealthApiBrowserLogsHealthGetQueryResult = NonNullable<Awaited<ReturnType<typeof browserLogsHealthApiBrowserLogsHealthGet>>>
-export type BrowserLogsHealthApiBrowserLogsHealthGetQueryError = unknown
-
-
-export function useBrowserLogsHealthApiBrowserLogsHealthGet<TData = Awaited<ReturnType<typeof browserLogsHealthApiBrowserLogsHealthGet>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof browserLogsHealthApiBrowserLogsHealthGet>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof browserLogsHealthApiBrowserLogsHealthGet>>,
-          TError,
-          Awaited<ReturnType<typeof browserLogsHealthApiBrowserLogsHealthGet>>
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useBrowserLogsHealthApiBrowserLogsHealthGet<TData = Awaited<ReturnType<typeof browserLogsHealthApiBrowserLogsHealthGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof browserLogsHealthApiBrowserLogsHealthGet>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof browserLogsHealthApiBrowserLogsHealthGet>>,
-          TError,
-          Awaited<ReturnType<typeof browserLogsHealthApiBrowserLogsHealthGet>>
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useBrowserLogsHealthApiBrowserLogsHealthGet<TData = Awaited<ReturnType<typeof browserLogsHealthApiBrowserLogsHealthGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof browserLogsHealthApiBrowserLogsHealthGet>>, TError, TData>>, }
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
- * @summary Browser Logs Health
- */
-
-export function useBrowserLogsHealthApiBrowserLogsHealthGet<TData = Awaited<ReturnType<typeof browserLogsHealthApiBrowserLogsHealthGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof browserLogsHealthApiBrowserLogsHealthGet>>, TError, TData>>, }
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getBrowserLogsHealthApiBrowserLogsHealthGetQueryOptions(options)
-
-  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
-
-  return query;
-}
-
-
-
-
-/**
- * Get statistics about browser logs
- * @summary Get Browser Logs Stats
- */
-export const getBrowserLogsStatsApiBrowserLogsStatsGet = (
-    
- signal?: AbortSignal
-) => {
-      
-      
-      return generatedApiClient<unknown>(
-      {url: `/api/browser-logs/stats`, method: 'GET', signal
-    },
-      );
-    }
-  
-
-export const getGetBrowserLogsStatsApiBrowserLogsStatsGetQueryKey = () => {
-    return [`/api/browser-logs/stats`] as const;
-    }
-
-    
-export const getGetBrowserLogsStatsApiBrowserLogsStatsGetQueryOptions = <TData = Awaited<ReturnType<typeof getBrowserLogsStatsApiBrowserLogsStatsGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBrowserLogsStatsApiBrowserLogsStatsGet>>, TError, TData>>, }
-) => {
-
-const {query: queryOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getGetBrowserLogsStatsApiBrowserLogsStatsGetQueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getBrowserLogsStatsApiBrowserLogsStatsGet>>> = ({ signal }) => getBrowserLogsStatsApiBrowserLogsStatsGet(signal);
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getBrowserLogsStatsApiBrowserLogsStatsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetBrowserLogsStatsApiBrowserLogsStatsGetQueryResult = NonNullable<Awaited<ReturnType<typeof getBrowserLogsStatsApiBrowserLogsStatsGet>>>
-export type GetBrowserLogsStatsApiBrowserLogsStatsGetQueryError = unknown
-
-
-export function useGetBrowserLogsStatsApiBrowserLogsStatsGet<TData = Awaited<ReturnType<typeof getBrowserLogsStatsApiBrowserLogsStatsGet>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBrowserLogsStatsApiBrowserLogsStatsGet>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getBrowserLogsStatsApiBrowserLogsStatsGet>>,
-          TError,
-          Awaited<ReturnType<typeof getBrowserLogsStatsApiBrowserLogsStatsGet>>
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetBrowserLogsStatsApiBrowserLogsStatsGet<TData = Awaited<ReturnType<typeof getBrowserLogsStatsApiBrowserLogsStatsGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBrowserLogsStatsApiBrowserLogsStatsGet>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getBrowserLogsStatsApiBrowserLogsStatsGet>>,
-          TError,
-          Awaited<ReturnType<typeof getBrowserLogsStatsApiBrowserLogsStatsGet>>
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetBrowserLogsStatsApiBrowserLogsStatsGet<TData = Awaited<ReturnType<typeof getBrowserLogsStatsApiBrowserLogsStatsGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBrowserLogsStatsApiBrowserLogsStatsGet>>, TError, TData>>, }
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
- * @summary Get Browser Logs Stats
- */
-
-export function useGetBrowserLogsStatsApiBrowserLogsStatsGet<TData = Awaited<ReturnType<typeof getBrowserLogsStatsApiBrowserLogsStatsGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBrowserLogsStatsApiBrowserLogsStatsGet>>, TError, TData>>, }
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetBrowserLogsStatsApiBrowserLogsStatsGetQueryOptions(options)
 
   const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -3490,6 +3337,75 @@ export function useTailLogsApiLogsTailGet<TData = Awaited<ReturnType<typeof tail
 
 
 
+/**
+ * Endpoint для приема логов от внешних источников:
+- Chrome MCP (console.log, ошибки)
+- Frontend приложения  
+- Других внешних систем
+ * @summary Receive External Logs
+ */
+export const receiveExternalLogsApiLogsExternalPost = (
+    externalLogsRequestType: ExternalLogsRequestType,
+ signal?: AbortSignal
+) => {
+      
+      
+      return generatedApiClient<unknown>(
+      {url: `/api/logs/external`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: externalLogsRequestType, signal
+    },
+      );
+    }
+  
+
+
+export const getReceiveExternalLogsApiLogsExternalPostMutationOptions = <TError = HTTPValidationErrorType,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof receiveExternalLogsApiLogsExternalPost>>, TError,{data: ExternalLogsRequestType}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof receiveExternalLogsApiLogsExternalPost>>, TError,{data: ExternalLogsRequestType}, TContext> => {
+
+const mutationKey = ['receiveExternalLogsApiLogsExternalPost'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof receiveExternalLogsApiLogsExternalPost>>, {data: ExternalLogsRequestType}> = (props) => {
+          const {data} = props ?? {};
+
+          return  receiveExternalLogsApiLogsExternalPost(data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ReceiveExternalLogsApiLogsExternalPostMutationResult = NonNullable<Awaited<ReturnType<typeof receiveExternalLogsApiLogsExternalPost>>>
+    export type ReceiveExternalLogsApiLogsExternalPostMutationBody = ExternalLogsRequestType
+    export type ReceiveExternalLogsApiLogsExternalPostMutationError = HTTPValidationErrorType
+
+    /**
+ * @summary Receive External Logs
+ */
+export const useReceiveExternalLogsApiLogsExternalPost = <TError = HTTPValidationErrorType,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof receiveExternalLogsApiLogsExternalPost>>, TError,{data: ExternalLogsRequestType}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof receiveExternalLogsApiLogsExternalPost>>,
+        TError,
+        {data: ExternalLogsRequestType},
+        TContext
+      > => {
+
+      const mutationOptions = getReceiveExternalLogsApiLogsExternalPostMutationOptions(options);
+
+      return useMutation(mutationOptions , queryClient);
+    }
+    
 /**
  * Получение списка блоков контента с пагинацией и фильтрацией
  * @summary Get Content Blocks
@@ -8027,7 +7943,7 @@ export const getProgressStatsApiV2ProgressStatsGet = (
 ) => {
       
       
-      return generatedApiClient<ProgressStatsResponseType>(
+      return generatedApiClient<AppFeaturesProgressDtoResponsesProgressStatsResponseType>(
       {url: `/api/v2/progress/stats`, method: 'GET',
         params, signal
     },
@@ -9543,7 +9459,7 @@ export const getContentStatsApiV2StatsStatsContentGet = (
 ) => {
       
       
-      return generatedApiClient<ContentStatsResponseType>(
+      return generatedApiClient<AppFeaturesStatsDtoResponsesContentStatsResponseType>(
       {url: `/api/v2/stats/stats/content`, method: 'GET', signal
     },
       );
@@ -10709,7 +10625,7 @@ export const getAdminStatsApiV2AdminStatsGet = (
 ) => {
       
       
-      return generatedApiClient<unknown>(
+      return generatedApiClient<AdminStatsResponseType>(
       {url: `/api/v2/admin/stats`, method: 'GET', signal
     },
       );
@@ -10777,6 +10693,96 @@ export function useGetAdminStatsApiV2AdminStatsGet<TData = Awaited<ReturnType<ty
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetAdminStatsApiV2AdminStatsGetQueryOptions(options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
+ * Получить список пользователей
+ * @summary Get Users
+ */
+export const getUsersApiV2AdminUsersGet = (
+    params?: GetUsersApiV2AdminUsersGetParams,
+ signal?: AbortSignal
+) => {
+      
+      
+      return generatedApiClient<UsersListResponseType>(
+      {url: `/api/v2/admin/users`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+  
+
+export const getGetUsersApiV2AdminUsersGetQueryKey = (params?: GetUsersApiV2AdminUsersGetParams,) => {
+    return [`/api/v2/admin/users`, ...(params ? [params]: [])] as const;
+    }
+
+    
+export const getGetUsersApiV2AdminUsersGetQueryOptions = <TData = Awaited<ReturnType<typeof getUsersApiV2AdminUsersGet>>, TError = HTTPValidationErrorType>(params?: GetUsersApiV2AdminUsersGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsersApiV2AdminUsersGet>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetUsersApiV2AdminUsersGetQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getUsersApiV2AdminUsersGet>>> = ({ signal }) => getUsersApiV2AdminUsersGet(params, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getUsersApiV2AdminUsersGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetUsersApiV2AdminUsersGetQueryResult = NonNullable<Awaited<ReturnType<typeof getUsersApiV2AdminUsersGet>>>
+export type GetUsersApiV2AdminUsersGetQueryError = HTTPValidationErrorType
+
+
+export function useGetUsersApiV2AdminUsersGet<TData = Awaited<ReturnType<typeof getUsersApiV2AdminUsersGet>>, TError = HTTPValidationErrorType>(
+ params: undefined |  GetUsersApiV2AdminUsersGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsersApiV2AdminUsersGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getUsersApiV2AdminUsersGet>>,
+          TError,
+          Awaited<ReturnType<typeof getUsersApiV2AdminUsersGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetUsersApiV2AdminUsersGet<TData = Awaited<ReturnType<typeof getUsersApiV2AdminUsersGet>>, TError = HTTPValidationErrorType>(
+ params?: GetUsersApiV2AdminUsersGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsersApiV2AdminUsersGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getUsersApiV2AdminUsersGet>>,
+          TError,
+          Awaited<ReturnType<typeof getUsersApiV2AdminUsersGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetUsersApiV2AdminUsersGet<TData = Awaited<ReturnType<typeof getUsersApiV2AdminUsersGet>>, TError = HTTPValidationErrorType>(
+ params?: GetUsersApiV2AdminUsersGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsersApiV2AdminUsersGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Users
+ */
+
+export function useGetUsersApiV2AdminUsersGet<TData = Awaited<ReturnType<typeof getUsersApiV2AdminUsersGet>>, TError = HTTPValidationErrorType>(
+ params?: GetUsersApiV2AdminUsersGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsersApiV2AdminUsersGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetUsersApiV2AdminUsersGetQueryOptions(params,options)
 
   const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

@@ -132,86 +132,6 @@
         }
       }
     },
-    "/api/browser-logs/": {
-      "post": {
-        "tags": [
-          "Browser Logs"
-        ],
-        "summary": "Receive Browser Logs",
-        "description": "Endpoint for receiving browser logs from Browser Tools MCP server",
-        "operationId": "receive_browser_logs_api_browser_logs__post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/BrowserLogsRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/browser-logs/health": {
-      "get": {
-        "tags": [
-          "Browser Logs"
-        ],
-        "summary": "Browser Logs Health",
-        "description": "Health check for browser logs endpoint",
-        "operationId": "browser_logs_health_api_browser_logs_health_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/browser-logs/stats": {
-      "get": {
-        "tags": [
-          "Browser Logs"
-        ],
-        "summary": "Get Browser Logs Stats",
-        "description": "Get statistics about browser logs",
-        "operationId": "get_browser_logs_stats_api_browser_logs_stats_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/logs/viewer": {
       "get": {
         "tags": [
@@ -374,6 +294,46 @@
         ],
         "responses": {
           "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/logs/external": {
+      "post": {
+        "tags": [
+          "Logs"
+        ],
+        "summary": "Receive External Logs",
+        "description": "Endpoint для приема логов от внешних источников:\n- Chrome MCP (console.log, ошибки)\n- Frontend приложения  \n- Других внешних систем",
+        "operationId": "receive_external_logs_api_logs_external_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExternalLogsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
             "description": "Successful Response",
             "content": {
               "application/json": {
@@ -4961,134 +4921,6 @@
         "title": "AttemptHistoryResponse",
         "description": "История попыток"
       },
-      "BrowserLogEntry": {
-        "properties": {
-          "level": {
-            "type": "string",
-            "title": "Level"
-          },
-          "message": {
-            "type": "string",
-            "title": "Message"
-          },
-          "timestamp": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Timestamp"
-          },
-          "url": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Url"
-          },
-          "user_id": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "User Id"
-          },
-          "source": {
-            "type": "string",
-            "title": "Source",
-            "default": "browser"
-          },
-          "stack_trace": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Stack Trace"
-          },
-          "metadata": {
-            "anyOf": [
-              {
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Metadata"
-          }
-        },
-        "type": "object",
-        "required": [
-          "level",
-          "message",
-          "timestamp"
-        ],
-        "title": "BrowserLogEntry"
-      },
-      "BrowserLogsRequest": {
-        "properties": {
-          "console_logs": {
-            "items": {
-              "$ref": "#/components/schemas/BrowserLogEntry"
-            },
-            "type": "array",
-            "title": "Console Logs",
-            "default": []
-          },
-          "network_logs": {
-            "items": {
-              "$ref": "#/components/schemas/NetworkLogEntry"
-            },
-            "type": "array",
-            "title": "Network Logs",
-            "default": []
-          },
-          "page_url": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Page Url"
-          },
-          "user_agent": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "User Agent"
-          },
-          "session_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Session Id"
-          }
-        },
-        "type": "object",
-        "title": "BrowserLogsRequest"
-      },
       "CardState": {
         "type": "string",
         "enum": [
@@ -6518,6 +6350,97 @@
         ],
         "title": "ExecutionStatus"
       },
+      "ExternalLogEntry": {
+        "properties": {
+          "level": {
+            "type": "string",
+            "title": "Level"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          },
+          "user_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Id"
+          },
+          "metadata": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metadata"
+          }
+        },
+        "type": "object",
+        "required": [
+          "level",
+          "message",
+          "source"
+        ],
+        "title": "ExternalLogEntry"
+      },
+      "ExternalLogsRequest": {
+        "properties": {
+          "logs": {
+            "items": {
+              "$ref": "#/components/schemas/ExternalLogEntry"
+            },
+            "type": "array",
+            "title": "Logs"
+          },
+          "source_info": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Info"
+          }
+        },
+        "type": "object",
+        "required": [
+          "logs"
+        ],
+        "title": "ExternalLogsRequest"
+      },
       "FileResponse": {
         "properties": {
           "id": {
@@ -6820,7 +6743,7 @@
             "title": "Token Type"
           },
           "user": {
-            "$ref": "#/components/schemas/app__features__auth__dto__auth_dto__UserResponse"
+            "$ref": "#/components/schemas/UserResponse"
           },
           "session_id": {
             "anyOf": [
@@ -7026,91 +6949,6 @@
         ],
         "title": "MindMapResponse",
         "description": "Ответ с данными mindmap"
-      },
-      "NetworkLogEntry": {
-        "properties": {
-          "url": {
-            "type": "string",
-            "title": "Url"
-          },
-          "method": {
-            "type": "string",
-            "title": "Method"
-          },
-          "status_code": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Status Code"
-          },
-          "timestamp": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Timestamp"
-          },
-          "request_headers": {
-            "anyOf": [
-              {
-                "additionalProperties": {
-                  "type": "string"
-                },
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Request Headers"
-          },
-          "response_headers": {
-            "anyOf": [
-              {
-                "additionalProperties": {
-                  "type": "string"
-                },
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Response Headers"
-          },
-          "error_message": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Error Message"
-          },
-          "user_id": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "User Id"
-          }
-        },
-        "type": "object",
-        "required": [
-          "url",
-          "method",
-          "timestamp"
-        ],
-        "title": "NetworkLogEntry"
       },
       "PaginatedResponse_ContentBlockResponse_": {
         "properties": {
@@ -7496,7 +7334,7 @@
       "RegisterResponse": {
         "properties": {
           "user": {
-            "$ref": "#/components/schemas/app__features__auth__dto__auth_dto__UserResponse"
+            "$ref": "#/components/schemas/UserResponse"
           },
           "message": {
             "type": "string",
@@ -8743,6 +8581,118 @@
         "title": "UserProgressSummaryResponse",
         "description": "Сводка прогресса пользователя"
       },
+      "UserResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updatedat"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username"
+          },
+          "first_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Name"
+          },
+          "last_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Name"
+          },
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "role": {
+            "$ref": "#/components/schemas/UserRole"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active",
+            "default": true
+          },
+          "is_verified": {
+            "type": "boolean",
+            "title": "Is Verified",
+            "default": true
+          },
+          "totalTasksSolved": {
+            "type": "integer",
+            "title": "Totaltaskssolved"
+          },
+          "lastActivityDate": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lastactivitydate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "createdAt",
+          "updatedAt",
+          "email",
+          "display_name",
+          "role",
+          "totalTasksSolved",
+          "lastActivityDate"
+        ],
+        "title": "UserResponse",
+        "description": "Ответ с данными пользователя"
+      },
       "UserRole": {
         "type": "string",
         "enum": [
@@ -8932,7 +8882,7 @@
         "properties": {
           "items": {
             "items": {
-              "$ref": "#/components/schemas/app__features__auth__dto__responses__UserResponse"
+              "$ref": "#/components/schemas/UserResponse"
             },
             "type": "array",
             "title": "Items",
@@ -9122,177 +9072,6 @@
         ],
         "title": "ProgressStatsResponse",
         "description": "Statistics about user progress"
-      },
-      "app__features__auth__dto__auth_dto__UserResponse": {
-        "properties": {
-          "id": {
-            "type": "integer",
-            "title": "Id"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Createdat"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Updatedat"
-          },
-          "email": {
-            "type": "string",
-            "title": "Email"
-          },
-          "role": {
-            "$ref": "#/components/schemas/UserRole"
-          },
-          "totalTasksSolved": {
-            "type": "integer",
-            "title": "Totaltaskssolved"
-          },
-          "lastActivityDate": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Lastactivitydate"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "createdAt",
-          "updatedAt",
-          "email",
-          "role",
-          "totalTasksSolved",
-          "lastActivityDate"
-        ],
-        "title": "UserResponse",
-        "description": "Ответ с данными пользователя"
-      },
-      "app__features__auth__dto__responses__UserResponse": {
-        "properties": {
-          "id": {
-            "type": "integer",
-            "title": "Id",
-            "description": "User ID"
-          },
-          "email": {
-            "type": "string",
-            "title": "Email",
-            "description": "User email"
-          },
-          "username": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Username",
-            "description": "Username"
-          },
-          "first_name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "First Name",
-            "description": "First name"
-          },
-          "last_name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Last Name",
-            "description": "Last name"
-          },
-          "full_name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Full Name",
-            "description": "Full name"
-          },
-          "display_name": {
-            "type": "string",
-            "title": "Display Name",
-            "description": "Display name"
-          },
-          "role": {
-            "$ref": "#/components/schemas/UserRole",
-            "description": "User role"
-          },
-          "is_active": {
-            "type": "boolean",
-            "title": "Is Active",
-            "description": "Is user active"
-          },
-          "is_verified": {
-            "type": "boolean",
-            "title": "Is Verified",
-            "description": "Is user verified"
-          },
-          "total_tasks_solved": {
-            "type": "integer",
-            "title": "Total Tasks Solved",
-            "description": "Total tasks solved"
-          },
-          "last_activity_date": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Last Activity Date",
-            "description": "Last activity date"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Created At",
-            "description": "Account creation date"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "email",
-          "display_name",
-          "role",
-          "is_active",
-          "is_verified",
-          "total_tasks_solved",
-          "created_at"
-        ],
-        "title": "UserResponse",
-        "description": "Response model for user information."
       },
       "app__features__code_editor__dto__responses__HealthResponse": {
         "properties": {

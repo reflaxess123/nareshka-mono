@@ -15,9 +15,7 @@ from app.core.logging import get_logger, init_default_logging
 from app.core.settings import settings
 from app.features.admin.api.admin_router import router as admin_router
 from app.features.auth.api.auth_router import router as auth_router
-from app.features.browser_logs.api.browser_logs_router import (
-    router as browser_logs_router,
-)
+# browser_logs модуль удален - см. app/features/browser_logs/DELETED_MODULE.md
 from app.features.code_editor.api import router as code_editor_router
 from app.features.content.api import router as content_router
 from app.features.interviews.api.categories_router import router as categories_router
@@ -70,7 +68,7 @@ app.add_middleware(
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 app.include_router(auth_router, prefix="/api/v2")
-app.include_router(browser_logs_router)
+# browser_logs_router удален
 app.include_router(logs_router)
 app.include_router(content_router, prefix="/api/v2")
 app.include_router(interviews_router, prefix="/api/v2")
