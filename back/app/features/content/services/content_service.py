@@ -31,6 +31,48 @@ class ContentService:
     def __init__(self, content_repository: ContentRepository):
         self.content_repository = content_repository
 
+    def _create_content_block_response(
+        self, block, progress: Optional[int] = None
+    ) -> ContentBlockResponse:
+        """Фабрика для создания response объектов блоков контента"""
+        response_data = {
+            "id": block.id,
+            "createdAt": block.createdAt,
+            "updatedAt": block.updatedAt,
+            "fileId": block.fileId,
+            "pathTitles": block.pathTitles,
+            "blockTitle": block.blockTitle,
+            "blockLevel": block.blockLevel,
+            "orderInFile": block.orderInFile,
+            "textContent": block.textContent,
+            "codeContent": block.codeContent,
+            "codeLanguage": block.codeLanguage,
+            "isCodeFoldable": block.isCodeFoldable,
+            "codeFoldTitle": block.codeFoldTitle,
+            "extractedUrls": block.extractedUrls,
+            "companies": block.companies,
+            "rawBlockContentHash": block.rawBlockContentHash,
+        }
+
+        if progress is not None:
+            response_data["userProgress"] = progress
+            response = ContentBlockWithProgressResponse(**response_data)
+        else:
+            response = ContentBlockResponse(**response_data)
+
+        if hasattr(block, "file") and block.file:
+            response.file = ContentFileResponse(
+                id=block.file.id,
+                createdAt=block.file.createdAt,
+                updatedAt=block.file.updatedAt,
+                webdavPath=block.file.webdavPath,
+                mainCategory=block.file.mainCategory,
+                subCategory=block.file.subCategory,
+                lastFileHash=block.file.lastFileHash,
+            )
+
+        return response
+
     async def get_content_files(
         self,
         page: int = 1,
@@ -51,7 +93,7 @@ class ContentService:
             },
         )
 
-        files, total = await self.content_repository.get_content_files(
+        files, total = self.content_repository.get_content_files(
             page=page,
             limit=limit,
             main_category=main_category,
@@ -101,7 +143,7 @@ class ContentService:
             },
         )
 
-        blocks, total = await self.content_repository.get_content_blocks(
+        blocks, total = self.content_repository.get_content_blocks(
             page=page,
             limit=limit,
             webdav_path=webdav_path,
@@ -113,94 +155,26 @@ class ContentService:
             sort_order=sort_order,
         )
 
-        # Если пользователь аутентифицирован, добавляем прогресс
-        if user_id:
-            block_responses = []
-            for block in blocks:
-                progress = await self.content_repository.get_user_content_progress(
-                    user_id, block.id
-                )
+        block_responses = []
 
-                # Создаем response с прогрессом
-                block_response = ContentBlockWithProgressResponse(
-                    id=block.id,
-                    createdAt=block.createdAt,
-                    updatedAt=block.updatedAt,
-                    fileId=block.fileId,
-                    pathTitles=block.pathTitles,
-                    blockTitle=block.blockTitle,
-                    blockLevel=block.blockLevel,
-                    orderInFile=block.orderInFile,
-                    textContent=block.textContent,
-                    codeContent=block.codeContent,
-                    codeLanguage=block.codeLanguage,
-                    isCodeFoldable=block.isCodeFoldable,
-                    codeFoldTitle=block.codeFoldTitle,
-                    extractedUrls=block.extractedUrls,
-                    companies=block.companies,
-                    rawBlockContentHash=block.rawBlockContentHash,
-                    userProgress=progress.solvedCount if progress else 0,
-                )
+        progress_map = {}
+        if user_id and blocks:
+            block_ids = [block.id for block in blocks]
+            progress_map = self.content_repository.get_user_content_progress_batch(user_id, block_ids)
 
-                # Добавляем информацию о файле если доступна
-                if hasattr(block, "file") and block.file:
-                    block_response.file = ContentFileResponse(
-                        id=block.file.id,
-                        createdAt=block.file.createdAt,
-                        updatedAt=block.file.updatedAt,
-                        webdavPath=block.file.webdavPath,
-                        mainCategory=block.file.mainCategory,
-                        subCategory=block.file.subCategory,
-                        lastFileHash=block.file.lastFileHash,
-                    )
+        for block in blocks:
+            progress_value = None
+            if user_id:
+                progress = progress_map.get(block.id)
+                progress_value = progress.solvedCount if progress else 0
 
-                block_responses.append(block_response)
+            block_response = self._create_content_block_response(block, progress_value)
+            block_responses.append(block_response)
 
-            logger.info(
-                f"Retrieved {len(block_responses)} content blocks with progress (total: {total})"
-            )
-            return block_responses, total
-        else:
-            # Без прогресса пользователя
-            block_responses = []
-            for block in blocks:
-                block_response = ContentBlockResponse(
-                    id=block.id,
-                    createdAt=block.createdAt,
-                    updatedAt=block.updatedAt,
-                    fileId=block.fileId,
-                    pathTitles=block.pathTitles,
-                    blockTitle=block.blockTitle,
-                    blockLevel=block.blockLevel,
-                    orderInFile=block.orderInFile,
-                    textContent=block.textContent,
-                    codeContent=block.codeContent,
-                    codeLanguage=block.codeLanguage,
-                    isCodeFoldable=block.isCodeFoldable,
-                    codeFoldTitle=block.codeFoldTitle,
-                    extractedUrls=block.extractedUrls,
-                    companies=block.companies,
-                    rawBlockContentHash=block.rawBlockContentHash,
-                )
-
-                # Добавляем информацию о файле если доступна
-                if hasattr(block, "file") and block.file:
-                    block_response.file = ContentFileResponse(
-                        id=block.file.id,
-                        createdAt=block.file.createdAt,
-                        updatedAt=block.file.updatedAt,
-                        webdavPath=block.file.webdavPath,
-                        mainCategory=block.file.mainCategory,
-                        subCategory=block.file.subCategory,
-                        lastFileHash=block.file.lastFileHash,
-                    )
-
-                block_responses.append(block_response)
-
-            logger.info(
-                f"Retrieved {len(block_responses)} content blocks (total: {total})"
-            )
-            return block_responses, total
+        logger.info(
+            f"Retrieved {len(block_responses)} content blocks{' with progress' if user_id else ''} (total: {total})"
+        )
+        return block_responses, total
 
     async def get_content_block_by_id(
         self, block_id: str, user_id: Optional[int] = None
@@ -209,64 +183,16 @@ class ContentService:
         logger.debug(f"Getting content block by ID: {block_id} (user_id: {user_id})")
 
         # Получаем блок (исключение будет выброшено автоматически если не найден)
-        block = await self.content_repository.get_content_block_by_id(block_id)
+        block = self.content_repository.get_content_block_by_id(block_id)
 
+        progress_value = None
         if user_id:
-            # Получаем прогресс пользователя
-            progress = await self.content_repository.get_user_content_progress(
+            progress = self.content_repository.get_user_content_progress(
                 user_id, block_id
             )
+            progress_value = progress.solvedCount if progress else 0
 
-            response = ContentBlockWithProgressResponse(
-                id=block.id,
-                createdAt=block.createdAt,
-                updatedAt=block.updatedAt,
-                fileId=block.fileId,
-                pathTitles=block.pathTitles,
-                blockTitle=block.blockTitle,
-                blockLevel=block.blockLevel,
-                orderInFile=block.orderInFile,
-                textContent=block.textContent,
-                codeContent=block.codeContent,
-                codeLanguage=block.codeLanguage,
-                isCodeFoldable=block.isCodeFoldable,
-                codeFoldTitle=block.codeFoldTitle,
-                extractedUrls=block.extractedUrls,
-                companies=block.companies,
-                rawBlockContentHash=block.rawBlockContentHash,
-                userProgress=progress.solvedCount if progress else 0,
-            )
-        else:
-            response = ContentBlockResponse(
-                id=block.id,
-                createdAt=block.createdAt,
-                updatedAt=block.updatedAt,
-                fileId=block.fileId,
-                pathTitles=block.pathTitles,
-                blockTitle=block.blockTitle,
-                blockLevel=block.blockLevel,
-                orderInFile=block.orderInFile,
-                textContent=block.textContent,
-                codeContent=block.codeContent,
-                codeLanguage=block.codeLanguage,
-                isCodeFoldable=block.isCodeFoldable,
-                codeFoldTitle=block.codeFoldTitle,
-                extractedUrls=block.extractedUrls,
-                companies=block.companies,
-                rawBlockContentHash=block.rawBlockContentHash,
-            )
-
-        # Добавляем информацию о файле
-        if hasattr(block, "file") and block.file:
-            response.file = ContentFileResponse(
-                id=block.file.id,
-                createdAt=block.file.createdAt,
-                updatedAt=block.file.updatedAt,
-                webdavPath=block.file.webdavPath,
-                mainCategory=block.file.mainCategory,
-                subCategory=block.file.subCategory,
-                lastFileHash=block.file.lastFileHash,
-            )
+        response = self._create_content_block_response(block, progress_value)
 
         logger.info(f"Retrieved content block: {block.blockTitle}")
         return response
@@ -275,7 +201,7 @@ class ContentService:
         """Получение списка всех основных категорий контента"""
         logger.debug("Getting content categories")
 
-        categories = await self.content_repository.get_content_categories()
+        categories = self.content_repository.get_content_categories()
 
         logger.info(f"Retrieved {len(categories)} content categories")
         return categories
@@ -284,7 +210,7 @@ class ContentService:
         """Получение списка подкатегорий для указанной категории"""
         logger.debug(f"Getting subcategories for category: {category}")
 
-        subcategories = await self.content_repository.get_content_subcategories(
+        subcategories = self.content_repository.get_content_subcategories(
             category
         )
 
@@ -300,10 +226,10 @@ class ContentService:
         )
 
         # Проверяем существование блока (исключение выбросится автоматически)
-        await self.content_repository.get_content_block_by_id(block_id)
+        self.content_repository.get_content_block_by_id(block_id)
 
         # Получаем текущий прогресс
-        current_progress = await self.content_repository.get_user_content_progress(
+        current_progress = self.content_repository.get_user_content_progress(
             user_id, block_id
         )
         current_count = current_progress.solvedCount if current_progress else 0
@@ -317,7 +243,7 @@ class ContentService:
             raise InvalidProgressActionError(action.action)
 
         # Сохраняем новый прогресс
-        progress = await self.content_repository.create_or_update_user_progress(
+        progress = self.content_repository.create_or_update_user_progress(
             user_id=user_id, block_id=block_id, solved_count=new_count
         )
 
@@ -332,7 +258,7 @@ class ContentService:
         """Получение общего количества решенных блоков пользователем"""
         logger.debug(f"Getting total solved count for user: {user_id}")
 
-        count = await self.content_repository.get_user_total_solved_count(user_id)
+        count = self.content_repository.get_user_total_solved_count(user_id)
 
         logger.info(f"User {user_id} has solved {count} content blocks")
         return count

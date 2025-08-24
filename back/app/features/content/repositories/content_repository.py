@@ -25,7 +25,19 @@ class ContentRepository:
     def __init__(self, session: Session):
         self.session = session
 
-    async def get_content_files(
+    def _apply_category_filters(self, query, main_category: Optional[str], sub_category: Optional[str]):
+        """Применяет фильтры по категориям к запросу"""
+        if main_category:
+            query = query.filter(
+                func.lower(ContentFile.mainCategory) == func.lower(main_category)
+            )
+        if sub_category:
+            query = query.filter(
+                func.lower(ContentFile.subCategory) == func.lower(sub_category)
+            )
+        return query
+
+    def get_content_files(
         self,
         page: int = 1,
         limit: int = 10,
@@ -39,15 +51,7 @@ class ContentRepository:
         query = self.session.query(ContentFile)
 
         # Фильтры
-        if main_category:
-            query = query.filter(
-                func.lower(ContentFile.mainCategory) == func.lower(main_category)
-            )
-
-        if sub_category:
-            query = query.filter(
-                func.lower(ContentFile.subCategory) == func.lower(sub_category)
-            )
+        query = self._apply_category_filters(query, main_category, sub_category)
 
         if webdav_path:
             query = query.filter(ContentFile.webdavPath.ilike(f"%{webdav_path}%"))
@@ -60,7 +64,7 @@ class ContentRepository:
 
         return files, total
 
-    async def get_content_blocks(
+    def get_content_blocks(
         self,
         page: int = 1,
         limit: int = 10,
@@ -81,15 +85,7 @@ class ContentRepository:
         if webdav_path:
             query = query.filter(ContentFile.webdavPath.ilike(f"%{webdav_path}%"))
 
-        if main_category:
-            query = query.filter(
-                func.lower(ContentFile.mainCategory) == func.lower(main_category)
-            )
-
-        if sub_category:
-            query = query.filter(
-                func.lower(ContentFile.subCategory) == func.lower(sub_category)
-            )
+        query = self._apply_category_filters(query, main_category, sub_category)
 
         if file_path_id:
             query = query.filter(ContentFile.id == file_path_id)
@@ -135,7 +131,7 @@ class ContentRepository:
 
         return blocks, total
 
-    async def get_content_block_by_id(self, block_id: str) -> ContentBlock:
+    def get_content_block_by_id(self, block_id: str) -> ContentBlock:
         """Получение блока контента по ID"""
         block = (
             self.session.query(ContentBlock)
@@ -149,7 +145,7 @@ class ContentRepository:
 
         return block
 
-    async def get_content_file_by_id(self, file_id: str) -> ContentFile:
+    def get_content_file_by_id(self, file_id: str) -> ContentFile:
         """Получение файла контента по ID"""
         file = self.session.query(ContentFile).filter(ContentFile.id == file_id).first()
 
@@ -158,7 +154,7 @@ class ContentRepository:
 
         return file
 
-    async def get_content_categories(self) -> List[str]:
+    def get_content_categories(self) -> List[str]:
         """Получение списка основных категорий контента"""
         return [
             row[0]
@@ -168,7 +164,7 @@ class ContentRepository:
             .all()
         ]
 
-    async def get_content_subcategories(self, category: str) -> List[str]:
+    def get_content_subcategories(self, category: str) -> List[str]:
         """Получение списка подкатегорий для указанной категории"""
         return [
             row[0]
@@ -179,7 +175,7 @@ class ContentRepository:
             .all()
         ]
 
-    async def get_user_content_progress(
+    def get_user_content_progress(
         self, user_id: int, block_id: str
     ) -> Optional[UserContentProgress]:
         """Получение прогресса пользователя по конкретному блоку"""
@@ -194,7 +190,24 @@ class ContentRepository:
             .first()
         )
 
-    async def create_or_update_user_progress(
+    def get_user_content_progress_batch(
+        self, user_id: int, block_ids: List[str]
+    ) -> dict[str, UserContentProgress]:
+        """Получение прогресса пользователя по множеству блоков (для избежания N+1)"""
+        progress_records = (
+            self.session.query(UserContentProgress)
+            .filter(
+                and_(
+                    UserContentProgress.userId == user_id,
+                    UserContentProgress.blockId.in_(block_ids),
+                )
+            )
+            .all()
+        )
+
+        return {progress.blockId: progress for progress in progress_records}
+
+    def create_or_update_user_progress(
         self, user_id: int, block_id: str, solved_count: int
     ) -> UserContentProgress:
         """Создание или обновление прогресса пользователя по блоку"""
@@ -211,15 +224,15 @@ class ContentRepository:
 
         if progress:
             progress.solvedCount = solved_count
-            progress.updatedAt = datetime.utcnow()
+            progress.updatedAt = datetime.now()
         else:
             progress = UserContentProgress(
                 id=str(uuid4()),
                 userId=user_id,
                 blockId=block_id,
                 solvedCount=solved_count,
-                createdAt=datetime.utcnow(),
-                updatedAt=datetime.utcnow(),
+                createdAt=datetime.now(),
+                updatedAt=datetime.now(),
             )
             self.session.add(progress)
 
@@ -229,7 +242,7 @@ class ContentRepository:
 
         return progress
 
-    async def get_user_total_solved_count(self, user_id: int) -> int:
+    def get_user_total_solved_count(self, user_id: int) -> int:
         """Получение общего количества решенных блоков пользователем (исключая тестовые)"""
         return (
             self.session.query(func.count(UserContentProgress.id))
@@ -251,7 +264,7 @@ class ContentRepository:
             or 0
         )
 
-    async def create_content_file(
+    def create_content_file(
         self,
         file_id: str,
         webdav_path: str,
@@ -266,14 +279,16 @@ class ContentRepository:
             mainCategory=main_category,
             subCategory=sub_category,
             lastFileHash=last_file_hash,
-            createdAt=datetime.utcnow(),
-            updatedAt=datetime.utcnow(),
+            createdAt=datetime.now(),
+            updatedAt=datetime.now(),
         )
 
         self.session.add(content_file)
+        self.session.commit()
+        self.session.refresh(content_file)
         return content_file
 
-    async def create_content_block(
+    def create_content_block(
         self,
         block_id: str,
         file_id: str,
@@ -306,9 +321,11 @@ class ContentRepository:
             extractedUrls=extracted_urls or [],
             companies=companies or [],
             rawBlockContentHash=raw_block_content_hash,
-            createdAt=datetime.utcnow(),
-            updatedAt=datetime.utcnow(),
+            createdAt=datetime.now(),
+            updatedAt=datetime.now(),
         )
 
         self.session.add(content_block)
+        self.session.commit()
+        self.session.refresh(content_block)
         return content_block

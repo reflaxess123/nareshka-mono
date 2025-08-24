@@ -68,7 +68,6 @@ app.add_middleware(
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 app.include_router(auth_router, prefix="/api/v2")
-# browser_logs_router удален
 app.include_router(logs_router)
 app.include_router(content_router, prefix="/api/v2")
 app.include_router(interviews_router, prefix="/api/v2")
