@@ -18,7 +18,6 @@ from .dto.requests import (
     CategoryProgressUpdateRequest,
     ContentProgressUpdateRequest,
     ProgressAnalyticsRequest,
-    UserStatsUpdateRequest,
 )
 from .dto.responses import (
     AttemptHistoryResponse,
@@ -46,7 +45,6 @@ __all__ = [
     "ContentProgressUpdateRequest",
     "CategoryProgressUpdateRequest",
     "ProgressAnalyticsRequest",
-    "UserStatsUpdateRequest",
     # DTOs - Responses
     "CategoryProgressResponse",
     "ContentProgressResponse",

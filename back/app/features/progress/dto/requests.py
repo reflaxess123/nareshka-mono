@@ -8,7 +8,7 @@ from typing import Any, Dict, Optional
 
 from pydantic import BaseModel, Field, validator
 
-from app.shared.types.common import validate_not_empty, validate_positive_int
+from app.features.progress.utils.validators import validate_not_empty, validate_positive_int, validate_limit, validate_offset
 
 
 class TaskAttemptCreateRequest(BaseModel):
@@ -31,15 +31,11 @@ class TaskAttemptCreateRequest(BaseModel):
 
     @validator("user_id")
     def validate_user_id(cls, v):
-        if v <= 0:
-            raise ValueError("User ID должен быть положительным числом")
-        return v
+        return validate_positive_int(v, "User ID")
 
     @validator("task_id")
     def validate_task_id(cls, v):
-        if not v or not v.strip():
-            raise ValueError("Task ID не может быть пустым")
-        return v.strip()
+        return validate_not_empty(v, "Task ID")
 
     @validator("execution_time_ms")
     def validate_execution_time(cls, v):
@@ -197,16 +193,12 @@ class ProgressAnalyticsRequest(BaseModel):
         return v
 
     @validator("limit")
-    def validate_limit(cls, v):
-        if v < 1 or v > 100:
-            raise ValueError("Лимит должен быть от 1 до 100")
-        return v
+    def validate_limit_value(cls, v):
+        return validate_limit(v)
 
     @validator("offset")
-    def validate_offset(cls, v):
-        if v < 0:
-            raise ValueError("Смещение не может быть отрицательным")
-        return v
+    def validate_offset_value(cls, v):
+        return validate_offset(v)
 
     @validator("date_to")
     def validate_date_range(cls, v, values):
@@ -218,22 +210,3 @@ class ProgressAnalyticsRequest(BaseModel):
         ):
             raise ValueError("Дата окончания не может быть раньше даты начала")
         return v
-
-
-class UserStatsUpdateRequest(BaseModel):
-    """Запрос на обновление общей статистики пользователя"""
-
-    user_id: int = Field(..., description="ID пользователя")
-    tasks_solved_delta: int = Field(
-        0, description="Изменение количества решенных задач"
-    )
-    time_spent_delta: int = Field(
-        0, description="Изменение потраченного времени в минутах"
-    )
-    force_recalculate: bool = Field(
-        False, description="Принудительный пересчет всей статистики"
-    )
-
-    @validator("user_id")
-    def validate_user_id(cls, v):
-        return validate_positive_int(v, "User ID")

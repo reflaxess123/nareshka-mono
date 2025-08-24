@@ -8,7 +8,6 @@ from .requests import (
     ProgressAnalyticsRequest,
     TaskAttemptCreateRequest,
     TaskSolutionCreateRequest,
-    UserStatsUpdateRequest,
 )
 from .responses import (
     AttemptHistoryResponse,
@@ -33,7 +32,6 @@ __all__ = [
     "ContentProgressUpdateRequest",
     "CategoryProgressUpdateRequest",
     "ProgressAnalyticsRequest",
-    "UserStatsUpdateRequest",
     # Responses
     "TaskAttemptResponse",
     "TaskSolutionResponse",

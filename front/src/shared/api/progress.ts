@@ -129,7 +129,7 @@ const progressAPI = {
     options?: AxiosRequestConfig
   ): Promise<UserDetailedProgress> {
     const response = await apiInstance.get(
-      '/v2/progress/user/my/detailed',
+      '/v2/progress/detailed',
       options
     );
     return response.data;
@@ -141,7 +141,7 @@ const progressAPI = {
     options?: AxiosRequestConfig
   ): Promise<UserDetailedProgress> {
     const response = await apiInstance.get(
-      `/v2/progress/user/${userId}/detailed`,
+      `/v2/progress/admin/users/${userId}/detailed`,
       options
     );
     return response.data;
