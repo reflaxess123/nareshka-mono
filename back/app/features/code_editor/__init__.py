@@ -9,7 +9,6 @@ Code Editor Feature
 - Статистика выполнений
 """
 
-# Router импортируется напрямую в main.py для избежания циклических импортов
 from app.features.code_editor.repositories.code_editor_repository import (
     CodeEditorRepository,
 )

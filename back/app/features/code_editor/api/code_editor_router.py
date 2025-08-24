@@ -320,9 +320,16 @@ async def health_check(
 
     except Exception as e:
         logger.error(f"API: Ошибка при проверке здоровья: {e}")
+        # Получаем реальную статистику даже при ошибке
+        try:
+            languages = await code_editor_service.get_supported_languages()
+            language_count = len(languages)
+        except:
+            language_count = 0
+            
         return HealthResponse(
             status="unhealthy",
             module="code_editor",
-            supportedLanguages=0,
+            supportedLanguages=language_count,
             totalExecutions=0,
         )

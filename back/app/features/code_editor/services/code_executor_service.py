@@ -10,6 +10,7 @@ import re
 import tempfile
 import time
 import uuid
+from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 import docker
@@ -18,7 +19,7 @@ from docker.errors import ContainerError, ImageNotFound
 from app.features.code_editor.repositories.code_editor_repository import (
     CodeEditorRepository,
 )
-from app.shared.entities.code_editor_types import CodeExecution, SupportedLanguage
+from app.shared.models.code_execution_models import CodeExecution, SupportedLanguage
 from app.shared.entities.enums import CodeLanguage, ExecutionStatus
 
 logger = logging.getLogger(__name__)
@@ -115,7 +116,7 @@ class CodeExecutorService:
             memoryUsedMB=None,
             containerLogs=None,
             errorMessage=None,
-            createdAt=time.time(),
+            createdAt=datetime.now(),
             completedAt=None,
         )
 
@@ -127,7 +128,7 @@ class CodeExecutorService:
                 execution.status = ExecutionStatus.ERROR
                 execution.errorMessage = str(e)
                 execution.executionTimeMs = int((time.time() - start_time) * 1000)
-                execution.completedAt = time.time()
+                execution.completedAt = datetime.now()
                 await self.code_editor_repository.save_execution(execution)
                 return execution
 
@@ -138,7 +139,7 @@ class CodeExecutorService:
                 os.chmod(temp_dir, 0o777)
 
                 # Записываем исходный код в файл
-                source_file = os.path.join(temp_dir, f"main{language.file_extension}")
+                source_file = os.path.join(temp_dir, f"main{language.fileExtension}")
                 with open(source_file, "w", encoding="utf-8") as f:
                     f.write(source_code)
                 # Даем права на чтение и запись всем
@@ -167,7 +168,7 @@ class CodeExecutorService:
                 execution.memoryUsedMB = result.get("memoryUsedMB")
                 execution.containerLogs = result.get("containerLogs")
                 execution.errorMessage = result.get("errorMessage")
-                execution.completedAt = time.time()
+                execution.completedAt = datetime.now()
 
                 logger.info(
                     f"Code execution {execution_id} completed in {execution.executionTimeMs}ms"
@@ -178,7 +179,7 @@ class CodeExecutorService:
             execution.status = ExecutionStatus.ERROR
             execution.errorMessage = str(e)
             execution.executionTimeMs = int((time.time() - start_time) * 1000)
-            execution.completedAt = time.time()
+            execution.completedAt = datetime.now()
 
         # Сохраняем результат в репозитории
         await self.code_editor_repository.save_execution(execution)
@@ -199,12 +200,12 @@ class CodeExecutorService:
 
             # Настройки контейнера
             container_config = {
-                "image": language.docker_image,
+                "image": language.dockerImage,
                 "command": command,
                 "working_dir": "/code",
                 "volumes": {temp_dir: {"bind": "/code", "mode": "ro"}},
-                "mem_limit": f"{language.memory_limit_mb}m",
-                "memswap_limit": f"{language.memory_limit_mb}m",
+                "mem_limit": f"{language.memoryLimitMB}m",
+                "memswap_limit": f"{language.memoryLimitMB}m",
                 "cpu_quota": 50000,  # 50% CPU
                 "network_disabled": True,  # Отключаем сеть
                 "read_only": True,  # Только чтение файловой системы
@@ -262,7 +263,7 @@ class CodeExecutorService:
         except ImageNotFound:
             return {
                 "status": ExecutionStatus.ERROR,
-                "errorMessage": f"Docker image {language.docker_image} not found",
+                "errorMessage": f"Docker image {language.dockerImage} not found",
                 "containerLogs": "Docker image not available",
             }
 
@@ -278,14 +279,14 @@ class CodeExecutorService:
     ) -> str:
         """Подготавливает команду для выполнения в контейнере"""
 
-        base_command = language.run_command.replace(
-            "{file}", f"main{language.file_extension}"
+        base_command = language.runCommand.replace(
+            "{file}", f"main{language.fileExtension}"
         )
 
         # Если есть компиляция
-        if language.compile_command:
-            compile_cmd = language.compile_command.replace(
-                "{file}", f"main{language.file_extension}"
+        if language.compileCommand:
+            compile_cmd = language.compileCommand.replace(
+                "{file}", f"main{language.fileExtension}"
             )
             if stdin_file:
                 return f"bash -c '{compile_cmd} && {base_command} < input.txt'"

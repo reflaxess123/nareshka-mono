@@ -446,7 +446,10 @@ class CodeEditorService:
                 totalTests=len(test_cases),
                 publicTests=public_count,
                 hiddenTests=hidden_count,
-                lastGenerated=None,  # TODO: Вычислить последнюю дату генерации
+                lastGenerated=max(
+                    (tc.generatedAt for tc in test_cases if tc.generatedAt), 
+                    default=None
+                ),
             )
 
         except Exception as e:
@@ -577,11 +580,20 @@ class CodeEditorService:
 
             status = "healthy" if len(languages) > 0 else "unhealthy"
 
+            # Получаем реальную статистику выполнений
+            try:
+                from app.shared.models.code_execution_models import CodeExecution
+                all_executions = (
+                    self.code_editor_repository.session.query(CodeExecution).count()
+                )
+            except:
+                all_executions = 0
+
             return HealthResponse(
                 status=status,
                 module="code_editor",
                 supportedLanguages=len(languages),
-                totalExecutions=0,  # TODO: Получить реальную статистику
+                totalExecutions=all_executions,
             )
 
         except Exception as e:

@@ -15,7 +15,6 @@ from app.core.logging import get_logger, init_default_logging
 from app.core.settings import settings
 from app.features.admin.api.admin_router import router as admin_router
 from app.features.auth.api.auth_router import router as auth_router
-# browser_logs модуль удален - см. app/features/browser_logs/DELETED_MODULE.md
 from app.features.code_editor.api import router as code_editor_router
 from app.features.content.api import router as content_router
 from app.features.interviews.api.categories_router import router as categories_router
@@ -24,12 +23,12 @@ from app.features.interviews.api.interviews_router import router as interviews_r
 from app.features.logs.api.logs_router import (
     router as logs_router,
     setup_websocket_logging,
+    disable_websocket_logging,
 )
 from app.features.mindmap.api import router as mindmap_router
 from app.features.progress.api import router as progress_router
 from app.features.stats.api import router as stats_router
 
-# from app.features.analytics.api.analytics_router import router as analytics_router
 from app.features.task.api import router as task_router
 from app.features.theory.api import router as theory_router
 from app.features.visualization.api import router as cluster_viz_router
@@ -42,9 +41,10 @@ logger = get_logger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     setup_di_container()
-    setup_websocket_logging()  # Инициализируем WebSocket логирование
+    setup_websocket_logging()  # Включено обратно с исправлениями
     logger.info("🚀 Приложение запущено", extra={"event": "startup"})
     yield
+    disable_websocket_logging()  # Корректное отключение при shutdown
     logger.info("🔒 Приложение остановлено", extra={"event": "shutdown"})
 
 
@@ -131,5 +131,5 @@ if __name__ == "__main__":
         host=settings.host,
         port=settings.port,
         reload=settings.debug,
-        reload_excludes=["logs/*", "*.log"],
+        reload_excludes=["logs/*", "*.log", "app/features/*/tests/*"],
     )

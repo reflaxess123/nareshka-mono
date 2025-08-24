@@ -49,18 +49,3 @@ class TestCaseCreateRequest(BaseModel):
     timeoutSeconds: int = 30
 
 
-class ValidationRequestDTO(BaseModel):
-    """DTO для запроса валидации"""
-
-    sourceCode: str
-    language: str
-
-
-class ValidationResultDTO(BaseModel):
-    """DTO для результата валидации"""
-
-    passed: bool
-    totalTests: int
-    passedTests: int
-    failedTests: int
-    results: List[dict]

@@ -515,7 +515,7 @@ class CodeEditorRepository(CodeEditorRepositoryInterface):
                 self.session.query(func.count(CodeExecution.id))
                 .filter(
                     CodeExecution.userId == user_id,
-                    CodeExecution.status == ExecutionStatus.COMPLETED,
+                    CodeExecution.status == ExecutionStatus.SUCCESS,
                     CodeExecution.exitCode == 0,
                 )
                 .scalar()
