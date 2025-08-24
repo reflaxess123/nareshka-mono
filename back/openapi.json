@@ -1021,7 +1021,7 @@
           "interviews"
         ],
         "summary": "Список компаний",
-        "description": "Возвращает список всех компаний для использования в фильтрах",
+        "description": "Возвращает список всех компаний с количеством вопросов для использования в фильтрах",
         "operationId": "get_companies_list_api_v2_interviews_companies_list_get",
         "responses": {
           "200": {
@@ -1029,68 +1029,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CompaniesListResponse"
+                  "$ref": "#/components/schemas/CompaniesListWithCountResponse"
                 }
               }
             }
           },
           "404": {
             "description": "Not found"
-          }
-        }
-      }
-    },
-    "/api/v2/interviews/top-companies": {
-      "get": {
-        "tags": [
-          "interviews"
-        ],
-        "summary": "Получить топ компаний",
-        "description": "Возвращает список компаний с наибольшим количеством вопросов",
-        "operationId": "get_top_companies_api_v2_interviews_top_companies_get",
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "maximum": 500,
-              "minimum": 1,
-              "description": "Количество компаний в топе",
-              "default": 20,
-              "title": "Limit"
-            },
-            "description": "Количество компаний в топе"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CompanyResponse"
-                  },
-                  "title": "Response Get Top Companies Api V2 Interviews Top Companies Get"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
           }
         }
       }
@@ -1402,64 +1347,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/QuestionsListResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v2/interview-categories/companies/top": {
-      "get": {
-        "tags": [
-          "interview-categories"
-        ],
-        "summary": "Получить топ компаний",
-        "description": "Возвращает список компаний с наибольшим количеством вопросов",
-        "operationId": "get_top_companies_endpoint_api_v2_interview_categories_companies_top_get",
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "maximum": 100,
-              "minimum": 1,
-              "description": "Количество компаний в топе",
-              "default": 20,
-              "title": "Limit"
-            },
-            "description": "Количество компаний в топе"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CompanyResponse"
-                  },
-                  "title": "Response Get Top Companies Endpoint Api V2 Interview Categories Companies Top Get"
                 }
               }
             }
@@ -5795,11 +5682,11 @@
         ],
         "title": "CodeLanguage"
       },
-      "CompaniesListResponse": {
+      "CompaniesListWithCountResponse": {
         "properties": {
           "companies": {
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/CompanyWithCountResponse"
             },
             "type": "array",
             "title": "Companies"
@@ -5809,8 +5696,8 @@
         "required": [
           "companies"
         ],
-        "title": "CompaniesListResponse",
-        "description": "Список компаний"
+        "title": "CompaniesListWithCountResponse",
+        "description": "Список компаний с количеством вопросов"
       },
       "CompanyResponse": {
         "properties": {
@@ -5867,6 +5754,25 @@
         ],
         "title": "CompanyStatsResponse",
         "description": "Статистика по компании"
+      },
+      "CompanyWithCountResponse": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "count"
+        ],
+        "title": "CompanyWithCountResponse",
+        "description": "Компания с количеством вопросов"
       },
       "ContentBlockResponse": {
         "properties": {

@@ -12,7 +12,9 @@ from app.features.interviews.dto.categories_responses import CompanyResponse
 from app.features.interviews.dto.responses import (
     AnalyticsResponse,
     CompaniesListResponse,
+    CompaniesListWithCountResponse,
     CompanyStatsResponse,
+    CompanyWithCountResponse,
     InterviewDetailResponse,
     InterviewsListResponse,
 )
@@ -34,7 +36,7 @@ router = APIRouter(
     summary="Получить список интервью",
     description="Возвращает список интервью с поддержкой фильтрации по компании и пагинации",
 )
-async def get_interviews(
+def get_interviews(
     page: int = Query(1, ge=1, description="Номер страницы"),
     limit: int = Query(20, ge=1, le=100, description="Количество записей на странице"),
     company: Optional[str] = Query(
@@ -78,7 +80,7 @@ async def get_interviews(
     summary="Статистика по компании",
     description="Возвращает подробную статистику по интервью конкретной компании",
 )
-async def get_company_stats(
+def get_company_stats(
     company_name: str,
     session: Session = Depends(get_session),
     current_user=Depends(get_current_user_optional),
@@ -104,7 +106,7 @@ async def get_company_stats(
     summary="Общая аналитика",
     description="Возвращает сводную аналитику по всем интервью в системе",
 )
-async def get_analytics_overview(
+def get_analytics_overview(
     session: Session = Depends(get_session),
     current_user=Depends(get_current_user_optional),
 ):
@@ -121,46 +123,24 @@ async def get_analytics_overview(
 
 @router.get(
     "/companies/list",
-    response_model=CompaniesListResponse,
+    response_model=CompaniesListWithCountResponse,
     summary="Список компаний",
-    description="Возвращает список всех компаний для использования в фильтрах",
+    description="Возвращает список всех компаний с количеством вопросов для использования в фильтрах",
 )
-async def get_companies_list(
+def get_companies_list(
     session: Session = Depends(get_session),
     current_user=Depends(get_current_user_optional),
 ):
     """Список всех компаний для фильтров
 
-    Возвращает массив названий компаний, присутствующих в базе данных интервью
+    Возвращает массив компаний с количеством вопросов
     """
     service = InterviewService(session)
-    return {"companies": service.get_companies_list()}
+    companies_with_count = service.get_companies_with_count()
+    result = {"companies": companies_with_count}
+    return result
 
 
-@router.get(
-    "/top-companies",
-    response_model=List[CompanyResponse],
-    summary="Получить топ компаний",
-    description="Возвращает список компаний с наибольшим количеством вопросов",
-)
-async def get_top_companies(
-    limit: int = Query(
-        20,
-        ge=1,
-        le=500,  # Увеличиваем лимит до 500 для получения всех компаний
-        description="Количество компаний в топе",
-    ),
-    session: Session = Depends(get_session),
-    current_user=Depends(get_current_user_optional),
-) -> List[CompanyResponse]:
-    """
-    Получить топ компаний по количеству вопросов
-
-    Возвращает список компаний, отсортированный по убыванию количества
-    вопросов от каждой компании.
-    """
-    cat_service = CategoriesService(session)
-    return cat_service.get_top_companies(limit=limit)
 
 
 @router.get(
@@ -169,10 +149,9 @@ async def get_top_companies(
     summary="Получить детали интервью",
     description="Возвращает полную информацию об интервью включая полный текст",
 )
-async def get_interview_detail(
+def get_interview_detail(
     interview_id: str,
     session: Session = Depends(get_session),
-    current_user=Depends(get_current_user_optional),
 ):
     """Получение детальной информации об интервью
 

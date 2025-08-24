@@ -7,6 +7,7 @@ export default defineConfig({
       target: 'src/shared/api/generated/api.ts',
       client: 'react-query',
       mode: 'single',
+      packageJson: './package.json',
       mock: false,
       clean: true,
       prettier: false,
@@ -21,6 +22,7 @@ export default defineConfig({
           signal: true,
           shouldExportHttpClient: true,
           shouldExportMutatorHooks: true,
+          version: 5,
         },
         operations: {},
         components: {

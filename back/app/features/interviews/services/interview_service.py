@@ -57,9 +57,13 @@ class InterviewService:
 
         return InterviewDetailResponse.model_validate(interview)
 
-    def get_companies_list(self) -> list[str]:
+    def get_companies_list(self) -> list[dict]:
         """Получение списка компаний"""
-        return self.repository.get_companies_list()
+        return self.repository.get_companies_with_count()
+
+    def get_companies_with_count(self) -> list[dict]:
+        """Получение списка компаний с количеством вопросов"""
+        return self.repository.get_companies_with_count()
 
     def get_company_statistics(
         self, company_name: str

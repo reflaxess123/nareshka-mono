@@ -2,7 +2,7 @@
 Categories Service - сервис для работы с категориями вопросов
 """
 
-from typing import List, Optional
+from typing import Dict, List, Optional, Any
 
 from sqlalchemy.orm import Session
 
@@ -26,6 +26,19 @@ class CategoriesService:
     def __init__(self, session: Session):
         self.repository = CategoriesRepository(session)
         self.session = session
+
+    def _create_question_response(self, question_data: Dict[str, Any]) -> QuestionResponse:
+        """Фабрика для создания QuestionResponse из данных репозитория"""
+        return QuestionResponse(
+            id=question_data["id"],
+            question_text=question_data["question_text"],
+            company=question_data.get("company"),
+            cluster_id=question_data.get("cluster_id"),
+            category_id=question_data.get("category_id"),
+            topic_name=question_data.get("topic_name"),
+            canonical_question=question_data.get("canonical_question"),
+            interview_id=question_data.get("interview_id"),
+        )
 
     def get_all_categories(self) -> List[CategoryResponse]:
         """Получить все категории"""
@@ -80,17 +93,7 @@ class CategoriesService:
             category_id=category_id, limit=limit_questions, random=True
         )
         sample_questions = [
-            QuestionResponse(
-                id=q["id"],
-                question_text=q["question_text"],
-                company=q.get("company"),
-                cluster_id=q.get("cluster_id"),
-                category_id=q.get("category_id"),
-                topic_name=q.get("topic_name"),
-                canonical_question=q.get("canonical_question"),
-                interview_id=q.get("interview_id"),
-            )
-            for q in questions_data
+            self._create_question_response(q) for q in questions_data
         ]
 
         return CategoryDetailResponse(
@@ -107,19 +110,7 @@ class CategoriesService:
             cluster_id=cluster_id, limit=limit, offset=offset
         )
 
-        return [
-            QuestionResponse(
-                id=q["id"],
-                question_text=q["question_text"],
-                company=q.get("company"),
-                cluster_id=q.get("cluster_id"),
-                category_id=q.get("category_id"),
-                topic_name=q.get("topic_name"),
-                canonical_question=q.get("canonical_question"),
-                interview_id=q.get("interview_id"),
-            )
-            for q in questions_data
-        ]
+        return [self._create_question_response(q) for q in questions_data]
 
     def search_questions(
         self,
@@ -151,19 +142,7 @@ class CategoriesService:
         )
 
         # Конвертируем в DTO
-        questions = [
-            QuestionResponse(
-                id=q["id"],
-                question_text=q["question_text"],
-                company=q.get("company"),
-                cluster_id=q.get("cluster_id"),
-                category_id=q.get("category_id"),
-                topic_name=q.get("topic_name"),
-                canonical_question=q.get("canonical_question"),
-                interview_id=q.get("interview_id"),
-            )
-            for q in questions_data
-        ]
+        questions = [self._create_question_response(q) for q in questions_data]
 
         # Рассчитываем пагинацию
         page = (offset // limit) + 1

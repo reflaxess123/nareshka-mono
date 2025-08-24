@@ -57,10 +57,21 @@ class CompanyStatsResponse(BaseModel):
     avg_duration: Optional[int]
 
 
+class CompanyWithCountResponse(BaseModel):
+    """Компания с количеством вопросов"""
+    name: str
+    count: int
+
+
 class CompaniesListResponse(BaseModel):
     """Список компаний"""
 
-    companies: List[str]
+    companies: List[CompanyWithCountResponse]  # ИСПРАВЛЕНО: Теперь объекты вместо строк
+
+
+class CompaniesListWithCountResponse(BaseModel):
+    """Список компаний с количеством вопросов"""
+    companies: List[CompanyWithCountResponse]
 
 
 class AnalyticsResponse(BaseModel):

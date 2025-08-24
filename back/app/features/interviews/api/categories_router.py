@@ -148,21 +148,6 @@ def search_questions(
 
 
 @router.get(
-    "/companies/top",
-    response_model=List[CompanyResponse],
-    summary="Получить топ компаний",
-    description="Возвращает список компаний с наибольшим количеством вопросов",
-)
-def get_top_companies_endpoint(
-    limit: int = Query(20, ge=1, le=100, description="Количество компаний в топе"),
-    session: Session = Depends(get_session),
-    current_user=Depends(get_current_user_optional),
-) -> List[CompanyResponse]:
-    service = CategoriesService(session)
-    return service.get_top_companies(limit=limit)
-
-
-@router.get(
     "/companies/count",
     response_model=int,
     summary="Получить общее количество компаний",

@@ -51,10 +51,20 @@ interface ChromeMonitor {
   logs: ChromeMonitorLog[];
   errors: ChromeMonitorError[];
   startTime: number;
+  sendTimeout: any;
+  batchDelay: number;
+  lastSentLogsCount: number;
+  lastSentErrorsCount: number;
+  _addLog?: (type: string, message: string, extra?: any) => void;
+  _addError?: (errorData: any) => void;
   init(): void;
   getStats(): ChromeMonitorData;
   clear(): void;
   export(): void;
+  sendToBackend(): Promise<{status: string, result?: any, error?: string, reason?: string}>;
+  clearMonitor(): void;
+  startAutoSend(): void;
+  scheduleSend(): void;
 }
 
 // Глобальные переменные
@@ -64,5 +74,6 @@ declare global {
     getMonitorStats: () => ChromeMonitorData;
     clearMonitor: () => void;
     exportMonitor: () => void;
+    sendToBackend: () => Promise<{status: string, result?: any, error?: string, reason?: string}>;
   }
 }

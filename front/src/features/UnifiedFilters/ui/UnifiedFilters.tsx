@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { X } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { useGetTopCompaniesApiV2InterviewsTopCompaniesGet } from '@/shared/api/generated/api';
+import { useGetCompaniesListApiV2InterviewsCompaniesListGet } from '@/shared/api/generated/api';
 import { FilterSection } from './FilterSection';
 import { CompanyFilter } from './CompanyFilter';
 import { AdditionalFilter } from './AdditionalFilter';
@@ -95,7 +95,7 @@ export const UnifiedFilters: React.FC<UnifiedFiltersProps> = ({
 
   // Загрузка данных компаний для интервью и вопросов с количеством вопросов
   const { data: companiesData, isLoading: companiesLoading } = 
-    useGetTopCompaniesApiV2InterviewsTopCompaniesGet(
+    useGetCompaniesListApiV2InterviewsCompaniesListGet(
       { limit: 400 }, // Загружаем все компании (380+)
       {
         query: {
@@ -259,7 +259,16 @@ export const UnifiedFilters: React.FC<UnifiedFiltersProps> = ({
   };
 
   const activeFilters = hasActiveFilters(filters);
-  const companiesList = companiesData || [];
+  // Преобразуем список компаний из API в нужный формат
+  const companiesList = React.useMemo(() => {
+    if (!companiesData?.companies) return [];
+    // ВРЕМЕННО: API возвращает массив строк, преобразуем в объекты
+    if (typeof companiesData.companies[0] === 'string') {
+      return companiesData.companies.map((company: string) => ({ name: company, count: 0 }));
+    }
+    // API теперь возвращает массив объектов с name и count
+    return companiesData.companies;
+  }, [companiesData]);
 
   return (
     <div className={`${styles.unifiedFilters} ${className || ''}`}>

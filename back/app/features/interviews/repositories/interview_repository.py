@@ -68,15 +68,28 @@ class InterviewRepository:
         """Получение интервью по ID"""
         return self.session.query(InterviewRecord).filter_by(id=interview_id).first()
 
-    def get_companies_list(self) -> List[str]:
+    def get_companies_list(self) -> List[Dict[str, Any]]:
         """Получение списка всех компаний"""
+        # ИСПРАВЛЕНО: Теперь возвращает объекты для совместимости с фронтендом
+        return self.get_companies_with_count()
+    
+    def get_companies_with_count(self) -> List[Dict[str, Any]]:
+        """Получение списка компаний с количеством вопросов"""
+        from sqlalchemy import func
+        
         companies = (
-            self.session.query(InterviewRecord.company_name)
-            .distinct()
+            self.session.query(
+                InterviewRecord.company_name,
+                func.count(InterviewRecord.id).label("count")
+            )
+            .group_by(InterviewRecord.company_name)
             .order_by(InterviewRecord.company_name)
             .all()
         )
-        return [company[0] for company in companies]
+        return [
+            {"name": company, "count": count}
+            for company, count in companies
+        ]
 
     def get_company_statistics(self, company_name: str) -> Optional[Dict[str, Any]]:
         """Получение статистики по компании"""
@@ -121,7 +134,7 @@ class InterviewRepository:
         )
 
         top_companies_list = [
-            {"company_name": company, "total_interviews": count}
+            {"company_name": company, "total_interviews": count, "avg_duration": None}
             for company, count in top_companies
         ]
 
