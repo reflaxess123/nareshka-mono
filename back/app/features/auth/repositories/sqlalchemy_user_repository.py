@@ -1,6 +1,6 @@
 """Реализация репозитория пользователей для SQLAlchemy"""
 
-from typing import List, Optional
+from typing import Optional
 
 from sqlalchemy.orm import Session
 
@@ -14,130 +14,54 @@ class SQLAlchemyUserRepository(UserRepository):
     def __init__(self):
         pass
 
+    def _get_session(self, session: Session = None) -> Session:
+        """Получить сессию БД - единый способ"""
+        if session is not None:
+            return session
+            
+        from app.shared.database import get_session
+        return next(get_session())
+
+    def _execute_with_session(self, operation, session: Session = None):
+        """Выполнить операцию с автоматическим управлением сессией"""
+        if session is not None:
+            return operation(session)
+        
+        from app.shared.database import get_session
+        db_session = next(get_session())
+        try:
+            return operation(db_session)
+        finally:
+            db_session.close()
+
     async def get_by_id(self, id: int, session: Session = None) -> Optional[User]:
         """Получить пользователя по ID"""
-        if session is None:
-            from app.shared.database.base import db_manager
-
-            with db_manager.get_session() as session:
-                return session.query(User).filter(User.id == id).first()
-        return session.query(User).filter(User.id == id).first()
+        def operation(s: Session):
+            return s.query(User).filter(User.id == id).first()
+        
+        return self._execute_with_session(operation, session)
 
     async def get_by_email(self, email: str, session: Session = None) -> Optional[User]:
         """Получить пользователя по email"""
-        if session is None:
-            from app.shared.database.connection import get_db
-
-            db_gen = get_db()
-            session = next(db_gen)
-            try:
-                return session.query(User).filter(User.email == email).first()
-            finally:
-                db_gen.close()
-        return session.query(User).filter(User.email == email).first()
-
-    async def get_all(
-        self, limit: int = 100, offset: int = 0, session: Session = None
-    ) -> List[User]:
-        """Получить всех пользователей с пагинацией"""
-        if session is None:
-            from app.shared.database.base import db_manager
-
-            with db_manager.get_session() as session:
-                return session.query(User).offset(offset).limit(limit).all()
-        return session.query(User).offset(offset).limit(limit).all()
+        def operation(s: Session):
+            return s.query(User).filter(User.email == email).first()
+        
+        return self._execute_with_session(operation, session)
 
     async def create(self, entity: User, session: Session = None) -> User:
         """Создать пользователя"""
-        if session is None:
-            from app.shared.database.base import db_manager
-
-            with db_manager.get_session() as session:
-                session.add(entity)
-                session.flush()  # Получаем ID без commit
-                session.commit()  # Коммитим изменения
-                session.refresh(
-                    entity
-                )  # Обновляем объект после коммита для избежания DetachedInstanceError
-                return entity
-        session.add(entity)
-        session.flush()  # Получаем ID без commit
-        return entity
-
-    async def update(self, entity: User, session: Session = None) -> User:
-        """Обновить пользователя"""
-        if session is None:
-            from app.shared.database.base import db_manager
-
-            with db_manager.get_session() as session:
-                # Получаем существующий объект
-                existing_user = session.query(User).filter(User.id == entity.id).first()
-                if not existing_user:
-                    raise ValueError(f"User with id {entity.id} not found")
-
-                # Обновляем данные
-                existing_user.email = entity.email
-                existing_user.password = entity.password
-                existing_user.role = entity.role
-                existing_user.updatedAt = entity.updatedAt
-                existing_user.totalTasksSolved = entity.totalTasksSolved
-                existing_user.lastActivityDate = entity.lastActivityDate
-                session.commit()
-                return existing_user
-
-        # Получаем существующий объект
-        existing_user = session.query(User).filter(User.id == entity.id).first()
-        if not existing_user:
-            raise ValueError(f"User with id {entity.id} not found")
-
-        # Обновляем данные
-        existing_user.email = entity.email
-        existing_user.password = entity.password
-        existing_user.role = entity.role
-        existing_user.updatedAt = entity.updatedAt
-        existing_user.totalTasksSolved = entity.totalTasksSolved
-        existing_user.lastActivityDate = entity.lastActivityDate
-
-        return existing_user
-
-    async def delete(self, id: int, session: Session = None) -> bool:
-        """Удалить пользователя"""
-        if session is None:
-            from app.shared.database.base import db_manager
-
-            with db_manager.get_session() as session:
-                user = session.query(User).filter(User.id == id).first()
-                if user:
-                    session.delete(user)
-                    session.commit()
-                    return True
-                return False
-        user = session.query(User).filter(User.id == id).first()
-        if user:
-            session.delete(user)
-            return True
-        return False
-
-    async def exists(self, id: int, session: Session = None) -> bool:
-        """Проверить существование пользователя"""
-        if session is None:
-            from app.shared.database.base import db_manager
-
-            with db_manager.get_session() as session:
-                return session.query(User).filter(User.id == id).first() is not None
-        return session.query(User).filter(User.id == id).first() is not None
+        def operation(s: Session):
+            s.add(entity)
+            s.flush()  # Получаем ID без commit
+            s.commit()  # Коммитим изменения
+            s.refresh(entity)  # Обновляем объект после коммита
+            return entity
+        
+        return self._execute_with_session(operation, session)
 
     async def email_exists(self, email: str, session: Session = None) -> bool:
         """Проверить существование email"""
-        if session is None:
-            from app.shared.database.base import db_manager
-
-            session_obj = db_manager.SessionLocal()
-            try:
-                return (
-                    session_obj.query(User).filter(User.email == email).first()
-                    is not None
-                )
-            finally:
-                session_obj.close()
-        return session.query(User).filter(User.email == email).first() is not None
+        def operation(s: Session):
+            return s.query(User).filter(User.email == email).first() is not None
+        
+        return self._execute_with_session(operation, session)

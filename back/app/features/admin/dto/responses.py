@@ -5,7 +5,7 @@ from typing import Optional
 from pydantic import Field
 
 from app.shared.types import BaseResponse
-from app.features.auth.dto.responses import UserResponse
+from app.features.auth.dto.auth_dto import UserResponse
 
 
 class UserStatsResponse(BaseResponse):

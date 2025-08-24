@@ -233,3 +233,4 @@ NUL
 
 # Exclude entire sobes-data directory
 sobes-data/
+!/.venv/

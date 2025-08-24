@@ -1,51 +1,19 @@
 # Auth DTOs
 
-from .requests import (
-    ChangePasswordRequest,
+from .auth_dto import (
     LoginRequest,
-    LogoutRequest,
-    PasswordResetConfirmRequest,
-    PasswordResetRequest,
-    RefreshTokenRequest,
-    RegisterRequest,
-    UpdateUserProfileRequest,
-)
-from .responses import (
-    AuthErrorResponse,
-    AuthStatusResponse,
-    ChangePasswordResponse,
     LoginResponse,
     LogoutResponse,
-    PasswordResetConfirmResponse,
-    PasswordResetResponse,
-    RefreshTokenResponse,
+    RegisterRequest,
     RegisterResponse,
-    TokenResponse,
-    UpdateProfileResponse,
     UserResponse,
 )
 
 __all__ = [
-    # Requests
     "LoginRequest",
     "RegisterRequest",
-    "PasswordResetRequest",
-    "PasswordResetConfirmRequest",
-    "ChangePasswordRequest",
-    "UpdateUserProfileRequest",
-    "RefreshTokenRequest",
-    "LogoutRequest",
-    # Responses
-    "UserResponse",
-    "TokenResponse",
-    "LoginResponse",
+    "LoginResponse", 
     "RegisterResponse",
-    "RefreshTokenResponse",
-    "AuthStatusResponse",
     "LogoutResponse",
-    "PasswordResetResponse",
-    "PasswordResetConfirmResponse",
-    "ChangePasswordResponse",
-    "UpdateProfileResponse",
-    "AuthErrorResponse",
+    "UserResponse",
 ]

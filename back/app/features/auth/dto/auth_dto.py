@@ -40,12 +40,39 @@ class UserResponse(IdentifiedResponse):
     """Ответ с данными пользователя"""
 
     email: str
+    username: Optional[str] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    full_name: Optional[str] = None
+    display_name: str
     role: UserRole
+    is_active: bool = True
+    is_verified: bool = True
     totalTasksSolved: int
     lastActivityDate: Optional[datetime]
 
+    @classmethod
+    def from_user(cls, user) -> "UserResponse":
+        """Create response from User model."""
+        return cls(
+            id=user.id,
+            email=user.email,
+            username=user.username if hasattr(user, 'username') else None,
+            first_name=user.first_name if hasattr(user, 'first_name') else None,
+            last_name=user.last_name if hasattr(user, 'last_name') else None,
+            full_name=user.full_name if hasattr(user, 'full_name') else None,
+            display_name=user.display_name if hasattr(user, 'display_name') else user.email.split('@')[0],
+            role=user.role,
+            is_active=user.is_active if hasattr(user, 'is_active') else True,
+            is_verified=user.is_verified if hasattr(user, 'is_verified') else True,
+            totalTasksSolved=user.totalTasksSolved,
+            lastActivityDate=user.lastActivityDate,
+            createdAt=user.createdAt,
+            updatedAt=user.updatedAt if hasattr(user, 'updatedAt') else user.createdAt,
+        )
+
     class Config:
-        from_attributes = True  # Для работы с SQLAlchemy моделями
+        from_attributes = True
 
 
 class LoginResponse(BaseModel):
@@ -68,10 +95,3 @@ class LogoutResponse(MessageResponse):
     """Ответ на выход"""
 
     pass
-
-
-class TokenData(BaseModel):
-    """Данные токена"""
-
-    email: str
-    user_id: int

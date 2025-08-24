@@ -12,7 +12,7 @@ from app.features.admin.dto.responses import (
     UsersListResponse,
     UserStatsResponse,
 )
-from app.features.auth.dto.responses import UserResponse
+from app.features.auth.dto.auth_dto import UserResponse
 from app.features.admin.repositories.admin_repository import AdminRepository
 from app.features.admin.exceptions import AdminStatsException
 

@@ -16,7 +16,6 @@ from .dto.auth_dto import (
     LogoutResponse,
     RegisterRequest,
     RegisterResponse,
-    TokenData,
     UserResponse,
 )
 from .repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
@@ -34,5 +33,4 @@ __all__ = [
     "RegisterResponse",
     "UserResponse",
     "LogoutResponse",
-    "TokenData",
 ]
