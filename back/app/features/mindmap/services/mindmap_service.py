@@ -2,6 +2,7 @@
 
 import logging
 import math
+from datetime import datetime
 from typing import Optional
 
 from app.features.mindmap.dto.responses import (
@@ -20,6 +21,12 @@ from app.features.mindmap.dto.responses import (
     TopicResponse,
     TopicStatsResponse,
     TopicTasksResponse,
+)
+from app.features.mindmap.utils.enums import (
+    MindMapLayout,
+    MindMapStructureType,
+    NodeType,
+    Technology,
 )
 from app.features.mindmap.exceptions.mindmap_exceptions import (
     TaskNotFoundError,
@@ -40,7 +47,7 @@ class MindMapService:
     def generate_mindmap(
         self,
         user_id: Optional[int] = None,
-        technology: str = "javascript",
+        technology: str = Technology.JAVASCRIPT.value,
         difficulty_filter: Optional[str] = None,
         topic_filter: Optional[str] = None,
     ) -> MindMapResponse:
@@ -76,17 +83,21 @@ class MindMapService:
             nodes = []
             edges = []
 
+            # Константы для радиальной структуры
+            RADIUS = 400
+            CENTER_X, CENTER_Y = 500.0, 400.0
+
             # Центральный узел
             center_node = MindMapNodeResponse(
                 id="center",
-                type="center",
-                position={"x": 500.0, "y": 400.0},
+                type=NodeType.CENTER.value,
+                position={"x": CENTER_X, "y": CENTER_Y},
                 data={
                     "title": tech_center["display_name"],
                     "description": tech_center["description"],
                     "icon": tech_center["icon"],
                     "color": tech_center["color"],
-                    "type": "center",
+                    "type": NodeType.CENTER.value,
                     "technology": technology,
                     "overallProgress": overall_progress,
                 },
@@ -94,13 +105,12 @@ class MindMapService:
             nodes.append(center_node)
 
             # Топики как узлы в радиальной структуре
-            radius = 400
             topic_count = len(active_topics)
 
             for i, topic in enumerate(active_topics):
                 angle = (2 * math.pi * i) / topic_count
-                x = 500 + radius * math.cos(angle)
-                y = 400 + radius * math.sin(angle)
+                x = CENTER_X + RADIUS * math.cos(angle)
+                y = CENTER_Y + RADIUS * math.sin(angle)
 
                 # Получаем прогресс по теме если пользователь авторизован
                 topic_progress = None
@@ -112,7 +122,7 @@ class MindMapService:
                 # Создаем узел топика
                 topic_node = MindMapNodeResponse(
                     id=f"topic_{topic['key']}",
-                    type="topic",
+                    type=NodeType.TOPIC.value,
                     position={"x": x, "y": y},
                     data={
                         "title": topic["title"],
@@ -120,7 +130,7 @@ class MindMapService:
                         "color": topic["color"],
                         "description": topic["description"],
                         "topic_key": topic["key"],
-                        "type": "topic",
+                        "type": NodeType.TOPIC.value,
                         "progress": topic_progress,
                     },
                 )
@@ -140,10 +150,10 @@ class MindMapService:
             mindmap_data = MindMapDataResponse(
                 nodes=nodes,
                 edges=edges,
-                layout="radial",
+                layout=MindMapLayout.RADIAL.value,
                 total_nodes=len(nodes),
                 total_edges=len(edges),
-                structure_type="topics",
+                structure_type=MindMapStructureType.TOPICS.value,
                 active_topics=len(active_topics),
                 applied_filters={
                     "difficulty": difficulty_filter,
@@ -154,7 +164,7 @@ class MindMapService:
 
             metadata = {
                 "technology": technology,
-                "generated_at": "now",
+                "generated_at": datetime.now().isoformat(),
                 "user_id": user_id,
                 "filters_applied": bool(difficulty_filter or topic_filter),
             }
@@ -166,7 +176,7 @@ class MindMapService:
             return MindMapResponse(
                 success=True,
                 data=mindmap_data,
-                structure_type="topics",
+                structure_type=MindMapStructureType.TOPICS.value,
                 metadata=metadata,
             )
 
@@ -211,7 +221,7 @@ class MindMapService:
         self,
         topic_key: str,
         user_id: Optional[int] = None,
-        technology: str = "javascript",
+        technology: str = Technology.JAVASCRIPT.value,
         difficulty_filter: Optional[str] = None,
     ) -> TopicTasksResponse:
         """Получить топик с задачами"""

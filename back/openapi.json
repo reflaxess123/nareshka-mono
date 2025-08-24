@@ -4466,46 +4466,6 @@
         }
       }
     },
-    "/api/v2/mindmap/debug/classes-tasks": {
-      "get": {
-        "tags": [
-          "mindmap"
-        ],
-        "summary": "Debug Classes Tasks",
-        "description": "Debug endpoint для проверки задач по классам",
-        "operationId": "debug_classes_tasks_api_v2_mindmap_debug_classes_tasks_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v2/mindmap/test-db": {
-      "get": {
-        "tags": [
-          "mindmap"
-        ],
-        "summary": "Test Db",
-        "description": "Тестовый endpoint для проверки запросов к БД",
-        "operationId": "test_db_api_v2_mindmap_test_db_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v2/admin/stats": {
       "get": {
         "tags": [

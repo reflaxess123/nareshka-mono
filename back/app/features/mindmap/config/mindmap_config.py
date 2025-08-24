@@ -1,8 +1,10 @@
 # Конфигурация для связывания топиков MindMap с реальными категориями контента
 
+from app.features.mindmap.utils.enums import Technology
+
 # Конфигурация центральных узлов для разных технологий
 TECHNOLOGY_CENTERS = {
-    "javascript": {
+    Technology.JAVASCRIPT.value: {
         "title": "JavaScript Skills",
         "description": "Изучение JavaScript",
         "icon": "⚡",

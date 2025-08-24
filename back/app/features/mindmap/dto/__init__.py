@@ -1,9 +1,6 @@
 """MindMap DTOs"""
 
-from app.features.mindmap.dto.requests import (
-    MindMapGenerateRequest,
-    TopicTasksRequest,
-)
+# Убираем импорт requests, так как модели не используются
 from app.features.mindmap.dto.responses import (
     HealthResponse,
     MindMapDataResponse,
@@ -24,9 +21,6 @@ from app.features.mindmap.dto.responses import (
 )
 
 __all__ = [
-    # Requests
-    "MindMapGenerateRequest",
-    "TopicTasksRequest",
     # Responses
     "TechnologyConfigResponse",
     "ProgressResponse",

@@ -15,7 +15,6 @@ import type {
   DefinedInitialDataOptions,
   DefinedUseQueryResult,
   MutationFunction,
-  QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
@@ -429,10 +428,10 @@ export const CodeLanguageType = {
 } as const;
 
 /**
- * Список компаний
+ * Список компаний с количеством вопросов
  */
-export interface CompaniesListResponseType {
-  companies: string[];
+export interface CompaniesListWithCountResponseType {
+  companies: CompanyWithCountResponseType[];
 }
 
 /**
@@ -454,6 +453,14 @@ export interface CompanyStatsResponseType {
   company_name: string;
   total_interviews: number;
   avg_duration: CompanyStatsResponseTypeAvgDuration;
+}
+
+/**
+ * Компания с количеством вопросов
+ */
+export interface CompanyWithCountResponseType {
+  name: string;
+  count: number;
 }
 
 /**
@@ -2683,8 +2690,8 @@ export const loginApiV2AuthLoginPost = (
     loginRequestType: LoginRequestType,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<LoginResponseType>(
       {url: `/api/v2/auth/login`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
@@ -2692,7 +2699,7 @@ export const loginApiV2AuthLoginPost = (
     },
       );
     }
-  
+
 
 
 export const getLoginApiV2AuthLoginPostMutationOptions = <TError = HTTPValidationErrorType,
@@ -2706,7 +2713,7 @@ const {mutation: mutationOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof loginApiV2AuthLoginPost>>, {data: LoginRequestType}> = (props) => {
@@ -2715,7 +2722,7 @@ const {mutation: mutationOptions} = options ?
           return  loginApiV2AuthLoginPost(data,)
         }
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -2739,7 +2746,7 @@ export const useLoginApiV2AuthLoginPost = <TError = HTTPValidationErrorType,
 
       return useMutation(mutationOptions , queryClient);
     }
-    
+
 /**
  * Регистрация пользователя
  * @summary Register
@@ -2748,8 +2755,8 @@ export const registerApiV2AuthRegisterPost = (
     registerRequestType: RegisterRequestType,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<RegisterResponseType>(
       {url: `/api/v2/auth/register`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
@@ -2757,7 +2764,7 @@ export const registerApiV2AuthRegisterPost = (
     },
       );
     }
-  
+
 
 
 export const getRegisterApiV2AuthRegisterPostMutationOptions = <TError = HTTPValidationErrorType,
@@ -2771,7 +2778,7 @@ const {mutation: mutationOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof registerApiV2AuthRegisterPost>>, {data: RegisterRequestType}> = (props) => {
@@ -2780,7 +2787,7 @@ const {mutation: mutationOptions} = options ?
           return  registerApiV2AuthRegisterPost(data,)
         }
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -2804,23 +2811,23 @@ export const useRegisterApiV2AuthRegisterPost = <TError = HTTPValidationErrorTyp
 
       return useMutation(mutationOptions , queryClient);
     }
-    
+
 /**
  * Выход пользователя
  * @summary Logout
  */
 export const logoutApiV2AuthLogoutPost = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<LogoutResponseType>(
       {url: `/api/v2/auth/logout`, method: 'POST', signal
     },
       );
     }
-  
+
 
 
 export const getLogoutApiV2AuthLogoutPostMutationOptions = <TError = unknown,
@@ -2834,22 +2841,22 @@ const {mutation: mutationOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof logoutApiV2AuthLogoutPost>>, void> = () => {
-          
+
 
           return  logoutApiV2AuthLogoutPost()
         }
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
 
     export type LogoutApiV2AuthLogoutPostMutationResult = NonNullable<Awaited<ReturnType<typeof logoutApiV2AuthLogoutPost>>>
-    
+
     export type LogoutApiV2AuthLogoutPostMutationError = unknown
 
     /**
@@ -2867,29 +2874,29 @@ export const useLogoutApiV2AuthLogoutPost = <TError = unknown,
 
       return useMutation(mutationOptions , queryClient);
     }
-    
+
 /**
  * Получение информации о текущем пользователе
  * @summary Get Current User Info
  */
 export const getCurrentUserInfoApiV2AuthMeGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<unknown>(
       {url: `/api/v2/auth/me`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetCurrentUserInfoApiV2AuthMeGetQueryKey = () => {
     return [`/api/v2/auth/me`] as const;
     }
 
-    
+
 export const getGetCurrentUserInfoApiV2AuthMeGetQueryOptions = <TData = Awaited<ReturnType<typeof getCurrentUserInfoApiV2AuthMeGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserInfoApiV2AuthMeGet>>, TError, TData>>, }
 ) => {
 
@@ -2897,13 +2904,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetCurrentUserInfoApiV2AuthMeGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getCurrentUserInfoApiV2AuthMeGet>>> = ({ signal }) => getCurrentUserInfoApiV2AuthMeGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserInfoApiV2AuthMeGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -2938,7 +2945,7 @@ export function useGetCurrentUserInfoApiV2AuthMeGet<TData = Awaited<ReturnType<t
  */
 
 export function useGetCurrentUserInfoApiV2AuthMeGet<TData = Awaited<ReturnType<typeof getCurrentUserInfoApiV2AuthMeGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserInfoApiV2AuthMeGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserInfoApiV2AuthMeGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetCurrentUserInfoApiV2AuthMeGetQueryOptions(options)
@@ -2958,23 +2965,23 @@ export function useGetCurrentUserInfoApiV2AuthMeGet<TData = Awaited<ReturnType<t
  * @summary Log Viewer
  */
 export const logViewerApiLogsViewerGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<unknown>(
       {url: `/api/logs/viewer`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getLogViewerApiLogsViewerGetQueryKey = () => {
     return [`/api/logs/viewer`] as const;
     }
 
-    
+
 export const getLogViewerApiLogsViewerGetQueryOptions = <TData = Awaited<ReturnType<typeof logViewerApiLogsViewerGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof logViewerApiLogsViewerGet>>, TError, TData>>, }
 ) => {
 
@@ -2982,13 +2989,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getLogViewerApiLogsViewerGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof logViewerApiLogsViewerGet>>> = ({ signal }) => logViewerApiLogsViewerGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof logViewerApiLogsViewerGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -3023,7 +3030,7 @@ export function useLogViewerApiLogsViewerGet<TData = Awaited<ReturnType<typeof l
  */
 
 export function useLogViewerApiLogsViewerGet<TData = Awaited<ReturnType<typeof logViewerApiLogsViewerGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof logViewerApiLogsViewerGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof logViewerApiLogsViewerGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getLogViewerApiLogsViewerGetQueryOptions(options)
@@ -3046,21 +3053,21 @@ export const getLogBufferApiLogsBufferGet = (
     params?: GetLogBufferApiLogsBufferGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<unknown>(
       {url: `/api/logs/buffer`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getGetLogBufferApiLogsBufferGetQueryKey = (params?: GetLogBufferApiLogsBufferGetParams,) => {
     return [`/api/logs/buffer`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getGetLogBufferApiLogsBufferGetQueryOptions = <TData = Awaited<ReturnType<typeof getLogBufferApiLogsBufferGet>>, TError = HTTPValidationErrorType>(params?: GetLogBufferApiLogsBufferGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLogBufferApiLogsBufferGet>>, TError, TData>>, }
 ) => {
 
@@ -3068,13 +3075,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetLogBufferApiLogsBufferGetQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getLogBufferApiLogsBufferGet>>> = ({ signal }) => getLogBufferApiLogsBufferGet(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getLogBufferApiLogsBufferGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -3109,7 +3116,7 @@ export function useGetLogBufferApiLogsBufferGet<TData = Awaited<ReturnType<typeo
  */
 
 export function useGetLogBufferApiLogsBufferGet<TData = Awaited<ReturnType<typeof getLogBufferApiLogsBufferGet>>, TError = HTTPValidationErrorType>(
- params?: GetLogBufferApiLogsBufferGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLogBufferApiLogsBufferGet>>, TError, TData>>, } 
+ params?: GetLogBufferApiLogsBufferGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLogBufferApiLogsBufferGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetLogBufferApiLogsBufferGetQueryOptions(params,options)
@@ -3132,21 +3139,21 @@ export const getRecentLogsApiLogsRecentGet = (
     params?: GetRecentLogsApiLogsRecentGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<unknown>(
       {url: `/api/logs/recent`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getGetRecentLogsApiLogsRecentGetQueryKey = (params?: GetRecentLogsApiLogsRecentGetParams,) => {
     return [`/api/logs/recent`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getGetRecentLogsApiLogsRecentGetQueryOptions = <TData = Awaited<ReturnType<typeof getRecentLogsApiLogsRecentGet>>, TError = HTTPValidationErrorType>(params?: GetRecentLogsApiLogsRecentGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRecentLogsApiLogsRecentGet>>, TError, TData>>, }
 ) => {
 
@@ -3154,13 +3161,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetRecentLogsApiLogsRecentGetQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getRecentLogsApiLogsRecentGet>>> = ({ signal }) => getRecentLogsApiLogsRecentGet(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getRecentLogsApiLogsRecentGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -3195,7 +3202,7 @@ export function useGetRecentLogsApiLogsRecentGet<TData = Awaited<ReturnType<type
  */
 
 export function useGetRecentLogsApiLogsRecentGet<TData = Awaited<ReturnType<typeof getRecentLogsApiLogsRecentGet>>, TError = HTTPValidationErrorType>(
- params?: GetRecentLogsApiLogsRecentGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRecentLogsApiLogsRecentGet>>, TError, TData>>, } 
+ params?: GetRecentLogsApiLogsRecentGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRecentLogsApiLogsRecentGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetRecentLogsApiLogsRecentGetQueryOptions(params,options)
@@ -3218,21 +3225,21 @@ export const tailLogsApiLogsTailGet = (
     params?: TailLogsApiLogsTailGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<unknown>(
       {url: `/api/logs/tail`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getTailLogsApiLogsTailGetQueryKey = (params?: TailLogsApiLogsTailGetParams,) => {
     return [`/api/logs/tail`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getTailLogsApiLogsTailGetQueryOptions = <TData = Awaited<ReturnType<typeof tailLogsApiLogsTailGet>>, TError = HTTPValidationErrorType>(params?: TailLogsApiLogsTailGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tailLogsApiLogsTailGet>>, TError, TData>>, }
 ) => {
 
@@ -3240,13 +3247,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getTailLogsApiLogsTailGetQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof tailLogsApiLogsTailGet>>> = ({ signal }) => tailLogsApiLogsTailGet(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof tailLogsApiLogsTailGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -3281,7 +3288,7 @@ export function useTailLogsApiLogsTailGet<TData = Awaited<ReturnType<typeof tail
  */
 
 export function useTailLogsApiLogsTailGet<TData = Awaited<ReturnType<typeof tailLogsApiLogsTailGet>>, TError = HTTPValidationErrorType>(
- params?: TailLogsApiLogsTailGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tailLogsApiLogsTailGet>>, TError, TData>>, } 
+ params?: TailLogsApiLogsTailGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tailLogsApiLogsTailGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getTailLogsApiLogsTailGetQueryOptions(params,options)
@@ -3299,7 +3306,7 @@ export function useTailLogsApiLogsTailGet<TData = Awaited<ReturnType<typeof tail
 /**
  * Endpoint для приема логов от внешних источников:
 - Chrome MCP (console.log, ошибки)
-- Frontend приложения  
+- Frontend приложения
 - Других внешних систем
  * @summary Receive External Logs
  */
@@ -3307,8 +3314,8 @@ export const receiveExternalLogsApiLogsExternalPost = (
     externalLogsRequestType: ExternalLogsRequestType,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<unknown>(
       {url: `/api/logs/external`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
@@ -3316,7 +3323,7 @@ export const receiveExternalLogsApiLogsExternalPost = (
     },
       );
     }
-  
+
 
 
 export const getReceiveExternalLogsApiLogsExternalPostMutationOptions = <TError = HTTPValidationErrorType,
@@ -3330,7 +3337,7 @@ const {mutation: mutationOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof receiveExternalLogsApiLogsExternalPost>>, {data: ExternalLogsRequestType}> = (props) => {
@@ -3339,7 +3346,7 @@ const {mutation: mutationOptions} = options ?
           return  receiveExternalLogsApiLogsExternalPost(data,)
         }
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -3363,7 +3370,7 @@ export const useReceiveExternalLogsApiLogsExternalPost = <TError = HTTPValidatio
 
       return useMutation(mutationOptions , queryClient);
     }
-    
+
 /**
  * Получение списка блоков контента с пагинацией и фильтрацией
  * @summary Get Content Blocks
@@ -3372,21 +3379,21 @@ export const getContentBlocksApiV2ContentBlocksGet = (
     params?: GetContentBlocksApiV2ContentBlocksGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<PaginatedResponseContentBlockResponseType>(
       {url: `/api/v2/content/blocks`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getGetContentBlocksApiV2ContentBlocksGetQueryKey = (params?: GetContentBlocksApiV2ContentBlocksGetParams,) => {
     return [`/api/v2/content/blocks`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getGetContentBlocksApiV2ContentBlocksGetQueryOptions = <TData = Awaited<ReturnType<typeof getContentBlocksApiV2ContentBlocksGet>>, TError = HTTPValidationErrorType>(params?: GetContentBlocksApiV2ContentBlocksGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContentBlocksApiV2ContentBlocksGet>>, TError, TData>>, }
 ) => {
 
@@ -3394,13 +3401,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetContentBlocksApiV2ContentBlocksGetQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getContentBlocksApiV2ContentBlocksGet>>> = ({ signal }) => getContentBlocksApiV2ContentBlocksGet(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getContentBlocksApiV2ContentBlocksGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -3435,7 +3442,7 @@ export function useGetContentBlocksApiV2ContentBlocksGet<TData = Awaited<ReturnT
  */
 
 export function useGetContentBlocksApiV2ContentBlocksGet<TData = Awaited<ReturnType<typeof getContentBlocksApiV2ContentBlocksGet>>, TError = HTTPValidationErrorType>(
- params?: GetContentBlocksApiV2ContentBlocksGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContentBlocksApiV2ContentBlocksGet>>, TError, TData>>, } 
+ params?: GetContentBlocksApiV2ContentBlocksGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContentBlocksApiV2ContentBlocksGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetContentBlocksApiV2ContentBlocksGetQueryOptions(params,options)
@@ -3458,21 +3465,21 @@ export const getContentFilesApiV2ContentFilesGet = (
     params?: GetContentFilesApiV2ContentFilesGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<PaginatedResponseContentFileResponseType>(
       {url: `/api/v2/content/files`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getGetContentFilesApiV2ContentFilesGetQueryKey = (params?: GetContentFilesApiV2ContentFilesGetParams,) => {
     return [`/api/v2/content/files`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getGetContentFilesApiV2ContentFilesGetQueryOptions = <TData = Awaited<ReturnType<typeof getContentFilesApiV2ContentFilesGet>>, TError = HTTPValidationErrorType>(params?: GetContentFilesApiV2ContentFilesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContentFilesApiV2ContentFilesGet>>, TError, TData>>, }
 ) => {
 
@@ -3480,13 +3487,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetContentFilesApiV2ContentFilesGetQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getContentFilesApiV2ContentFilesGet>>> = ({ signal }) => getContentFilesApiV2ContentFilesGet(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getContentFilesApiV2ContentFilesGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -3521,7 +3528,7 @@ export function useGetContentFilesApiV2ContentFilesGet<TData = Awaited<ReturnTyp
  */
 
 export function useGetContentFilesApiV2ContentFilesGet<TData = Awaited<ReturnType<typeof getContentFilesApiV2ContentFilesGet>>, TError = HTTPValidationErrorType>(
- params?: GetContentFilesApiV2ContentFilesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContentFilesApiV2ContentFilesGet>>, TError, TData>>, } 
+ params?: GetContentFilesApiV2ContentFilesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContentFilesApiV2ContentFilesGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetContentFilesApiV2ContentFilesGetQueryOptions(params,options)
@@ -3541,23 +3548,23 @@ export function useGetContentFilesApiV2ContentFilesGet<TData = Awaited<ReturnTyp
  * @summary Get Content Categories
  */
 export const getContentCategoriesApiV2ContentCategoriesGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<ContentCategoriesResponseType>(
       {url: `/api/v2/content/categories`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetContentCategoriesApiV2ContentCategoriesGetQueryKey = () => {
     return [`/api/v2/content/categories`] as const;
     }
 
-    
+
 export const getGetContentCategoriesApiV2ContentCategoriesGetQueryOptions = <TData = Awaited<ReturnType<typeof getContentCategoriesApiV2ContentCategoriesGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContentCategoriesApiV2ContentCategoriesGet>>, TError, TData>>, }
 ) => {
 
@@ -3565,13 +3572,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetContentCategoriesApiV2ContentCategoriesGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getContentCategoriesApiV2ContentCategoriesGet>>> = ({ signal }) => getContentCategoriesApiV2ContentCategoriesGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getContentCategoriesApiV2ContentCategoriesGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -3606,7 +3613,7 @@ export function useGetContentCategoriesApiV2ContentCategoriesGet<TData = Awaited
  */
 
 export function useGetContentCategoriesApiV2ContentCategoriesGet<TData = Awaited<ReturnType<typeof getContentCategoriesApiV2ContentCategoriesGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContentCategoriesApiV2ContentCategoriesGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContentCategoriesApiV2ContentCategoriesGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetContentCategoriesApiV2ContentCategoriesGetQueryOptions(options)
@@ -3629,20 +3636,20 @@ export const getContentSubcategoriesApiV2ContentCategoriesCategorySubcategoriesG
     category: string,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<ContentSubcategoriesResponseType>(
       {url: `/api/v2/content/categories/${category}/subcategories`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetContentSubcategoriesApiV2ContentCategoriesCategorySubcategoriesGetQueryKey = (category?: string,) => {
     return [`/api/v2/content/categories/${category}/subcategories`] as const;
     }
 
-    
+
 export const getGetContentSubcategoriesApiV2ContentCategoriesCategorySubcategoriesGetQueryOptions = <TData = Awaited<ReturnType<typeof getContentSubcategoriesApiV2ContentCategoriesCategorySubcategoriesGet>>, TError = HTTPValidationErrorType>(category: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContentSubcategoriesApiV2ContentCategoriesCategorySubcategoriesGet>>, TError, TData>>, }
 ) => {
 
@@ -3650,13 +3657,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetContentSubcategoriesApiV2ContentCategoriesCategorySubcategoriesGetQueryKey(category);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getContentSubcategoriesApiV2ContentCategoriesCategorySubcategoriesGet>>> = ({ signal }) => getContentSubcategoriesApiV2ContentCategoriesCategorySubcategoriesGet(category, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, enabled: !!(category), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getContentSubcategoriesApiV2ContentCategoriesCategorySubcategoriesGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -3691,7 +3698,7 @@ export function useGetContentSubcategoriesApiV2ContentCategoriesCategorySubcateg
  */
 
 export function useGetContentSubcategoriesApiV2ContentCategoriesCategorySubcategoriesGet<TData = Awaited<ReturnType<typeof getContentSubcategoriesApiV2ContentCategoriesCategorySubcategoriesGet>>, TError = HTTPValidationErrorType>(
- category: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContentSubcategoriesApiV2ContentCategoriesCategorySubcategoriesGet>>, TError, TData>>, } 
+ category: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContentSubcategoriesApiV2ContentCategoriesCategorySubcategoriesGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetContentSubcategoriesApiV2ContentCategoriesCategorySubcategoriesGetQueryOptions(category,options)
@@ -3714,20 +3721,20 @@ export const getContentBlockApiV2ContentBlocksBlockIdGet = (
     blockId: string,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<ContentBlockResponseType>(
       {url: `/api/v2/content/blocks/${blockId}`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetContentBlockApiV2ContentBlocksBlockIdGetQueryKey = (blockId?: string,) => {
     return [`/api/v2/content/blocks/${blockId}`] as const;
     }
 
-    
+
 export const getGetContentBlockApiV2ContentBlocksBlockIdGetQueryOptions = <TData = Awaited<ReturnType<typeof getContentBlockApiV2ContentBlocksBlockIdGet>>, TError = HTTPValidationErrorType>(blockId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContentBlockApiV2ContentBlocksBlockIdGet>>, TError, TData>>, }
 ) => {
 
@@ -3735,13 +3742,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetContentBlockApiV2ContentBlocksBlockIdGetQueryKey(blockId);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getContentBlockApiV2ContentBlocksBlockIdGet>>> = ({ signal }) => getContentBlockApiV2ContentBlocksBlockIdGet(blockId, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, enabled: !!(blockId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getContentBlockApiV2ContentBlocksBlockIdGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -3776,7 +3783,7 @@ export function useGetContentBlockApiV2ContentBlocksBlockIdGet<TData = Awaited<R
  */
 
 export function useGetContentBlockApiV2ContentBlocksBlockIdGet<TData = Awaited<ReturnType<typeof getContentBlockApiV2ContentBlocksBlockIdGet>>, TError = HTTPValidationErrorType>(
- blockId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContentBlockApiV2ContentBlocksBlockIdGet>>, TError, TData>>, } 
+ blockId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContentBlockApiV2ContentBlocksBlockIdGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetContentBlockApiV2ContentBlocksBlockIdGetQueryOptions(blockId,options)
@@ -3799,8 +3806,8 @@ export const updateContentBlockProgressApiV2ContentBlocksBlockIdProgressPatch = 
     blockId: string,
     appFeaturesContentDtoRequestsProgressActionType: AppFeaturesContentDtoRequestsProgressActionType,
  ) => {
-      
-      
+
+
       return generatedApiClient<UserContentProgressResponseType>(
       {url: `/api/v2/content/blocks/${blockId}/progress`, method: 'PATCH',
       headers: {'Content-Type': 'application/json', },
@@ -3808,7 +3815,7 @@ export const updateContentBlockProgressApiV2ContentBlocksBlockIdProgressPatch = 
     },
       );
     }
-  
+
 
 
 export const getUpdateContentBlockProgressApiV2ContentBlocksBlockIdProgressPatchMutationOptions = <TError = HTTPValidationErrorType,
@@ -3822,7 +3829,7 @@ const {mutation: mutationOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateContentBlockProgressApiV2ContentBlocksBlockIdProgressPatch>>, {blockId: string;data: AppFeaturesContentDtoRequestsProgressActionType}> = (props) => {
@@ -3831,7 +3838,7 @@ const {mutation: mutationOptions} = options ?
           return  updateContentBlockProgressApiV2ContentBlocksBlockIdProgressPatch(blockId,data,)
         }
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -3855,7 +3862,7 @@ export const useUpdateContentBlockProgressApiV2ContentBlocksBlockIdProgressPatch
 
       return useMutation(mutationOptions , queryClient);
     }
-    
+
 /**
  * Возвращает список интервью с поддержкой фильтрации по компании и пагинации
  * @summary Получить список интервью
@@ -3864,21 +3871,21 @@ export const getInterviewsApiV2InterviewsGet = (
     params?: GetInterviewsApiV2InterviewsGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<InterviewsListResponseType>(
       {url: `/api/v2/interviews/`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getGetInterviewsApiV2InterviewsGetQueryKey = (params?: GetInterviewsApiV2InterviewsGetParams,) => {
     return [`/api/v2/interviews/`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getGetInterviewsApiV2InterviewsGetQueryOptions = <TData = Awaited<ReturnType<typeof getInterviewsApiV2InterviewsGet>>, TError = null | HTTPValidationErrorType>(params?: GetInterviewsApiV2InterviewsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInterviewsApiV2InterviewsGet>>, TError, TData>>, }
 ) => {
 
@@ -3886,13 +3893,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetInterviewsApiV2InterviewsGetQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getInterviewsApiV2InterviewsGet>>> = ({ signal }) => getInterviewsApiV2InterviewsGet(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getInterviewsApiV2InterviewsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -3927,7 +3934,7 @@ export function useGetInterviewsApiV2InterviewsGet<TData = Awaited<ReturnType<ty
  */
 
 export function useGetInterviewsApiV2InterviewsGet<TData = Awaited<ReturnType<typeof getInterviewsApiV2InterviewsGet>>, TError = null | HTTPValidationErrorType>(
- params?: GetInterviewsApiV2InterviewsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInterviewsApiV2InterviewsGet>>, TError, TData>>, } 
+ params?: GetInterviewsApiV2InterviewsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInterviewsApiV2InterviewsGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetInterviewsApiV2InterviewsGetQueryOptions(params,options)
@@ -3950,20 +3957,20 @@ export const getCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet = (
     companyName: string,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<CompanyStatsResponseType>(
       {url: `/api/v2/interviews/company/${companyName}/stats`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGetQueryKey = (companyName?: string,) => {
     return [`/api/v2/interviews/company/${companyName}/stats`] as const;
     }
 
-    
+
 export const getGetCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGetQueryOptions = <TData = Awaited<ReturnType<typeof getCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet>>, TError = null | HTTPValidationErrorType>(companyName: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet>>, TError, TData>>, }
 ) => {
 
@@ -3971,13 +3978,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGetQueryKey(companyName);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet>>> = ({ signal }) => getCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet(companyName, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, enabled: !!(companyName), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -4012,7 +4019,7 @@ export function useGetCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet<TDat
  */
 
 export function useGetCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet<TData = Awaited<ReturnType<typeof getCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet>>, TError = null | HTTPValidationErrorType>(
- companyName: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet>>, TError, TData>>, } 
+ companyName: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGetQueryOptions(companyName,options)
@@ -4032,23 +4039,23 @@ export function useGetCompanyStatsApiV2InterviewsCompanyCompanyNameStatsGet<TDat
  * @summary Общая аналитика
  */
 export const getAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<AnalyticsResponseType>(
       {url: `/api/v2/interviews/analytics/overview`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGetQueryKey = () => {
     return [`/api/v2/interviews/analytics/overview`] as const;
     }
 
-    
+
 export const getGetAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGetQueryOptions = <TData = Awaited<ReturnType<typeof getAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet>>, TError = null>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet>>, TError, TData>>, }
 ) => {
 
@@ -4056,13 +4063,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet>>> = ({ signal }) => getAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -4097,7 +4104,7 @@ export function useGetAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet<TData
  */
 
 export function useGetAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet<TData = Awaited<ReturnType<typeof getAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet>>, TError = null>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGetQueryOptions(options)
@@ -4113,27 +4120,27 @@ export function useGetAnalyticsOverviewApiV2InterviewsAnalyticsOverviewGet<TData
 
 
 /**
- * Возвращает список всех компаний для использования в фильтрах
+ * Возвращает список всех компаний с количеством вопросов для использования в фильтрах
  * @summary Список компаний
  */
 export const getCompaniesListApiV2InterviewsCompaniesListGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
-      return generatedApiClient<CompaniesListResponseType>(
+
+
+      return generatedApiClient<CompaniesListWithCountResponseType>(
       {url: `/api/v2/interviews/companies/list`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetCompaniesListApiV2InterviewsCompaniesListGetQueryKey = () => {
     return [`/api/v2/interviews/companies/list`] as const;
     }
 
-    
+
 export const getGetCompaniesListApiV2InterviewsCompaniesListGetQueryOptions = <TData = Awaited<ReturnType<typeof getCompaniesListApiV2InterviewsCompaniesListGet>>, TError = null>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompaniesListApiV2InterviewsCompaniesListGet>>, TError, TData>>, }
 ) => {
 
@@ -4141,13 +4148,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetCompaniesListApiV2InterviewsCompaniesListGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getCompaniesListApiV2InterviewsCompaniesListGet>>> = ({ signal }) => getCompaniesListApiV2InterviewsCompaniesListGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCompaniesListApiV2InterviewsCompaniesListGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -4182,7 +4189,7 @@ export function useGetCompaniesListApiV2InterviewsCompaniesListGet<TData = Await
  */
 
 export function useGetCompaniesListApiV2InterviewsCompaniesListGet<TData = Awaited<ReturnType<typeof getCompaniesListApiV2InterviewsCompaniesListGet>>, TError = null>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompaniesListApiV2InterviewsCompaniesListGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompaniesListApiV2InterviewsCompaniesListGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetCompaniesListApiV2InterviewsCompaniesListGetQueryOptions(options)
@@ -4205,20 +4212,20 @@ export const getInterviewDetailApiV2InterviewsDetailInterviewIdGet = (
     interviewId: string,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<InterviewDetailResponseType>(
       {url: `/api/v2/interviews/detail/${interviewId}`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetInterviewDetailApiV2InterviewsDetailInterviewIdGetQueryKey = (interviewId?: string,) => {
     return [`/api/v2/interviews/detail/${interviewId}`] as const;
     }
 
-    
+
 export const getGetInterviewDetailApiV2InterviewsDetailInterviewIdGetQueryOptions = <TData = Awaited<ReturnType<typeof getInterviewDetailApiV2InterviewsDetailInterviewIdGet>>, TError = null | HTTPValidationErrorType>(interviewId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInterviewDetailApiV2InterviewsDetailInterviewIdGet>>, TError, TData>>, }
 ) => {
 
@@ -4226,13 +4233,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetInterviewDetailApiV2InterviewsDetailInterviewIdGetQueryKey(interviewId);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getInterviewDetailApiV2InterviewsDetailInterviewIdGet>>> = ({ signal }) => getInterviewDetailApiV2InterviewsDetailInterviewIdGet(interviewId, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, enabled: !!(interviewId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getInterviewDetailApiV2InterviewsDetailInterviewIdGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -4267,7 +4274,7 @@ export function useGetInterviewDetailApiV2InterviewsDetailInterviewIdGet<TData =
  */
 
 export function useGetInterviewDetailApiV2InterviewsDetailInterviewIdGet<TData = Awaited<ReturnType<typeof getInterviewDetailApiV2InterviewsDetailInterviewIdGet>>, TError = null | HTTPValidationErrorType>(
- interviewId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInterviewDetailApiV2InterviewsDetailInterviewIdGet>>, TError, TData>>, } 
+ interviewId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInterviewDetailApiV2InterviewsDetailInterviewIdGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetInterviewDetailApiV2InterviewsDetailInterviewIdGetQueryOptions(interviewId,options)
@@ -4287,23 +4294,23 @@ export function useGetInterviewDetailApiV2InterviewsDetailInterviewIdGet<TData =
  * @summary Получить список категорий
  */
 export const getCategoriesApiV2InterviewCategoriesGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<CategoryResponseType[]>(
       {url: `/api/v2/interview-categories/`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetCategoriesApiV2InterviewCategoriesGetQueryKey = () => {
     return [`/api/v2/interview-categories/`] as const;
     }
 
-    
+
 export const getGetCategoriesApiV2InterviewCategoriesGetQueryOptions = <TData = Awaited<ReturnType<typeof getCategoriesApiV2InterviewCategoriesGet>>, TError = null | null>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoriesApiV2InterviewCategoriesGet>>, TError, TData>>, }
 ) => {
 
@@ -4311,13 +4318,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetCategoriesApiV2InterviewCategoriesGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getCategoriesApiV2InterviewCategoriesGet>>> = ({ signal }) => getCategoriesApiV2InterviewCategoriesGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCategoriesApiV2InterviewCategoriesGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -4352,7 +4359,7 @@ export function useGetCategoriesApiV2InterviewCategoriesGet<TData = Awaited<Retu
  */
 
 export function useGetCategoriesApiV2InterviewCategoriesGet<TData = Awaited<ReturnType<typeof getCategoriesApiV2InterviewCategoriesGet>>, TError = null | null>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoriesApiV2InterviewCategoriesGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoriesApiV2InterviewCategoriesGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetCategoriesApiV2InterviewCategoriesGetQueryOptions(options)
@@ -4372,23 +4379,23 @@ export function useGetCategoriesApiV2InterviewCategoriesGet<TData = Awaited<Retu
  * @summary Получить статистику категоризации
  */
 export const getStatisticsApiV2InterviewCategoriesStatisticsGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<CategoriesStatisticsResponseType>(
       {url: `/api/v2/interview-categories/statistics`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetStatisticsApiV2InterviewCategoriesStatisticsGetQueryKey = () => {
     return [`/api/v2/interview-categories/statistics`] as const;
     }
 
-    
+
 export const getGetStatisticsApiV2InterviewCategoriesStatisticsGetQueryOptions = <TData = Awaited<ReturnType<typeof getStatisticsApiV2InterviewCategoriesStatisticsGet>>, TError = null | null>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStatisticsApiV2InterviewCategoriesStatisticsGet>>, TError, TData>>, }
 ) => {
 
@@ -4396,13 +4403,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetStatisticsApiV2InterviewCategoriesStatisticsGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getStatisticsApiV2InterviewCategoriesStatisticsGet>>> = ({ signal }) => getStatisticsApiV2InterviewCategoriesStatisticsGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getStatisticsApiV2InterviewCategoriesStatisticsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -4437,7 +4444,7 @@ export function useGetStatisticsApiV2InterviewCategoriesStatisticsGet<TData = Aw
  */
 
 export function useGetStatisticsApiV2InterviewCategoriesStatisticsGet<TData = Awaited<ReturnType<typeof getStatisticsApiV2InterviewCategoriesStatisticsGet>>, TError = null | null>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStatisticsApiV2InterviewCategoriesStatisticsGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStatisticsApiV2InterviewCategoriesStatisticsGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetStatisticsApiV2InterviewCategoriesStatisticsGetQueryOptions(options)
@@ -4461,22 +4468,22 @@ export const getClusterQuestionsApiV2InterviewCategoriesClusterClusterIdQuestion
     params?: GetClusterQuestionsApiV2InterviewCategoriesClusterClusterIdQuestionsGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<QuestionResponseType[]>(
       {url: `/api/v2/interview-categories/cluster/${clusterId}/questions`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getGetClusterQuestionsApiV2InterviewCategoriesClusterClusterIdQuestionsGetQueryKey = (clusterId?: number,
     params?: GetClusterQuestionsApiV2InterviewCategoriesClusterClusterIdQuestionsGetParams,) => {
     return [`/api/v2/interview-categories/cluster/${clusterId}/questions`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getGetClusterQuestionsApiV2InterviewCategoriesClusterClusterIdQuestionsGetQueryOptions = <TData = Awaited<ReturnType<typeof getClusterQuestionsApiV2InterviewCategoriesClusterClusterIdQuestionsGet>>, TError = null | HTTPValidationErrorType | null>(clusterId: number,
     params?: GetClusterQuestionsApiV2InterviewCategoriesClusterClusterIdQuestionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClusterQuestionsApiV2InterviewCategoriesClusterClusterIdQuestionsGet>>, TError, TData>>, }
 ) => {
@@ -4485,13 +4492,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetClusterQuestionsApiV2InterviewCategoriesClusterClusterIdQuestionsGetQueryKey(clusterId,params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getClusterQuestionsApiV2InterviewCategoriesClusterClusterIdQuestionsGet>>> = ({ signal }) => getClusterQuestionsApiV2InterviewCategoriesClusterClusterIdQuestionsGet(clusterId,params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, enabled: !!(clusterId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getClusterQuestionsApiV2InterviewCategoriesClusterClusterIdQuestionsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -4530,7 +4537,7 @@ export function useGetClusterQuestionsApiV2InterviewCategoriesClusterClusterIdQu
 
 export function useGetClusterQuestionsApiV2InterviewCategoriesClusterClusterIdQuestionsGet<TData = Awaited<ReturnType<typeof getClusterQuestionsApiV2InterviewCategoriesClusterClusterIdQuestionsGet>>, TError = null | HTTPValidationErrorType | null>(
  clusterId: number,
-    params?: GetClusterQuestionsApiV2InterviewCategoriesClusterClusterIdQuestionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClusterQuestionsApiV2InterviewCategoriesClusterClusterIdQuestionsGet>>, TError, TData>>, } 
+    params?: GetClusterQuestionsApiV2InterviewCategoriesClusterClusterIdQuestionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClusterQuestionsApiV2InterviewCategoriesClusterClusterIdQuestionsGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetClusterQuestionsApiV2InterviewCategoriesClusterClusterIdQuestionsGetQueryOptions(clusterId,params,options)
@@ -4553,21 +4560,21 @@ export const searchQuestionsApiV2InterviewCategoriesSearchQuestionsGet = (
     params: SearchQuestionsApiV2InterviewCategoriesSearchQuestionsGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<QuestionsListResponseType>(
       {url: `/api/v2/interview-categories/search/questions`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getSearchQuestionsApiV2InterviewCategoriesSearchQuestionsGetQueryKey = (params?: SearchQuestionsApiV2InterviewCategoriesSearchQuestionsGetParams,) => {
     return [`/api/v2/interview-categories/search/questions`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getSearchQuestionsApiV2InterviewCategoriesSearchQuestionsGetQueryOptions = <TData = Awaited<ReturnType<typeof searchQuestionsApiV2InterviewCategoriesSearchQuestionsGet>>, TError = null | HTTPValidationErrorType | null>(params: SearchQuestionsApiV2InterviewCategoriesSearchQuestionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchQuestionsApiV2InterviewCategoriesSearchQuestionsGet>>, TError, TData>>, }
 ) => {
 
@@ -4575,13 +4582,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getSearchQuestionsApiV2InterviewCategoriesSearchQuestionsGetQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof searchQuestionsApiV2InterviewCategoriesSearchQuestionsGet>>> = ({ signal }) => searchQuestionsApiV2InterviewCategoriesSearchQuestionsGet(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof searchQuestionsApiV2InterviewCategoriesSearchQuestionsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -4616,7 +4623,7 @@ export function useSearchQuestionsApiV2InterviewCategoriesSearchQuestionsGet<TDa
  */
 
 export function useSearchQuestionsApiV2InterviewCategoriesSearchQuestionsGet<TData = Awaited<ReturnType<typeof searchQuestionsApiV2InterviewCategoriesSearchQuestionsGet>>, TError = null | HTTPValidationErrorType | null>(
- params: SearchQuestionsApiV2InterviewCategoriesSearchQuestionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchQuestionsApiV2InterviewCategoriesSearchQuestionsGet>>, TError, TData>>, } 
+ params: SearchQuestionsApiV2InterviewCategoriesSearchQuestionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchQuestionsApiV2InterviewCategoriesSearchQuestionsGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getSearchQuestionsApiV2InterviewCategoriesSearchQuestionsGetQueryOptions(params,options)
@@ -4636,23 +4643,23 @@ export function useSearchQuestionsApiV2InterviewCategoriesSearchQuestionsGet<TDa
  * @summary Получить общее количество компаний
  */
 export const getTotalCompaniesCountApiV2InterviewCategoriesCompaniesCountGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<number>(
       {url: `/api/v2/interview-categories/companies/count`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetTotalCompaniesCountApiV2InterviewCategoriesCompaniesCountGetQueryKey = () => {
     return [`/api/v2/interview-categories/companies/count`] as const;
     }
 
-    
+
 export const getGetTotalCompaniesCountApiV2InterviewCategoriesCompaniesCountGetQueryOptions = <TData = Awaited<ReturnType<typeof getTotalCompaniesCountApiV2InterviewCategoriesCompaniesCountGet>>, TError = null | null>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTotalCompaniesCountApiV2InterviewCategoriesCompaniesCountGet>>, TError, TData>>, }
 ) => {
 
@@ -4660,13 +4667,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetTotalCompaniesCountApiV2InterviewCategoriesCompaniesCountGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getTotalCompaniesCountApiV2InterviewCategoriesCompaniesCountGet>>> = ({ signal }) => getTotalCompaniesCountApiV2InterviewCategoriesCompaniesCountGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTotalCompaniesCountApiV2InterviewCategoriesCompaniesCountGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -4701,7 +4708,7 @@ export function useGetTotalCompaniesCountApiV2InterviewCategoriesCompaniesCountG
  */
 
 export function useGetTotalCompaniesCountApiV2InterviewCategoriesCompaniesCountGet<TData = Awaited<ReturnType<typeof getTotalCompaniesCountApiV2InterviewCategoriesCompaniesCountGet>>, TError = null | null>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTotalCompaniesCountApiV2InterviewCategoriesCompaniesCountGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTotalCompaniesCountApiV2InterviewCategoriesCompaniesCountGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetTotalCompaniesCountApiV2InterviewCategoriesCompaniesCountGetQueryOptions(options)
@@ -4724,21 +4731,21 @@ export const getAllClustersApiV2InterviewCategoriesClustersAllGet = (
     params?: GetAllClustersApiV2InterviewCategoriesClustersAllGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<ClusterResponseType[]>(
       {url: `/api/v2/interview-categories/clusters/all`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getGetAllClustersApiV2InterviewCategoriesClustersAllGetQueryKey = (params?: GetAllClustersApiV2InterviewCategoriesClustersAllGetParams,) => {
     return [`/api/v2/interview-categories/clusters/all`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getGetAllClustersApiV2InterviewCategoriesClustersAllGetQueryOptions = <TData = Awaited<ReturnType<typeof getAllClustersApiV2InterviewCategoriesClustersAllGet>>, TError = null | HTTPValidationErrorType | null>(params?: GetAllClustersApiV2InterviewCategoriesClustersAllGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllClustersApiV2InterviewCategoriesClustersAllGet>>, TError, TData>>, }
 ) => {
 
@@ -4746,13 +4753,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetAllClustersApiV2InterviewCategoriesClustersAllGetQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllClustersApiV2InterviewCategoriesClustersAllGet>>> = ({ signal }) => getAllClustersApiV2InterviewCategoriesClustersAllGet(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAllClustersApiV2InterviewCategoriesClustersAllGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -4787,7 +4794,7 @@ export function useGetAllClustersApiV2InterviewCategoriesClustersAllGet<TData = 
  */
 
 export function useGetAllClustersApiV2InterviewCategoriesClustersAllGet<TData = Awaited<ReturnType<typeof getAllClustersApiV2InterviewCategoriesClustersAllGet>>, TError = null | HTTPValidationErrorType | null>(
- params?: GetAllClustersApiV2InterviewCategoriesClustersAllGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllClustersApiV2InterviewCategoriesClustersAllGet>>, TError, TData>>, } 
+ params?: GetAllClustersApiV2InterviewCategoriesClustersAllGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllClustersApiV2InterviewCategoriesClustersAllGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetAllClustersApiV2InterviewCategoriesClustersAllGetQueryOptions(params,options)
@@ -4811,22 +4818,22 @@ export const getCategoryDetailApiV2InterviewCategoriesCategoryIdGet = (
     params?: GetCategoryDetailApiV2InterviewCategoriesCategoryIdGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<CategoryDetailResponseType>(
       {url: `/api/v2/interview-categories/${categoryId}`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getGetCategoryDetailApiV2InterviewCategoriesCategoryIdGetQueryKey = (categoryId?: string,
     params?: GetCategoryDetailApiV2InterviewCategoriesCategoryIdGetParams,) => {
     return [`/api/v2/interview-categories/${categoryId}`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getGetCategoryDetailApiV2InterviewCategoriesCategoryIdGetQueryOptions = <TData = Awaited<ReturnType<typeof getCategoryDetailApiV2InterviewCategoriesCategoryIdGet>>, TError = null | HTTPValidationErrorType | null>(categoryId: string,
     params?: GetCategoryDetailApiV2InterviewCategoriesCategoryIdGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryDetailApiV2InterviewCategoriesCategoryIdGet>>, TError, TData>>, }
 ) => {
@@ -4835,13 +4842,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetCategoryDetailApiV2InterviewCategoriesCategoryIdGetQueryKey(categoryId,params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getCategoryDetailApiV2InterviewCategoriesCategoryIdGet>>> = ({ signal }) => getCategoryDetailApiV2InterviewCategoriesCategoryIdGet(categoryId,params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, enabled: !!(categoryId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCategoryDetailApiV2InterviewCategoriesCategoryIdGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -4880,7 +4887,7 @@ export function useGetCategoryDetailApiV2InterviewCategoriesCategoryIdGet<TData 
 
 export function useGetCategoryDetailApiV2InterviewCategoriesCategoryIdGet<TData = Awaited<ReturnType<typeof getCategoryDetailApiV2InterviewCategoriesCategoryIdGet>>, TError = null | HTTPValidationErrorType | null>(
  categoryId: string,
-    params?: GetCategoryDetailApiV2InterviewCategoriesCategoryIdGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryDetailApiV2InterviewCategoriesCategoryIdGet>>, TError, TData>>, } 
+    params?: GetCategoryDetailApiV2InterviewCategoriesCategoryIdGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryDetailApiV2InterviewCategoriesCategoryIdGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetCategoryDetailApiV2InterviewCategoriesCategoryIdGetQueryOptions(categoryId,params,options)
@@ -4903,21 +4910,21 @@ export const getTopCompaniesApiV2CompaniesTopGet = (
     params?: GetTopCompaniesApiV2CompaniesTopGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<CompanyResponseType[]>(
       {url: `/api/v2/companies/top`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getGetTopCompaniesApiV2CompaniesTopGetQueryKey = (params?: GetTopCompaniesApiV2CompaniesTopGetParams,) => {
     return [`/api/v2/companies/top`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getGetTopCompaniesApiV2CompaniesTopGetQueryOptions = <TData = Awaited<ReturnType<typeof getTopCompaniesApiV2CompaniesTopGet>>, TError = null | HTTPValidationErrorType | null>(params?: GetTopCompaniesApiV2CompaniesTopGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTopCompaniesApiV2CompaniesTopGet>>, TError, TData>>, }
 ) => {
 
@@ -4925,13 +4932,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetTopCompaniesApiV2CompaniesTopGetQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getTopCompaniesApiV2CompaniesTopGet>>> = ({ signal }) => getTopCompaniesApiV2CompaniesTopGet(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTopCompaniesApiV2CompaniesTopGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -4966,7 +4973,7 @@ export function useGetTopCompaniesApiV2CompaniesTopGet<TData = Awaited<ReturnTyp
  */
 
 export function useGetTopCompaniesApiV2CompaniesTopGet<TData = Awaited<ReturnType<typeof getTopCompaniesApiV2CompaniesTopGet>>, TError = null | HTTPValidationErrorType | null>(
- params?: GetTopCompaniesApiV2CompaniesTopGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTopCompaniesApiV2CompaniesTopGet>>, TError, TData>>, } 
+ params?: GetTopCompaniesApiV2CompaniesTopGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTopCompaniesApiV2CompaniesTopGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetTopCompaniesApiV2CompaniesTopGetQueryOptions(params,options)
@@ -4989,21 +4996,21 @@ export const getClusterConstellationApiV2ClusterVisualizationConstellationGet = 
     params?: GetClusterConstellationApiV2ClusterVisualizationConstellationGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<ClusterConstellationResponseType>(
       {url: `/api/v2/cluster-visualization/constellation`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getGetClusterConstellationApiV2ClusterVisualizationConstellationGetQueryKey = (params?: GetClusterConstellationApiV2ClusterVisualizationConstellationGetParams,) => {
     return [`/api/v2/cluster-visualization/constellation`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getGetClusterConstellationApiV2ClusterVisualizationConstellationGetQueryOptions = <TData = Awaited<ReturnType<typeof getClusterConstellationApiV2ClusterVisualizationConstellationGet>>, TError = null | HTTPValidationErrorType>(params?: GetClusterConstellationApiV2ClusterVisualizationConstellationGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClusterConstellationApiV2ClusterVisualizationConstellationGet>>, TError, TData>>, }
 ) => {
 
@@ -5011,13 +5018,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetClusterConstellationApiV2ClusterVisualizationConstellationGetQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getClusterConstellationApiV2ClusterVisualizationConstellationGet>>> = ({ signal }) => getClusterConstellationApiV2ClusterVisualizationConstellationGet(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getClusterConstellationApiV2ClusterVisualizationConstellationGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -5052,7 +5059,7 @@ export function useGetClusterConstellationApiV2ClusterVisualizationConstellation
  */
 
 export function useGetClusterConstellationApiV2ClusterVisualizationConstellationGet<TData = Awaited<ReturnType<typeof getClusterConstellationApiV2ClusterVisualizationConstellationGet>>, TError = null | HTTPValidationErrorType>(
- params?: GetClusterConstellationApiV2ClusterVisualizationConstellationGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClusterConstellationApiV2ClusterVisualizationConstellationGet>>, TError, TData>>, } 
+ params?: GetClusterConstellationApiV2ClusterVisualizationConstellationGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClusterConstellationApiV2ClusterVisualizationConstellationGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetClusterConstellationApiV2ClusterVisualizationConstellationGetQueryOptions(params,options)
@@ -5076,22 +5083,22 @@ export const getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestio
     params?: GetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<unknown>(
       {url: `/api/v2/cluster-visualization/cluster/${clusterId}/questions`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getGetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetQueryKey = (clusterId?: number,
     params?: GetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetParams,) => {
     return [`/api/v2/cluster-visualization/cluster/${clusterId}/questions`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getGetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetQueryOptions = <TData = Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError = null | HTTPValidationErrorType>(clusterId: number,
     params?: GetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError, TData>>, }
 ) => {
@@ -5100,13 +5107,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetQueryKey(clusterId,params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>> = ({ signal }) => getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet(clusterId,params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, enabled: !!(clusterId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -5145,7 +5152,7 @@ export function useGetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQ
 
 export function useGetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet<TData = Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError = null | HTTPValidationErrorType>(
  clusterId: number,
-    params?: GetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError, TData>>, } 
+    params?: GetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetClusterQuestionsApiV2ClusterVisualizationClusterClusterIdQuestionsGetQueryOptions(clusterId,params,options)
@@ -5168,21 +5175,21 @@ export const getTheoryCardsApiV2TheoryCardsGet = (
     params?: GetTheoryCardsApiV2TheoryCardsGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<TheoryCardsListResponseType>(
       {url: `/api/v2/theory/cards`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getGetTheoryCardsApiV2TheoryCardsGetQueryKey = (params?: GetTheoryCardsApiV2TheoryCardsGetParams,) => {
     return [`/api/v2/theory/cards`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getGetTheoryCardsApiV2TheoryCardsGetQueryOptions = <TData = Awaited<ReturnType<typeof getTheoryCardsApiV2TheoryCardsGet>>, TError = HTTPValidationErrorType>(params?: GetTheoryCardsApiV2TheoryCardsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTheoryCardsApiV2TheoryCardsGet>>, TError, TData>>, }
 ) => {
 
@@ -5190,13 +5197,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetTheoryCardsApiV2TheoryCardsGetQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getTheoryCardsApiV2TheoryCardsGet>>> = ({ signal }) => getTheoryCardsApiV2TheoryCardsGet(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTheoryCardsApiV2TheoryCardsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -5231,7 +5238,7 @@ export function useGetTheoryCardsApiV2TheoryCardsGet<TData = Awaited<ReturnType<
  */
 
 export function useGetTheoryCardsApiV2TheoryCardsGet<TData = Awaited<ReturnType<typeof getTheoryCardsApiV2TheoryCardsGet>>, TError = HTTPValidationErrorType>(
- params?: GetTheoryCardsApiV2TheoryCardsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTheoryCardsApiV2TheoryCardsGet>>, TError, TData>>, } 
+ params?: GetTheoryCardsApiV2TheoryCardsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTheoryCardsApiV2TheoryCardsGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetTheoryCardsApiV2TheoryCardsGetQueryOptions(params,options)
@@ -5251,23 +5258,23 @@ export function useGetTheoryCardsApiV2TheoryCardsGet<TData = Awaited<ReturnType<
  * @summary Get Theory Categories
  */
 export const getTheoryCategoriesApiV2TheoryCategoriesGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<TheoryCategoriesResponseType>(
       {url: `/api/v2/theory/categories`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetTheoryCategoriesApiV2TheoryCategoriesGetQueryKey = () => {
     return [`/api/v2/theory/categories`] as const;
     }
 
-    
+
 export const getGetTheoryCategoriesApiV2TheoryCategoriesGetQueryOptions = <TData = Awaited<ReturnType<typeof getTheoryCategoriesApiV2TheoryCategoriesGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTheoryCategoriesApiV2TheoryCategoriesGet>>, TError, TData>>, }
 ) => {
 
@@ -5275,13 +5282,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetTheoryCategoriesApiV2TheoryCategoriesGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getTheoryCategoriesApiV2TheoryCategoriesGet>>> = ({ signal }) => getTheoryCategoriesApiV2TheoryCategoriesGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTheoryCategoriesApiV2TheoryCategoriesGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -5316,7 +5323,7 @@ export function useGetTheoryCategoriesApiV2TheoryCategoriesGet<TData = Awaited<R
  */
 
 export function useGetTheoryCategoriesApiV2TheoryCategoriesGet<TData = Awaited<ReturnType<typeof getTheoryCategoriesApiV2TheoryCategoriesGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTheoryCategoriesApiV2TheoryCategoriesGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTheoryCategoriesApiV2TheoryCategoriesGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetTheoryCategoriesApiV2TheoryCategoriesGetQueryOptions(options)
@@ -5339,20 +5346,20 @@ export const getTheorySubcategoriesApiV2TheoryCategoriesCategorySubcategoriesGet
     category: string,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<TheorySubcategoriesResponseType>(
       {url: `/api/v2/theory/categories/${category}/subcategories`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetTheorySubcategoriesApiV2TheoryCategoriesCategorySubcategoriesGetQueryKey = (category?: string,) => {
     return [`/api/v2/theory/categories/${category}/subcategories`] as const;
     }
 
-    
+
 export const getGetTheorySubcategoriesApiV2TheoryCategoriesCategorySubcategoriesGetQueryOptions = <TData = Awaited<ReturnType<typeof getTheorySubcategoriesApiV2TheoryCategoriesCategorySubcategoriesGet>>, TError = HTTPValidationErrorType>(category: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTheorySubcategoriesApiV2TheoryCategoriesCategorySubcategoriesGet>>, TError, TData>>, }
 ) => {
 
@@ -5360,13 +5367,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetTheorySubcategoriesApiV2TheoryCategoriesCategorySubcategoriesGetQueryKey(category);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getTheorySubcategoriesApiV2TheoryCategoriesCategorySubcategoriesGet>>> = ({ signal }) => getTheorySubcategoriesApiV2TheoryCategoriesCategorySubcategoriesGet(category, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, enabled: !!(category), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTheorySubcategoriesApiV2TheoryCategoriesCategorySubcategoriesGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -5401,7 +5408,7 @@ export function useGetTheorySubcategoriesApiV2TheoryCategoriesCategorySubcategor
  */
 
 export function useGetTheorySubcategoriesApiV2TheoryCategoriesCategorySubcategoriesGet<TData = Awaited<ReturnType<typeof getTheorySubcategoriesApiV2TheoryCategoriesCategorySubcategoriesGet>>, TError = HTTPValidationErrorType>(
- category: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTheorySubcategoriesApiV2TheoryCategoriesCategorySubcategoriesGet>>, TError, TData>>, } 
+ category: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTheorySubcategoriesApiV2TheoryCategoriesCategorySubcategoriesGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetTheorySubcategoriesApiV2TheoryCategoriesCategorySubcategoriesGetQueryOptions(category,options)
@@ -5424,21 +5431,21 @@ export const getDueTheoryCardsApiV2TheoryCardsDueGet = (
     params?: GetDueTheoryCardsApiV2TheoryCardsDueGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<DueCardsResponseType>(
       {url: `/api/v2/theory/cards/due`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getGetDueTheoryCardsApiV2TheoryCardsDueGetQueryKey = (params?: GetDueTheoryCardsApiV2TheoryCardsDueGetParams,) => {
     return [`/api/v2/theory/cards/due`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getGetDueTheoryCardsApiV2TheoryCardsDueGetQueryOptions = <TData = Awaited<ReturnType<typeof getDueTheoryCardsApiV2TheoryCardsDueGet>>, TError = HTTPValidationErrorType>(params?: GetDueTheoryCardsApiV2TheoryCardsDueGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDueTheoryCardsApiV2TheoryCardsDueGet>>, TError, TData>>, }
 ) => {
 
@@ -5446,13 +5453,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetDueTheoryCardsApiV2TheoryCardsDueGetQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getDueTheoryCardsApiV2TheoryCardsDueGet>>> = ({ signal }) => getDueTheoryCardsApiV2TheoryCardsDueGet(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDueTheoryCardsApiV2TheoryCardsDueGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -5487,7 +5494,7 @@ export function useGetDueTheoryCardsApiV2TheoryCardsDueGet<TData = Awaited<Retur
  */
 
 export function useGetDueTheoryCardsApiV2TheoryCardsDueGet<TData = Awaited<ReturnType<typeof getDueTheoryCardsApiV2TheoryCardsDueGet>>, TError = HTTPValidationErrorType>(
- params?: GetDueTheoryCardsApiV2TheoryCardsDueGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDueTheoryCardsApiV2TheoryCardsDueGet>>, TError, TData>>, } 
+ params?: GetDueTheoryCardsApiV2TheoryCardsDueGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDueTheoryCardsApiV2TheoryCardsDueGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetDueTheoryCardsApiV2TheoryCardsDueGetQueryOptions(params,options)
@@ -5510,20 +5517,20 @@ export const getTheoryCardApiV2TheoryCardsCardIdGet = (
     cardId: string,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<TheoryCardResponseType>(
       {url: `/api/v2/theory/cards/${cardId}`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetTheoryCardApiV2TheoryCardsCardIdGetQueryKey = (cardId?: string,) => {
     return [`/api/v2/theory/cards/${cardId}`] as const;
     }
 
-    
+
 export const getGetTheoryCardApiV2TheoryCardsCardIdGetQueryOptions = <TData = Awaited<ReturnType<typeof getTheoryCardApiV2TheoryCardsCardIdGet>>, TError = HTTPValidationErrorType>(cardId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTheoryCardApiV2TheoryCardsCardIdGet>>, TError, TData>>, }
 ) => {
 
@@ -5531,13 +5538,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetTheoryCardApiV2TheoryCardsCardIdGetQueryKey(cardId);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getTheoryCardApiV2TheoryCardsCardIdGet>>> = ({ signal }) => getTheoryCardApiV2TheoryCardsCardIdGet(cardId, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, enabled: !!(cardId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTheoryCardApiV2TheoryCardsCardIdGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -5572,7 +5579,7 @@ export function useGetTheoryCardApiV2TheoryCardsCardIdGet<TData = Awaited<Return
  */
 
 export function useGetTheoryCardApiV2TheoryCardsCardIdGet<TData = Awaited<ReturnType<typeof getTheoryCardApiV2TheoryCardsCardIdGet>>, TError = HTTPValidationErrorType>(
- cardId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTheoryCardApiV2TheoryCardsCardIdGet>>, TError, TData>>, } 
+ cardId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTheoryCardApiV2TheoryCardsCardIdGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetTheoryCardApiV2TheoryCardsCardIdGetQueryOptions(cardId,options)
@@ -5595,8 +5602,8 @@ export const updateTheoryCardProgressApiV2TheoryCardsCardIdProgressPatch = (
     cardId: string,
     appFeaturesTheoryDtoRequestsProgressActionType: AppFeaturesTheoryDtoRequestsProgressActionType,
  ) => {
-      
-      
+
+
       return generatedApiClient<UserTheoryProgressResponseType>(
       {url: `/api/v2/theory/cards/${cardId}/progress`, method: 'PATCH',
       headers: {'Content-Type': 'application/json', },
@@ -5604,7 +5611,7 @@ export const updateTheoryCardProgressApiV2TheoryCardsCardIdProgressPatch = (
     },
       );
     }
-  
+
 
 
 export const getUpdateTheoryCardProgressApiV2TheoryCardsCardIdProgressPatchMutationOptions = <TError = HTTPValidationErrorType,
@@ -5618,7 +5625,7 @@ const {mutation: mutationOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateTheoryCardProgressApiV2TheoryCardsCardIdProgressPatch>>, {cardId: string;data: AppFeaturesTheoryDtoRequestsProgressActionType}> = (props) => {
@@ -5627,7 +5634,7 @@ const {mutation: mutationOptions} = options ?
           return  updateTheoryCardProgressApiV2TheoryCardsCardIdProgressPatch(cardId,data,)
         }
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -5651,7 +5658,7 @@ export const useUpdateTheoryCardProgressApiV2TheoryCardsCardIdProgressPatch = <T
 
       return useMutation(mutationOptions , queryClient);
     }
-    
+
 /**
  * Повторение карточки с оценкой
  * @summary Review Theory Card
@@ -5661,8 +5668,8 @@ export const reviewTheoryCardApiV2TheoryCardsCardIdReviewPost = (
     reviewRatingType: ReviewRatingType,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<UserTheoryProgressResponseType>(
       {url: `/api/v2/theory/cards/${cardId}/review`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
@@ -5670,7 +5677,7 @@ export const reviewTheoryCardApiV2TheoryCardsCardIdReviewPost = (
     },
       );
     }
-  
+
 
 
 export const getReviewTheoryCardApiV2TheoryCardsCardIdReviewPostMutationOptions = <TError = HTTPValidationErrorType,
@@ -5684,7 +5691,7 @@ const {mutation: mutationOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof reviewTheoryCardApiV2TheoryCardsCardIdReviewPost>>, {cardId: string;data: ReviewRatingType}> = (props) => {
@@ -5693,7 +5700,7 @@ const {mutation: mutationOptions} = options ?
           return  reviewTheoryCardApiV2TheoryCardsCardIdReviewPost(cardId,data,)
         }
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -5717,29 +5724,29 @@ export const useReviewTheoryCardApiV2TheoryCardsCardIdReviewPost = <TError = HTT
 
       return useMutation(mutationOptions , queryClient);
     }
-    
+
 /**
  * Получение статистики изучения теории
  * @summary Get Theory Stats Overview
  */
 export const getTheoryStatsOverviewApiV2TheoryStatsGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<AppFeaturesTheoryDtoResponsesTheoryStatsResponseType>(
       {url: `/api/v2/theory/stats`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetTheoryStatsOverviewApiV2TheoryStatsGetQueryKey = () => {
     return [`/api/v2/theory/stats`] as const;
     }
 
-    
+
 export const getGetTheoryStatsOverviewApiV2TheoryStatsGetQueryOptions = <TData = Awaited<ReturnType<typeof getTheoryStatsOverviewApiV2TheoryStatsGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTheoryStatsOverviewApiV2TheoryStatsGet>>, TError, TData>>, }
 ) => {
 
@@ -5747,13 +5754,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetTheoryStatsOverviewApiV2TheoryStatsGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getTheoryStatsOverviewApiV2TheoryStatsGet>>> = ({ signal }) => getTheoryStatsOverviewApiV2TheoryStatsGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTheoryStatsOverviewApiV2TheoryStatsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -5788,7 +5795,7 @@ export function useGetTheoryStatsOverviewApiV2TheoryStatsGet<TData = Awaited<Ret
  */
 
 export function useGetTheoryStatsOverviewApiV2TheoryStatsGet<TData = Awaited<ReturnType<typeof getTheoryStatsOverviewApiV2TheoryStatsGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTheoryStatsOverviewApiV2TheoryStatsGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTheoryStatsOverviewApiV2TheoryStatsGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetTheoryStatsOverviewApiV2TheoryStatsGetQueryOptions(options)
@@ -5811,14 +5818,14 @@ export const resetTheoryCardProgressApiV2TheoryCardsCardIdResetPost = (
     cardId: string,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<unknown>(
       {url: `/api/v2/theory/cards/${cardId}/reset`, method: 'POST', signal
     },
       );
     }
-  
+
 
 
 export const getResetTheoryCardProgressApiV2TheoryCardsCardIdResetPostMutationOptions = <TError = HTTPValidationErrorType,
@@ -5832,7 +5839,7 @@ const {mutation: mutationOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof resetTheoryCardProgressApiV2TheoryCardsCardIdResetPost>>, {cardId: string}> = (props) => {
@@ -5841,13 +5848,13 @@ const {mutation: mutationOptions} = options ?
           return  resetTheoryCardProgressApiV2TheoryCardsCardIdResetPost(cardId,)
         }
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
 
     export type ResetTheoryCardProgressApiV2TheoryCardsCardIdResetPostMutationResult = NonNullable<Awaited<ReturnType<typeof resetTheoryCardProgressApiV2TheoryCardsCardIdResetPost>>>
-    
+
     export type ResetTheoryCardProgressApiV2TheoryCardsCardIdResetPostMutationError = HTTPValidationErrorType
 
     /**
@@ -5865,29 +5872,29 @@ export const useResetTheoryCardProgressApiV2TheoryCardsCardIdResetPost = <TError
 
       return useMutation(mutationOptions , queryClient);
     }
-    
+
 /**
  * Тестовый endpoint для проверки camelCase
  * @summary Test Camel Case
  */
 export const testCamelCaseApiV2TheoryTestCamelCaseGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<TheoryCardResponseType>(
       {url: `/api/v2/theory/test-camel-case`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getTestCamelCaseApiV2TheoryTestCamelCaseGetQueryKey = () => {
     return [`/api/v2/theory/test-camel-case`] as const;
     }
 
-    
+
 export const getTestCamelCaseApiV2TheoryTestCamelCaseGetQueryOptions = <TData = Awaited<ReturnType<typeof testCamelCaseApiV2TheoryTestCamelCaseGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof testCamelCaseApiV2TheoryTestCamelCaseGet>>, TError, TData>>, }
 ) => {
 
@@ -5895,13 +5902,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getTestCamelCaseApiV2TheoryTestCamelCaseGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof testCamelCaseApiV2TheoryTestCamelCaseGet>>> = ({ signal }) => testCamelCaseApiV2TheoryTestCamelCaseGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof testCamelCaseApiV2TheoryTestCamelCaseGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -5936,7 +5943,7 @@ export function useTestCamelCaseApiV2TheoryTestCamelCaseGet<TData = Awaited<Retu
  */
 
 export function useTestCamelCaseApiV2TheoryTestCamelCaseGet<TData = Awaited<ReturnType<typeof testCamelCaseApiV2TheoryTestCamelCaseGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof testCamelCaseApiV2TheoryTestCamelCaseGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof testCamelCaseApiV2TheoryTestCamelCaseGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getTestCamelCaseApiV2TheoryTestCamelCaseGetQueryOptions(options)
@@ -5959,21 +5966,21 @@ export const getTaskItemsApiV2TasksItemsGet = (
     params?: GetTaskItemsApiV2TasksItemsGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<TasksListResponseType>(
       {url: `/api/v2/tasks/items`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getGetTaskItemsApiV2TasksItemsGetQueryKey = (params?: GetTaskItemsApiV2TasksItemsGetParams,) => {
     return [`/api/v2/tasks/items`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getGetTaskItemsApiV2TasksItemsGetQueryOptions = <TData = Awaited<ReturnType<typeof getTaskItemsApiV2TasksItemsGet>>, TError = HTTPValidationErrorType>(params?: GetTaskItemsApiV2TasksItemsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTaskItemsApiV2TasksItemsGet>>, TError, TData>>, }
 ) => {
 
@@ -5981,13 +5988,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetTaskItemsApiV2TasksItemsGetQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getTaskItemsApiV2TasksItemsGet>>> = ({ signal }) => getTaskItemsApiV2TasksItemsGet(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTaskItemsApiV2TasksItemsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -6022,7 +6029,7 @@ export function useGetTaskItemsApiV2TasksItemsGet<TData = Awaited<ReturnType<typ
  */
 
 export function useGetTaskItemsApiV2TasksItemsGet<TData = Awaited<ReturnType<typeof getTaskItemsApiV2TasksItemsGet>>, TError = HTTPValidationErrorType>(
- params?: GetTaskItemsApiV2TasksItemsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTaskItemsApiV2TasksItemsGet>>, TError, TData>>, } 
+ params?: GetTaskItemsApiV2TasksItemsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTaskItemsApiV2TasksItemsGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetTaskItemsApiV2TasksItemsGetQueryOptions(params,options)
@@ -6042,23 +6049,23 @@ export function useGetTaskItemsApiV2TasksItemsGet<TData = Awaited<ReturnType<typ
  * @summary Get Task Categories
  */
 export const getTaskCategoriesApiV2TasksCategoriesGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<TaskCategoriesResponseType>(
       {url: `/api/v2/tasks/categories`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetTaskCategoriesApiV2TasksCategoriesGetQueryKey = () => {
     return [`/api/v2/tasks/categories`] as const;
     }
 
-    
+
 export const getGetTaskCategoriesApiV2TasksCategoriesGetQueryOptions = <TData = Awaited<ReturnType<typeof getTaskCategoriesApiV2TasksCategoriesGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTaskCategoriesApiV2TasksCategoriesGet>>, TError, TData>>, }
 ) => {
 
@@ -6066,13 +6073,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetTaskCategoriesApiV2TasksCategoriesGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getTaskCategoriesApiV2TasksCategoriesGet>>> = ({ signal }) => getTaskCategoriesApiV2TasksCategoriesGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTaskCategoriesApiV2TasksCategoriesGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -6107,7 +6114,7 @@ export function useGetTaskCategoriesApiV2TasksCategoriesGet<TData = Awaited<Retu
  */
 
 export function useGetTaskCategoriesApiV2TasksCategoriesGet<TData = Awaited<ReturnType<typeof getTaskCategoriesApiV2TasksCategoriesGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTaskCategoriesApiV2TasksCategoriesGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTaskCategoriesApiV2TasksCategoriesGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetTaskCategoriesApiV2TasksCategoriesGetQueryOptions(options)
@@ -6130,21 +6137,21 @@ export const getCompaniesApiV2TasksCompaniesGet = (
     params?: GetCompaniesApiV2TasksCompaniesGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<TaskCompaniesResponseType>(
       {url: `/api/v2/tasks/companies`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getGetCompaniesApiV2TasksCompaniesGetQueryKey = (params?: GetCompaniesApiV2TasksCompaniesGetParams,) => {
     return [`/api/v2/tasks/companies`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getGetCompaniesApiV2TasksCompaniesGetQueryOptions = <TData = Awaited<ReturnType<typeof getCompaniesApiV2TasksCompaniesGet>>, TError = HTTPValidationErrorType>(params?: GetCompaniesApiV2TasksCompaniesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompaniesApiV2TasksCompaniesGet>>, TError, TData>>, }
 ) => {
 
@@ -6152,13 +6159,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetCompaniesApiV2TasksCompaniesGetQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getCompaniesApiV2TasksCompaniesGet>>> = ({ signal }) => getCompaniesApiV2TasksCompaniesGet(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCompaniesApiV2TasksCompaniesGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -6193,7 +6200,7 @@ export function useGetCompaniesApiV2TasksCompaniesGet<TData = Awaited<ReturnType
  */
 
 export function useGetCompaniesApiV2TasksCompaniesGet<TData = Awaited<ReturnType<typeof getCompaniesApiV2TasksCompaniesGet>>, TError = HTTPValidationErrorType>(
- params?: GetCompaniesApiV2TasksCompaniesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompaniesApiV2TasksCompaniesGet>>, TError, TData>>, } 
+ params?: GetCompaniesApiV2TasksCompaniesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompaniesApiV2TasksCompaniesGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetCompaniesApiV2TasksCompaniesGetQueryOptions(params,options)
@@ -6216,8 +6223,8 @@ export const createTaskAttemptApiV2TasksAttemptsPost = (
     appFeaturesTaskDtoRequestsTaskAttemptCreateRequestType: AppFeaturesTaskDtoRequestsTaskAttemptCreateRequestType,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<AppFeaturesTaskDtoResponsesTaskAttemptResponseType>(
       {url: `/api/v2/tasks/attempts`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
@@ -6225,7 +6232,7 @@ export const createTaskAttemptApiV2TasksAttemptsPost = (
     },
       );
     }
-  
+
 
 
 export const getCreateTaskAttemptApiV2TasksAttemptsPostMutationOptions = <TError = HTTPValidationErrorType,
@@ -6239,7 +6246,7 @@ const {mutation: mutationOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof createTaskAttemptApiV2TasksAttemptsPost>>, {data: AppFeaturesTaskDtoRequestsTaskAttemptCreateRequestType}> = (props) => {
@@ -6248,7 +6255,7 @@ const {mutation: mutationOptions} = options ?
           return  createTaskAttemptApiV2TasksAttemptsPost(data,)
         }
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -6272,7 +6279,7 @@ export const useCreateTaskAttemptApiV2TasksAttemptsPost = <TError = HTTPValidati
 
       return useMutation(mutationOptions , queryClient);
     }
-    
+
 /**
  * Получение попыток решения пользователя
  * @summary Get User Task Attempts
@@ -6281,21 +6288,21 @@ export const getUserTaskAttemptsApiV2TasksAttemptsGet = (
     params?: GetUserTaskAttemptsApiV2TasksAttemptsGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<AppFeaturesTaskDtoResponsesTaskAttemptResponseType[]>(
       {url: `/api/v2/tasks/attempts`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getGetUserTaskAttemptsApiV2TasksAttemptsGetQueryKey = (params?: GetUserTaskAttemptsApiV2TasksAttemptsGetParams,) => {
     return [`/api/v2/tasks/attempts`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getGetUserTaskAttemptsApiV2TasksAttemptsGetQueryOptions = <TData = Awaited<ReturnType<typeof getUserTaskAttemptsApiV2TasksAttemptsGet>>, TError = HTTPValidationErrorType>(params?: GetUserTaskAttemptsApiV2TasksAttemptsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserTaskAttemptsApiV2TasksAttemptsGet>>, TError, TData>>, }
 ) => {
 
@@ -6303,13 +6310,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetUserTaskAttemptsApiV2TasksAttemptsGetQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getUserTaskAttemptsApiV2TasksAttemptsGet>>> = ({ signal }) => getUserTaskAttemptsApiV2TasksAttemptsGet(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getUserTaskAttemptsApiV2TasksAttemptsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -6344,7 +6351,7 @@ export function useGetUserTaskAttemptsApiV2TasksAttemptsGet<TData = Awaited<Retu
  */
 
 export function useGetUserTaskAttemptsApiV2TasksAttemptsGet<TData = Awaited<ReturnType<typeof getUserTaskAttemptsApiV2TasksAttemptsGet>>, TError = HTTPValidationErrorType>(
- params?: GetUserTaskAttemptsApiV2TasksAttemptsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserTaskAttemptsApiV2TasksAttemptsGet>>, TError, TData>>, } 
+ params?: GetUserTaskAttemptsApiV2TasksAttemptsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserTaskAttemptsApiV2TasksAttemptsGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetUserTaskAttemptsApiV2TasksAttemptsGetQueryOptions(params,options)
@@ -6367,8 +6374,8 @@ export const createTaskSolutionApiV2TasksSolutionsPost = (
     appFeaturesTaskDtoRequestsTaskSolutionCreateRequestType: AppFeaturesTaskDtoRequestsTaskSolutionCreateRequestType,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<AppFeaturesTaskDtoResponsesTaskSolutionResponseType>(
       {url: `/api/v2/tasks/solutions`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
@@ -6376,7 +6383,7 @@ export const createTaskSolutionApiV2TasksSolutionsPost = (
     },
       );
     }
-  
+
 
 
 export const getCreateTaskSolutionApiV2TasksSolutionsPostMutationOptions = <TError = HTTPValidationErrorType,
@@ -6390,7 +6397,7 @@ const {mutation: mutationOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof createTaskSolutionApiV2TasksSolutionsPost>>, {data: AppFeaturesTaskDtoRequestsTaskSolutionCreateRequestType}> = (props) => {
@@ -6399,7 +6406,7 @@ const {mutation: mutationOptions} = options ?
           return  createTaskSolutionApiV2TasksSolutionsPost(data,)
         }
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -6423,7 +6430,7 @@ export const useCreateTaskSolutionApiV2TasksSolutionsPost = <TError = HTTPValida
 
       return useMutation(mutationOptions , queryClient);
     }
-    
+
 /**
  * Получение решений пользователя
  * @summary Get User Task Solutions
@@ -6432,21 +6439,21 @@ export const getUserTaskSolutionsApiV2TasksSolutionsGet = (
     params?: GetUserTaskSolutionsApiV2TasksSolutionsGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<AppFeaturesTaskDtoResponsesTaskSolutionResponseType[]>(
       {url: `/api/v2/tasks/solutions`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getGetUserTaskSolutionsApiV2TasksSolutionsGetQueryKey = (params?: GetUserTaskSolutionsApiV2TasksSolutionsGetParams,) => {
     return [`/api/v2/tasks/solutions`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getGetUserTaskSolutionsApiV2TasksSolutionsGetQueryOptions = <TData = Awaited<ReturnType<typeof getUserTaskSolutionsApiV2TasksSolutionsGet>>, TError = HTTPValidationErrorType>(params?: GetUserTaskSolutionsApiV2TasksSolutionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserTaskSolutionsApiV2TasksSolutionsGet>>, TError, TData>>, }
 ) => {
 
@@ -6454,13 +6461,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetUserTaskSolutionsApiV2TasksSolutionsGetQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getUserTaskSolutionsApiV2TasksSolutionsGet>>> = ({ signal }) => getUserTaskSolutionsApiV2TasksSolutionsGet(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getUserTaskSolutionsApiV2TasksSolutionsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -6495,7 +6502,7 @@ export function useGetUserTaskSolutionsApiV2TasksSolutionsGet<TData = Awaited<Re
  */
 
 export function useGetUserTaskSolutionsApiV2TasksSolutionsGet<TData = Awaited<ReturnType<typeof getUserTaskSolutionsApiV2TasksSolutionsGet>>, TError = HTTPValidationErrorType>(
- params?: GetUserTaskSolutionsApiV2TasksSolutionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserTaskSolutionsApiV2TasksSolutionsGet>>, TError, TData>>, } 
+ params?: GetUserTaskSolutionsApiV2TasksSolutionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserTaskSolutionsApiV2TasksSolutionsGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetUserTaskSolutionsApiV2TasksSolutionsGetQueryOptions(params,options)
@@ -6518,8 +6525,8 @@ export const createTaskAttemptApiV2ProgressAttemptsPost = (
     appFeaturesProgressDtoRequestsTaskAttemptCreateRequestType: AppFeaturesProgressDtoRequestsTaskAttemptCreateRequestType,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<AppFeaturesProgressDtoResponsesTaskAttemptResponseType>(
       {url: `/api/v2/progress/attempts`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
@@ -6527,7 +6534,7 @@ export const createTaskAttemptApiV2ProgressAttemptsPost = (
     },
       );
     }
-  
+
 
 
 export const getCreateTaskAttemptApiV2ProgressAttemptsPostMutationOptions = <TError = HTTPValidationErrorType,
@@ -6541,7 +6548,7 @@ const {mutation: mutationOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof createTaskAttemptApiV2ProgressAttemptsPost>>, {data: AppFeaturesProgressDtoRequestsTaskAttemptCreateRequestType}> = (props) => {
@@ -6550,7 +6557,7 @@ const {mutation: mutationOptions} = options ?
           return  createTaskAttemptApiV2ProgressAttemptsPost(data,)
         }
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -6574,7 +6581,7 @@ export const useCreateTaskAttemptApiV2ProgressAttemptsPost = <TError = HTTPValid
 
       return useMutation(mutationOptions , queryClient);
     }
-    
+
 /**
  * Получение списка попыток решения задач пользователя
  * @summary Получение попыток пользователя
@@ -6583,21 +6590,21 @@ export const getUserAttemptsApiV2ProgressAttemptsGet = (
     params?: GetUserAttemptsApiV2ProgressAttemptsGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<AppFeaturesProgressDtoResponsesTaskAttemptResponseType[]>(
       {url: `/api/v2/progress/attempts`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getGetUserAttemptsApiV2ProgressAttemptsGetQueryKey = (params?: GetUserAttemptsApiV2ProgressAttemptsGetParams,) => {
     return [`/api/v2/progress/attempts`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getGetUserAttemptsApiV2ProgressAttemptsGetQueryOptions = <TData = Awaited<ReturnType<typeof getUserAttemptsApiV2ProgressAttemptsGet>>, TError = HTTPValidationErrorType>(params?: GetUserAttemptsApiV2ProgressAttemptsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserAttemptsApiV2ProgressAttemptsGet>>, TError, TData>>, }
 ) => {
 
@@ -6605,13 +6612,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetUserAttemptsApiV2ProgressAttemptsGetQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getUserAttemptsApiV2ProgressAttemptsGet>>> = ({ signal }) => getUserAttemptsApiV2ProgressAttemptsGet(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getUserAttemptsApiV2ProgressAttemptsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -6646,7 +6653,7 @@ export function useGetUserAttemptsApiV2ProgressAttemptsGet<TData = Awaited<Retur
  */
 
 export function useGetUserAttemptsApiV2ProgressAttemptsGet<TData = Awaited<ReturnType<typeof getUserAttemptsApiV2ProgressAttemptsGet>>, TError = HTTPValidationErrorType>(
- params?: GetUserAttemptsApiV2ProgressAttemptsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserAttemptsApiV2ProgressAttemptsGet>>, TError, TData>>, } 
+ params?: GetUserAttemptsApiV2ProgressAttemptsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserAttemptsApiV2ProgressAttemptsGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetUserAttemptsApiV2ProgressAttemptsGetQueryOptions(params,options)
@@ -6669,20 +6676,20 @@ export const getAttemptHistoryApiV2ProgressAttemptsTaskIdHistoryGet = (
     taskId: string,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<AttemptHistoryResponseType>(
       {url: `/api/v2/progress/attempts/${taskId}/history`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetAttemptHistoryApiV2ProgressAttemptsTaskIdHistoryGetQueryKey = (taskId?: string,) => {
     return [`/api/v2/progress/attempts/${taskId}/history`] as const;
     }
 
-    
+
 export const getGetAttemptHistoryApiV2ProgressAttemptsTaskIdHistoryGetQueryOptions = <TData = Awaited<ReturnType<typeof getAttemptHistoryApiV2ProgressAttemptsTaskIdHistoryGet>>, TError = HTTPValidationErrorType>(taskId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttemptHistoryApiV2ProgressAttemptsTaskIdHistoryGet>>, TError, TData>>, }
 ) => {
 
@@ -6690,13 +6697,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetAttemptHistoryApiV2ProgressAttemptsTaskIdHistoryGetQueryKey(taskId);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getAttemptHistoryApiV2ProgressAttemptsTaskIdHistoryGet>>> = ({ signal }) => getAttemptHistoryApiV2ProgressAttemptsTaskIdHistoryGet(taskId, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, enabled: !!(taskId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAttemptHistoryApiV2ProgressAttemptsTaskIdHistoryGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -6731,7 +6738,7 @@ export function useGetAttemptHistoryApiV2ProgressAttemptsTaskIdHistoryGet<TData 
  */
 
 export function useGetAttemptHistoryApiV2ProgressAttemptsTaskIdHistoryGet<TData = Awaited<ReturnType<typeof getAttemptHistoryApiV2ProgressAttemptsTaskIdHistoryGet>>, TError = HTTPValidationErrorType>(
- taskId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttemptHistoryApiV2ProgressAttemptsTaskIdHistoryGet>>, TError, TData>>, } 
+ taskId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttemptHistoryApiV2ProgressAttemptsTaskIdHistoryGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetAttemptHistoryApiV2ProgressAttemptsTaskIdHistoryGetQueryOptions(taskId,options)
@@ -6754,8 +6761,8 @@ export const createTaskSolutionApiV2ProgressSolutionsPost = (
     appFeaturesProgressDtoRequestsTaskSolutionCreateRequestType: AppFeaturesProgressDtoRequestsTaskSolutionCreateRequestType,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<AppFeaturesProgressDtoResponsesTaskSolutionResponseType>(
       {url: `/api/v2/progress/solutions`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
@@ -6763,7 +6770,7 @@ export const createTaskSolutionApiV2ProgressSolutionsPost = (
     },
       );
     }
-  
+
 
 
 export const getCreateTaskSolutionApiV2ProgressSolutionsPostMutationOptions = <TError = HTTPValidationErrorType,
@@ -6777,7 +6784,7 @@ const {mutation: mutationOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof createTaskSolutionApiV2ProgressSolutionsPost>>, {data: AppFeaturesProgressDtoRequestsTaskSolutionCreateRequestType}> = (props) => {
@@ -6786,7 +6793,7 @@ const {mutation: mutationOptions} = options ?
           return  createTaskSolutionApiV2ProgressSolutionsPost(data,)
         }
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -6810,7 +6817,7 @@ export const useCreateTaskSolutionApiV2ProgressSolutionsPost = <TError = HTTPVal
 
       return useMutation(mutationOptions , queryClient);
     }
-    
+
 /**
  * Получение списка решений задач пользователя
  * @summary Получение решений пользователя
@@ -6819,21 +6826,21 @@ export const getUserSolutionsApiV2ProgressSolutionsGet = (
     params?: GetUserSolutionsApiV2ProgressSolutionsGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<AppFeaturesProgressDtoResponsesTaskSolutionResponseType[]>(
       {url: `/api/v2/progress/solutions`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getGetUserSolutionsApiV2ProgressSolutionsGetQueryKey = (params?: GetUserSolutionsApiV2ProgressSolutionsGetParams,) => {
     return [`/api/v2/progress/solutions`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getGetUserSolutionsApiV2ProgressSolutionsGetQueryOptions = <TData = Awaited<ReturnType<typeof getUserSolutionsApiV2ProgressSolutionsGet>>, TError = HTTPValidationErrorType>(params?: GetUserSolutionsApiV2ProgressSolutionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserSolutionsApiV2ProgressSolutionsGet>>, TError, TData>>, }
 ) => {
 
@@ -6841,13 +6848,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetUserSolutionsApiV2ProgressSolutionsGetQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getUserSolutionsApiV2ProgressSolutionsGet>>> = ({ signal }) => getUserSolutionsApiV2ProgressSolutionsGet(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getUserSolutionsApiV2ProgressSolutionsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -6882,7 +6889,7 @@ export function useGetUserSolutionsApiV2ProgressSolutionsGet<TData = Awaited<Ret
  */
 
 export function useGetUserSolutionsApiV2ProgressSolutionsGet<TData = Awaited<ReturnType<typeof getUserSolutionsApiV2ProgressSolutionsGet>>, TError = HTTPValidationErrorType>(
- params?: GetUserSolutionsApiV2ProgressSolutionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserSolutionsApiV2ProgressSolutionsGet>>, TError, TData>>, } 
+ params?: GetUserSolutionsApiV2ProgressSolutionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserSolutionsApiV2ProgressSolutionsGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetUserSolutionsApiV2ProgressSolutionsGetQueryOptions(params,options)
@@ -6905,20 +6912,20 @@ export const getTaskSolutionApiV2ProgressSolutionsTaskIdGet = (
     taskId: string,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<AppFeaturesProgressDtoResponsesTaskSolutionResponseType>(
       {url: `/api/v2/progress/solutions/${taskId}`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetTaskSolutionApiV2ProgressSolutionsTaskIdGetQueryKey = (taskId?: string,) => {
     return [`/api/v2/progress/solutions/${taskId}`] as const;
     }
 
-    
+
 export const getGetTaskSolutionApiV2ProgressSolutionsTaskIdGetQueryOptions = <TData = Awaited<ReturnType<typeof getTaskSolutionApiV2ProgressSolutionsTaskIdGet>>, TError = HTTPValidationErrorType>(taskId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTaskSolutionApiV2ProgressSolutionsTaskIdGet>>, TError, TData>>, }
 ) => {
 
@@ -6926,13 +6933,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetTaskSolutionApiV2ProgressSolutionsTaskIdGetQueryKey(taskId);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getTaskSolutionApiV2ProgressSolutionsTaskIdGet>>> = ({ signal }) => getTaskSolutionApiV2ProgressSolutionsTaskIdGet(taskId, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, enabled: !!(taskId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTaskSolutionApiV2ProgressSolutionsTaskIdGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -6967,7 +6974,7 @@ export function useGetTaskSolutionApiV2ProgressSolutionsTaskIdGet<TData = Awaite
  */
 
 export function useGetTaskSolutionApiV2ProgressSolutionsTaskIdGet<TData = Awaited<ReturnType<typeof getTaskSolutionApiV2ProgressSolutionsTaskIdGet>>, TError = HTTPValidationErrorType>(
- taskId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTaskSolutionApiV2ProgressSolutionsTaskIdGet>>, TError, TData>>, } 
+ taskId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTaskSolutionApiV2ProgressSolutionsTaskIdGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetTaskSolutionApiV2ProgressSolutionsTaskIdGetQueryOptions(taskId,options)
@@ -6989,8 +6996,8 @@ export function useGetTaskSolutionApiV2ProgressSolutionsTaskIdGet<TData = Awaite
 export const updateContentProgressApiV2ProgressContentPut = (
     contentProgressUpdateRequestType: ContentProgressUpdateRequestType,
  ) => {
-      
-      
+
+
       return generatedApiClient<ContentProgressResponseType>(
       {url: `/api/v2/progress/content`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
@@ -6998,7 +7005,7 @@ export const updateContentProgressApiV2ProgressContentPut = (
     },
       );
     }
-  
+
 
 
 export const getUpdateContentProgressApiV2ProgressContentPutMutationOptions = <TError = HTTPValidationErrorType,
@@ -7012,7 +7019,7 @@ const {mutation: mutationOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateContentProgressApiV2ProgressContentPut>>, {data: ContentProgressUpdateRequestType}> = (props) => {
@@ -7021,7 +7028,7 @@ const {mutation: mutationOptions} = options ?
           return  updateContentProgressApiV2ProgressContentPut(data,)
         }
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -7045,7 +7052,7 @@ export const useUpdateContentProgressApiV2ProgressContentPut = <TError = HTTPVal
 
       return useMutation(mutationOptions , queryClient);
     }
-    
+
 /**
  * Получение прогресса изучения контентных блоков
  * @summary Получение прогресса по контенту
@@ -7054,21 +7061,21 @@ export const getUserContentProgressApiV2ProgressContentGet = (
     params?: GetUserContentProgressApiV2ProgressContentGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<ContentProgressResponseType[]>(
       {url: `/api/v2/progress/content`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getGetUserContentProgressApiV2ProgressContentGetQueryKey = (params?: GetUserContentProgressApiV2ProgressContentGetParams,) => {
     return [`/api/v2/progress/content`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getGetUserContentProgressApiV2ProgressContentGetQueryOptions = <TData = Awaited<ReturnType<typeof getUserContentProgressApiV2ProgressContentGet>>, TError = HTTPValidationErrorType>(params?: GetUserContentProgressApiV2ProgressContentGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserContentProgressApiV2ProgressContentGet>>, TError, TData>>, }
 ) => {
 
@@ -7076,13 +7083,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetUserContentProgressApiV2ProgressContentGetQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getUserContentProgressApiV2ProgressContentGet>>> = ({ signal }) => getUserContentProgressApiV2ProgressContentGet(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getUserContentProgressApiV2ProgressContentGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -7117,7 +7124,7 @@ export function useGetUserContentProgressApiV2ProgressContentGet<TData = Awaited
  */
 
 export function useGetUserContentProgressApiV2ProgressContentGet<TData = Awaited<ReturnType<typeof getUserContentProgressApiV2ProgressContentGet>>, TError = HTTPValidationErrorType>(
- params?: GetUserContentProgressApiV2ProgressContentGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserContentProgressApiV2ProgressContentGet>>, TError, TData>>, } 
+ params?: GetUserContentProgressApiV2ProgressContentGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserContentProgressApiV2ProgressContentGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetUserContentProgressApiV2ProgressContentGetQueryOptions(params,options)
@@ -7139,8 +7146,8 @@ export function useGetUserContentProgressApiV2ProgressContentGet<TData = Awaited
 export const updateCategoryProgressApiV2ProgressCategoriesPut = (
     categoryProgressUpdateRequestType: CategoryProgressUpdateRequestType,
  ) => {
-      
-      
+
+
       return generatedApiClient<CategoryProgressResponseType>(
       {url: `/api/v2/progress/categories`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
@@ -7148,7 +7155,7 @@ export const updateCategoryProgressApiV2ProgressCategoriesPut = (
     },
       );
     }
-  
+
 
 
 export const getUpdateCategoryProgressApiV2ProgressCategoriesPutMutationOptions = <TError = HTTPValidationErrorType,
@@ -7162,7 +7169,7 @@ const {mutation: mutationOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateCategoryProgressApiV2ProgressCategoriesPut>>, {data: CategoryProgressUpdateRequestType}> = (props) => {
@@ -7171,7 +7178,7 @@ const {mutation: mutationOptions} = options ?
           return  updateCategoryProgressApiV2ProgressCategoriesPut(data,)
         }
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -7195,7 +7202,7 @@ export const useUpdateCategoryProgressApiV2ProgressCategoriesPut = <TError = HTT
 
       return useMutation(mutationOptions , queryClient);
     }
-    
+
 /**
  * Получение прогресса изучения категорий
  * @summary Получение прогресса по категориям
@@ -7204,21 +7211,21 @@ export const getUserCategoryProgressApiV2ProgressCategoriesGet = (
     params?: GetUserCategoryProgressApiV2ProgressCategoriesGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<CategoryProgressResponseType[]>(
       {url: `/api/v2/progress/categories`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getGetUserCategoryProgressApiV2ProgressCategoriesGetQueryKey = (params?: GetUserCategoryProgressApiV2ProgressCategoriesGetParams,) => {
     return [`/api/v2/progress/categories`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getGetUserCategoryProgressApiV2ProgressCategoriesGetQueryOptions = <TData = Awaited<ReturnType<typeof getUserCategoryProgressApiV2ProgressCategoriesGet>>, TError = HTTPValidationErrorType>(params?: GetUserCategoryProgressApiV2ProgressCategoriesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserCategoryProgressApiV2ProgressCategoriesGet>>, TError, TData>>, }
 ) => {
 
@@ -7226,13 +7233,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetUserCategoryProgressApiV2ProgressCategoriesGetQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getUserCategoryProgressApiV2ProgressCategoriesGet>>> = ({ signal }) => getUserCategoryProgressApiV2ProgressCategoriesGet(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getUserCategoryProgressApiV2ProgressCategoriesGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -7267,7 +7274,7 @@ export function useGetUserCategoryProgressApiV2ProgressCategoriesGet<TData = Awa
  */
 
 export function useGetUserCategoryProgressApiV2ProgressCategoriesGet<TData = Awaited<ReturnType<typeof getUserCategoryProgressApiV2ProgressCategoriesGet>>, TError = HTTPValidationErrorType>(
- params?: GetUserCategoryProgressApiV2ProgressCategoriesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserCategoryProgressApiV2ProgressCategoriesGet>>, TError, TData>>, } 
+ params?: GetUserCategoryProgressApiV2ProgressCategoriesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserCategoryProgressApiV2ProgressCategoriesGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetUserCategoryProgressApiV2ProgressCategoriesGetQueryOptions(params,options)
@@ -7287,23 +7294,23 @@ export function useGetUserCategoryProgressApiV2ProgressCategoriesGet<TData = Awa
  * @summary Сводка прогресса пользователя
  */
 export const getUserProgressSummaryApiV2ProgressSummaryGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<UserProgressSummaryResponseType>(
       {url: `/api/v2/progress/summary`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetUserProgressSummaryApiV2ProgressSummaryGetQueryKey = () => {
     return [`/api/v2/progress/summary`] as const;
     }
 
-    
+
 export const getGetUserProgressSummaryApiV2ProgressSummaryGetQueryOptions = <TData = Awaited<ReturnType<typeof getUserProgressSummaryApiV2ProgressSummaryGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserProgressSummaryApiV2ProgressSummaryGet>>, TError, TData>>, }
 ) => {
 
@@ -7311,13 +7318,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetUserProgressSummaryApiV2ProgressSummaryGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getUserProgressSummaryApiV2ProgressSummaryGet>>> = ({ signal }) => getUserProgressSummaryApiV2ProgressSummaryGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getUserProgressSummaryApiV2ProgressSummaryGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -7352,7 +7359,7 @@ export function useGetUserProgressSummaryApiV2ProgressSummaryGet<TData = Awaited
  */
 
 export function useGetUserProgressSummaryApiV2ProgressSummaryGet<TData = Awaited<ReturnType<typeof getUserProgressSummaryApiV2ProgressSummaryGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserProgressSummaryApiV2ProgressSummaryGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserProgressSummaryApiV2ProgressSummaryGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetUserProgressSummaryApiV2ProgressSummaryGetQueryOptions(options)
@@ -7372,23 +7379,23 @@ export function useGetUserProgressSummaryApiV2ProgressSummaryGet<TData = Awaited
  * @summary Детальный прогресс пользователя
  */
 export const getUserDetailedProgressApiV2ProgressDetailedGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<UserDetailedProgressResponseType>(
       {url: `/api/v2/progress/detailed`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetUserDetailedProgressApiV2ProgressDetailedGetQueryKey = () => {
     return [`/api/v2/progress/detailed`] as const;
     }
 
-    
+
 export const getGetUserDetailedProgressApiV2ProgressDetailedGetQueryOptions = <TData = Awaited<ReturnType<typeof getUserDetailedProgressApiV2ProgressDetailedGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserDetailedProgressApiV2ProgressDetailedGet>>, TError, TData>>, }
 ) => {
 
@@ -7396,13 +7403,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetUserDetailedProgressApiV2ProgressDetailedGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getUserDetailedProgressApiV2ProgressDetailedGet>>> = ({ signal }) => getUserDetailedProgressApiV2ProgressDetailedGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getUserDetailedProgressApiV2ProgressDetailedGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -7437,7 +7444,7 @@ export function useGetUserDetailedProgressApiV2ProgressDetailedGet<TData = Await
  */
 
 export function useGetUserDetailedProgressApiV2ProgressDetailedGet<TData = Awaited<ReturnType<typeof getUserDetailedProgressApiV2ProgressDetailedGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserDetailedProgressApiV2ProgressDetailedGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserDetailedProgressApiV2ProgressDetailedGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetUserDetailedProgressApiV2ProgressDetailedGetQueryOptions(options)
@@ -7457,23 +7464,23 @@ export function useGetUserDetailedProgressApiV2ProgressDetailedGet<TData = Await
  * @summary Детальный прогресс пользователя (альтернативный путь)
  */
 export const getMyDetailedProgressApiV2ProgressUserMyDetailedGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<UserDetailedProgressResponseType>(
       {url: `/api/v2/progress/user/my/detailed`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetMyDetailedProgressApiV2ProgressUserMyDetailedGetQueryKey = () => {
     return [`/api/v2/progress/user/my/detailed`] as const;
     }
 
-    
+
 export const getGetMyDetailedProgressApiV2ProgressUserMyDetailedGetQueryOptions = <TData = Awaited<ReturnType<typeof getMyDetailedProgressApiV2ProgressUserMyDetailedGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMyDetailedProgressApiV2ProgressUserMyDetailedGet>>, TError, TData>>, }
 ) => {
 
@@ -7481,13 +7488,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetMyDetailedProgressApiV2ProgressUserMyDetailedGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getMyDetailedProgressApiV2ProgressUserMyDetailedGet>>> = ({ signal }) => getMyDetailedProgressApiV2ProgressUserMyDetailedGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMyDetailedProgressApiV2ProgressUserMyDetailedGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -7522,7 +7529,7 @@ export function useGetMyDetailedProgressApiV2ProgressUserMyDetailedGet<TData = A
  */
 
 export function useGetMyDetailedProgressApiV2ProgressUserMyDetailedGet<TData = Awaited<ReturnType<typeof getMyDetailedProgressApiV2ProgressUserMyDetailedGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMyDetailedProgressApiV2ProgressUserMyDetailedGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMyDetailedProgressApiV2ProgressUserMyDetailedGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetMyDetailedProgressApiV2ProgressUserMyDetailedGetQueryOptions(options)
@@ -7545,21 +7552,21 @@ export const getProgressStatsApiV2ProgressStatsGet = (
     params?: GetProgressStatsApiV2ProgressStatsGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<AppFeaturesProgressDtoResponsesProgressStatsResponseType>(
       {url: `/api/v2/progress/stats`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getGetProgressStatsApiV2ProgressStatsGetQueryKey = (params?: GetProgressStatsApiV2ProgressStatsGetParams,) => {
     return [`/api/v2/progress/stats`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getGetProgressStatsApiV2ProgressStatsGetQueryOptions = <TData = Awaited<ReturnType<typeof getProgressStatsApiV2ProgressStatsGet>>, TError = HTTPValidationErrorType>(params?: GetProgressStatsApiV2ProgressStatsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProgressStatsApiV2ProgressStatsGet>>, TError, TData>>, }
 ) => {
 
@@ -7567,13 +7574,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetProgressStatsApiV2ProgressStatsGetQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getProgressStatsApiV2ProgressStatsGet>>> = ({ signal }) => getProgressStatsApiV2ProgressStatsGet(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getProgressStatsApiV2ProgressStatsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -7608,7 +7615,7 @@ export function useGetProgressStatsApiV2ProgressStatsGet<TData = Awaited<ReturnT
  */
 
 export function useGetProgressStatsApiV2ProgressStatsGet<TData = Awaited<ReturnType<typeof getProgressStatsApiV2ProgressStatsGet>>, TError = HTTPValidationErrorType>(
- params?: GetProgressStatsApiV2ProgressStatsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProgressStatsApiV2ProgressStatsGet>>, TError, TData>>, } 
+ params?: GetProgressStatsApiV2ProgressStatsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProgressStatsApiV2ProgressStatsGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetProgressStatsApiV2ProgressStatsGetQueryOptions(params,options)
@@ -7631,21 +7638,21 @@ export const getProgressAnalyticsApiV2ProgressAnalyticsGet = (
     params?: GetProgressAnalyticsApiV2ProgressAnalyticsGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<ProgressAnalyticsResponseType>(
       {url: `/api/v2/progress/analytics`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getGetProgressAnalyticsApiV2ProgressAnalyticsGetQueryKey = (params?: GetProgressAnalyticsApiV2ProgressAnalyticsGetParams,) => {
     return [`/api/v2/progress/analytics`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getGetProgressAnalyticsApiV2ProgressAnalyticsGetQueryOptions = <TData = Awaited<ReturnType<typeof getProgressAnalyticsApiV2ProgressAnalyticsGet>>, TError = HTTPValidationErrorType>(params?: GetProgressAnalyticsApiV2ProgressAnalyticsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProgressAnalyticsApiV2ProgressAnalyticsGet>>, TError, TData>>, }
 ) => {
 
@@ -7653,13 +7660,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetProgressAnalyticsApiV2ProgressAnalyticsGetQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getProgressAnalyticsApiV2ProgressAnalyticsGet>>> = ({ signal }) => getProgressAnalyticsApiV2ProgressAnalyticsGet(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getProgressAnalyticsApiV2ProgressAnalyticsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -7694,7 +7701,7 @@ export function useGetProgressAnalyticsApiV2ProgressAnalyticsGet<TData = Awaited
  */
 
 export function useGetProgressAnalyticsApiV2ProgressAnalyticsGet<TData = Awaited<ReturnType<typeof getProgressAnalyticsApiV2ProgressAnalyticsGet>>, TError = HTTPValidationErrorType>(
- params?: GetProgressAnalyticsApiV2ProgressAnalyticsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProgressAnalyticsApiV2ProgressAnalyticsGet>>, TError, TData>>, } 
+ params?: GetProgressAnalyticsApiV2ProgressAnalyticsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProgressAnalyticsApiV2ProgressAnalyticsGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetProgressAnalyticsApiV2ProgressAnalyticsGetQueryOptions(params,options)
@@ -7717,21 +7724,21 @@ export const getRecentActivityApiV2ProgressActivityGet = (
     params?: GetRecentActivityApiV2ProgressActivityGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<RecentActivityResponseType[]>(
       {url: `/api/v2/progress/activity`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getGetRecentActivityApiV2ProgressActivityGetQueryKey = (params?: GetRecentActivityApiV2ProgressActivityGetParams,) => {
     return [`/api/v2/progress/activity`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getGetRecentActivityApiV2ProgressActivityGetQueryOptions = <TData = Awaited<ReturnType<typeof getRecentActivityApiV2ProgressActivityGet>>, TError = HTTPValidationErrorType>(params?: GetRecentActivityApiV2ProgressActivityGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRecentActivityApiV2ProgressActivityGet>>, TError, TData>>, }
 ) => {
 
@@ -7739,13 +7746,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetRecentActivityApiV2ProgressActivityGetQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getRecentActivityApiV2ProgressActivityGet>>> = ({ signal }) => getRecentActivityApiV2ProgressActivityGet(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getRecentActivityApiV2ProgressActivityGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -7780,7 +7787,7 @@ export function useGetRecentActivityApiV2ProgressActivityGet<TData = Awaited<Ret
  */
 
 export function useGetRecentActivityApiV2ProgressActivityGet<TData = Awaited<ReturnType<typeof getRecentActivityApiV2ProgressActivityGet>>, TError = HTTPValidationErrorType>(
- params?: GetRecentActivityApiV2ProgressActivityGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRecentActivityApiV2ProgressActivityGet>>, TError, TData>>, } 
+ params?: GetRecentActivityApiV2ProgressActivityGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRecentActivityApiV2ProgressActivityGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetRecentActivityApiV2ProgressActivityGetQueryOptions(params,options)
@@ -7803,20 +7810,20 @@ export const getAdminUserProgressSummaryApiV2ProgressAdminUsersUserIdSummaryGet 
     userId: number,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<UserProgressSummaryResponseType>(
       {url: `/api/v2/progress/admin/users/${userId}/summary`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetAdminUserProgressSummaryApiV2ProgressAdminUsersUserIdSummaryGetQueryKey = (userId?: number,) => {
     return [`/api/v2/progress/admin/users/${userId}/summary`] as const;
     }
 
-    
+
 export const getGetAdminUserProgressSummaryApiV2ProgressAdminUsersUserIdSummaryGetQueryOptions = <TData = Awaited<ReturnType<typeof getAdminUserProgressSummaryApiV2ProgressAdminUsersUserIdSummaryGet>>, TError = HTTPValidationErrorType>(userId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminUserProgressSummaryApiV2ProgressAdminUsersUserIdSummaryGet>>, TError, TData>>, }
 ) => {
 
@@ -7824,13 +7831,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetAdminUserProgressSummaryApiV2ProgressAdminUsersUserIdSummaryGetQueryKey(userId);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminUserProgressSummaryApiV2ProgressAdminUsersUserIdSummaryGet>>> = ({ signal }) => getAdminUserProgressSummaryApiV2ProgressAdminUsersUserIdSummaryGet(userId, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, enabled: !!(userId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminUserProgressSummaryApiV2ProgressAdminUsersUserIdSummaryGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -7865,7 +7872,7 @@ export function useGetAdminUserProgressSummaryApiV2ProgressAdminUsersUserIdSumma
  */
 
 export function useGetAdminUserProgressSummaryApiV2ProgressAdminUsersUserIdSummaryGet<TData = Awaited<ReturnType<typeof getAdminUserProgressSummaryApiV2ProgressAdminUsersUserIdSummaryGet>>, TError = HTTPValidationErrorType>(
- userId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminUserProgressSummaryApiV2ProgressAdminUsersUserIdSummaryGet>>, TError, TData>>, } 
+ userId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminUserProgressSummaryApiV2ProgressAdminUsersUserIdSummaryGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetAdminUserProgressSummaryApiV2ProgressAdminUsersUserIdSummaryGetQueryOptions(userId,options)
@@ -7888,20 +7895,20 @@ export const getAdminUserDetailedProgressApiV2ProgressAdminUsersUserIdDetailedGe
     userId: number,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<UserDetailedProgressResponseType>(
       {url: `/api/v2/progress/admin/users/${userId}/detailed`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetAdminUserDetailedProgressApiV2ProgressAdminUsersUserIdDetailedGetQueryKey = (userId?: number,) => {
     return [`/api/v2/progress/admin/users/${userId}/detailed`] as const;
     }
 
-    
+
 export const getGetAdminUserDetailedProgressApiV2ProgressAdminUsersUserIdDetailedGetQueryOptions = <TData = Awaited<ReturnType<typeof getAdminUserDetailedProgressApiV2ProgressAdminUsersUserIdDetailedGet>>, TError = HTTPValidationErrorType>(userId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminUserDetailedProgressApiV2ProgressAdminUsersUserIdDetailedGet>>, TError, TData>>, }
 ) => {
 
@@ -7909,13 +7916,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetAdminUserDetailedProgressApiV2ProgressAdminUsersUserIdDetailedGetQueryKey(userId);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminUserDetailedProgressApiV2ProgressAdminUsersUserIdDetailedGet>>> = ({ signal }) => getAdminUserDetailedProgressApiV2ProgressAdminUsersUserIdDetailedGet(userId, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, enabled: !!(userId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminUserDetailedProgressApiV2ProgressAdminUsersUserIdDetailedGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -7950,7 +7957,7 @@ export function useGetAdminUserDetailedProgressApiV2ProgressAdminUsersUserIdDeta
  */
 
 export function useGetAdminUserDetailedProgressApiV2ProgressAdminUsersUserIdDetailedGet<TData = Awaited<ReturnType<typeof getAdminUserDetailedProgressApiV2ProgressAdminUsersUserIdDetailedGet>>, TError = HTTPValidationErrorType>(
- userId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminUserDetailedProgressApiV2ProgressAdminUsersUserIdDetailedGet>>, TError, TData>>, } 
+ userId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminUserDetailedProgressApiV2ProgressAdminUsersUserIdDetailedGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetAdminUserDetailedProgressApiV2ProgressAdminUsersUserIdDetailedGetQueryOptions(userId,options)
@@ -7973,21 +7980,21 @@ export const getAllRecentActivityApiV2ProgressAdminActivityAllGet = (
     params?: GetAllRecentActivityApiV2ProgressAdminActivityAllGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<RecentActivityResponseType[]>(
       {url: `/api/v2/progress/admin/activity/all`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getGetAllRecentActivityApiV2ProgressAdminActivityAllGetQueryKey = (params?: GetAllRecentActivityApiV2ProgressAdminActivityAllGetParams,) => {
     return [`/api/v2/progress/admin/activity/all`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getGetAllRecentActivityApiV2ProgressAdminActivityAllGetQueryOptions = <TData = Awaited<ReturnType<typeof getAllRecentActivityApiV2ProgressAdminActivityAllGet>>, TError = HTTPValidationErrorType>(params?: GetAllRecentActivityApiV2ProgressAdminActivityAllGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllRecentActivityApiV2ProgressAdminActivityAllGet>>, TError, TData>>, }
 ) => {
 
@@ -7995,13 +8002,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetAllRecentActivityApiV2ProgressAdminActivityAllGetQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllRecentActivityApiV2ProgressAdminActivityAllGet>>> = ({ signal }) => getAllRecentActivityApiV2ProgressAdminActivityAllGet(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAllRecentActivityApiV2ProgressAdminActivityAllGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -8036,7 +8043,7 @@ export function useGetAllRecentActivityApiV2ProgressAdminActivityAllGet<TData = 
  */
 
 export function useGetAllRecentActivityApiV2ProgressAdminActivityAllGet<TData = Awaited<ReturnType<typeof getAllRecentActivityApiV2ProgressAdminActivityAllGet>>, TError = HTTPValidationErrorType>(
- params?: GetAllRecentActivityApiV2ProgressAdminActivityAllGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllRecentActivityApiV2ProgressAdminActivityAllGet>>, TError, TData>>, } 
+ params?: GetAllRecentActivityApiV2ProgressAdminActivityAllGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllRecentActivityApiV2ProgressAdminActivityAllGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetAllRecentActivityApiV2ProgressAdminActivityAllGetQueryOptions(params,options)
@@ -8056,23 +8063,23 @@ export function useGetAllRecentActivityApiV2ProgressAdminActivityAllGet<TData = 
  * @summary Get Supported Languages
  */
 export const getSupportedLanguagesApiV2CodeEditorLanguagesGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<SupportedLanguageResponseType[]>(
       {url: `/api/v2/code-editor/languages`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetSupportedLanguagesApiV2CodeEditorLanguagesGetQueryKey = () => {
     return [`/api/v2/code-editor/languages`] as const;
     }
 
-    
+
 export const getGetSupportedLanguagesApiV2CodeEditorLanguagesGetQueryOptions = <TData = Awaited<ReturnType<typeof getSupportedLanguagesApiV2CodeEditorLanguagesGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSupportedLanguagesApiV2CodeEditorLanguagesGet>>, TError, TData>>, }
 ) => {
 
@@ -8080,13 +8087,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetSupportedLanguagesApiV2CodeEditorLanguagesGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getSupportedLanguagesApiV2CodeEditorLanguagesGet>>> = ({ signal }) => getSupportedLanguagesApiV2CodeEditorLanguagesGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSupportedLanguagesApiV2CodeEditorLanguagesGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -8121,7 +8128,7 @@ export function useGetSupportedLanguagesApiV2CodeEditorLanguagesGet<TData = Awai
  */
 
 export function useGetSupportedLanguagesApiV2CodeEditorLanguagesGet<TData = Awaited<ReturnType<typeof getSupportedLanguagesApiV2CodeEditorLanguagesGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSupportedLanguagesApiV2CodeEditorLanguagesGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSupportedLanguagesApiV2CodeEditorLanguagesGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetSupportedLanguagesApiV2CodeEditorLanguagesGetQueryOptions(options)
@@ -8144,8 +8151,8 @@ export const executeCodeApiV2CodeEditorExecutePost = (
     codeExecutionRequestType: CodeExecutionRequestType,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<CodeExecutionResponseType>(
       {url: `/api/v2/code-editor/execute`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
@@ -8153,7 +8160,7 @@ export const executeCodeApiV2CodeEditorExecutePost = (
     },
       );
     }
-  
+
 
 
 export const getExecuteCodeApiV2CodeEditorExecutePostMutationOptions = <TError = HTTPValidationErrorType,
@@ -8167,7 +8174,7 @@ const {mutation: mutationOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof executeCodeApiV2CodeEditorExecutePost>>, {data: CodeExecutionRequestType}> = (props) => {
@@ -8176,7 +8183,7 @@ const {mutation: mutationOptions} = options ?
           return  executeCodeApiV2CodeEditorExecutePost(data,)
         }
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -8200,7 +8207,7 @@ export const useExecuteCodeApiV2CodeEditorExecutePost = <TError = HTTPValidation
 
       return useMutation(mutationOptions , queryClient);
     }
-    
+
 /**
  * Получение результата выполнения кода
  * @summary Get Execution Result
@@ -8209,20 +8216,20 @@ export const getExecutionResultApiV2CodeEditorExecutionsExecutionIdGet = (
     executionId: string,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<CodeExecutionResponseType>(
       {url: `/api/v2/code-editor/executions/${executionId}`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetExecutionResultApiV2CodeEditorExecutionsExecutionIdGetQueryKey = (executionId?: string,) => {
     return [`/api/v2/code-editor/executions/${executionId}`] as const;
     }
 
-    
+
 export const getGetExecutionResultApiV2CodeEditorExecutionsExecutionIdGetQueryOptions = <TData = Awaited<ReturnType<typeof getExecutionResultApiV2CodeEditorExecutionsExecutionIdGet>>, TError = HTTPValidationErrorType>(executionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getExecutionResultApiV2CodeEditorExecutionsExecutionIdGet>>, TError, TData>>, }
 ) => {
 
@@ -8230,13 +8237,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetExecutionResultApiV2CodeEditorExecutionsExecutionIdGetQueryKey(executionId);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getExecutionResultApiV2CodeEditorExecutionsExecutionIdGet>>> = ({ signal }) => getExecutionResultApiV2CodeEditorExecutionsExecutionIdGet(executionId, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, enabled: !!(executionId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getExecutionResultApiV2CodeEditorExecutionsExecutionIdGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -8271,7 +8278,7 @@ export function useGetExecutionResultApiV2CodeEditorExecutionsExecutionIdGet<TDa
  */
 
 export function useGetExecutionResultApiV2CodeEditorExecutionsExecutionIdGet<TData = Awaited<ReturnType<typeof getExecutionResultApiV2CodeEditorExecutionsExecutionIdGet>>, TError = HTTPValidationErrorType>(
- executionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getExecutionResultApiV2CodeEditorExecutionsExecutionIdGet>>, TError, TData>>, } 
+ executionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getExecutionResultApiV2CodeEditorExecutionsExecutionIdGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetExecutionResultApiV2CodeEditorExecutionsExecutionIdGetQueryOptions(executionId,options)
@@ -8294,21 +8301,21 @@ export const getUserExecutionsApiV2CodeEditorExecutionsGet = (
     params?: GetUserExecutionsApiV2CodeEditorExecutionsGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<CodeExecutionResponseType[]>(
       {url: `/api/v2/code-editor/executions`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getGetUserExecutionsApiV2CodeEditorExecutionsGetQueryKey = (params?: GetUserExecutionsApiV2CodeEditorExecutionsGetParams,) => {
     return [`/api/v2/code-editor/executions`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getGetUserExecutionsApiV2CodeEditorExecutionsGetQueryOptions = <TData = Awaited<ReturnType<typeof getUserExecutionsApiV2CodeEditorExecutionsGet>>, TError = HTTPValidationErrorType>(params?: GetUserExecutionsApiV2CodeEditorExecutionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserExecutionsApiV2CodeEditorExecutionsGet>>, TError, TData>>, }
 ) => {
 
@@ -8316,13 +8323,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetUserExecutionsApiV2CodeEditorExecutionsGetQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getUserExecutionsApiV2CodeEditorExecutionsGet>>> = ({ signal }) => getUserExecutionsApiV2CodeEditorExecutionsGet(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getUserExecutionsApiV2CodeEditorExecutionsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -8357,7 +8364,7 @@ export function useGetUserExecutionsApiV2CodeEditorExecutionsGet<TData = Awaited
  */
 
 export function useGetUserExecutionsApiV2CodeEditorExecutionsGet<TData = Awaited<ReturnType<typeof getUserExecutionsApiV2CodeEditorExecutionsGet>>, TError = HTTPValidationErrorType>(
- params?: GetUserExecutionsApiV2CodeEditorExecutionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserExecutionsApiV2CodeEditorExecutionsGet>>, TError, TData>>, } 
+ params?: GetUserExecutionsApiV2CodeEditorExecutionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserExecutionsApiV2CodeEditorExecutionsGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetUserExecutionsApiV2CodeEditorExecutionsGetQueryOptions(params,options)
@@ -8380,8 +8387,8 @@ export const saveSolutionApiV2CodeEditorSolutionsPost = (
     userCodeSolutionCreateRequestType: UserCodeSolutionCreateRequestType,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<UserCodeSolutionResponseType>(
       {url: `/api/v2/code-editor/solutions`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
@@ -8389,7 +8396,7 @@ export const saveSolutionApiV2CodeEditorSolutionsPost = (
     },
       );
     }
-  
+
 
 
 export const getSaveSolutionApiV2CodeEditorSolutionsPostMutationOptions = <TError = HTTPValidationErrorType,
@@ -8403,7 +8410,7 @@ const {mutation: mutationOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof saveSolutionApiV2CodeEditorSolutionsPost>>, {data: UserCodeSolutionCreateRequestType}> = (props) => {
@@ -8412,7 +8419,7 @@ const {mutation: mutationOptions} = options ?
           return  saveSolutionApiV2CodeEditorSolutionsPost(data,)
         }
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -8436,7 +8443,7 @@ export const useSaveSolutionApiV2CodeEditorSolutionsPost = <TError = HTTPValidat
 
       return useMutation(mutationOptions , queryClient);
     }
-    
+
 /**
  * Получение решений пользователя для блока
  * @summary Get Block Solutions
@@ -8445,20 +8452,20 @@ export const getBlockSolutionsApiV2CodeEditorSolutionsBlockIdGet = (
     blockId: string,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<UserCodeSolutionResponseType[]>(
       {url: `/api/v2/code-editor/solutions/${blockId}`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetBlockSolutionsApiV2CodeEditorSolutionsBlockIdGetQueryKey = (blockId?: string,) => {
     return [`/api/v2/code-editor/solutions/${blockId}`] as const;
     }
 
-    
+
 export const getGetBlockSolutionsApiV2CodeEditorSolutionsBlockIdGetQueryOptions = <TData = Awaited<ReturnType<typeof getBlockSolutionsApiV2CodeEditorSolutionsBlockIdGet>>, TError = HTTPValidationErrorType>(blockId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBlockSolutionsApiV2CodeEditorSolutionsBlockIdGet>>, TError, TData>>, }
 ) => {
 
@@ -8466,13 +8473,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetBlockSolutionsApiV2CodeEditorSolutionsBlockIdGetQueryKey(blockId);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getBlockSolutionsApiV2CodeEditorSolutionsBlockIdGet>>> = ({ signal }) => getBlockSolutionsApiV2CodeEditorSolutionsBlockIdGet(blockId, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, enabled: !!(blockId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getBlockSolutionsApiV2CodeEditorSolutionsBlockIdGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -8507,7 +8514,7 @@ export function useGetBlockSolutionsApiV2CodeEditorSolutionsBlockIdGet<TData = A
  */
 
 export function useGetBlockSolutionsApiV2CodeEditorSolutionsBlockIdGet<TData = Awaited<ReturnType<typeof getBlockSolutionsApiV2CodeEditorSolutionsBlockIdGet>>, TError = HTTPValidationErrorType>(
- blockId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBlockSolutionsApiV2CodeEditorSolutionsBlockIdGet>>, TError, TData>>, } 
+ blockId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBlockSolutionsApiV2CodeEditorSolutionsBlockIdGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetBlockSolutionsApiV2CodeEditorSolutionsBlockIdGetQueryOptions(blockId,options)
@@ -8530,8 +8537,8 @@ export const updateSolutionApiV2CodeEditorSolutionsSolutionIdPut = (
     solutionId: string,
     userCodeSolutionUpdateRequestType: UserCodeSolutionUpdateRequestType,
  ) => {
-      
-      
+
+
       return generatedApiClient<UserCodeSolutionResponseType>(
       {url: `/api/v2/code-editor/solutions/${solutionId}`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
@@ -8539,7 +8546,7 @@ export const updateSolutionApiV2CodeEditorSolutionsSolutionIdPut = (
     },
       );
     }
-  
+
 
 
 export const getUpdateSolutionApiV2CodeEditorSolutionsSolutionIdPutMutationOptions = <TError = HTTPValidationErrorType,
@@ -8553,7 +8560,7 @@ const {mutation: mutationOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateSolutionApiV2CodeEditorSolutionsSolutionIdPut>>, {solutionId: string;data: UserCodeSolutionUpdateRequestType}> = (props) => {
@@ -8562,7 +8569,7 @@ const {mutation: mutationOptions} = options ?
           return  updateSolutionApiV2CodeEditorSolutionsSolutionIdPut(solutionId,data,)
         }
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -8586,29 +8593,29 @@ export const useUpdateSolutionApiV2CodeEditorSolutionsSolutionIdPut = <TError = 
 
       return useMutation(mutationOptions , queryClient);
     }
-    
+
 /**
  * Получение статистики выполнений пользователя
  * @summary Get Execution Stats
  */
 export const getExecutionStatsApiV2CodeEditorStatsGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<ExecutionStatsResponseType>(
       {url: `/api/v2/code-editor/stats`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetExecutionStatsApiV2CodeEditorStatsGetQueryKey = () => {
     return [`/api/v2/code-editor/stats`] as const;
     }
 
-    
+
 export const getGetExecutionStatsApiV2CodeEditorStatsGetQueryOptions = <TData = Awaited<ReturnType<typeof getExecutionStatsApiV2CodeEditorStatsGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getExecutionStatsApiV2CodeEditorStatsGet>>, TError, TData>>, }
 ) => {
 
@@ -8616,13 +8623,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetExecutionStatsApiV2CodeEditorStatsGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getExecutionStatsApiV2CodeEditorStatsGet>>> = ({ signal }) => getExecutionStatsApiV2CodeEditorStatsGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getExecutionStatsApiV2CodeEditorStatsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -8657,7 +8664,7 @@ export function useGetExecutionStatsApiV2CodeEditorStatsGet<TData = Awaited<Retu
  */
 
 export function useGetExecutionStatsApiV2CodeEditorStatsGet<TData = Awaited<ReturnType<typeof getExecutionStatsApiV2CodeEditorStatsGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getExecutionStatsApiV2CodeEditorStatsGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getExecutionStatsApiV2CodeEditorStatsGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetExecutionStatsApiV2CodeEditorStatsGetQueryOptions(options)
@@ -8680,20 +8687,20 @@ export const getTestCasesApiV2CodeEditorTestCasesBlockIdGet = (
     blockId: string,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<TestCasesResponseType>(
       {url: `/api/v2/code-editor/test_cases/${blockId}`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetTestCasesApiV2CodeEditorTestCasesBlockIdGetQueryKey = (blockId?: string,) => {
     return [`/api/v2/code-editor/test_cases/${blockId}`] as const;
     }
 
-    
+
 export const getGetTestCasesApiV2CodeEditorTestCasesBlockIdGetQueryOptions = <TData = Awaited<ReturnType<typeof getTestCasesApiV2CodeEditorTestCasesBlockIdGet>>, TError = HTTPValidationErrorType>(blockId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTestCasesApiV2CodeEditorTestCasesBlockIdGet>>, TError, TData>>, }
 ) => {
 
@@ -8701,13 +8708,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetTestCasesApiV2CodeEditorTestCasesBlockIdGetQueryKey(blockId);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getTestCasesApiV2CodeEditorTestCasesBlockIdGet>>> = ({ signal }) => getTestCasesApiV2CodeEditorTestCasesBlockIdGet(blockId, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, enabled: !!(blockId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTestCasesApiV2CodeEditorTestCasesBlockIdGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -8742,7 +8749,7 @@ export function useGetTestCasesApiV2CodeEditorTestCasesBlockIdGet<TData = Awaite
  */
 
 export function useGetTestCasesApiV2CodeEditorTestCasesBlockIdGet<TData = Awaited<ReturnType<typeof getTestCasesApiV2CodeEditorTestCasesBlockIdGet>>, TError = HTTPValidationErrorType>(
- blockId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTestCasesApiV2CodeEditorTestCasesBlockIdGet>>, TError, TData>>, } 
+ blockId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTestCasesApiV2CodeEditorTestCasesBlockIdGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetTestCasesApiV2CodeEditorTestCasesBlockIdGetQueryOptions(blockId,options)
@@ -8766,8 +8773,8 @@ export const validateSolutionApiV2CodeEditorValidateBlockIdPost = (
     validationRequestType: ValidationRequestType,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<ValidationResultResponseType>(
       {url: `/api/v2/code-editor/validate/${blockId}`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
@@ -8775,7 +8782,7 @@ export const validateSolutionApiV2CodeEditorValidateBlockIdPost = (
     },
       );
     }
-  
+
 
 
 export const getValidateSolutionApiV2CodeEditorValidateBlockIdPostMutationOptions = <TError = HTTPValidationErrorType,
@@ -8789,7 +8796,7 @@ const {mutation: mutationOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof validateSolutionApiV2CodeEditorValidateBlockIdPost>>, {blockId: string;data: ValidationRequestType}> = (props) => {
@@ -8798,7 +8805,7 @@ const {mutation: mutationOptions} = options ?
           return  validateSolutionApiV2CodeEditorValidateBlockIdPost(blockId,data,)
         }
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -8822,29 +8829,29 @@ export const useValidateSolutionApiV2CodeEditorValidateBlockIdPost = <TError = H
 
       return useMutation(mutationOptions , queryClient);
     }
-    
+
 /**
  * Проверка здоровья модуля редактора кода
  * @summary Health Check
  */
 export const healthCheckApiV2CodeEditorHealthGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<AppFeaturesCodeEditorDtoResponsesHealthResponseType>(
       {url: `/api/v2/code-editor/health`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getHealthCheckApiV2CodeEditorHealthGetQueryKey = () => {
     return [`/api/v2/code-editor/health`] as const;
     }
 
-    
+
 export const getHealthCheckApiV2CodeEditorHealthGetQueryOptions = <TData = Awaited<ReturnType<typeof healthCheckApiV2CodeEditorHealthGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof healthCheckApiV2CodeEditorHealthGet>>, TError, TData>>, }
 ) => {
 
@@ -8852,13 +8859,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getHealthCheckApiV2CodeEditorHealthGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof healthCheckApiV2CodeEditorHealthGet>>> = ({ signal }) => healthCheckApiV2CodeEditorHealthGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof healthCheckApiV2CodeEditorHealthGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -8893,7 +8900,7 @@ export function useHealthCheckApiV2CodeEditorHealthGet<TData = Awaited<ReturnTyp
  */
 
 export function useHealthCheckApiV2CodeEditorHealthGet<TData = Awaited<ReturnType<typeof healthCheckApiV2CodeEditorHealthGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof healthCheckApiV2CodeEditorHealthGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof healthCheckApiV2CodeEditorHealthGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getHealthCheckApiV2CodeEditorHealthGetQueryOptions(options)
@@ -8913,23 +8920,23 @@ export function useHealthCheckApiV2CodeEditorHealthGet<TData = Awaited<ReturnTyp
  * @summary Get User Stats Overview
  */
 export const getUserStatsOverviewApiV2StatsStatsOverviewGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<UserStatsOverviewResponseType>(
       {url: `/api/v2/stats/stats/overview`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetUserStatsOverviewApiV2StatsStatsOverviewGetQueryKey = () => {
     return [`/api/v2/stats/stats/overview`] as const;
     }
 
-    
+
 export const getGetUserStatsOverviewApiV2StatsStatsOverviewGetQueryOptions = <TData = Awaited<ReturnType<typeof getUserStatsOverviewApiV2StatsStatsOverviewGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserStatsOverviewApiV2StatsStatsOverviewGet>>, TError, TData>>, }
 ) => {
 
@@ -8937,13 +8944,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetUserStatsOverviewApiV2StatsStatsOverviewGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getUserStatsOverviewApiV2StatsStatsOverviewGet>>> = ({ signal }) => getUserStatsOverviewApiV2StatsStatsOverviewGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getUserStatsOverviewApiV2StatsStatsOverviewGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -8978,7 +8985,7 @@ export function useGetUserStatsOverviewApiV2StatsStatsOverviewGet<TData = Awaite
  */
 
 export function useGetUserStatsOverviewApiV2StatsStatsOverviewGet<TData = Awaited<ReturnType<typeof getUserStatsOverviewApiV2StatsStatsOverviewGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserStatsOverviewApiV2StatsStatsOverviewGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserStatsOverviewApiV2StatsStatsOverviewGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetUserStatsOverviewApiV2StatsStatsOverviewGetQueryOptions(options)
@@ -8998,23 +9005,23 @@ export function useGetUserStatsOverviewApiV2StatsStatsOverviewGet<TData = Awaite
  * @summary Get Content Stats
  */
 export const getContentStatsApiV2StatsStatsContentGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<AppFeaturesStatsDtoResponsesContentStatsResponseType>(
       {url: `/api/v2/stats/stats/content`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetContentStatsApiV2StatsStatsContentGetQueryKey = () => {
     return [`/api/v2/stats/stats/content`] as const;
     }
 
-    
+
 export const getGetContentStatsApiV2StatsStatsContentGetQueryOptions = <TData = Awaited<ReturnType<typeof getContentStatsApiV2StatsStatsContentGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContentStatsApiV2StatsStatsContentGet>>, TError, TData>>, }
 ) => {
 
@@ -9022,13 +9029,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetContentStatsApiV2StatsStatsContentGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getContentStatsApiV2StatsStatsContentGet>>> = ({ signal }) => getContentStatsApiV2StatsStatsContentGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getContentStatsApiV2StatsStatsContentGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -9063,7 +9070,7 @@ export function useGetContentStatsApiV2StatsStatsContentGet<TData = Awaited<Retu
  */
 
 export function useGetContentStatsApiV2StatsStatsContentGet<TData = Awaited<ReturnType<typeof getContentStatsApiV2StatsStatsContentGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContentStatsApiV2StatsStatsContentGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContentStatsApiV2StatsStatsContentGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetContentStatsApiV2StatsStatsContentGetQueryOptions(options)
@@ -9083,23 +9090,23 @@ export function useGetContentStatsApiV2StatsStatsContentGet<TData = Awaited<Retu
  * @summary Get Theory Stats
  */
 export const getTheoryStatsApiV2StatsStatsTheoryGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<AppFeaturesStatsDtoResponsesTheoryStatsResponseType>(
       {url: `/api/v2/stats/stats/theory`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetTheoryStatsApiV2StatsStatsTheoryGetQueryKey = () => {
     return [`/api/v2/stats/stats/theory`] as const;
     }
 
-    
+
 export const getGetTheoryStatsApiV2StatsStatsTheoryGetQueryOptions = <TData = Awaited<ReturnType<typeof getTheoryStatsApiV2StatsStatsTheoryGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTheoryStatsApiV2StatsStatsTheoryGet>>, TError, TData>>, }
 ) => {
 
@@ -9107,13 +9114,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetTheoryStatsApiV2StatsStatsTheoryGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getTheoryStatsApiV2StatsStatsTheoryGet>>> = ({ signal }) => getTheoryStatsApiV2StatsStatsTheoryGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTheoryStatsApiV2StatsStatsTheoryGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -9148,7 +9155,7 @@ export function useGetTheoryStatsApiV2StatsStatsTheoryGet<TData = Awaited<Return
  */
 
 export function useGetTheoryStatsApiV2StatsStatsTheoryGet<TData = Awaited<ReturnType<typeof getTheoryStatsApiV2StatsStatsTheoryGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTheoryStatsApiV2StatsStatsTheoryGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTheoryStatsApiV2StatsStatsTheoryGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetTheoryStatsApiV2StatsStatsTheoryGetQueryOptions(options)
@@ -9168,23 +9175,23 @@ export function useGetTheoryStatsApiV2StatsStatsTheoryGet<TData = Awaited<Return
  * @summary Get Roadmap Stats
  */
 export const getRoadmapStatsApiV2StatsStatsRoadmapGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<RoadmapStatsResponseType>(
       {url: `/api/v2/stats/stats/roadmap`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetRoadmapStatsApiV2StatsStatsRoadmapGetQueryKey = () => {
     return [`/api/v2/stats/stats/roadmap`] as const;
     }
 
-    
+
 export const getGetRoadmapStatsApiV2StatsStatsRoadmapGetQueryOptions = <TData = Awaited<ReturnType<typeof getRoadmapStatsApiV2StatsStatsRoadmapGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRoadmapStatsApiV2StatsStatsRoadmapGet>>, TError, TData>>, }
 ) => {
 
@@ -9192,13 +9199,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetRoadmapStatsApiV2StatsStatsRoadmapGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getRoadmapStatsApiV2StatsStatsRoadmapGet>>> = ({ signal }) => getRoadmapStatsApiV2StatsStatsRoadmapGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getRoadmapStatsApiV2StatsStatsRoadmapGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -9233,7 +9240,7 @@ export function useGetRoadmapStatsApiV2StatsStatsRoadmapGet<TData = Awaited<Retu
  */
 
 export function useGetRoadmapStatsApiV2StatsStatsRoadmapGet<TData = Awaited<ReturnType<typeof getRoadmapStatsApiV2StatsStatsRoadmapGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRoadmapStatsApiV2StatsStatsRoadmapGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRoadmapStatsApiV2StatsStatsRoadmapGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetRoadmapStatsApiV2StatsStatsRoadmapGetQueryOptions(options)
@@ -9253,23 +9260,23 @@ export function useGetRoadmapStatsApiV2StatsStatsRoadmapGet<TData = Awaited<Retu
  * @summary Health Check
  */
 export const healthCheckApiV2StatsStatsHealthGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<StatsHealthResponseType>(
       {url: `/api/v2/stats/stats/health`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getHealthCheckApiV2StatsStatsHealthGetQueryKey = () => {
     return [`/api/v2/stats/stats/health`] as const;
     }
 
-    
+
 export const getHealthCheckApiV2StatsStatsHealthGetQueryOptions = <TData = Awaited<ReturnType<typeof healthCheckApiV2StatsStatsHealthGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof healthCheckApiV2StatsStatsHealthGet>>, TError, TData>>, }
 ) => {
 
@@ -9277,13 +9284,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getHealthCheckApiV2StatsStatsHealthGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof healthCheckApiV2StatsStatsHealthGet>>> = ({ signal }) => healthCheckApiV2StatsStatsHealthGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof healthCheckApiV2StatsStatsHealthGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -9318,7 +9325,7 @@ export function useHealthCheckApiV2StatsStatsHealthGet<TData = Awaited<ReturnTyp
  */
 
 export function useHealthCheckApiV2StatsStatsHealthGet<TData = Awaited<ReturnType<typeof healthCheckApiV2StatsStatsHealthGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof healthCheckApiV2StatsStatsHealthGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof healthCheckApiV2StatsStatsHealthGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getHealthCheckApiV2StatsStatsHealthGetQueryOptions(options)
@@ -9338,23 +9345,23 @@ export function useHealthCheckApiV2StatsStatsHealthGet<TData = Awaited<ReturnTyp
  * @summary Get User Progress Summary
  */
 export const getUserProgressSummaryApiV2StatsStatsSummaryGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<unknown>(
       {url: `/api/v2/stats/stats/summary`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetUserProgressSummaryApiV2StatsStatsSummaryGetQueryKey = () => {
     return [`/api/v2/stats/stats/summary`] as const;
     }
 
-    
+
 export const getGetUserProgressSummaryApiV2StatsStatsSummaryGetQueryOptions = <TData = Awaited<ReturnType<typeof getUserProgressSummaryApiV2StatsStatsSummaryGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserProgressSummaryApiV2StatsStatsSummaryGet>>, TError, TData>>, }
 ) => {
 
@@ -9362,13 +9369,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetUserProgressSummaryApiV2StatsStatsSummaryGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getUserProgressSummaryApiV2StatsStatsSummaryGet>>> = ({ signal }) => getUserProgressSummaryApiV2StatsStatsSummaryGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getUserProgressSummaryApiV2StatsStatsSummaryGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -9403,7 +9410,7 @@ export function useGetUserProgressSummaryApiV2StatsStatsSummaryGet<TData = Await
  */
 
 export function useGetUserProgressSummaryApiV2StatsStatsSummaryGet<TData = Awaited<ReturnType<typeof getUserProgressSummaryApiV2StatsStatsSummaryGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserProgressSummaryApiV2StatsStatsSummaryGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserProgressSummaryApiV2StatsStatsSummaryGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetUserProgressSummaryApiV2StatsStatsSummaryGetQueryOptions(options)
@@ -9423,23 +9430,23 @@ export function useGetUserProgressSummaryApiV2StatsStatsSummaryGet<TData = Await
  * @summary Get Category Comparison
  */
 export const getCategoryComparisonApiV2StatsStatsCategoriesComparisonGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<unknown>(
       {url: `/api/v2/stats/stats/categories/comparison`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetCategoryComparisonApiV2StatsStatsCategoriesComparisonGetQueryKey = () => {
     return [`/api/v2/stats/stats/categories/comparison`] as const;
     }
 
-    
+
 export const getGetCategoryComparisonApiV2StatsStatsCategoriesComparisonGetQueryOptions = <TData = Awaited<ReturnType<typeof getCategoryComparisonApiV2StatsStatsCategoriesComparisonGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryComparisonApiV2StatsStatsCategoriesComparisonGet>>, TError, TData>>, }
 ) => {
 
@@ -9447,13 +9454,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetCategoryComparisonApiV2StatsStatsCategoriesComparisonGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getCategoryComparisonApiV2StatsStatsCategoriesComparisonGet>>> = ({ signal }) => getCategoryComparisonApiV2StatsStatsCategoriesComparisonGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCategoryComparisonApiV2StatsStatsCategoriesComparisonGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -9488,7 +9495,7 @@ export function useGetCategoryComparisonApiV2StatsStatsCategoriesComparisonGet<T
  */
 
 export function useGetCategoryComparisonApiV2StatsStatsCategoriesComparisonGet<TData = Awaited<ReturnType<typeof getCategoryComparisonApiV2StatsStatsCategoriesComparisonGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryComparisonApiV2StatsStatsCategoriesComparisonGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryComparisonApiV2StatsStatsCategoriesComparisonGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetCategoryComparisonApiV2StatsStatsCategoriesComparisonGetQueryOptions(options)
@@ -9511,21 +9518,21 @@ export const generateMindmapApiV2MindmapGenerateGet = (
     params?: GenerateMindmapApiV2MindmapGenerateGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<MindMapResponseType>(
       {url: `/api/v2/mindmap/generate`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getGenerateMindmapApiV2MindmapGenerateGetQueryKey = (params?: GenerateMindmapApiV2MindmapGenerateGetParams,) => {
     return [`/api/v2/mindmap/generate`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getGenerateMindmapApiV2MindmapGenerateGetQueryOptions = <TData = Awaited<ReturnType<typeof generateMindmapApiV2MindmapGenerateGet>>, TError = HTTPValidationErrorType>(params?: GenerateMindmapApiV2MindmapGenerateGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof generateMindmapApiV2MindmapGenerateGet>>, TError, TData>>, }
 ) => {
 
@@ -9533,13 +9540,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGenerateMindmapApiV2MindmapGenerateGetQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof generateMindmapApiV2MindmapGenerateGet>>> = ({ signal }) => generateMindmapApiV2MindmapGenerateGet(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof generateMindmapApiV2MindmapGenerateGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -9574,7 +9581,7 @@ export function useGenerateMindmapApiV2MindmapGenerateGet<TData = Awaited<Return
  */
 
 export function useGenerateMindmapApiV2MindmapGenerateGet<TData = Awaited<ReturnType<typeof generateMindmapApiV2MindmapGenerateGet>>, TError = HTTPValidationErrorType>(
- params?: GenerateMindmapApiV2MindmapGenerateGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof generateMindmapApiV2MindmapGenerateGet>>, TError, TData>>, } 
+ params?: GenerateMindmapApiV2MindmapGenerateGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof generateMindmapApiV2MindmapGenerateGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGenerateMindmapApiV2MindmapGenerateGetQueryOptions(params,options)
@@ -9594,23 +9601,23 @@ export function useGenerateMindmapApiV2MindmapGenerateGet<TData = Awaited<Return
  * @summary Get Available Technologies
  */
 export const getAvailableTechnologiesApiV2MindmapTechnologiesGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<TechnologiesResponseType>(
       {url: `/api/v2/mindmap/technologies`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetAvailableTechnologiesApiV2MindmapTechnologiesGetQueryKey = () => {
     return [`/api/v2/mindmap/technologies`] as const;
     }
 
-    
+
 export const getGetAvailableTechnologiesApiV2MindmapTechnologiesGetQueryOptions = <TData = Awaited<ReturnType<typeof getAvailableTechnologiesApiV2MindmapTechnologiesGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAvailableTechnologiesApiV2MindmapTechnologiesGet>>, TError, TData>>, }
 ) => {
 
@@ -9618,13 +9625,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetAvailableTechnologiesApiV2MindmapTechnologiesGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getAvailableTechnologiesApiV2MindmapTechnologiesGet>>> = ({ signal }) => getAvailableTechnologiesApiV2MindmapTechnologiesGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAvailableTechnologiesApiV2MindmapTechnologiesGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -9659,7 +9666,7 @@ export function useGetAvailableTechnologiesApiV2MindmapTechnologiesGet<TData = A
  */
 
 export function useGetAvailableTechnologiesApiV2MindmapTechnologiesGet<TData = Awaited<ReturnType<typeof getAvailableTechnologiesApiV2MindmapTechnologiesGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAvailableTechnologiesApiV2MindmapTechnologiesGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAvailableTechnologiesApiV2MindmapTechnologiesGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetAvailableTechnologiesApiV2MindmapTechnologiesGetQueryOptions(options)
@@ -9683,22 +9690,22 @@ export const getTopicTasksApiV2MindmapTopicTopicKeyTasksGet = (
     params?: GetTopicTasksApiV2MindmapTopicTopicKeyTasksGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<TopicTasksResponseType>(
       {url: `/api/v2/mindmap/topic/${topicKey}/tasks`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getGetTopicTasksApiV2MindmapTopicTopicKeyTasksGetQueryKey = (topicKey?: string,
     params?: GetTopicTasksApiV2MindmapTopicTopicKeyTasksGetParams,) => {
     return [`/api/v2/mindmap/topic/${topicKey}/tasks`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getGetTopicTasksApiV2MindmapTopicTopicKeyTasksGetQueryOptions = <TData = Awaited<ReturnType<typeof getTopicTasksApiV2MindmapTopicTopicKeyTasksGet>>, TError = HTTPValidationErrorType>(topicKey: string,
     params?: GetTopicTasksApiV2MindmapTopicTopicKeyTasksGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTopicTasksApiV2MindmapTopicTopicKeyTasksGet>>, TError, TData>>, }
 ) => {
@@ -9707,13 +9714,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetTopicTasksApiV2MindmapTopicTopicKeyTasksGetQueryKey(topicKey,params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getTopicTasksApiV2MindmapTopicTopicKeyTasksGet>>> = ({ signal }) => getTopicTasksApiV2MindmapTopicTopicKeyTasksGet(topicKey,params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, enabled: !!(topicKey), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTopicTasksApiV2MindmapTopicTopicKeyTasksGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -9752,7 +9759,7 @@ export function useGetTopicTasksApiV2MindmapTopicTopicKeyTasksGet<TData = Awaite
 
 export function useGetTopicTasksApiV2MindmapTopicTopicKeyTasksGet<TData = Awaited<ReturnType<typeof getTopicTasksApiV2MindmapTopicTopicKeyTasksGet>>, TError = HTTPValidationErrorType>(
  topicKey: string,
-    params?: GetTopicTasksApiV2MindmapTopicTopicKeyTasksGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTopicTasksApiV2MindmapTopicTopicKeyTasksGet>>, TError, TData>>, } 
+    params?: GetTopicTasksApiV2MindmapTopicTopicKeyTasksGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTopicTasksApiV2MindmapTopicTopicKeyTasksGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetTopicTasksApiV2MindmapTopicTopicKeyTasksGetQueryOptions(topicKey,params,options)
@@ -9775,20 +9782,20 @@ export const getTaskDetailApiV2MindmapTaskTaskIdGet = (
     taskId: string,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<TaskDetailResponseWrapperType>(
       {url: `/api/v2/mindmap/task/${taskId}`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetTaskDetailApiV2MindmapTaskTaskIdGetQueryKey = (taskId?: string,) => {
     return [`/api/v2/mindmap/task/${taskId}`] as const;
     }
 
-    
+
 export const getGetTaskDetailApiV2MindmapTaskTaskIdGetQueryOptions = <TData = Awaited<ReturnType<typeof getTaskDetailApiV2MindmapTaskTaskIdGet>>, TError = HTTPValidationErrorType>(taskId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTaskDetailApiV2MindmapTaskTaskIdGet>>, TError, TData>>, }
 ) => {
 
@@ -9796,13 +9803,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetTaskDetailApiV2MindmapTaskTaskIdGetQueryKey(taskId);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getTaskDetailApiV2MindmapTaskTaskIdGet>>> = ({ signal }) => getTaskDetailApiV2MindmapTaskTaskIdGet(taskId, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, enabled: !!(taskId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTaskDetailApiV2MindmapTaskTaskIdGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -9837,7 +9844,7 @@ export function useGetTaskDetailApiV2MindmapTaskTaskIdGet<TData = Awaited<Return
  */
 
 export function useGetTaskDetailApiV2MindmapTaskTaskIdGet<TData = Awaited<ReturnType<typeof getTaskDetailApiV2MindmapTaskTaskIdGet>>, TError = HTTPValidationErrorType>(
- taskId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTaskDetailApiV2MindmapTaskTaskIdGet>>, TError, TData>>, } 
+ taskId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTaskDetailApiV2MindmapTaskTaskIdGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetTaskDetailApiV2MindmapTaskTaskIdGetQueryOptions(taskId,options)
@@ -9857,23 +9864,23 @@ export function useGetTaskDetailApiV2MindmapTaskTaskIdGet<TData = Awaited<Return
  * @summary Health Check
  */
 export const healthCheckApiV2MindmapHealthGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<AppFeaturesMindmapDtoResponsesHealthResponseType>(
       {url: `/api/v2/mindmap/health`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getHealthCheckApiV2MindmapHealthGetQueryKey = () => {
     return [`/api/v2/mindmap/health`] as const;
     }
 
-    
+
 export const getHealthCheckApiV2MindmapHealthGetQueryOptions = <TData = Awaited<ReturnType<typeof healthCheckApiV2MindmapHealthGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof healthCheckApiV2MindmapHealthGet>>, TError, TData>>, }
 ) => {
 
@@ -9881,13 +9888,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getHealthCheckApiV2MindmapHealthGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof healthCheckApiV2MindmapHealthGet>>> = ({ signal }) => healthCheckApiV2MindmapHealthGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof healthCheckApiV2MindmapHealthGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -9922,180 +9929,10 @@ export function useHealthCheckApiV2MindmapHealthGet<TData = Awaited<ReturnType<t
  */
 
 export function useHealthCheckApiV2MindmapHealthGet<TData = Awaited<ReturnType<typeof healthCheckApiV2MindmapHealthGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof healthCheckApiV2MindmapHealthGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof healthCheckApiV2MindmapHealthGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getHealthCheckApiV2MindmapHealthGetQueryOptions(options)
-
-  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
-
-  return query;
-}
-
-
-
-
-/**
- * Debug endpoint для проверки задач по классам
- * @summary Debug Classes Tasks
- */
-export const debugClassesTasksApiV2MindmapDebugClassesTasksGet = (
-    
- signal?: AbortSignal
-) => {
-      
-      
-      return generatedApiClient<unknown>(
-      {url: `/api/v2/mindmap/debug/classes-tasks`, method: 'GET', signal
-    },
-      );
-    }
-  
-
-export const getDebugClassesTasksApiV2MindmapDebugClassesTasksGetQueryKey = () => {
-    return [`/api/v2/mindmap/debug/classes-tasks`] as const;
-    }
-
-    
-export const getDebugClassesTasksApiV2MindmapDebugClassesTasksGetQueryOptions = <TData = Awaited<ReturnType<typeof debugClassesTasksApiV2MindmapDebugClassesTasksGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof debugClassesTasksApiV2MindmapDebugClassesTasksGet>>, TError, TData>>, }
-) => {
-
-const {query: queryOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getDebugClassesTasksApiV2MindmapDebugClassesTasksGetQueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof debugClassesTasksApiV2MindmapDebugClassesTasksGet>>> = ({ signal }) => debugClassesTasksApiV2MindmapDebugClassesTasksGet(signal);
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof debugClassesTasksApiV2MindmapDebugClassesTasksGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type DebugClassesTasksApiV2MindmapDebugClassesTasksGetQueryResult = NonNullable<Awaited<ReturnType<typeof debugClassesTasksApiV2MindmapDebugClassesTasksGet>>>
-export type DebugClassesTasksApiV2MindmapDebugClassesTasksGetQueryError = unknown
-
-
-export function useDebugClassesTasksApiV2MindmapDebugClassesTasksGet<TData = Awaited<ReturnType<typeof debugClassesTasksApiV2MindmapDebugClassesTasksGet>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof debugClassesTasksApiV2MindmapDebugClassesTasksGet>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof debugClassesTasksApiV2MindmapDebugClassesTasksGet>>,
-          TError,
-          Awaited<ReturnType<typeof debugClassesTasksApiV2MindmapDebugClassesTasksGet>>
-        > , 'initialData'
-      >, }
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useDebugClassesTasksApiV2MindmapDebugClassesTasksGet<TData = Awaited<ReturnType<typeof debugClassesTasksApiV2MindmapDebugClassesTasksGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof debugClassesTasksApiV2MindmapDebugClassesTasksGet>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof debugClassesTasksApiV2MindmapDebugClassesTasksGet>>,
-          TError,
-          Awaited<ReturnType<typeof debugClassesTasksApiV2MindmapDebugClassesTasksGet>>
-        > , 'initialData'
-      >, }
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useDebugClassesTasksApiV2MindmapDebugClassesTasksGet<TData = Awaited<ReturnType<typeof debugClassesTasksApiV2MindmapDebugClassesTasksGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof debugClassesTasksApiV2MindmapDebugClassesTasksGet>>, TError, TData>>, }
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
- * @summary Debug Classes Tasks
- */
-
-export function useDebugClassesTasksApiV2MindmapDebugClassesTasksGet<TData = Awaited<ReturnType<typeof debugClassesTasksApiV2MindmapDebugClassesTasksGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof debugClassesTasksApiV2MindmapDebugClassesTasksGet>>, TError, TData>>, } 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getDebugClassesTasksApiV2MindmapDebugClassesTasksGetQueryOptions(options)
-
-  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
-
-  return query;
-}
-
-
-
-
-/**
- * Тестовый endpoint для проверки запросов к БД
- * @summary Test Db
- */
-export const testDbApiV2MindmapTestDbGet = (
-    
- signal?: AbortSignal
-) => {
-      
-      
-      return generatedApiClient<unknown>(
-      {url: `/api/v2/mindmap/test-db`, method: 'GET', signal
-    },
-      );
-    }
-  
-
-export const getTestDbApiV2MindmapTestDbGetQueryKey = () => {
-    return [`/api/v2/mindmap/test-db`] as const;
-    }
-
-    
-export const getTestDbApiV2MindmapTestDbGetQueryOptions = <TData = Awaited<ReturnType<typeof testDbApiV2MindmapTestDbGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof testDbApiV2MindmapTestDbGet>>, TError, TData>>, }
-) => {
-
-const {query: queryOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getTestDbApiV2MindmapTestDbGetQueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof testDbApiV2MindmapTestDbGet>>> = ({ signal }) => testDbApiV2MindmapTestDbGet(signal);
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof testDbApiV2MindmapTestDbGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type TestDbApiV2MindmapTestDbGetQueryResult = NonNullable<Awaited<ReturnType<typeof testDbApiV2MindmapTestDbGet>>>
-export type TestDbApiV2MindmapTestDbGetQueryError = unknown
-
-
-export function useTestDbApiV2MindmapTestDbGet<TData = Awaited<ReturnType<typeof testDbApiV2MindmapTestDbGet>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof testDbApiV2MindmapTestDbGet>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof testDbApiV2MindmapTestDbGet>>,
-          TError,
-          Awaited<ReturnType<typeof testDbApiV2MindmapTestDbGet>>
-        > , 'initialData'
-      >, }
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTestDbApiV2MindmapTestDbGet<TData = Awaited<ReturnType<typeof testDbApiV2MindmapTestDbGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof testDbApiV2MindmapTestDbGet>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof testDbApiV2MindmapTestDbGet>>,
-          TError,
-          Awaited<ReturnType<typeof testDbApiV2MindmapTestDbGet>>
-        > , 'initialData'
-      >, }
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTestDbApiV2MindmapTestDbGet<TData = Awaited<ReturnType<typeof testDbApiV2MindmapTestDbGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof testDbApiV2MindmapTestDbGet>>, TError, TData>>, }
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
- * @summary Test Db
- */
-
-export function useTestDbApiV2MindmapTestDbGet<TData = Awaited<ReturnType<typeof testDbApiV2MindmapTestDbGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof testDbApiV2MindmapTestDbGet>>, TError, TData>>, } 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getTestDbApiV2MindmapTestDbGetQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -10112,23 +9949,23 @@ export function useTestDbApiV2MindmapTestDbGet<TData = Awaited<ReturnType<typeof
  * @summary Get Admin Stats
  */
 export const getAdminStatsApiV2AdminStatsGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<AdminStatsResponseType>(
       {url: `/api/v2/admin/stats`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetAdminStatsApiV2AdminStatsGetQueryKey = () => {
     return [`/api/v2/admin/stats`] as const;
     }
 
-    
+
 export const getGetAdminStatsApiV2AdminStatsGetQueryOptions = <TData = Awaited<ReturnType<typeof getAdminStatsApiV2AdminStatsGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminStatsApiV2AdminStatsGet>>, TError, TData>>, }
 ) => {
 
@@ -10136,13 +9973,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetAdminStatsApiV2AdminStatsGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminStatsApiV2AdminStatsGet>>> = ({ signal }) => getAdminStatsApiV2AdminStatsGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminStatsApiV2AdminStatsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -10177,7 +10014,7 @@ export function useGetAdminStatsApiV2AdminStatsGet<TData = Awaited<ReturnType<ty
  */
 
 export function useGetAdminStatsApiV2AdminStatsGet<TData = Awaited<ReturnType<typeof getAdminStatsApiV2AdminStatsGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminStatsApiV2AdminStatsGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminStatsApiV2AdminStatsGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetAdminStatsApiV2AdminStatsGetQueryOptions(options)
@@ -10200,21 +10037,21 @@ export const getUsersApiV2AdminUsersGet = (
     params?: GetUsersApiV2AdminUsersGetParams,
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<UsersListResponseType>(
       {url: `/api/v2/admin/users`, method: 'GET',
         params, signal
     },
       );
     }
-  
+
 
 export const getGetUsersApiV2AdminUsersGetQueryKey = (params?: GetUsersApiV2AdminUsersGetParams,) => {
     return [`/api/v2/admin/users`, ...(params ? [params]: [])] as const;
     }
 
-    
+
 export const getGetUsersApiV2AdminUsersGetQueryOptions = <TData = Awaited<ReturnType<typeof getUsersApiV2AdminUsersGet>>, TError = HTTPValidationErrorType>(params?: GetUsersApiV2AdminUsersGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsersApiV2AdminUsersGet>>, TError, TData>>, }
 ) => {
 
@@ -10222,13 +10059,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetUsersApiV2AdminUsersGetQueryKey(params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getUsersApiV2AdminUsersGet>>> = ({ signal }) => getUsersApiV2AdminUsersGet(params, signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getUsersApiV2AdminUsersGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -10263,7 +10100,7 @@ export function useGetUsersApiV2AdminUsersGet<TData = Awaited<ReturnType<typeof 
  */
 
 export function useGetUsersApiV2AdminUsersGet<TData = Awaited<ReturnType<typeof getUsersApiV2AdminUsersGet>>, TError = HTTPValidationErrorType>(
- params?: GetUsersApiV2AdminUsersGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsersApiV2AdminUsersGet>>, TError, TData>>, } 
+ params?: GetUsersApiV2AdminUsersGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsersApiV2AdminUsersGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetUsersApiV2AdminUsersGetQueryOptions(params,options)
@@ -10282,23 +10119,23 @@ export function useGetUsersApiV2AdminUsersGet<TData = Awaited<ReturnType<typeof 
  * @summary Root
  */
 export const rootGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<unknown>(
       {url: `/`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getRootGetQueryKey = () => {
     return [`/`] as const;
     }
 
-    
+
 export const getRootGetQueryOptions = <TData = Awaited<ReturnType<typeof rootGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof rootGet>>, TError, TData>>, }
 ) => {
 
@@ -10306,13 +10143,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getRootGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof rootGet>>> = ({ signal }) => rootGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof rootGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -10347,7 +10184,7 @@ export function useRootGet<TData = Awaited<ReturnType<typeof rootGet>>, TError =
  */
 
 export function useRootGet<TData = Awaited<ReturnType<typeof rootGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof rootGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof rootGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getRootGetQueryOptions(options)
@@ -10366,23 +10203,23 @@ export function useRootGet<TData = Awaited<ReturnType<typeof rootGet>>, TError =
  * @summary Api Root
  */
 export const apiRootApiGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<unknown>(
       {url: `/api/`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getApiRootApiGetQueryKey = () => {
     return [`/api/`] as const;
     }
 
-    
+
 export const getApiRootApiGetQueryOptions = <TData = Awaited<ReturnType<typeof apiRootApiGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof apiRootApiGet>>, TError, TData>>, }
 ) => {
 
@@ -10390,13 +10227,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getApiRootApiGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof apiRootApiGet>>> = ({ signal }) => apiRootApiGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof apiRootApiGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -10431,7 +10268,7 @@ export function useApiRootApiGet<TData = Awaited<ReturnType<typeof apiRootApiGet
  */
 
 export function useApiRootApiGet<TData = Awaited<ReturnType<typeof apiRootApiGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof apiRootApiGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof apiRootApiGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getApiRootApiGetQueryOptions(options)
@@ -10450,23 +10287,23 @@ export function useApiRootApiGet<TData = Awaited<ReturnType<typeof apiRootApiGet
  * @summary Redirect
  */
 export const redirectRedirectGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<unknown>(
       {url: `/redirect`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getRedirectRedirectGetQueryKey = () => {
     return [`/redirect`] as const;
     }
 
-    
+
 export const getRedirectRedirectGetQueryOptions = <TData = Awaited<ReturnType<typeof redirectRedirectGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof redirectRedirectGet>>, TError, TData>>, }
 ) => {
 
@@ -10474,13 +10311,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getRedirectRedirectGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof redirectRedirectGet>>> = ({ signal }) => redirectRedirectGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof redirectRedirectGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -10515,7 +10352,7 @@ export function useRedirectRedirectGet<TData = Awaited<ReturnType<typeof redirec
  */
 
 export function useRedirectRedirectGet<TData = Awaited<ReturnType<typeof redirectRedirectGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof redirectRedirectGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof redirectRedirectGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getRedirectRedirectGetQueryOptions(options)
@@ -10534,23 +10371,23 @@ export function useRedirectRedirectGet<TData = Awaited<ReturnType<typeof redirec
  * @summary Get Top Companies Simple
  */
 export const getTopCompaniesSimpleApiTestCompaniesGet = (
-    
+
  signal?: AbortSignal
 ) => {
-      
-      
+
+
       return generatedApiClient<unknown>(
       {url: `/api/test-companies`, method: 'GET', signal
     },
       );
     }
-  
+
 
 export const getGetTopCompaniesSimpleApiTestCompaniesGetQueryKey = () => {
     return [`/api/test-companies`] as const;
     }
 
-    
+
 export const getGetTopCompaniesSimpleApiTestCompaniesGetQueryOptions = <TData = Awaited<ReturnType<typeof getTopCompaniesSimpleApiTestCompaniesGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTopCompaniesSimpleApiTestCompaniesGet>>, TError, TData>>, }
 ) => {
 
@@ -10558,13 +10395,13 @@ const {query: queryOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetTopCompaniesSimpleApiTestCompaniesGetQueryKey();
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getTopCompaniesSimpleApiTestCompaniesGet>>> = ({ signal }) => getTopCompaniesSimpleApiTestCompaniesGet(signal);
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTopCompaniesSimpleApiTestCompaniesGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -10599,7 +10436,7 @@ export function useGetTopCompaniesSimpleApiTestCompaniesGet<TData = Awaited<Retu
  */
 
 export function useGetTopCompaniesSimpleApiTestCompaniesGet<TData = Awaited<ReturnType<typeof getTopCompaniesSimpleApiTestCompaniesGet>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTopCompaniesSimpleApiTestCompaniesGet>>, TError, TData>>, } 
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTopCompaniesSimpleApiTestCompaniesGet>>, TError, TData>>, }
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetTopCompaniesSimpleApiTestCompaniesGetQueryOptions(options)

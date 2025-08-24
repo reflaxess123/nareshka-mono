@@ -13,6 +13,9 @@ from app.features.mindmap.config import (
     get_technology_topics,
     get_topic_config,
 )
+from app.features.mindmap.utils.enums import CodeLanguage
+from app.features.mindmap.utils.query_builder import ContentQueryBuilder
+from app.features.mindmap.utils.progress_calculator import ProgressCalculator
 from app.shared.entities.content import ContentBlock, ContentFile
 from app.shared.models.content_models import UserContentProgress
 
@@ -172,50 +175,20 @@ class MindMapRepository(MindMapRepositoryInterface):
 
             main_category = tech_center["main_category"]
 
-            # Получаем общее количество задач с кодом для данной технологии
-            total_tasks = (
-                self.session.query(func.count(ContentBlock.id))
-                .join(ContentFile, ContentBlock.fileId == ContentFile.id)
-                .filter(
-                    ContentBlock.codeContent.isnot(None),
-                    func.lower(ContentFile.mainCategory) == func.lower(main_category),
-                )
-                .scalar()
-                or 0
+            # Используем новые утилиты для подсчета
+            total_tasks = ContentQueryBuilder.count_total_tasks(
+                self.session, main_category
+            )
+            completed_tasks = ContentQueryBuilder.count_completed_tasks(
+                self.session, user_id, main_category
             )
 
-            # Получаем количество решенных задач
-            completed_tasks = (
-                self.session.query(func.count(UserContentProgress.id))
-                .join(ContentBlock, UserContentProgress.blockId == ContentBlock.id)
-                .join(ContentFile, ContentBlock.fileId == ContentFile.id)
-                .filter(
-                    UserContentProgress.userId == user_id,
-                    UserContentProgress.solvedCount > 0,
-                    ContentBlock.codeContent.isnot(None),
-                    func.lower(ContentFile.mainCategory) == func.lower(main_category),
-                )
-                .scalar()
-                or 0
+            progress = ProgressCalculator.build_progress_dict(
+                total_tasks, completed_tasks
             )
-
-            completion_rate = (
-                (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0.0
-            )
-
-            progress = {
-                "totalTasks": total_tasks,
-                "completedTasks": completed_tasks,
-                "completionRate": round(completion_rate, 1),
-                "status": "completed"
-                if completion_rate == 100
-                else "in_progress"
-                if completion_rate > 0
-                else "not_started",
-            }
 
             logger.info(
-                f"Общий прогресс пользователя {user_id}: {completed_tasks}/{total_tasks} ({completion_rate:.1f}%)"
+                f"Общий прогресс пользователя {user_id}: {completed_tasks}/{total_tasks} ({progress['completionRate']:.1f}%)"
             )
             return progress
 
@@ -239,52 +212,20 @@ class MindMapRepository(MindMapRepositoryInterface):
             main_category = topic_config["main_category"]
             sub_category = topic_config["sub_category"]
 
-            # Получаем общее количество задач в топике
-            total_tasks = (
-                self.session.query(func.count(ContentBlock.id))
-                .join(ContentFile, ContentBlock.fileId == ContentFile.id)
-                .filter(
-                    ContentBlock.codeContent.isnot(None),
-                    func.lower(ContentFile.mainCategory) == func.lower(main_category),
-                    func.lower(ContentFile.subCategory) == func.lower(sub_category),
-                )
-                .scalar()
-                or 0
+            # Используем новые утилиты
+            total_tasks = ContentQueryBuilder.count_total_tasks(
+                self.session, main_category, sub_category
+            )
+            completed_tasks = ContentQueryBuilder.count_completed_tasks(
+                self.session, user_id, main_category, sub_category
             )
 
-            # Получаем количество решенных задач в топике
-            completed_tasks = (
-                self.session.query(func.count(UserContentProgress.id))
-                .join(ContentBlock, UserContentProgress.blockId == ContentBlock.id)
-                .join(ContentFile, ContentBlock.fileId == ContentFile.id)
-                .filter(
-                    UserContentProgress.userId == user_id,
-                    UserContentProgress.solvedCount > 0,
-                    ContentBlock.codeContent.isnot(None),
-                    func.lower(ContentFile.mainCategory) == func.lower(main_category),
-                    func.lower(ContentFile.subCategory) == func.lower(sub_category),
-                )
-                .scalar()
-                or 0
+            progress = ProgressCalculator.build_progress_dict(
+                total_tasks, completed_tasks
             )
-
-            completion_rate = (
-                (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0.0
-            )
-
-            progress = {
-                "totalTasks": total_tasks,
-                "completedTasks": completed_tasks,
-                "completionRate": round(completion_rate, 1),
-                "status": "completed"
-                if completion_rate == 100
-                else "in_progress"
-                if completion_rate > 0
-                else "not_started",
-            }
 
             logger.info(
-                f"Прогресс по топику {topic_key}: {completed_tasks}/{total_tasks} ({completion_rate:.1f}%)"
+                f"Прогресс по топику {topic_key}: {completed_tasks}/{total_tasks} ({progress['completionRate']:.1f}%)"
             )
             return progress
 
@@ -315,14 +256,10 @@ class MindMapRepository(MindMapRepositoryInterface):
                 f"Поиск задач для категории: {main_category}, подкатегории: {sub_category}"
             )
 
-            # Используем простой join как в content_repository с func.lower()
+            # Используем QueryBuilder
             results = (
-                self.session.query(ContentBlock)
-                .join(ContentFile)
-                .filter(
-                    ContentBlock.codeContent.isnot(None),
-                    func.lower(ContentFile.mainCategory) == func.lower(main_category),
-                    func.lower(ContentFile.subCategory) == func.lower(sub_category),
+                ContentQueryBuilder.get_content_blocks_with_code(
+                    self.session, main_category, sub_category
                 )
                 .all()
             )
@@ -331,23 +268,8 @@ class MindMapRepository(MindMapRepositoryInterface):
 
             tasks = []
             for content_block in results:
-                # Получаем прогресс если пользователь указан
-                progress = None
-                if user_id:
-                    user_progress = (
-                        self.session.query(UserContentProgress)
-                        .filter(
-                            UserContentProgress.userId == user_id,
-                            UserContentProgress.blockId == content_block.id,
-                        )
-                        .first()
-                    )
-
-                    if user_progress:
-                        progress = {
-                            "solvedCount": user_progress.solvedCount,
-                            "isCompleted": user_progress.solvedCount > 0,
-                        }
+                # Получаем прогресс для одной задачи
+                progress = self._get_task_progress_for_user(user_id, content_block.id) if user_id else None
 
                 task = {
                     "id": str(content_block.id),
@@ -396,17 +318,17 @@ class MindMapRepository(MindMapRepositoryInterface):
 
                 if user_progress:
                     progress = {
-                        "solvedCount": user_progress.solved_count,
-                        "isCompleted": user_progress.solved_count > 0,
+                        "solvedCount": user_progress.solvedCount,
+                        "isCompleted": user_progress.solvedCount > 0,
                     }
 
             task = {
                 "id": str(content_block.id),
-                "title": content_block.block_title or f"Задача {content_block.id}",
-                "description": content_block.text_content or "",
-                "hasCode": bool(content_block.code_content),
-                "codeContent": content_block.code_content,
-                "codeLanguage": "javascript",  # Default для mindmap
+                "title": content_block.blockTitle or f"Задача {content_block.id}",
+                "description": content_block.textContent or "",
+                "hasCode": bool(content_block.codeContent),
+                "codeContent": content_block.codeContent,
+                "codeLanguage": CodeLanguage.JAVASCRIPT.value,
                 "progress": progress,
             }
 
@@ -492,3 +414,22 @@ class MindMapRepository(MindMapRepositoryInterface):
         except Exception as e:
             logger.error(f"Ошибка при получении технологий: {e}")
             return []
+
+    def _get_task_progress_for_user(
+        self, user_id: int, block_id: str
+    ) -> Optional[Dict[str, Any]]:
+        """Получить прогресс задачи для пользователя"""
+        user_progress = (
+            self.session.query(UserContentProgress)
+            .filter(
+                UserContentProgress.userId == user_id,
+                UserContentProgress.blockId == block_id,
+            )
+            .first()
+        )
+
+        if user_progress:
+            return ProgressCalculator.build_task_progress_dict(
+                user_progress.solvedCount
+            )
+        return None
