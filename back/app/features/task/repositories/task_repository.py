@@ -14,7 +14,6 @@ from app.features.task.dto.responses import (
     TaskCompanyResponse as TaskCompany,
 )
 from app.features.task.repositories.task_attempt_repository import TaskAttemptRepository
-from app.features.task.services.task_aggregator_service import TaskAggregatorService
 from app.shared.entities.content import ContentBlock, ContentFile
 from app.shared.entities.progress_types import TaskAttempt, TaskSolution
 from app.shared.entities.task_types import Task
@@ -34,8 +33,15 @@ class TaskRepository:
     def __init__(self, session: Session):
         self.session = session
         # Создаем экземпляры новых сервисов для обратной совместимости
-        self._aggregator = TaskAggregatorService(session)
+        self._aggregator = None  # Lazy initialization
         self._attempt_repo = TaskAttemptRepository(session)
+
+    def _get_aggregator(self):
+        """Lazy initialization для TaskAggregatorService"""
+        if self._aggregator is None:
+            from app.features.task.services.task_aggregator_service import TaskAggregatorService
+            self._aggregator = TaskAggregatorService(self.session)
+        return self._aggregator
 
     # Методы делегируются к новым сервисам для обратной совместимости
 
@@ -52,7 +58,7 @@ class TaskRepository:
         offset: Optional[int] = None,
     ) -> Tuple[List[Task], int]:
         """DEPRECATED: Используйте TaskAggregatorService.get_tasks()"""
-        return self._aggregator.get_tasks(
+        return self._get_aggregator().get_tasks(
             user_id=user_id,
             category=category,
             search=search,
@@ -66,11 +72,11 @@ class TaskRepository:
 
     def get_task_categories(self) -> List[TaskCategory]:
         """DEPRECATED: Используйте TaskAggregatorService.get_task_categories()"""
-        return self._aggregator.get_task_categories()
+        return self._get_aggregator().get_task_categories()
 
     def get_task_companies(self) -> List[TaskCompany]:
         """DEPRECATED: Используйте TaskAggregatorService.get_task_companies()"""
-        return self._aggregator.get_task_companies()
+        return self._get_aggregator().get_task_companies()
 
     async def create_task_attempt(self, user_id: int, **attempt_data) -> TaskAttempt:
         """DEPRECATED: Используйте TaskAttemptRepository.create_task_attempt()"""

@@ -1095,7 +1095,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 100,
+              "maximum": 500,
               "minimum": 1,
               "description": "Количество компаний в топе",
               "default": 20,
@@ -3503,7 +3503,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProgressStatsResponse"
+                  "$ref": "#/components/schemas/app__features__progress__dto__responses__ProgressStatsResponse"
                 }
               }
             }
@@ -4251,7 +4251,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ContentStatsResponse"
+                  "$ref": "#/components/schemas/app__features__stats__dto__responses__ContentStatsResponse"
                 }
               }
             }
@@ -4672,7 +4672,63 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/AdminStatsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/admin/users": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get Users",
+        "description": "Получить список пользователей",
+        "operationId": "get_users_api_v2_admin_users_get",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsersListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
@@ -4746,6 +4802,53 @@
   },
   "components": {
     "schemas": {
+      "AdminStatsResponse": {
+        "properties": {
+          "users": {
+            "$ref": "#/components/schemas/UserStatsResponse",
+            "description": "User statistics"
+          },
+          "content": {
+            "$ref": "#/components/schemas/app__features__admin__dto__responses__ContentStatsResponse",
+            "description": "Content statistics"
+          },
+          "progress": {
+            "$ref": "#/components/schemas/app__features__admin__dto__responses__ProgressStatsResponse",
+            "description": "Progress statistics"
+          },
+          "system": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SystemStatsResponse"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "System statistics"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error",
+            "description": "Error message if any"
+          }
+        },
+        "type": "object",
+        "required": [
+          "users",
+          "content",
+          "progress"
+        ],
+        "title": "AdminStatsResponse",
+        "description": "Complete admin dashboard statistics"
+      },
       "AnalyticsResponse": {
         "properties": {
           "total_interviews": {
@@ -6331,35 +6434,6 @@
         "title": "ContentProgressUpdateRequest",
         "description": "Запрос на обновление прогресса по контенту"
       },
-      "ContentStatsResponse": {
-        "properties": {
-          "categories": {
-            "type": "object",
-            "title": "Categories"
-          },
-          "totalBlocks": {
-            "type": "integer",
-            "title": "Totalblocks"
-          },
-          "solvedBlocks": {
-            "type": "integer",
-            "title": "Solvedblocks"
-          },
-          "averageSolveCount": {
-            "type": "number",
-            "title": "Averagesolvecount"
-          }
-        },
-        "type": "object",
-        "required": [
-          "categories",
-          "totalBlocks",
-          "solvedBlocks",
-          "averageSolveCount"
-        ],
-        "title": "ContentStatsResponse",
-        "description": "Детальная статистика по контенту"
-      },
       "ContentSubcategoriesResponse": {
         "properties": {
           "subcategories": {
@@ -6746,7 +6820,7 @@
             "title": "Token Type"
           },
           "user": {
-            "$ref": "#/components/schemas/UserResponse"
+            "$ref": "#/components/schemas/app__features__auth__dto__auth_dto__UserResponse"
           },
           "session_id": {
             "anyOf": [
@@ -7177,63 +7251,6 @@
         "title": "ProgressAnalyticsResponse",
         "description": "Ответ с аналитикой прогресса"
       },
-      "ProgressStatsResponse": {
-        "properties": {
-          "period": {
-            "type": "string",
-            "title": "Period",
-            "description": "Период статистики"
-          },
-          "tasks_solved": {
-            "type": "integer",
-            "title": "Tasks Solved",
-            "description": "Решенных задач"
-          },
-          "time_spent_hours": {
-            "type": "number",
-            "title": "Time Spent Hours",
-            "description": "Потраченных часов"
-          },
-          "success_rate": {
-            "type": "string",
-            "title": "Success Rate",
-            "description": "Процент успеха"
-          },
-          "improvement_rate": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Improvement Rate",
-            "description": "Темп улучшения"
-          },
-          "streak_days": {
-            "type": "integer",
-            "title": "Streak Days",
-            "description": "Дней подряд"
-          },
-          "categories_active": {
-            "type": "integer",
-            "title": "Categories Active",
-            "description": "Активных категорий"
-          }
-        },
-        "type": "object",
-        "required": [
-          "period",
-          "tasks_solved",
-          "time_spent_hours",
-          "success_rate",
-          "streak_days",
-          "categories_active"
-        ],
-        "title": "ProgressStatsResponse",
-        "description": "Статистика прогресса"
-      },
       "QuestionResponse": {
         "properties": {
           "id": {
@@ -7479,7 +7496,7 @@
       "RegisterResponse": {
         "properties": {
           "user": {
-            "$ref": "#/components/schemas/UserResponse"
+            "$ref": "#/components/schemas/app__features__auth__dto__auth_dto__UserResponse"
           },
           "message": {
             "type": "string",
@@ -7592,6 +7609,49 @@
         ],
         "title": "SupportedLanguageResponse",
         "description": "Поддерживаемый язык программирования"
+      },
+      "SystemStatsResponse": {
+        "properties": {
+          "uptimeSeconds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Uptimeseconds",
+            "description": "System uptime in seconds"
+          },
+          "memoryUsageMB": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Memoryusagemb",
+            "description": "Memory usage in MB"
+          },
+          "databaseConnections": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Databaseconnections",
+            "description": "Active database connections"
+          }
+        },
+        "type": "object",
+        "title": "SystemStatsResponse",
+        "description": "System health and performance statistics"
       },
       "TaskCategoriesResponse": {
         "properties": {
@@ -8683,59 +8743,6 @@
         "title": "UserProgressSummaryResponse",
         "description": "Сводка прогресса пользователя"
       },
-      "UserResponse": {
-        "properties": {
-          "id": {
-            "type": "integer",
-            "title": "Id"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Createdat"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Updatedat"
-          },
-          "email": {
-            "type": "string",
-            "title": "Email"
-          },
-          "role": {
-            "$ref": "#/components/schemas/UserRole"
-          },
-          "totalTasksSolved": {
-            "type": "integer",
-            "title": "Totaltaskssolved"
-          },
-          "lastActivityDate": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Lastactivitydate"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "createdAt",
-          "updatedAt",
-          "email",
-          "role",
-          "totalTasksSolved",
-          "lastActivityDate"
-        ],
-        "title": "UserResponse",
-        "description": "Ответ с данными пользователя"
-      },
       "UserRole": {
         "type": "string",
         "enum": [
@@ -8793,6 +8800,39 @@
         ],
         "title": "UserStatsOverviewResponse",
         "description": "Общая статистика пользователя"
+      },
+      "UserStatsResponse": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "description": "Total number of users"
+          },
+          "admins": {
+            "type": "integer",
+            "title": "Admins",
+            "description": "Number of admin users"
+          },
+          "regularUsers": {
+            "type": "integer",
+            "title": "Regularusers",
+            "description": "Number of regular users"
+          },
+          "guests": {
+            "type": "integer",
+            "title": "Guests",
+            "description": "Number of guest users"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "admins",
+          "regularUsers",
+          "guests"
+        ],
+        "title": "UserStatsResponse",
+        "description": "Statistics about users"
       },
       "UserTheoryProgressResponse": {
         "properties": {
@@ -8887,6 +8927,30 @@
         ],
         "title": "UserTheoryProgressResponse",
         "description": "Ответ с информацией о прогрессе изучения карточки"
+      },
+      "UsersListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/app__features__auth__dto__responses__UserResponse"
+            },
+            "type": "array",
+            "title": "Items",
+            "description": "List of users"
+          },
+          "pagination": {
+            "type": "object",
+            "title": "Pagination",
+            "description": "Pagination info"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "pagination"
+        ],
+        "title": "UsersListResponse",
+        "description": "Response for admin users list"
       },
       "ValidationError": {
         "properties": {
@@ -9010,6 +9074,225 @@
         ],
         "title": "ValidationResultResponse",
         "description": "Результат валидации решения"
+      },
+      "app__features__admin__dto__responses__ContentStatsResponse": {
+        "properties": {
+          "totalFiles": {
+            "type": "integer",
+            "title": "Totalfiles",
+            "description": "Total number of content files"
+          },
+          "totalBlocks": {
+            "type": "integer",
+            "title": "Totalblocks",
+            "description": "Total number of content blocks"
+          },
+          "totalTheoryCards": {
+            "type": "integer",
+            "title": "Totaltheorycards",
+            "description": "Total number of theory cards"
+          }
+        },
+        "type": "object",
+        "required": [
+          "totalFiles",
+          "totalBlocks",
+          "totalTheoryCards"
+        ],
+        "title": "ContentStatsResponse",
+        "description": "Statistics about content"
+      },
+      "app__features__admin__dto__responses__ProgressStatsResponse": {
+        "properties": {
+          "totalContentProgress": {
+            "type": "integer",
+            "title": "Totalcontentprogress",
+            "description": "Total content progress records"
+          },
+          "totalTheoryProgress": {
+            "type": "integer",
+            "title": "Totaltheoryprogress",
+            "description": "Total theory progress records"
+          }
+        },
+        "type": "object",
+        "required": [
+          "totalContentProgress",
+          "totalTheoryProgress"
+        ],
+        "title": "ProgressStatsResponse",
+        "description": "Statistics about user progress"
+      },
+      "app__features__auth__dto__auth_dto__UserResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updatedat"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "role": {
+            "$ref": "#/components/schemas/UserRole"
+          },
+          "totalTasksSolved": {
+            "type": "integer",
+            "title": "Totaltaskssolved"
+          },
+          "lastActivityDate": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lastactivitydate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "createdAt",
+          "updatedAt",
+          "email",
+          "role",
+          "totalTasksSolved",
+          "lastActivityDate"
+        ],
+        "title": "UserResponse",
+        "description": "Ответ с данными пользователя"
+      },
+      "app__features__auth__dto__responses__UserResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id",
+            "description": "User ID"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email",
+            "description": "User email"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username",
+            "description": "Username"
+          },
+          "first_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Name",
+            "description": "First name"
+          },
+          "last_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Name",
+            "description": "Last name"
+          },
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name",
+            "description": "Full name"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name",
+            "description": "Display name"
+          },
+          "role": {
+            "$ref": "#/components/schemas/UserRole",
+            "description": "User role"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active",
+            "description": "Is user active"
+          },
+          "is_verified": {
+            "type": "boolean",
+            "title": "Is Verified",
+            "description": "Is user verified"
+          },
+          "total_tasks_solved": {
+            "type": "integer",
+            "title": "Total Tasks Solved",
+            "description": "Total tasks solved"
+          },
+          "last_activity_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Activity Date",
+            "description": "Last activity date"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At",
+            "description": "Account creation date"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "email",
+          "display_name",
+          "role",
+          "is_active",
+          "is_verified",
+          "total_tasks_solved",
+          "created_at"
+        ],
+        "title": "UserResponse",
+        "description": "Response model for user information."
       },
       "app__features__code_editor__dto__responses__HealthResponse": {
         "properties": {
@@ -9321,6 +9604,63 @@
         "title": "TaskSolutionCreateRequest",
         "description": "Запрос на создание решения задачи"
       },
+      "app__features__progress__dto__responses__ProgressStatsResponse": {
+        "properties": {
+          "period": {
+            "type": "string",
+            "title": "Period",
+            "description": "Период статистики"
+          },
+          "tasks_solved": {
+            "type": "integer",
+            "title": "Tasks Solved",
+            "description": "Решенных задач"
+          },
+          "time_spent_hours": {
+            "type": "number",
+            "title": "Time Spent Hours",
+            "description": "Потраченных часов"
+          },
+          "success_rate": {
+            "type": "string",
+            "title": "Success Rate",
+            "description": "Процент успеха"
+          },
+          "improvement_rate": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Improvement Rate",
+            "description": "Темп улучшения"
+          },
+          "streak_days": {
+            "type": "integer",
+            "title": "Streak Days",
+            "description": "Дней подряд"
+          },
+          "categories_active": {
+            "type": "integer",
+            "title": "Categories Active",
+            "description": "Активных категорий"
+          }
+        },
+        "type": "object",
+        "required": [
+          "period",
+          "tasks_solved",
+          "time_spent_hours",
+          "success_rate",
+          "streak_days",
+          "categories_active"
+        ],
+        "title": "ProgressStatsResponse",
+        "description": "Статистика прогресса"
+      },
       "app__features__progress__dto__responses__TaskAttemptResponse": {
         "properties": {
           "id": {
@@ -9588,6 +9928,35 @@
         ],
         "title": "TaskSolutionResponse",
         "description": "Ответ с информацией о решении задачи"
+      },
+      "app__features__stats__dto__responses__ContentStatsResponse": {
+        "properties": {
+          "categories": {
+            "type": "object",
+            "title": "Categories"
+          },
+          "totalBlocks": {
+            "type": "integer",
+            "title": "Totalblocks"
+          },
+          "solvedBlocks": {
+            "type": "integer",
+            "title": "Solvedblocks"
+          },
+          "averageSolveCount": {
+            "type": "number",
+            "title": "Averagesolvecount"
+          }
+        },
+        "type": "object",
+        "required": [
+          "categories",
+          "totalBlocks",
+          "solvedBlocks",
+          "averageSolveCount"
+        ],
+        "title": "ContentStatsResponse",
+        "description": "Детальная статистика по контенту"
       },
       "app__features__stats__dto__responses__TheoryStatsResponse": {
         "properties": {

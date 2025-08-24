@@ -3,59 +3,35 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
+from app.features.admin.dto.responses import AdminStatsResponse, UsersListResponse
+from app.features.admin.services.admin_service import AdminService
+from app.features.admin.api.decorators import require_admin
 from app.shared.database import get_session
+from app.shared.dependencies import get_current_admin_session
+from app.shared.models.user_models import User
 
 router = APIRouter(tags=["admin"])
 
 
-@router.get("/stats")
-async def get_admin_stats(session: Session = Depends(get_session)):
+@require_admin
+@router.get("/stats", response_model=AdminStatsResponse)
+async def get_admin_stats(
+    current_admin: User = Depends(get_current_admin_session),
+    session: Session = Depends(get_session),
+) -> AdminStatsResponse:
     """Получить статистику для админ панели"""
-    try:
-        # Подсчет пользователей
-        from app.shared.models.user_models import User
+    admin_service = AdminService(session)
+    return await admin_service.get_admin_stats()
 
-        total_users = session.query(User).count()
-        admin_users = session.query(User).filter(User.role == "ADMIN").count()
-        regular_users = session.query(User).filter(User.role == "USER").count()
-        guest_users = session.query(User).filter(User.role == "GUEST").count()
 
-        # Подсчет контента
-        from app.shared.entities.content import ContentBlock, ContentFile
-        from app.shared.models.theory_models import TheoryCard
-
-        total_files = session.query(ContentFile).count()
-        total_blocks = session.query(ContentBlock).count()
-        total_theory_cards = session.query(TheoryCard).count()
-
-        # Подсчет прогресса
-        from app.shared.models.content_models import UserContentProgress
-        from app.shared.models.theory_models import UserTheoryProgress
-
-        total_content_progress = session.query(UserContentProgress).count()
-        total_theory_progress = session.query(UserTheoryProgress).count()
-
-        return {
-            "users": {
-                "total": total_users,
-                "admins": admin_users,
-                "regularUsers": regular_users,
-                "guests": guest_users,
-            },
-            "content": {
-                "totalFiles": total_files,
-                "totalBlocks": total_blocks,
-                "totalTheoryCards": total_theory_cards,
-            },
-            "progress": {
-                "totalContentProgress": total_content_progress,
-                "totalTheoryProgress": total_theory_progress,
-            },
-        }
-    except Exception as e:
-        return {
-            "users": {"total": 0, "admins": 0, "regularUsers": 0, "guests": 0},
-            "content": {"totalFiles": 0, "totalBlocks": 0, "totalTheoryCards": 0},
-            "progress": {"totalContentProgress": 0, "totalTheoryProgress": 0},
-            "error": str(e),
-        }
+@require_admin
+@router.get("/users", response_model=UsersListResponse)
+async def get_users(
+    page: int = 1,
+    limit: int = 10,
+    current_admin: User = Depends(get_current_admin_session),
+    session: Session = Depends(get_session),
+) -> UsersListResponse:
+    """Получить список пользователей"""
+    admin_service = AdminService(session)
+    return await admin_service.get_users_list(page, limit)

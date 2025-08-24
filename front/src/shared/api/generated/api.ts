@@ -2246,7 +2246,7 @@ export type GetTopCompaniesApiV2InterviewsTopCompaniesGetParams = {
 /**
  * Количество компаний в топе
  * @minimum 1
- * @maximum 100
+ * @maximum 500
  */
 limit?: number;
 };

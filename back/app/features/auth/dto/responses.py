@@ -40,17 +40,17 @@ class UserResponse(BaseResponse):
         return cls(
             id=user.id,
             email=user.email,
-            username=user.username,
-            first_name=user.first_name,
-            last_name=user.last_name,
-            full_name=user.full_name,
-            display_name=user.display_name,
+            username=user.username if hasattr(user, 'username') else None,
+            first_name=user.first_name if hasattr(user, 'first_name') else None,
+            last_name=user.last_name if hasattr(user, 'last_name') else None,
+            full_name=user.full_name if hasattr(user, 'full_name') else None,
+            display_name=user.display_name if hasattr(user, 'display_name') else user.email.split('@')[0],
             role=user.role,
-            is_active=user.is_active,
-            is_verified=user.is_verified,
+            is_active=user.is_active if hasattr(user, 'is_active') else True,
+            is_verified=user.is_verified if hasattr(user, 'is_verified') else True,
             total_tasks_solved=user.totalTasksSolved,
             last_activity_date=user.lastActivityDate,
-            created_at=user.created_at,
+            created_at=user.createdAt,
         )
 
     class Config:

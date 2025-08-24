@@ -165,7 +165,7 @@ const ProgressAnalyticsDashboard: React.FC<ProgressAnalyticsDashboardProps> = ({
             <TrendingUp className={styles.chartIcon} />
           </div>
           <div className={styles.chartContent}>
-            {analytics.mostPopularCategories.length > 0 ? (
+            {analytics.mostPopularCategories?.length > 0 ? (
               <div className={styles.categoryList}>
                 {analytics.mostPopularCategories
                   .slice(0, 10)
@@ -202,7 +202,7 @@ const ProgressAnalyticsDashboard: React.FC<ProgressAnalyticsDashboardProps> = ({
             <AlertTriangle className={styles.chartIcon} />
           </div>
           <div className={styles.chartContent}>
-            {analytics.strugglingAreas.length > 0 ? (
+            {analytics.strugglingAreas?.length > 0 ? (
               <div className={styles.categoryList}>
                 {analytics.strugglingAreas.slice(0, 10).map((area, index) => (
                   <div key={index} className={styles.categoryItem}>
