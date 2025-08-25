@@ -9,7 +9,7 @@ Content Feature - образовательный контент платформ
 
 from app.features.content.repositories.content_repository import ContentRepository
 from app.features.content.services.content_service import ContentService
-from app.shared.entities.content import ContentBlock, ContentFile
+from app.shared.models.content_models import ContentBlock, ContentFile
 
 __all__ = [
     # Models

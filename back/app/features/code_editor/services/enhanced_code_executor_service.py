@@ -12,7 +12,7 @@ from app.features.code_editor.repositories.code_editor_repository import (
 )
 from app.features.code_editor.services.code_executor_service import CodeExecutorService
 # Judge0Service удален
-from app.shared.entities.enums import ExecutionStatus
+from app.shared.models.enums import ExecutionStatus
 from app.shared.models.code_execution_models import CodeExecution, SupportedLanguage
 
 logger = logging.getLogger(__name__)

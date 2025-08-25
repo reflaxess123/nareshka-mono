@@ -20,7 +20,7 @@ from app.features.code_editor.repositories.code_editor_repository import (
     CodeEditorRepository,
 )
 from app.shared.models.code_execution_models import CodeExecution, SupportedLanguage
-from app.shared.entities.enums import CodeLanguage, ExecutionStatus
+from app.shared.models.enums import CodeLanguage, ExecutionStatus
 
 logger = logging.getLogger(__name__)
 

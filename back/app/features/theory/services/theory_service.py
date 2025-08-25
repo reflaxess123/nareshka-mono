@@ -20,7 +20,7 @@ from app.features.theory.exceptions.theory_exceptions import (
     TheoryCardNotFoundError,
 )
 from app.features.theory.repositories.theory_repository import TheoryRepository
-from app.shared.entities.enums import CardState
+from app.shared.models.enums import CardState
 
 logger = logging.getLogger(__name__)
 

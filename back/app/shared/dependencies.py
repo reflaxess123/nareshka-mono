@@ -13,11 +13,8 @@ from app.core.logging import get_logger
 from app.core.rate_limiter import get_rate_limiter
 from app.core.settings import Settings
 
-# Service types for DI
 from app.features.auth.services.auth_service import AuthService
-from app.features.code_editor.services.ai_test_generator_service import (
-    AITestGeneratorService,
-)
+from app.features.code_editor.services.ai_test_generator_service import AITestGeneratorService
 from app.features.code_editor.services.code_editor_service import CodeEditorService
 from app.features.code_editor.services.code_executor_service import CodeExecutorService
 from app.features.content.services.content_service import ContentService
@@ -27,18 +24,24 @@ from app.features.stats.services.stats_service import StatsService
 from app.features.task.services.task_service import TaskService
 from app.features.theory.services.theory_service import TheoryService
 
-# New shared dependencies
+# Database
 from app.shared.database import get_session
-
-# Legacy imports for backward compatibility
 from app.shared.database.connection import get_db
 
 # DI Container
 from app.shared.di import create_service_dependency
+
+# Models
 from app.shared.models.user_models import User
+
+# Utils
 from app.shared.utils import RequestContext
 
-from .auth_schemes import oauth2_scheme
+# OAuth2 scheme for JWT authentication
+from fastapi.security import OAuth2PasswordBearer
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v2/auth/login")
+
 
 logger = get_logger(__name__)
 
@@ -52,9 +55,6 @@ def get_app_settings() -> Settings:
     return Settings()
 
 
-def get_db_manager():
-    """Get database manager - заглушка."""
-    return None
 
 
 def get_db_session() -> Session:
@@ -72,9 +72,7 @@ def get_rate_limiter_service():
     return get_rate_limiter()
 
 
-# ===== NEW DI CONTAINER BASED DEPENDENCIES =====
 
-# Service dependencies using DI container
 get_content_service = create_service_dependency(ContentService)
 get_theory_service = create_service_dependency(TheoryService)
 get_task_service = create_service_dependency(TaskService)
@@ -87,151 +85,20 @@ get_code_executor_service = create_service_dependency(CodeExecutorService)
 get_ai_test_generator_service = create_service_dependency(AITestGeneratorService)
 
 
-# ===== LEGACY COMPATIBILITY LAYER =====
-
-
-def get_content_service_legacy(db: Session = Depends(get_db)) -> ContentService:
-    """LEGACY: Получение сервиса для работы с контентом"""
-    from app.features.content.repositories.content_repository import ContentRepository
-
-    content_repository = ContentRepository(db)
-    return ContentService(content_repository)
-
-
-def get_theory_service_legacy(db: Session = Depends(get_db)) -> TheoryService:
-    """LEGACY: Получение сервиса для работы с теоретическими карточками"""
-    from app.features.theory.repositories.theory_repository import TheoryRepository
-
-    theory_repository = TheoryRepository(db)
-    return TheoryService(theory_repository)
-
-
-def get_task_service_legacy(db: Session = Depends(get_db)) -> TaskService:
-    """LEGACY: Получение сервиса для работы с заданиями"""
-    from app.features.task.repositories.task_repository import TaskRepository
-
-    task_repository = TaskRepository(db)
-    return TaskService(task_repository)
-
-
-def get_progress_service_legacy(db: Session = Depends(get_db)) -> ProgressService:
-    """LEGACY: Получение сервиса для работы с прогрессом"""
-    from app.features.progress.repositories.progress_repository import (
-        ProgressRepository,
-    )
-
-    progress_repository = ProgressRepository(db)
-    return ProgressService(progress_repository)
-
-
-def get_code_editor_service_legacy(db: Session = Depends(get_db)) -> CodeEditorService:
-    """LEGACY: Возвращает экземпляр CodeEditorService с зависимостями"""
-    from app.features.code_editor.repositories.code_editor_repository import (
-        CodeEditorRepository,
-    )
-
-    code_editor_repository = CodeEditorRepository()
-    return CodeEditorService(code_editor_repository)
-
-
-def get_stats_service_legacy(db: Session = Depends(get_db)) -> StatsService:
-    """LEGACY: Получение сервиса для работы со статистикой"""
-    from app.features.stats.repositories.stats_repository import StatsRepository
-
-    stats_repository = StatsRepository(db)
-    return StatsService(stats_repository)
-
-
-def get_mindmap_service_legacy(db: Session = Depends(get_db)) -> MindMapService:
-    """LEGACY: Получение сервиса для работы с mindmap"""
-    from app.features.mindmap.repositories.mindmap_repository import MindMapRepository
-
-    mindmap_repository = MindMapRepository(db)
-    return MindMapService(mindmap_repository)
-
-
-def get_auth_service_legacy() -> AuthService:
-    """LEGACY: Получение сервиса авторизации"""
-    from app.features.auth.repositories.sqlalchemy_user_repository import (
-        SQLAlchemyUserRepository,
-    )
-
-    user_repository = SQLAlchemyUserRepository()
-    return AuthService(user_repository)
-
-
-# def get_admin_service(
-#     db: Session = Depends(get_db), auth_service: AuthService = Depends(get_auth_service)
-# ) -> AdminService:
-#     """Получение сервиса для работы с админкой"""
-#     admin_repository = AdminRepository(db)
-#     return AdminService(admin_repository, auth_service)
-# Admin временно отключен - не мигрируем
-
-
-# Legacy - Remove after full migration
-def get_ai_test_generator_service_legacy(
-    db: Session = Depends(get_db),
-) -> AITestGeneratorService:
-    """LEGACY: Получение сервиса генерации тест-кейсов через AI"""
-    from app.features.content.repositories.content_repository import ContentRepository
-    from app.features.task.repositories.task_repository import TaskRepository
-
-    content_repository = ContentRepository(db)
-    task_repository = TaskRepository(db)
-    return AITestGeneratorService(content_repository, task_repository)
-
-
-def get_code_executor_service_legacy(
-    db: Session = Depends(get_db),
-) -> CodeExecutorService:
-    """LEGACY: Возвращает экземпляр CodeExecutorService с зависимостями"""
-    from app.features.code_editor.repositories.code_editor_repository import (
-        CodeEditorRepository,
-    )
-
-    code_editor_repository = CodeEditorRepository()
-    return CodeExecutorService(code_editor_repository)
-
 
 async def get_current_user_optional(
     request: Request, auth_service: AuthService = Depends(get_auth_service)
 ) -> Optional[User]:
     """Получение текущего пользователя (опционально)"""
     try:
-        session_id = request.cookies.get("session_id")
-        logger.info(
-            "🔍 DEBUG: get_current_user_optional called",
-            extra={
-                "has_session_cookie": session_id is not None,
-                "session_id_prefix": session_id[:10] + "..." if session_id else None,
-                "url": str(request.url),
-                "method": request.method,
-            },
-        )
-
         user = await auth_service.get_user_by_session(request)
-
         if user:
-            logger.info(
-                "🔍 DEBUG: User found from session",
-                extra={
-                    "user_id": user.id,
-                    "user_email": user.email,
-                    "session_id_prefix": session_id[:10] + "..."
-                    if session_id
-                    else None,
-                },
+            logger.debug(
+                "User authenticated via session",
+                extra={"user_id": user.id, "email": user.email}
             )
-        else:
-            logger.info("🔍 DEBUG: No user found from session")
-
         return user
-    except HTTPException as e:
-        logger.info(
-            "🔍 DEBUG: Auth failed in get_current_user_optional",
-            extra={"error": str(e), "status_code": e.status_code},
-        )
+    except HTTPException:
         return None
 
 
@@ -343,40 +210,6 @@ async def get_current_user_jwt_optional(
         logger.debug("Optional JWT authentication failed", extra={"error": str(e)})
         return None
 
-
-async def get_current_admin_jwt(
-    current_user: User = Depends(get_current_user_jwt),
-) -> User:
-    """Check admin privileges (JWT) with enhanced validation."""
-    is_admin = getattr(current_user, "role", None) == "ADMIN" or getattr(
-        current_user, "is_admin", False
-    )
-
-    if not is_admin:
-        logger.warning(
-            "Admin access denied",
-            extra={
-                "user_id": current_user.id,
-                "username": getattr(current_user, "username", "unknown"),
-                "role": getattr(current_user, "role", "unknown"),
-            },
-        )
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Admin privileges required",
-        )
-
-    logger.info(
-        "Admin access granted",
-        extra={
-            "user_id": current_user.id,
-            "username": getattr(current_user, "username", "unknown"),
-        },
-    )
-
-    return current_user
-
-
 def get_current_admin_session(
     current_user: User = Depends(get_current_user_required),
 ) -> User:
@@ -410,7 +243,15 @@ def get_current_admin_session(
     return current_user
 
 
-# ===== NEW FEATURE-FIRST DEPENDENCIES =====
+# ===== UTILITY DEPENDENCIES =====
+
+
+def get_db_manager():
+    """Get DatabaseManager instance for progress feature."""
+    from app.shared.database.base import DatabaseManager
+    from app.core.settings import settings
+
+    return DatabaseManager(settings.database_url)
 
 
 def get_correlation_id(request: Request) -> str:
@@ -423,20 +264,3 @@ def get_correlation_id(request: Request) -> str:
     return correlation_id
 
 
-async def log_request_middleware(
-    request: Request,
-    request_context: RequestContext = Depends(get_request_context),
-    user: Optional[User] = Depends(get_current_user_optional),
-):
-    """Middleware for request logging."""
-    logger.info(
-        "API request",
-        extra={
-            "method": request_context.method,
-            "url": request_context.url,
-            "client_ip": request_context.client_ip,
-            "user_agent": request_context.user_agent,
-            "user_id": user.id if user else None,
-            "username": getattr(user, "username", None) if user else None,
-        },
-    )

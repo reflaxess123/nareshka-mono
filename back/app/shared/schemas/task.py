@@ -5,7 +5,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
-from app.shared.entities.enums import CodeLanguage
+from app.shared.models.enums import CodeLanguage
 
 
 class TaskType(BaseModel):

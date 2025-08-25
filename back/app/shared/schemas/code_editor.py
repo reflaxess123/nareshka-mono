@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel
 
-from app.shared.entities.enums import CodeLanguage, ExecutionStatus
+from app.shared.models.enums import CodeLanguage, ExecutionStatus
 
 
 class SupportedLanguage(BaseModel):

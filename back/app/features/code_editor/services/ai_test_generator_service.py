@@ -19,8 +19,8 @@ from app.core.logging import get_logger
 from app.features.code_editor.dto.test_case_dto import TestCaseAIGenerate
 from app.features.content.repositories.content_repository import ContentRepository
 from app.features.task.repositories.task_repository import TaskRepository
-from app.shared.entities.content import ContentBlock
-from app.shared.entities.progress_types import TestCase
+from app.shared.models.content_models import ContentBlock
+from app.shared.schemas.progress import TestCase
 
 logger = get_logger(__name__)
 

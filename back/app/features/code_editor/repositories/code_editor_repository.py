@@ -11,8 +11,8 @@ from sqlalchemy.orm import Session
 from app.features.code_editor.exceptions.code_editor_exceptions import (
     CodeExecutionError,
 )
-from app.shared.entities.content import ContentBlock
-from app.shared.entities.enums import CodeLanguage, ExecutionStatus
+from app.shared.models.content_models import ContentBlock
+from app.shared.models.enums import CodeLanguage, ExecutionStatus
 from app.shared.models.code_execution_models import (
     CodeExecution,
     SupportedLanguage,

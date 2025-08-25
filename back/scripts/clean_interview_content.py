@@ -23,7 +23,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 # Import database components
 from app.shared.database import SessionLocal
-from app.shared.entities.interview import InterviewRecord
+from app.shared.models.interview_models import InterviewRecord
 
 
 def clean_content(text: str) -> str:

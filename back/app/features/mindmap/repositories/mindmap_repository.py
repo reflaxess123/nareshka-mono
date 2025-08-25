@@ -16,7 +16,7 @@ from app.features.mindmap.config import (
 from app.features.mindmap.utils.enums import CodeLanguage
 from app.features.mindmap.utils.query_builder import ContentQueryBuilder
 from app.features.mindmap.utils.progress_calculator import ProgressCalculator
-from app.shared.entities.content import ContentBlock, ContentFile
+from app.shared.models.content_models import ContentBlock, ContentFile
 from app.shared.models.content_models import UserContentProgress
 
 logger = logging.getLogger(__name__)

@@ -1,6 +1,6 @@
-"""Shared DTOs - общие типы данных для всего приложения"""
+"""Shared schemas for API requests and responses"""
 
-from .base_dto import (
+from .base import (
     BaseResponse,
     BulkActionRequest,
     CategoriesResponse,
@@ -8,6 +8,7 @@ from .base_dto import (
     IdentifiedResponse,
     MessageResponse,
     PaginatedResponse,
+    PaginationInfo,
     StringIdentifiedResponse,
     SubcategoriesResponse,
     TimestampedResponse,
@@ -19,6 +20,7 @@ __all__ = [
     "IdentifiedResponse",
     "StringIdentifiedResponse",
     "PaginatedResponse",
+    "PaginationInfo",
     "MessageResponse",
     "BulkActionRequest",
     "CountResponse",

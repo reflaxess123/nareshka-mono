@@ -1,4 +1,4 @@
-"""Базовые DTO классы для устранения дублирования"""
+"""Base schema classes for API responses and requests"""
 
 from datetime import datetime
 from typing import Any, Dict, Generic, List, TypeVar
@@ -6,39 +6,39 @@ from typing import Any, Dict, Generic, List, TypeVar
 from pydantic import BaseModel
 from pydantic.generics import GenericModel
 
-# Type variables для Generic классов
+# Type variables for Generic classes
 T = TypeVar("T")
 ItemT = TypeVar("ItemT", bound=BaseModel)
 
 
 class BaseResponse(BaseModel):
-    """Базовый Response DTO с общими настройками"""
+    """Base response DTO with common settings"""
 
     class Config:
         from_attributes = True
 
 
 class TimestampedResponse(BaseResponse):
-    """Response DTO с временными метками"""
+    """Response DTO with timestamps"""
 
     createdAt: datetime
     updatedAt: datetime
 
 
 class IdentifiedResponse(TimestampedResponse):
-    """Response DTO с ID и временными метками"""
+    """Response DTO with ID and timestamps"""
 
     id: int
 
 
 class StringIdentifiedResponse(TimestampedResponse):
-    """Response DTO с строковым ID и временными метками"""
+    """Response DTO with string ID and timestamps"""
 
     id: str
 
 
 class PaginationInfo(BaseModel):
-    """Информация о пагинации"""
+    """Pagination information"""
 
     page: int
     limit: int
@@ -47,13 +47,13 @@ class PaginationInfo(BaseModel):
 
     @classmethod
     def create(cls, page: int, limit: int, total: int) -> "PaginationInfo":
-        """Создание информации о пагинации"""
+        """Create pagination info"""
         total_pages = (total + limit - 1) // limit if total > 0 else 0
         return cls(page=page, limit=limit, total=total, totalPages=total_pages)
 
 
 class PaginatedResponse(GenericModel, Generic[ItemT]):
-    """Универсальный пагинированный ответ"""
+    """Generic paginated response"""
 
     items: List[ItemT]
     pagination: PaginationInfo
@@ -62,41 +62,41 @@ class PaginatedResponse(GenericModel, Generic[ItemT]):
     def create(
         cls, items: List[ItemT], page: int, limit: int, total: int
     ) -> "PaginatedResponse[ItemT]":
-        """Создание пагинированного ответа"""
+        """Create paginated response"""
         pagination = PaginationInfo.create(page, limit, total)
         return cls(items=items, pagination=pagination)
 
 
 class CategoriesResponse(BaseModel):
-    """Ответ со списком категорий"""
+    """Response with categories list"""
     
     categories: List[str]
 
     @classmethod
     def create(cls, categories: List[str]) -> "CategoriesResponse":
-        """Создание ответа с категориями"""
+        """Create categories response"""
         return cls(categories=categories)
 
 
 class SubcategoriesResponse(BaseModel):
-    """Ответ со списком подкатегорий"""
+    """Response with subcategories list"""
     
     subcategories: List[str]
 
     @classmethod
     def create(cls, subcategories: List[str]) -> "SubcategoriesResponse":
-        """Создание ответа с подкатегориями"""
+        """Create subcategories response"""
         return cls(subcategories=subcategories)
 
 
 class CountResponse(BaseModel):
-    """Ответ с количеством"""
+    """Response with count"""
 
     count: int
 
 
 class MessageResponse(BaseModel):
-    """Ответ с сообщением"""
+    """Response with message"""
 
     message: str
 
@@ -104,25 +104,23 @@ class MessageResponse(BaseModel):
     def success(
         cls, message: str = "Operation completed successfully"
     ) -> "MessageResponse":
-        """Создание успешного ответа"""
+        """Create success response"""
         return cls(message=message)
 
     @classmethod
     def error(cls, message: str) -> "MessageResponse":
-        """Создание ответа с ошибкой"""
+        """Create error response"""
         return cls(message=message)
 
 
 class BulkActionRequest(BaseModel):
-    """Запрос на массовое действие"""
+    """Request for bulk actions"""
 
     ids: List[int]
 
     def validate_ids(self) -> None:
-        """Валидация списка ID"""
+        """Validate IDs list"""
         if not self.ids:
             raise ValueError("IDs list cannot be empty")
-        if len(self.ids) > 1000:  # Защита от слишком больших запросов
+        if len(self.ids) > 1000:  # Protection against too large requests
             raise ValueError("Too many IDs (max 1000)")
-
-

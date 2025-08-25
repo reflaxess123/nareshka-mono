@@ -4,9 +4,8 @@ from typing import Any, Dict, Optional, Union
 
 from fastapi import status
 
-from app.core.logging import get_logger
-
-logger = get_logger(__name__)
+# Avoid circular import - logger will be set up later if needed
+logger = None
 
 
 class BaseAppException(Exception):

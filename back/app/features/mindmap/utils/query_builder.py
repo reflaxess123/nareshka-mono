@@ -3,7 +3,7 @@
 from typing import Optional, List, Dict
 from sqlalchemy import func
 from sqlalchemy.orm import Query, Session
-from app.shared.entities.content import ContentBlock, ContentFile
+from app.shared.models.content_models import ContentBlock, ContentFile
 from app.shared.models.content_models import UserContentProgress
 
 

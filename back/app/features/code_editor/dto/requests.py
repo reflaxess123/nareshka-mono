@@ -4,7 +4,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from app.shared.entities.enums import CodeLanguage
+from app.shared.models.enums import CodeLanguage
 
 
 class CodeExecutionRequest(BaseModel):

@@ -11,7 +11,7 @@ from app.features.theory.exceptions.theory_exceptions import (
     TheoryCardNotFoundError,
     TheoryProgressError,
 )
-from app.shared.entities.enums import CardState
+from app.shared.models.enums import CardState
 from app.shared.models.theory_models import (
     TheoryCard,
     UserTheoryProgress,

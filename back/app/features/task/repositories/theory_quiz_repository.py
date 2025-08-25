@@ -6,7 +6,7 @@ from typing import List, Optional, Tuple
 from sqlalchemy import asc
 from sqlalchemy.orm import Session
 
-from app.shared.entities.task_types import Task
+from app.shared.schemas.task import Task
 from app.shared.models.theory_models import TheoryCard, UserTheoryProgress
 
 logger = logging.getLogger(__name__)

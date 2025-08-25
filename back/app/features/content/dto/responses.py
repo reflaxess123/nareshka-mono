@@ -8,7 +8,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
-from app.shared.dto import PaginatedResponse, StringIdentifiedResponse
+from app.shared.schemas import PaginatedResponse, StringIdentifiedResponse
 
 
 class ContentFileResponse(StringIdentifiedResponse):

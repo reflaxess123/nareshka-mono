@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel
 
-from app.shared.entities.enums import CardState
+from app.shared.models.enums import CardState
 
 
 class TheoryCardResponse(BaseModel):

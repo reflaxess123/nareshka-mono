@@ -6,8 +6,8 @@ from typing import List, Optional, Tuple
 from sqlalchemy import asc, or_
 from sqlalchemy.orm import Session, joinedload
 
-from app.shared.entities.content import ContentBlock
-from app.shared.entities.task_types import Task
+from app.shared.models.content_models import ContentBlock
+from app.shared.schemas.task import Task
 from app.shared.models.content_models import UserContentProgress
 
 logger = logging.getLogger(__name__)

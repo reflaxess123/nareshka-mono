@@ -14,7 +14,7 @@ from app.core.settings import settings
 # Добавляем импорт всех моделей чтобы alembic видел их
 # Используем новые shared модели
 from app.shared.database import Base
-from app.shared.entities import *  # noqa: F403
+# from app.shared.entities import *  # noqa: F403  # Moved to schemas
 from app.shared.models.code_execution_models import *  # noqa: F403
 from app.shared.models.content_models import *  # noqa: F403
 from app.shared.models.learning_path_models import *  # noqa: F403

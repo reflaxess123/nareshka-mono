@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.features.admin.exceptions import AdminStatsException
 from app.shared.models.user_models import User
-from app.shared.entities.content import ContentBlock, ContentFile
+from app.shared.models.content_models import ContentBlock, ContentFile
 from app.shared.models.theory_models import TheoryCard
 from app.shared.models.content_models import UserContentProgress
 from app.shared.models.theory_models import UserTheoryProgress

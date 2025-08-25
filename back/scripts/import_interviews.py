@@ -19,7 +19,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.shared.database import get_session
-from app.shared.entities.interview import InterviewAnalytics, InterviewRecord
+from app.shared.models.interview_models import InterviewAnalytics, InterviewRecord
 
 
 class InterviewImporter:

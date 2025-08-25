@@ -14,9 +14,9 @@ from app.features.task.dto.responses import (
     TaskCompanyResponse as TaskCompany,
 )
 from app.features.task.repositories.task_attempt_repository import TaskAttemptRepository
-from app.shared.entities.content import ContentBlock, ContentFile
-from app.shared.entities.progress_types import TaskAttempt, TaskSolution
-from app.shared.entities.task_types import Task
+from app.shared.models.content_models import ContentBlock, ContentFile
+from app.shared.schemas.progress import TaskAttempt, TaskSolution
+from app.shared.schemas.task import Task
 from app.shared.models.content_models import UserContentProgress
 from app.shared.models.theory_models import TheoryCard, UserTheoryProgress
 
@@ -318,7 +318,7 @@ class TaskRepository:
             if block.codeLanguage:
                 mapped_lang = language_mapping.get(block.codeLanguage.lower())
                 if mapped_lang:
-                    from app.shared.entities.enums import CodeLanguage
+                    from app.shared.models.enums import CodeLanguage
 
                     try:
                         code_language = CodeLanguage(mapped_lang)

@@ -9,39 +9,29 @@ from .database import (
     get_session,
 )
 
-# Common types
-from .types import (
-    # Base types
-    ID,
-    BaseCreateRequest,
-    BaseEntity,
+# Common schemas
+from .schemas.base import (
     BaseResponse,
-    BaseUpdateRequest,
-    ContentType,
-    Difficulty,
-    EntityStatus,
-    # Common models
-    ErrorDetail,
-    # Type aliases
-    JsonDict,
-    ProgrammingLanguage,
-    Result,
-    StringDict,
-    TaskStatus,
-    # Enums
-    UserRole,
+    PaginatedResponse as SchemaPaginatedResponse,
 )
 
-# Shared entities
-# from .entities import (
-#     User,
-#     ContentBlock,
-#     ContentFile,
-# )
-# Utility functions
+# Common types and enums from models
+from .models.enums import (
+    UserRole,
+    CardState,
+    CodeLanguage,
+    ExecutionStatus,
+    ProgressStatus,
+)
+
+# Type aliases
+ID = str
+JsonDict = dict
+StringDict = dict[str, str]
+Result = tuple[bool, str]
+
 from .utils import (
     ApiResponse,
-    PaginatedResponse,
     # HTTP utilities
     PaginationParams,
     RequestContext,
@@ -59,6 +49,9 @@ from .utils import (
     validate_field,
     validate_password_strength,
 )
+
+# Re-export PaginatedResponse from schemas
+from .schemas.base import PaginatedResponse
 
 # Exception handling (temporarily import from base module)
 try:
@@ -107,19 +100,16 @@ __all__ = [
     "create_error_response",
     "create_paginated_response",
     "StatusCodes",
-    # Types
-    "ID",
+    # Schemas
     "BaseResponse",
-    "BaseEntity",
-    "BaseCreateRequest",
-    "BaseUpdateRequest",
+    # Enums
     "UserRole",
-    "EntityStatus",
-    "TaskStatus",
-    "ContentType",
-    "Difficulty",
-    "ProgrammingLanguage",
-    "ErrorDetail",
+    "CardState",
+    "CodeLanguage",
+    "ExecutionStatus",
+    "ProgressStatus",
+    # Type aliases
+    "ID",
     "Result",
     "JsonDict",
     "StringDict",

@@ -15,7 +15,7 @@ from app.features.content.exceptions.content_exceptions import (
     ContentBlockNotFoundError,
     ContentFileNotFoundError,
 )
-from app.shared.entities.content import ContentBlock, ContentFile
+from app.shared.models.content_models import ContentBlock, ContentFile
 from app.shared.models.content_models import UserContentProgress
 
 

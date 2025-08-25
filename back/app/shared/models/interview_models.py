@@ -1,6 +1,5 @@
 """
-Interview entities - SQLAlchemy модели для работы с собеседованиями
-Следует паттернам существующих entities (ContentBlock, TheoryCard)
+Interview models - SQLAlchemy модели для работы с собеседованиями
 """
 
 from datetime import datetime
@@ -12,15 +11,10 @@ from sqlalchemy.sql import func
 
 from app.shared.database import Base
 
-# Очищаем кэш метаданных для InterviewRecord
-if hasattr(Base, "metadata") and "InterviewRecord" in Base.metadata.tables:
-    Base.metadata.remove(Base.metadata.tables["InterviewRecord"])
-
 
 class InterviewRecord(Base):
     """
     Модель записи собеседования
-    Повторяет паттерн ContentBlock с timestamp полями и ARRAY полями
     """
 
     __tablename__ = "InterviewRecord"
@@ -29,11 +23,11 @@ class InterviewRecord(Base):
     company_name: str = Column(String, nullable=False)
     interview_date: datetime = Column(DateTime, nullable=False)
     position: Optional[str] = Column(String, nullable=True)
-    full_content: str = Column(Text, nullable=False)  # Полная версия
+    full_content: str = Column(Text, nullable=False)
     duration_minutes: Optional[int] = Column(Integer, nullable=True)
     questions_count: Optional[int] = Column(Integer, nullable=True)
 
-    # ARRAY поля как в ContentBlock
+    # ARRAY поля
     companies: List[str] = Column(ARRAY(String), nullable=False, default=list)
     tags: List[str] = Column(ARRAY(String), nullable=False, default=list)
     extracted_urls: List[str] = Column(ARRAY(String), nullable=False, default=list)
@@ -43,7 +37,7 @@ class InterviewRecord(Base):
     content_hash: Optional[str] = Column(String, nullable=True)
     has_audio_recording: bool = Column(Boolean, nullable=False, default=False)
 
-    # Timestamp поля (как в BaseModel)
+    # Timestamp поля
     updatedAt: datetime = Column(
         "updatedAt", DateTime, nullable=False, default=func.now(), onupdate=func.now()
     )
@@ -51,16 +45,13 @@ class InterviewRecord(Base):
 
 class InterviewAnalytics(Base):
     """
-    Модель предрасчитанной аналитики
-    Для быстрой отдачи статистики без тяжелых запросов
+    Модель предрасчитанной аналитики для интервью
     """
 
     __tablename__ = "InterviewAnalytics"
 
     id: str = Column(String, primary_key=True)
-    metric_type: str = Column(
-        String, nullable=False
-    )  # 'company', 'technology', 'monthly'
+    metric_type: str = Column(String, nullable=False)  # 'company', 'technology', 'monthly'
     metric_value: str = Column(String, nullable=False)  # 'Яндекс', 'React', '2024-11'
     period: Optional[str] = Column(String, nullable=True)  # 'monthly', 'yearly', 'all'
 

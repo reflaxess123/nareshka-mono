@@ -29,7 +29,7 @@ from app.shared.dependencies import (
     get_current_user_optional,
     get_current_user_required,
 )
-from app.shared.dto import PaginatedResponse
+from app.shared.schemas import PaginatedResponse
 from app.shared.models.user_models import User
 
 logger = get_logger(__name__)

@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional
 from sqlalchemy import desc, func, or_
 from sqlalchemy.orm import Session
 
-from app.shared.entities.interview import InterviewRecord
+from app.shared.models.interview_models import InterviewRecord
 
 
 class InterviewRepository:

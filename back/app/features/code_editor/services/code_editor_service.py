@@ -34,7 +34,7 @@ from app.features.code_editor.repositories.code_editor_repository import (
 from app.features.code_editor.services.enhanced_code_executor_service import (
     EnhancedCodeExecutorService,
 )
-from app.shared.entities.enums import CodeLanguage
+from app.shared.models.enums import CodeLanguage
 from app.shared.models.code_execution_models import (
     UserCodeSolution,
 )

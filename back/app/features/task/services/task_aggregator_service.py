@@ -13,7 +13,7 @@ from app.features.task.repositories.content_block_repository import (
     ContentBlockRepository,
 )
 from app.features.task.repositories.theory_quiz_repository import TheoryQuizRepository
-from app.shared.entities.task_types import Task
+from app.shared.schemas.task import Task
 
 logger = logging.getLogger(__name__)
 

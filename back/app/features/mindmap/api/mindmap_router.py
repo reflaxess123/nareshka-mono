@@ -21,7 +21,7 @@ from app.features.mindmap.exceptions.mindmap_exceptions import (
 from app.features.mindmap.services.mindmap_service import MindMapService
 from app.shared.database import get_session
 from app.shared.dependencies import get_current_user_id_optional
-from app.shared.entities.content import ContentBlock, ContentFile
+from app.shared.models.content_models import ContentBlock, ContentFile
 
 logger = logging.getLogger(__name__)
 
