@@ -67,53 +67,32 @@ class PaginatedResponse(GenericModel, Generic[ItemT]):
         return cls(items=items, pagination=pagination)
 
 
-class SimpleListResponse(GenericModel, Generic[T]):
-    """Простой список элементов"""
-
-    items: List[T]
-
-    @classmethod
-    def create(cls, items: List[T]) -> "SimpleListResponse[T]":
-        """Создание простого списка"""
-        return cls(items=items)
-
-
-class NamedListResponse(BaseModel):
-    """Список строк с именованным полем"""
+class CategoriesResponse(BaseModel):
+    """Ответ со списком категорий"""
+    
+    categories: List[str]
 
     @classmethod
-    def create_categories(cls, categories: List[str]) -> Dict[str, List[str]]:
+    def create(cls, categories: List[str]) -> "CategoriesResponse":
         """Создание ответа с категориями"""
-        return {"categories": categories}
+        return cls(categories=categories)
+
+
+class SubcategoriesResponse(BaseModel):
+    """Ответ со списком подкатегорий"""
+    
+    subcategories: List[str]
 
     @classmethod
-    def create_subcategories(cls, subcategories: List[str]) -> Dict[str, List[str]]:
+    def create(cls, subcategories: List[str]) -> "SubcategoriesResponse":
         """Создание ответа с подкатегориями"""
-        return {"subcategories": subcategories}
+        return cls(subcategories=subcategories)
 
 
 class CountResponse(BaseModel):
     """Ответ с количеством"""
 
     count: int
-
-
-class BulkActionResponse(BaseModel):
-    """Ответ на массовое действие"""
-
-    success_count: int
-    failed_ids: List[int] = []
-    error_messages: List[str] = []
-
-    @property
-    def total_processed(self) -> int:
-        """Общее количество обработанных элементов"""
-        return self.success_count + len(self.failed_ids)
-
-    @property
-    def has_errors(self) -> bool:
-        """Есть ли ошибки"""
-        return len(self.failed_ids) > 0
 
 
 class MessageResponse(BaseModel):
@@ -134,19 +113,6 @@ class MessageResponse(BaseModel):
         return cls(message=message)
 
 
-# Базовые Request DTO
-class CreateRequest(BaseModel):
-    """Базовый запрос на создание"""
-
-    pass
-
-
-class UpdateRequest(BaseModel):
-    """Базовый запрос на обновление (все поля опциональные)"""
-
-    pass
-
-
 class BulkActionRequest(BaseModel):
     """Запрос на массовое действие"""
 
@@ -160,36 +126,3 @@ class BulkActionRequest(BaseModel):
             raise ValueError("Too many IDs (max 1000)")
 
 
-# Утилиты для миграции
-class DTOMigrationHelper:
-    """Помощник для постепенной миграции DTO"""
-
-    @staticmethod
-    def convert_legacy_pagination(
-        data: List[ItemT],
-        total: int,
-        page: int,
-        limit: int,
-        data_field_name: str = "data",
-    ) -> Dict[str, Any]:
-        """Конвертация старого формата пагинации в новый"""
-        pagination_info = PaginationInfo.create(page, limit, total)
-
-        return {
-            data_field_name: data,
-            "pagination": pagination_info.dict(),
-            # Дополнительные поля для обратной совместимости
-            "total": total,
-            "page": page,
-            "limit": limit,
-            "totalPages": pagination_info.totalPages,
-        }
-
-    @staticmethod
-    def add_legacy_fields(
-        response_dict: Dict[str, Any], **legacy_fields
-    ) -> Dict[str, Any]:
-        """Добавление legacy полей для обратной совместимости"""
-        result = response_dict.copy()
-        result.update(legacy_fields)
-        return result

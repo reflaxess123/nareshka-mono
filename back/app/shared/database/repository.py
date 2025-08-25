@@ -61,8 +61,9 @@ class BaseRepository(Generic[T]):
 
     def get_by_id(self, entity_id: Any, session: Session = None) -> Optional[T]:
         """Get entity by ID."""
-        if session is None:
-            session = get_db_session()
+        session_provided = session is not None
+        if not session_provided:
+            session = next(get_db_session())
 
         try:
             entity = (
@@ -87,6 +88,9 @@ class BaseRepository(Generic[T]):
                 },
             )
             raise DatabaseError(f"Failed to get {self.model_name}")
+        finally:
+            if not session_provided:
+                session.close()
 
     def get_by_id_or_raise(self, entity_id: Any, session: Session = None) -> T:
         """Get entity by ID or raise EntityNotFoundError."""
@@ -105,8 +109,9 @@ class BaseRepository(Generic[T]):
         session: Session = None,
     ) -> List[T]:
         """Get all entities with optional filtering and pagination."""
-        if session is None:
-            session = get_db_session()
+        session_provided = session is not None
+        if not session_provided:
+            session = next(get_db_session())
 
         try:
             query = session.query(self.model)
@@ -147,6 +152,9 @@ class BaseRepository(Generic[T]):
                 extra={"model": self.model_name, "error": str(e), "filters": filters},
             )
             raise DatabaseError(f"Failed to get {self.model_name} entities")
+        finally:
+            if not session_provided:
+                session.close()
 
     @transactional
     def update(
@@ -231,8 +239,9 @@ class BaseRepository(Generic[T]):
         self, filters: Optional[Dict[str, Any]] = None, session: Session = None
     ) -> int:
         """Count entities with optional filtering."""
-        if session is None:
-            session = get_db_session()
+        session_provided = session is not None
+        if not session_provided:
+            session = next(get_db_session())
 
         try:
             query = session.query(self.model)
@@ -258,6 +267,9 @@ class BaseRepository(Generic[T]):
                 extra={"model": self.model_name, "error": str(e)},
             )
             raise DatabaseError(f"Failed to count {self.model_name} entities")
+        finally:
+            if not session_provided:
+                session.close()
 
     def exists(self, filters: Dict[str, Any], session: Session = None) -> bool:
         """Check if entity exists with given filters."""
@@ -267,8 +279,9 @@ class BaseRepository(Generic[T]):
         self, data_list: List[Dict[str, Any]], session: Session = None
     ) -> List[T]:
         """Create multiple entities in bulk."""
-        if session is None:
-            session = get_db_session()
+        session_provided = session is not None
+        if not session_provided:
+            session = next(get_db_session())
 
         try:
             entities = []
@@ -296,6 +309,9 @@ class BaseRepository(Generic[T]):
                 },
             )
             raise DatabaseError(f"Failed to bulk create {self.model_name} entities")
+        finally:
+            if not session_provided:
+                session.close()
 
 
 class ReadOnlyRepository(BaseRepository[T]):

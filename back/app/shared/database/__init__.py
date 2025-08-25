@@ -1,34 +1,31 @@
 """Database infrastructure."""
 
-from .base import BaseModel
+# Import real exceptions instead of stubs
+from app.shared.exceptions.base import (
+    DatabaseException,
+    ResourceConflictException,
+    ResourceNotFoundException,
+)
+
+from .base import async_transactional, db_manager, transactional
 from .connection import Base, SessionLocal, engine, get_db
-from .repository import BaseRepository
+from .models import AuditMixin, BaseModel, SoftDeleteMixin
+from .repository import BaseRepository, ReadOnlyRepository
+from .session import get_db_session, get_db_transaction
 
 
-# Create missing classes for compatibility
-class DatabaseException(Exception):
-    pass
-
-
-def transactional(func):
-    """Simple transactional decorator"""
-    return func
-
-
-class AuditMixin:
-    pass
-
-
-# Database manager заглушка
+# Real implementations instead of stubs
 def get_database_manager():
-    """Database manager заглушка"""
-    return None
+    """Get the global database manager"""
+    return db_manager
 
 
-# Health check заглушка
 def check_database_health():
-    """Health check заглушка"""
-    return {"status": "ok", "database": "connected"}
+    """Check database connection health"""
+    return {
+        "status": "ok" if db_manager.health_check() else "error",
+        "database": "connected" if db_manager.health_check() else "disconnected"
+    }
 
 
 # Alias for compatibility

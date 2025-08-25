@@ -3,14 +3,14 @@
 from .base_dto import (
     BaseResponse,
     BulkActionRequest,
+    CategoriesResponse,
     CountResponse,
-    CreateRequest,
     IdentifiedResponse,
     MessageResponse,
     PaginatedResponse,
     StringIdentifiedResponse,
+    SubcategoriesResponse,
     TimestampedResponse,
-    UpdateRequest,
 )
 
 __all__ = [
@@ -20,8 +20,8 @@ __all__ = [
     "StringIdentifiedResponse",
     "PaginatedResponse",
     "MessageResponse",
-    "CreateRequest",
-    "UpdateRequest",
     "BulkActionRequest",
     "CountResponse",
+    "CategoriesResponse",
+    "SubcategoriesResponse",
 ]

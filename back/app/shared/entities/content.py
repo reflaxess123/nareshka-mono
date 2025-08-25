@@ -22,10 +22,10 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 
-from app.shared.database import AuditMixin, Base
+from app.shared.database import Base
 
 
-class ContentFile(Base, AuditMixin):
+class ContentFile(Base):
     """
     Shared ContentFile entity for cross-feature usage.
 
@@ -62,7 +62,7 @@ class ContentFile(Base, AuditMixin):
         from_attributes = True
 
 
-class ContentBlock(Base, AuditMixin):
+class ContentBlock(Base):
     """
     Shared ContentBlock entity for cross-feature usage.
 

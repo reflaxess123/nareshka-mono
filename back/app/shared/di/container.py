@@ -116,27 +116,26 @@ def configure_container():
     from app.features.task.repositories.task_repository import TaskRepository
     from app.features.theory.repositories.theory_repository import TheoryRepository
 
-    # Регистрируем как транзиентные (новый экземпляр каждый раз)
+    # Репозитории с сессиями БД
+    db_repositories = [
+        ContentRepository,
+        TaskRepository, 
+        TheoryRepository,
+        ProgressRepository,
+        StatsRepository,
+        MindMapRepository
+    ]
+    
+    for repo_class in db_repositories:
+        container.register_transient(
+            repo_class, lambda cls=repo_class: cls(get_session())
+        )
+    
+    # Специальные репозитории без сессий
     container.register_transient(
         SQLAlchemyUserRepository, lambda: SQLAlchemyUserRepository()
     )
-    container.register_transient(
-        ContentRepository, lambda: ContentRepository(get_session())
-    )
-    container.register_transient(TaskRepository, lambda: TaskRepository(get_session()))
-    container.register_transient(
-        TheoryRepository, lambda: TheoryRepository(get_session())
-    )
-    container.register_transient(
-        ProgressRepository, lambda: ProgressRepository(get_session())
-    )
-    container.register_transient(
-        StatsRepository, lambda: StatsRepository(get_session())
-    )
     container.register_transient(CodeEditorRepository, lambda: CodeEditorRepository())
-    container.register_transient(
-        MindMapRepository, lambda: MindMapRepository(get_session())
-    )
 
     # Регистрируем сервисы
     from app.features.auth.services.auth_service import AuthService
@@ -154,78 +153,36 @@ def configure_container():
     from app.features.task.services.task_service import TaskService
     from app.features.theory.services.theory_service import TheoryService
 
-    # Регистрируем как транзиентные с правильными зависимостями
-    def create_auth_service():
-        return AuthService(container.get(SQLAlchemyUserRepository))
-
-    def create_content_service():
-        return ContentService(container.get(ContentRepository))
-
-    def create_task_service():
-        return TaskService(container.get(TaskRepository))
-
-    def create_theory_service():
-        return TheoryService(container.get(TheoryRepository))
-
-    def create_progress_service():
-        return ProgressService(container.get(ProgressRepository))
-
-    def create_stats_service():
-        return StatsService(container.get(StatsRepository))
-
-    def create_code_editor_service():
-        return CodeEditorService(container.get(CodeEditorRepository))
-
-    def create_code_executor_service():
-        return EnhancedCodeExecutorService(container.get(CodeEditorRepository))
-
-    def create_mindmap_service():
-        return MindMapService(container.get(MindMapRepository))
-
-    def create_ai_test_generator_service():
-        return AITestGeneratorService(
-            container.get(ContentRepository), container.get(TaskRepository)
+    # Сервисы с простыми зависимостями (один репозиторий)
+    simple_services = [
+        (AuthService, SQLAlchemyUserRepository),
+        (ContentService, ContentRepository),
+        (TaskService, TaskRepository),
+        (TheoryService, TheoryRepository),
+        (ProgressService, ProgressRepository),
+        (StatsService, StatsRepository),
+        (CodeEditorService, CodeEditorRepository),
+        (EnhancedCodeExecutorService, CodeEditorRepository),
+        (MindMapService, MindMapRepository),
+    ]
+    
+    for service_class, repo_class in simple_services:
+        container.register_transient(
+            service_class, lambda svc=service_class, repo=repo_class: svc(container.get(repo))
         )
-
-    container.register_transient(AuthService, create_auth_service)
-    container.register_transient(ContentService, create_content_service)
-    container.register_transient(TaskService, create_task_service)
-    container.register_transient(TheoryService, create_theory_service)
-    container.register_transient(ProgressService, create_progress_service)
-    container.register_transient(StatsService, create_stats_service)
-    container.register_transient(CodeEditorService, create_code_editor_service)
+    
+    # Сервисы со сложными зависимостями
     container.register_transient(
-        EnhancedCodeExecutorService, create_code_executor_service
-    )
-    container.register_transient(MindMapService, create_mindmap_service)
-    container.register_transient(
-        AITestGeneratorService, create_ai_test_generator_service
+        AITestGeneratorService, 
+        lambda: AITestGeneratorService(
+            container.get(ContentRepository), 
+            container.get(TaskRepository)
+        )
     )
 
     logger.info("DI Container configured successfully")
 
 
-# Декоратор для внедрения зависимостей
-def inject(service_type: Type[T]):
-    """
-    Декоратор для внедрения зависимостей
-
-    Usage:
-        @inject(AuthService)
-        def my_function(auth_service: AuthService):
-            # auth_service будет автоматически внедрен
-            pass
-    """
-
-    def decorator(func: Callable):
-        def wrapper(*args, **kwargs):
-            container = get_container()
-            service = container.get(service_type)
-            return func(*args, service, **kwargs)
-
-        return wrapper
-
-    return decorator
 
 
 # FastAPI Dependencies
@@ -239,48 +196,6 @@ def create_service_dependency(service_type: Type[T]) -> Callable[[], T]:
     return get_service
 
 
-class ServiceFactory:
-    """Фабрика для создания сервисов"""
-
-    @staticmethod
-    def create_auth_service() -> "AuthService":
-        return get_container().get(AuthService)
-
-    @staticmethod
-    def create_content_service() -> "ContentService":
-        return get_container().get(ContentService)
-
-    @staticmethod
-    def create_task_service() -> "TaskService":
-        return get_container().get(TaskService)
-
-    @staticmethod
-    def create_theory_service() -> "TheoryService":
-        return get_container().get(TheoryService)
-
-    @staticmethod
-    def create_progress_service() -> "ProgressService":
-        return get_container().get(ProgressService)
-
-    @staticmethod
-    def create_stats_service() -> "StatsService":
-        return get_container().get(StatsService)
-
-    @staticmethod
-    def create_code_editor_service() -> "CodeEditorService":
-        return get_container().get(CodeEditorService)
-
-    @staticmethod
-    def create_code_executor_service() -> "EnhancedCodeExecutorService":
-        return get_container().get(EnhancedCodeExecutorService)
-
-    @staticmethod
-    def create_ai_test_generator_service() -> "AITestGeneratorService":
-        return get_container().get(AITestGeneratorService)
-
-    @staticmethod
-    def create_mindmap_service() -> "MindMapService":
-        return get_container().get(MindMapService)
 
 
 # Middleware для настройки контейнера при старте приложения

@@ -3,20 +3,18 @@
 from app.shared.database.base import (
     Base,
     BaseModel,
-    BaseRepository,
     async_transactional,
     db_manager,
     get_db_session,
     get_db_transaction,
     transactional,
 )
+from app.shared.database.repository import BaseRepository
 
-# Экспорт для обратной совместимости
 engine = db_manager.engine
 SessionLocal = db_manager.SessionLocal
 get_db = get_db_session
 
-# Экспорт всех необходимых компонентов
 __all__ = [
     "engine",
     "SessionLocal",

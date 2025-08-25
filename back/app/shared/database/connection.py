@@ -6,7 +6,6 @@ from sqlalchemy.orm import sessionmaker
 
 from app.core.settings import settings
 
-# Создание engine с новой конфигурацией
 engine = create_engine(
     settings.database_url,
     echo=settings.database_echo,
@@ -16,14 +15,12 @@ engine = create_engine(
     pool_recycle=3600,
 )
 
-# Создание сессии
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Базовая модель
 Base = declarative_base()
 
 
-# Зависимость для получения сессии базы данных
 def get_db():
     """Получение сессии базы данных"""
     db = SessionLocal()

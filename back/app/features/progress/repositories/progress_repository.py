@@ -556,17 +556,19 @@ class ProgressRepository(BaseRepository[UserCategoryProgress]):
                 # Активные пользователи сегодня
                 func.count(
                     func.distinct(
-                        func.case([
-                            (func.date(TaskAttempt.createdAt) == today, TaskAttempt.userId)
-                        ])
+                        case(
+                            (func.date(TaskAttempt.createdAt) == today, TaskAttempt.userId),
+                            else_=None
+                        )
                     )
                 ).label("active_users_today"),
                 # Активные пользователи за неделю
                 func.count(
                     func.distinct(
-                        func.case([
-                            (func.date(TaskAttempt.createdAt) >= week_ago, TaskAttempt.userId)
-                        ])
+                        case(
+                            (func.date(TaskAttempt.createdAt) >= week_ago, TaskAttempt.userId),
+                            else_=None
+                        )
                     )
                 ).label("active_users_week"),
             )

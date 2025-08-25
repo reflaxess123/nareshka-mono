@@ -1,13 +1,10 @@
 """Базовая модель и система транзакций"""
 
-import asyncio
 from contextlib import contextmanager
-from datetime import datetime
 from functools import wraps
-from typing import Any, Callable, Dict, Type, TypeVar
+from typing import Callable, TypeVar
 
-from sqlalchemy import Boolean, Column, DateTime, Integer, text
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import text
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.core.logging import get_logger
@@ -15,50 +12,12 @@ from app.core.settings import settings
 
 logger = get_logger(__name__)
 
-# Создаем базовую модель
-Base = declarative_base()
+from app.shared.database.models import BaseModel
+
+Base = BaseModel
 
 # Type для generic модели
 T = TypeVar("T", bound="BaseModel")
-
-
-class BaseModel(Base):
-    """Базовая модель для всех таблиц"""
-
-    __abstract__ = True
-
-    id = Column(Integer, primary_key=True, index=True)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
-    )
-    is_deleted = Column(Boolean, default=False, nullable=False)
-
-    def __repr__(self) -> str:
-        return f"<{self.__class__.__name__}(id={self.id})>"
-
-    def to_dict(self) -> Dict[str, Any]:
-        """Преобразовать модель в словарь"""
-        return {
-            column.name: getattr(self, column.name) for column in self.__table__.columns
-        }
-
-    @classmethod
-    def from_dict(cls: Type[T], data: Dict[str, Any]) -> T:
-        """Создать модель из словаря"""
-        return cls(**data)
-
-    def soft_delete(self) -> None:
-        """Мягкое удаление записи"""
-        self.is_deleted = True
-        self.updated_at = datetime.utcnow()
-        logger.info(f"Soft deleted {self.__class__.__name__}", record_id=self.id)
-
-    def restore(self) -> None:
-        """Восстановить мягко удаленную запись"""
-        self.is_deleted = False
-        self.updated_at = datetime.utcnow()
-        logger.info(f"Restored {self.__class__.__name__}", record_id=self.id)
 
 
 class DatabaseManager:
@@ -126,11 +85,7 @@ class DatabaseManager:
             return False
 
 
-# Глобальный менеджер БД
-# ВАЖНО: Используем исправленный URL напрямую пока settings не обновится
-db_manager = DatabaseManager(
-    "postgresql://postgres:dev_password@127.0.0.1:5432/nareshka_dev?sslmode=disable"
-)
+db_manager = DatabaseManager(settings.database_url)
 
 
 def transactional(func: Callable) -> Callable:
@@ -162,32 +117,15 @@ def transactional(func: Callable) -> Callable:
 def async_transactional(func: Callable) -> Callable:
     """
     Декоратор для выполнения async функции в транзакции
-
-    Использование:
-    @async_transactional
-    async def create_user(name: str) -> User:
-        # Код будет выполнен в транзакции
-        pass
+    ВНИМАНИЕ: Этот декоратор предназначен для будущего использования с async ORM
+    В текущей реализации с синхронным SQLAlchemy используйте обычный @transactional
     """
+    logger.warning(
+        f"async_transactional используется для {func.__name__}. "
+        f"Рекомендуется использовать @transactional для синхронных функций."
+    )
 
-    @wraps(func)
-    async def wrapper(*args, **kwargs):
-        # Проверяем, есть ли уже session в kwargs
-        if "session" in kwargs:
-            # Если session уже есть, используем её
-            return await func(*args, **kwargs)
-
-        # Создаем новую транзакцию в thread pool
-        def run_in_transaction():
-            with db_manager.get_transaction() as session:
-                kwargs["session"] = session
-                return func(*args, **kwargs)
-
-        # Выполняем в отдельном thread
-        loop = asyncio.get_event_loop()
-        return await loop.run_in_executor(None, run_in_transaction)
-
-    return wrapper
+    return transactional(func)
 
 
 # Dependency для получения сессии
