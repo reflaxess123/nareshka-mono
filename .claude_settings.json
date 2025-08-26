@@ -1,44 +1,127 @@
 {
   "project": {
     "name": "Nareshka Platform",
-    "description": "Full-stack образовательная платформа с ML-анализом интервью",
+    "description": "Full-stack образовательная платформа с ML-анализом интервью и интерактивным обучением программированию",
     "type": "full-stack",
-    "languages": ["Python", "TypeScript", "JavaScript", "SQL"],
-    "frameworks": ["FastAPI", "React", "SQLAlchemy", "Vite"],
-    "version": "2.0.0"
+    "languages": ["Python", "TypeScript", "JavaScript", "SQL", "SCSS"],
+    "frameworks": ["FastAPI", "React", "SQLAlchemy", "Vite", "Redux Toolkit", "React Query"],
+    "version": "3.0.0",
+    "architecture": {
+      "backend": "Feature-First + Clean Architecture",
+      "frontend": "Feature-Sliced Design (FSD)"
+    }
   },
   "development": {
     "preferred_editor": "webstorm",
-    "python_version": "3.11",
-    "node_version": "20",
+    "python_version": "3.9+",
+    "node_version": "20+",
     "package_manager": {
       "backend": "poetry",
       "frontend": "npm"
+    },
+    "linters": {
+      "backend": "ruff",
+      "frontend": "eslint"
+    },
+    "type_checkers": {
+      "backend": "mypy",
+      "frontend": "typescript"
     }
   },
   "commands": {
-    "dev_start": "start-dev-simple.bat",
+    "dev_start": "start.bat",
     "backend_dev": "cd back && poetry run uvicorn main:app --host 0.0.0.0 --port 4000 --reload",
     "frontend_dev": "cd front && npm run dev",
     "lint_backend": "cd back && poetry run ruff check .",
+    "format_backend": "cd back && poetry run ruff format .",
     "lint_frontend": "cd front && npm run lint",
-    "type_check": "cd front && npm run type-check && cd ../back && poetry run mypy .",
-    "test_backend": "cd back && poetry run pytest",
+    "type_check_backend": "cd back && poetry run mypy . --config-file .mypy.ini",
+    "type_check_frontend": "cd front && npm run type-check",
     "api_generate": "cd front && npm run api:generate",
+    "api_watch": "cd front && npm run api:watch",
     "db_migrate": "cd back && alembic upgrade head",
     "db_create_migration": "cd back && alembic revision --autogenerate -m",
     "docker_dev": "docker-compose -f docker-compose.dev.yml up",
-    "docker_prod": "docker-compose up -d"
+    "docker_prod": "docker-compose up -d",
+    "build_frontend": "cd front && npm run build",
+    "preview_frontend": "cd front && npm run preview"
   },
   "paths": {
-    "backend": "back/",
-    "frontend": "front/",
-    "data": "sobes-data/",
-    "scripts": "back/scripts/",
-    "analysis": "sobes-data/analysis/",
-    "migrations": "back/alembic/versions/",
-    "logs": "back/logs/",
-    "uploads": "back/uploads/"
+    "backend": {
+      "root": "back/",
+      "app": "back/app/",
+      "features": "back/app/features/",
+      "shared": "back/app/shared/",
+      "core": "back/app/core/",
+      "scripts": "back/scripts/",
+      "migrations": "back/alembic/versions/",
+      "logs": "back/logs/",
+      "uploads": "back/uploads/"
+    },
+    "frontend": {
+      "root": "front/",
+      "src": "front/src/",
+      "app": "front/src/app/",
+      "pages": "front/src/pages/",
+      "widgets": "front/src/widgets/",
+      "features": "front/src/features/",
+      "entities": "front/src/entities/",
+      "shared": "front/src/shared/",
+      "api": "front/src/shared/api/",
+      "components": "front/src/shared/components/",
+      "styles": "front/src/app/styles/"
+    },
+    "data": {
+      "root": "sobes-data/",
+      "analysis": "sobes-data/analysis/",
+      "datasets": "sobes-data/datasets/",
+      "interviews": "sobes-data/interviews/"
+    }
+  },
+  "backend_structure": {
+    "features": [
+      "auth",
+      "interviews", 
+      "code_editor",
+      "mindmap",
+      "progress",
+      "theory",
+      "admin",
+      "logs",
+      "stats",
+      "task",
+      "content",
+      "visualization"
+    ],
+    "patterns": [
+      "Dependency Injection",
+      "Repository Pattern",
+      "Service Layer",
+      "Feature-First",
+      "DTO Pattern"
+    ]
+  },
+  "frontend_structure": {
+    "layers": {
+      "app": "Конфигурация приложения и провайдеры",
+      "pages": "Страницы и роутинг",
+      "widgets": "Композитные UI блоки",
+      "features": "Бизнес-функции",
+      "entities": "Бизнес-сущности",
+      "shared": "Переиспользуемый код"
+    },
+    "state_management": {
+      "global": "Redux Toolkit",
+      "server": "React Query v5",
+      "forms": "React Hook Form + Zod"
+    },
+    "ui_libraries": [
+      "Monaco Editor",
+      "React Flow (XYFlow)",
+      "Framer Motion",
+      "D3.js",
+      "ECharts"
+    ]
   },
   "database": {
     "dev_url": "postgresql://postgres:dev_password@127.0.0.1:5432/nareshka_dev",
@@ -49,37 +132,102 @@
       "User",
       "ContentBlock",
       "Task",
-      "Progress"
-    ]
+      "Progress",
+      "TheoryCard",
+      "TaskAttempt"
+    ],
+    "orm": "SQLAlchemy",
+    "migrations": "Alembic"
   },
   "apis": {
     "backend": "http://localhost:4000",
     "frontend": "http://localhost:5173",
     "docs": "http://localhost:4000/docs",
-    "openapi": "http://localhost:4000/openapi.json"
+    "openapi": "http://localhost:4000/openapi.json",
+    "logs_viewer": "http://localhost:4000/api/logs/viewer"
+  },
+  "api_endpoints": {
+    "auth": [
+      "POST /api/v2/auth/register",
+      "POST /api/v2/auth/login",
+      "POST /api/v2/auth/refresh",
+      "GET /api/v2/auth/me"
+    ],
+    "interviews": [
+      "GET /api/v2/interview-categories/",
+      "GET /api/v2/interview-categories/search/questions",
+      "GET /api/v2/interviews/companies/list",
+      "GET /api/v2/interviews/"
+    ],
+    "code_editor": [
+      "POST /api/v2/code-editor/execute",
+      "POST /api/v2/code-editor/validate",
+      "POST /api/v2/code-editor/generate-tests"
+    ],
+    "mindmap": [
+      "POST /api/v2/mindmap/generate",
+      "GET /api/v2/mindmap/progress"
+    ],
+    "progress": [
+      "GET /api/v2/progress/",
+      "POST /api/v2/progress/update",
+      "GET /api/v2/progress/analytics"
+    ],
+    "theory": [
+      "GET /api/v2/theory/cards",
+      "GET /api/v2/theory/quiz"
+    ],
+    "stats": [
+      "GET /api/v2/stats/dashboard",
+      "GET /api/v2/stats/user/{id}"
+    ],
+    "admin": [
+      "GET /api/v2/admin/users",
+      "GET /api/v2/admin/stats"
+    ],
+    "logs": [
+      "GET /api/logs/viewer",
+      "GET /api/logs/recent",
+      "POST /api/logs/external",
+      "WS /api/logs/stream"
+    ]
   },
   "features": {
     "code_execution": {
       "enabled": true,
-      "isolation": "docker",
+      "isolation": "docker-in-docker",
       "languages": ["python", "javascript", "java", "cpp", "typescript"],
-      "security": "sandboxed"
+      "security": "sandboxed",
+      "fallback": "Judge0 API",
+      "validation": "multi-level dangerous patterns check"
     },
     "interviews": {
       "total_questions": 8560,
       "categories": 13,
       "companies": 380,
-      "ml_categorization": true
+      "ml_categorization": true,
+      "clustering": "BERTopic + HDBSCAN",
+      "search": "PostgreSQL full-text search"
     },
     "mindmaps": {
       "enabled": true,
-      "technology": "React Flow",
-      "dynamic_generation": true
+      "technology": "React Flow (XYFlow)",
+      "dynamic_generation": true,
+      "3d_visualization": true
     },
     "ai_features": {
       "test_generation": true,
       "code_validation": true,
-      "question_categorization": true
+      "question_categorization": true,
+      "gpt_postprocessing": true
+    },
+    "logging": {
+      "structured": true,
+      "format": "JSON",
+      "library": "structlog",
+      "websocket_streaming": true,
+      "chrome_mcp_integration": true,
+      "correlation_id": true
     }
   },
   "ml_pipeline": {
@@ -87,14 +235,78 @@
     "embeddings": "paraphrase-multilingual-mpnet-base-v2",
     "clustering": "HDBSCAN",
     "postprocessing": "GPT-4",
-    "quality": "82% useful clusters"
+    "quality": "82% useful clusters",
+    "coverage": "100% questions categorized"
   },
   "security": {
-    "code_execution": "docker-in-docker",
+    "code_execution": "docker-in-docker with isolation",
     "network_isolation": true,
     "resource_limits": true,
     "dangerous_patterns_validation": true,
-    "authentication": "JWT + Sessions",
-    "cors_enabled": true
+    "authentication": "JWT + Sessions with Redis",
+    "cors_enabled": true,
+    "rate_limiting": "SlowAPI",
+    "sensitive_data_filtering": true
+  },
+  "deployment": {
+    "docker": {
+      "compose_dev": "docker-compose.dev.yml",
+      "compose_prod": "docker-compose.yml",
+      "multi_stage_builds": true,
+      "health_checks": true
+    },
+    "dokploy": {
+      "auto_deploy": true,
+      "ssl_tls": "Traefik",
+      "backup_system": true
+    },
+    "nginx": {
+      "reverse_proxy": true,
+      "gzip_compression": true
+    }
+  },
+  "monitoring": {
+    "chrome_monitor": {
+      "auto_start": true,
+      "send_interval": 60,
+      "tracks": ["console", "xhr", "errors", "performance"]
+    },
+    "endpoints": {
+      "logs_viewer": "/api/logs/viewer",
+      "logs_api": "/api/logs/recent",
+      "health": "/api/health",
+      "metrics": "/metrics"
+    }
+  },
+  "testing": {
+    "backend": {
+      "framework": "pytest",
+      "integration_tests": true
+    },
+    "frontend": {
+      "framework": "vitest",
+      "e2e": "playwright"
+    }
+  },
+  "mcp_servers": [
+    "postgres",
+    "git",
+    "chrome",
+    "filesystem",
+    "github",
+    "ide"
+  ],
+  "environment_variables": {
+    "backend": [
+      "DATABASE_URL",
+      "REDIS_URL",
+      "SECRET_KEY",
+      "DEBUG",
+      "ALLOWED_ORIGINS"
+    ],
+    "frontend": [
+      "VITE_API_URL",
+      "VITE_APP_ENV"
+    ]
   }
 }
