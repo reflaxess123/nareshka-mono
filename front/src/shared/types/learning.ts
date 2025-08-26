@@ -2,6 +2,8 @@
  * Общие типы для унифицированной системы обучения
  */
 
+import type { InterviewResponse, ContentBlockResponse, TheoryCardResponse, QuestionResponse } from './api-responses';
+
 export type ContentType = 'interviews' | 'questions' | 'practice' | 'theory';
 
 export interface UniversalContentItem {
@@ -23,23 +25,39 @@ export interface UniversalContentItem {
   isCompleted?: boolean;      // для practice/theory
   studyCount?: number;        // для theory (количество изучений)
   solvedCount?: number;       // для practice (количество решений)
+  codeLanguage?: string;      // для practice
   
   // Временные метки
   createdAt: string;
   updatedAt?: string;
   
   // Специфичные данные в metadata
-  metadata: Record<string, any>;
+  metadata: {
+    interviewInfo?: {
+      formattedName: string;
+      id: string;
+    };
+    webdavPath?: string;
+    technologies?: string[];
+    duration?: string;
+    cardType?: string;
+    questionBlock?: string;
+    answerBlock?: string;
+    fullContent?: string;
+    textContent?: string;
+    interviewId?: string;
+    originalData?: InterviewResponse | ContentBlockResponse | TheoryCardResponse | QuestionResponse;
+  };
 }
 
 export interface LearningFilters {
-  contentTypes: ContentType[];
+  contentTypes?: ContentType[];
   search?: string;
   companies?: string[];
   categories?: string[];
-  clusters?: string[];
+  clusters?: number[];
   subCategories?: string[];
-  difficulty?: string[];
+  difficulty?: ('easy' | 'medium' | 'hard')[];
   has_audio?: boolean;
   hasAudio?: boolean; // deprecated, use has_audio
   onlyCompleted?: boolean;
@@ -133,9 +151,9 @@ export interface LearningSearchRequest {
   search?: string;
   companies?: string[];
   categories?: string[];
-  clusters?: string[];
+  clusters?: number[];
   subCategories?: string[];
-  difficulty?: string[];
+  difficulty?: ('easy' | 'medium' | 'hard')[];
   has_audio?: boolean;
   hasAudio?: boolean; // deprecated, use has_audio
   onlyCompleted?: boolean;

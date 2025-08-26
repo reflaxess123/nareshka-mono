@@ -158,12 +158,6 @@ const progressAPI = {
     const response = await apiInstance.get('/v2/progress/analytics');
     return response.data;
   },
-
-  // Проверка работоспособности
-  async healthCheck(): Promise<{ status: string }> {
-    const response = await apiInstance.get('/v2/progress/health');
-    return response.data;
-  },
 };
 
 export { progressAPI };

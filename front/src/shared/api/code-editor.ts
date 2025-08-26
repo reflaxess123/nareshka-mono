@@ -1,6 +1,5 @@
 import { apiInstance } from './base';
 
-// Types
 export interface SupportedLanguage {
   id: string;
   name: string;
@@ -76,7 +75,6 @@ export interface ExecutionStats {
   }>;
 }
 
-// API Functions
 export const codeEditorApi = {
   // Получение поддерживаемых языков
   async getSupportedLanguages(): Promise<SupportedLanguage[]> {
@@ -131,17 +129,6 @@ export const codeEditorApi = {
     return response.data;
   },
 
-  // Обновление решения
-  async updateSolution(
-    solutionId: string,
-    update: CodeSolutionUpdate
-  ): Promise<UserCodeSolution> {
-    const response = await apiInstance.put(
-      `/v2/code-editor/solutions/${solutionId}`,
-      update
-    );
-    return response.data;
-  },
 
   // Получение статистики
   async getExecutionStats(): Promise<ExecutionStats> {
@@ -189,7 +176,6 @@ export const codeEditorApi = {
   },
 };
 
-// React Query hooks keys
 export const codeEditorKeys = {
   all: ['codeEditor'] as const,
   languages: () => [...codeEditorKeys.all, 'languages'] as const,

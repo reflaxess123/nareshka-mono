@@ -2,7 +2,7 @@
 export interface ApiError {
   message: string;
   code?: string;
-  details?: Record<string, unknown>;
+  details?: Record<string, string | number | boolean | null>;
 }
 
 export interface ApiResponse<TData = unknown> {
@@ -37,8 +37,8 @@ export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 export interface RequestConfig {
   method: HttpMethod;
   url: string;
-  data?: unknown;
-  params?: Record<string, unknown>;
+  data?: string | Record<string, string | number | boolean | null>;
+  params?: Record<string, string | number | boolean>;
   headers?: Record<string, string>;
 }
 

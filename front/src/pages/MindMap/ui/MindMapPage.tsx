@@ -1,5 +1,5 @@
-import { TechnologySwitcher } from '@/components/TechnologySwitcher';
-import { useGenerateMindmapApiV2MindmapGenerateGet } from '@/shared/api/generated/api';
+import { TechnologySwitcher } from '@/features/TechnologySwitcher';
+import { useGenerateMindmapApiV2MindmapGenerateGet, useGetCategoriesApiV2InterviewCategoriesGet } from '@/shared/api/generated/api';
 import { BottomNavBar } from '@/shared/components/BottomNavBar';
 import type { TechnologyType } from '@/types/mindmap';
 import {
@@ -16,15 +16,12 @@ import {
 import '@xyflow/react/dist/style.css';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { TaskDetailModal } from '../../../components/mindmap/TaskDetailModal';
-import CenterNode from '../../../components/MindMapNodes/CenterNode';
-import MindMapProgressSidebar from '../../../components/MindMapNodes/MindMapProgressSidebar';
-import TopicNode from '../../../components/MindMapNodes/TopicNode';
-import InterviewRootNode from '../../../components/mindmap/InterviewRootNode';
-import InterviewCategoryNode from '../../../components/mindmap/InterviewCategoryNode';
-import InterviewCategorySidebar from '../../../components/mindmap/InterviewCategorySidebar';
+import { TaskDetailModal } from '@/widgets/TaskDetailModal';
+import { CenterNode, TopicNode } from '@/features/visualizations/MindMapNodes';
+import { MindMapProgressSidebar } from '@/widgets/MindMapProgressSidebar';
+import { InterviewRootNode, InterviewCategoryNode } from '@/features/visualizations/InterviewMapNodes';
+import { InterviewCategorySidebar } from '@/widgets/InterviewCategorySidebar';
 import { useTaskDetails } from '../../../hooks/useMindMap';
-import { useInterviewsVisualization } from '../../../hooks/useInterviewsVisualization';
 import styles from './MindMapPage.module.scss';
 
 interface MindMapData {
@@ -70,6 +67,20 @@ const interviewNodeTypes: NodeTypes = {
 const NewMindMapPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
+
+  // Подавляем ResizeObserver ошибки (это известная проблема React Flow)
+  useEffect(() => {
+    const originalError = console.error;
+    console.error = (...args) => {
+      if (args[0]?.includes?.('ResizeObserver loop completed')) {
+        return; // Игнорируем ResizeObserver ошибки
+      }
+      originalError(...args);
+    };
+    return () => {
+      console.error = originalError;
+    };
+  }, []);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [selectedTopic, setSelectedTopic] = useState<SelectedTopicData | null>(
     null
@@ -82,7 +93,9 @@ const NewMindMapPage: React.FC = () => {
 
   // Получаем текущую технологию из URL параметров
   const currentTechnology = (searchParams.get('tech') as TechnologyType) || 'javascript';
-  
+
+  console.log('🎆 Current Technology:', currentTechnology, 'is interviews?', currentTechnology === 'interviews');
+
   // Состояние для выбранной категории интервью
   const selectedCategoryId = searchParams.get('category');
   const [selectedCategory, setSelectedCategory] = useState<{
@@ -93,8 +106,113 @@ const NewMindMapPage: React.FC = () => {
     percentage: number;
   } | null>(null);
 
-  // Используем хук для данных интервью
-  const interviewsData = useInterviewsVisualization();
+  // Получаем данные категорий интервью через API
+  const queryResult = useGetCategoriesApiV2InterviewCategoriesGet({
+    query: {
+      enabled: currentTechnology === 'interviews'
+    }
+  });
+
+  console.log('🔧 Full React Query result:', {
+    queryResult: Object.keys(queryResult),
+    data: queryResult.data,
+    isLoading: queryResult.isLoading,
+    error: queryResult.error,
+    isSuccess: queryResult.isSuccess,
+    status: queryResult.status
+  });
+
+  const {
+    data: interviewCategoriesResponse,
+    isLoading: interviewCategoriesLoading,
+    error: interviewCategoriesError
+  } = queryResult;
+
+  // Преобразуем данные в формат для React Flow
+  const interviewsData = React.useMemo(() => {
+    if (!interviewCategoriesResponse || !Array.isArray(interviewCategoriesResponse)) {
+      return {
+        nodes: [],
+        edges: [],
+        data: { categories: [], nodes: [], edges: [] },
+        isLoading: interviewCategoriesLoading,
+        error: interviewCategoriesError
+      };
+    }
+
+    const categories = interviewCategoriesResponse;
+    const totalQuestions = categories.reduce((sum, cat) => sum + (cat.questions_count || 0), 0);
+    const totalClusters = categories.reduce((sum, cat) => sum + (cat.clusters_count || 0), 0);
+
+    // Идеальное центрирование для React Flow
+    // React Flow лучше всего работает с fitView, поэтому используем компактные координаты
+    const centerX = 0;
+    const centerY = 0;
+
+    const rootNode = {
+      id: 'root',
+      type: 'interviewRoot',
+      position: { x: centerX, y: centerY },
+      data: {
+        totalQuestions,
+        totalClusters,
+        totalCategories: categories.length
+      }
+    };
+
+    // Оптимальное позиционирование категорий по кругу
+    const categoryNodes = categories.map((category, index) => {
+      // Начинаем с верхнего положения (12 часов) и двигаемся по часовой стрелке
+      const angle = (2 * Math.PI * index) / categories.length - Math.PI / 2;
+
+      // Уменьшаем радиус до комфортного расстояния
+      // Минимальный радиус чтобы не налезали: ~450px
+      const radius = 550;
+
+      const x = centerX + radius * Math.cos(angle);
+      const y = centerY + radius * Math.sin(angle);
+
+      return {
+        id: category.id.toString(),
+        type: 'interviewCategory',
+        position: { x, y },
+        data: {
+          id: category.id.toString(),
+          name: category.name,
+          questionsCount: category.questions_count || 0,
+          clustersCount: category.clusters_count || 0,
+          percentage: category.percentage || 0
+        }
+      };
+    });
+
+    const nodes = [rootNode, ...categoryNodes];
+
+    // Создаем связи от центра к категориям
+    const edges = categoryNodes.map((node, index) => ({
+      id: `e${index + 1}`,
+      source: 'root',
+      target: node.id
+    }));
+
+    return {
+      nodes,
+      edges,
+      data: {
+        categories: categories.map(cat => ({
+          id: cat.id.toString(),
+          name: cat.name,
+          questionsCount: cat.questions_count || 0,
+          clustersCount: cat.clusters_count || 0,
+          percentage: cat.percentage || 0
+        })),
+        nodes,
+        edges
+      },
+      isLoading: interviewCategoriesLoading,
+      error: interviewCategoriesError
+    };
+  }, [interviewCategoriesResponse, interviewCategoriesLoading, interviewCategoriesError]);
 
   // Используем generated hook для получения данных mindmap
   const {
@@ -113,7 +231,7 @@ const NewMindMapPage: React.FC = () => {
     }
   );
 
-  const mindMapData = mindMapResponse?.data as unknown as MindMapData | null;
+  const mindMapData = mindMapResponse?.data as MindMapData | undefined;
 
   // Выбираем данные и состояния в зависимости от режима
   const isInterviewsMode = currentTechnology === 'interviews';
@@ -143,13 +261,13 @@ const NewMindMapPage: React.FC = () => {
           clustersCount: node.data.clustersCount as number,
           percentage: node.data.percentage as number
         };
-        
+
         // Обновляем URL с параметром category
         const newParams = new URLSearchParams(searchParams);
         newParams.set('tech', 'interviews');
         newParams.set('category', categoryData.id);
         setSearchParams(newParams);
-        
+
         setSelectedCategory(categoryData);
       }
       return;
@@ -184,31 +302,35 @@ const NewMindMapPage: React.FC = () => {
     if (currentTechnology === 'interviews' && selectedCategoryId && interviewsData.data) {
       // Находим данные категории из nodes
       const categoryNode = interviewsData.data.nodes.find(
-        node => node.type === 'interviewCategory' && node.data.id === selectedCategoryId
+        (node) => node.type === 'interviewCategory' && 
+        'id' in node.data && node.data.id === selectedCategoryId
       );
-      
-      if (categoryNode && (!selectedCategory || selectedCategory.id !== selectedCategoryId)) {
-        setSelectedCategory({
-          id: categoryNode.data.id as string,
-          name: categoryNode.data.name as string,
-          questionsCount: categoryNode.data.questionsCount as number,
-          clustersCount: categoryNode.data.clustersCount as number,
-          percentage: categoryNode.data.percentage as number
-        });
+
+      if (categoryNode && categoryNode.type === 'interviewCategory' && (!selectedCategory || selectedCategory.id !== selectedCategoryId)) {
+        const nodeData = categoryNode.data;
+        if ('id' in nodeData && 'name' in nodeData && 'questionsCount' in nodeData && 'clustersCount' in nodeData && 'percentage' in nodeData) {
+          setSelectedCategory({
+            id: nodeData.id as string,
+            name: nodeData.name as string,
+            questionsCount: nodeData.questionsCount as number,
+            clustersCount: nodeData.clustersCount as number,
+            percentage: nodeData.percentage as number
+          });
+        }
       }
     } else if (!selectedCategoryId && selectedCategory) {
       // Если в URL нет category, но в state есть - сбрасываем
       setSelectedCategory(null);
     }
-  }, [selectedCategoryId, currentTechnology, interviewsData.data]);
+  }, [selectedCategoryId, currentTechnology, interviewsData, selectedCategory]);
 
   // Обновляем nodes и edges при изменении данных
   useEffect(() => {
     if (isInterviewsMode) {
       // Используем данные интервью
-      if (interviewsData.data) {
-        setNodes(interviewsData.data.nodes);
-        setEdges(interviewsData.data.edges);
+      if (interviewsData.nodes && interviewsData.edges) {
+        setNodes(interviewsData.nodes);
+        setEdges(interviewsData.edges);
       }
     } else {
       // Используем обычные mindmap данные
@@ -217,7 +339,7 @@ const NewMindMapPage: React.FC = () => {
         setEdges(mindMapData.edges);
       }
     }
-  }, [mindMapData, interviewsData.data, isInterviewsMode, setNodes, setEdges]);
+  }, [mindMapData, interviewsData, isInterviewsMode, setNodes, setEdges]);
 
   if (loading) {
     return (
@@ -252,6 +374,24 @@ const NewMindMapPage: React.FC = () => {
       >
         ❌ Ошибка загрузки данных:{' '}
         {error instanceof Error ? error.message : 'Произошла ошибка'}
+      </div>
+    );
+  }
+
+  if (isInterviewsMode && (!interviewsData.nodes || interviewsData.nodes.length === 0)) {
+    return (
+      <div
+        style={{
+          width: '100vw',
+          height: '100vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          fontSize: '18px',
+          color: '#666',
+        }}
+      >
+        ❌ Нет данных интервью для отображения
       </div>
     );
   }
@@ -299,10 +439,14 @@ const NewMindMapPage: React.FC = () => {
           onNodeClick={onNodeClick}
           nodeTypes={nodeTypes}
           fitView
-          fitViewOptions={{ padding: 0.1, includeHiddenNodes: false }}
-          defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
-          minZoom={0.3}
-          maxZoom={2}
+          fitViewOptions={{
+            padding: 0.15, // Больше паддинга для красивого обрамления
+            includeHiddenNodes: false,
+            maxZoom: 1.2 // Ограничиваем авто-масштабирование
+          }}
+          defaultViewport={{ x: 0, y: 0, zoom: 0.9 }}
+          minZoom={0.4}
+          maxZoom={1.8}
           deleteKeyCode={null}
           multiSelectionKeyCode={null}
           panOnDrag={true}
@@ -326,7 +470,7 @@ const NewMindMapPage: React.FC = () => {
           >
             <MiniMap
               nodeColor={(node) => {
-                const data = node.data as Record<string, unknown>;
+                const data = node.data as { color?: string };
                 return (data.color as string) || '#e2e8f0';
               }}
               maskColor="rgba(0, 0, 0, 0.05)"
@@ -364,7 +508,7 @@ const NewMindMapPage: React.FC = () => {
               newParams.delete('category');
             }
             setSearchParams(newParams);
-            // НЕ вызываем setSelectedCategory(null) здесь - 
+            // НЕ вызываем setSelectedCategory(null) здесь -
             // useEffect сам сбросит state при изменении URL
           }}
           categoryId={selectedCategory.id}

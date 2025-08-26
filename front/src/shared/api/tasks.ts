@@ -88,57 +88,6 @@ class TasksAPI {
     return response.data;
   }
 
-  async getTaskCategories(): Promise<TaskCategory[]> {
-    const response = await apiInstance.get<TaskCategory[]>(
-      '/v2/tasks/categories'
-    );
-    return response.data;
-  }
-
-  async searchTasks(
-    query: string,
-    filters: Omit<TaskItemsFilters, 'q'> = {}
-  ): Promise<TaskItemsResponse> {
-    return this.getTaskItems({ ...filters, q: query });
-  }
-
-  async getTasksByCategory(
-    category: string,
-    subCategory?: string,
-    filters: Omit<TaskItemsFilters, 'category' | 'subCategory'> = {}
-  ): Promise<TaskItemsResponse> {
-    return this.getTaskItems({
-      ...filters,
-      category,
-      ...(subCategory && { subCategory }),
-    });
-  }
-
-  async getContentBlocks(
-    filters: Omit<TaskItemsFilters, 'itemType'> = {}
-  ): Promise<TaskItemsResponse> {
-    return this.getTaskItems({ ...filters, itemType: 'content_block' });
-  }
-
-  async getQuizCards(
-    filters: Omit<TaskItemsFilters, 'itemType'> = {}
-  ): Promise<TaskItemsResponse> {
-    return this.getTaskItems({ ...filters, itemType: 'theory_quiz' });
-  }
-
-  async getMoreTasks(
-    currentPage: number,
-    filters: TaskItemsFilters = {}
-  ): Promise<TaskItemsResponse> {
-    return this.getTaskItems({ ...filters, page: currentPage + 1 });
-  }
-
-  async getCompanies(): Promise<CompaniesResponse> {
-    const response = await apiInstance.get<CompaniesResponse>(
-      '/v2/tasks/companies'
-    );
-    return response.data;
-  }
 }
 
 export const tasksApi = new TasksAPI();

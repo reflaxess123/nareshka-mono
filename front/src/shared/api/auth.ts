@@ -1,7 +1,6 @@
 import type {
   AdminStats,
   AdminUser,
-  CreateUserRequest,
   LoginRequest,
   RegisterRequest,
   UpdateUserRequest,
@@ -67,14 +66,6 @@ export const authApi = {
       return response.data;
     },
 
-    async createUser(data: CreateUserRequest): Promise<AdminUser> {
-      const response = await apiInstance.post<AdminUser>(
-        '/v2/admin/users',
-        data
-      );
-      return response.data;
-    },
-
     async updateUser(
       userId: number,
       data: UpdateUserRequest
@@ -89,20 +80,6 @@ export const authApi = {
     async deleteUser(userId: number): Promise<void> {
       const response = await apiInstance.delete<void>(
         `/v2/admin/users/${userId}`
-      );
-      return response.data;
-    },
-
-    async getContentStats(): Promise<Record<string, unknown>> {
-      const response = await apiInstance.get<Record<string, unknown>>(
-        '/v2/admin/content/stats'
-      );
-      return response.data;
-    },
-
-    async deleteContentFile(fileId: string): Promise<void> {
-      const response = await apiInstance.delete<void>(
-        `/v2/admin/content/files/${fileId}`
       );
       return response.data;
     },

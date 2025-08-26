@@ -1,9 +1,4 @@
 import { authApi } from '@/shared/api/auth';
-import {
-  useGetContentStatsApiV2StatsStatsContentGet,
-  useGetTheoryStatsApiV2StatsStatsTheoryGet,
-  useGetUserStatsOverviewApiV2StatsStatsOverviewGet,
-} from '@/shared/api/generated/api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 // Ключи для кэширования
@@ -12,10 +7,6 @@ export const adminQueryKeys = {
   stats: () => [...adminQueryKeys.all, 'stats'] as const,
   users: () => [...adminQueryKeys.all, 'users'] as const,
   overview: () => [...adminQueryKeys.all, 'overview'] as const,
-  contentStats: (params?: { category?: string; includeBlocks?: boolean }) =>
-    [...adminQueryKeys.all, 'content-stats', params] as const,
-  theoryStats: (params?: { category?: string; includeCards?: boolean }) =>
-    [...adminQueryKeys.all, 'theory-stats', params] as const,
 };
 
 // Хук для получения основной статистики для админ-дашборда
@@ -43,7 +34,7 @@ export const useUsers = () => {
         return [];
       }
     },
-    staleTime: 1 * 60 * 1000, // 1 минута
+    staleTime: 60 * 1000, // 1 минута
     retry: 3,
   });
 };
@@ -97,47 +88,8 @@ export const useDetailedStats = () => {
   });
 };
 
-// Хук для получения статистики обзора
-export const useOverviewStats = () => {
-  return useGetUserStatsOverviewApiV2StatsStatsOverviewGet({
-    query: {
-      staleTime: 5 * 60 * 1000, // 5 минут
-      retry: 3,
-    },
-  });
-};
 
-// Хук для получения статистики контента
-export const useContentStats = (
-  params: {
-    category?: string;
-    includeBlocks?: boolean;
-  } = {}
-) => {
-  return useGetContentStatsApiV2StatsStatsContentGet({
-    query: {
-      enabled: Object.keys(params).length > 0,
-      staleTime: 5 * 60 * 1000, // 5 минут
-      retry: 3,
-    },
-  });
-};
 
-// Хук для получения статистики теории
-export const useTheoryStats = (
-  params: {
-    category?: string;
-    includeCards?: boolean;
-  } = {}
-) => {
-  return useGetTheoryStatsApiV2StatsStatsTheoryGet({
-    query: {
-      enabled: Object.keys(params).length > 0,
-      staleTime: 5 * 60 * 1000, // 5 минут
-      retry: 3,
-    },
-  });
-};
 
 // Хук для изменения роли пользователя
 export const useChangeUserRole = () => {

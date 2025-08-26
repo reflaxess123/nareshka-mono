@@ -9,8 +9,8 @@ export const QueryProvider = ({ children }: { children: React.ReactNode }) => {
           queries: {
             retry: 3,
             retryDelay: 1000,
-            staleTime: 5 * 60 * 1000, // 5 minutes
-            gcTime: 10 * 60 * 1000, // 10 minutes (was cacheTime in v4)
+            staleTime: 5 * 60 * 1000,
+            gcTime: 10 * 60 * 1000,
           },
           mutations: {
             retry: 2,

@@ -1,1 +1,0 @@
-export { InterviewsList } from './ui/InterviewsList';

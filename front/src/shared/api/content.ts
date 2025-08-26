@@ -2,13 +2,11 @@ import type {
   ContentBlock,
   ContentBlocksFilters,
   ContentBlocksResponse,
-  ContentCategory,
   ContentProgressResponse,
   ContentProgressUpdate,
 } from '@/entities/ContentBlock';
 import { apiInstance } from './base';
 
-// Тип для блока от сервера (с progressEntries)
 interface ServerContentBlock {
   id: string;
   fileId: string;
@@ -68,7 +66,7 @@ class ContentAPI {
     );
 
     // Преобразуем данные сервера в нужный формат
-    const transformedData: ContentBlocksResponse = {
+    return {
       data: response.data.blocks.map((block) => ({
         ...block,
         title: block.blockTitle,
@@ -80,8 +78,6 @@ class ContentAPI {
       })),
       pagination: response.data.pagination,
     };
-
-    return transformedData;
   }
 
   // Получение конкретного блока по ID
@@ -116,12 +112,6 @@ class ContentAPI {
     return response.data;
   }
 
-  // Получение иерархии категорий
-  async getCategories(): Promise<ContentCategory[]> {
-    const response = await apiInstance.get('/v2/content/categories');
-    return response.data;
-  }
-
   // Поиск блоков по тексту
   async searchBlocks(
     query: string,
@@ -143,13 +133,6 @@ class ContentAPI {
     });
   }
 
-  // Получение блоков с пагинацией (для бесконечного скролла)
-  async getMoreBlocks(
-    currentPage: number,
-    filters: ContentBlocksFilters = {}
-  ): Promise<ContentBlocksResponse> {
-    return this.getBlocks({ ...filters, page: currentPage + 1 });
-  }
 }
 
 export const contentApi = new ContentAPI();

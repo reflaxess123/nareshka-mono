@@ -3,17 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Mic, 
   Building2, 
-  Calendar, 
   BookOpen, 
   CheckCircle, 
   Code,
-  Code2,
   Clock,
   Brain,
   ExternalLink,
   PlayCircle,
-  FileText,
-  Eye
+  FileText
 } from 'lucide-react';
 import type { UniversalContentItem } from '@/shared/types/learning';
 import { CONTENT_TYPE_CONFIG } from '@/shared/types/learning';
@@ -34,6 +31,10 @@ export const UniversalContentCard: React.FC<UniversalContentCardProps> = ({
   const navigate = useNavigate();
   const config = CONTENT_TYPE_CONFIG[item.type];
   const { updateFilters } = useLearningStore();
+  
+  const [showAnswer, setShowAnswer] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const previewTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Получаем прогресс из localStorage для практики
   const getProgress = () => {
@@ -49,9 +50,37 @@ export const UniversalContentCard: React.FC<UniversalContentCardProps> = ({
   };
 
   const isCompleted = getProgress();
-  const [showAnswer, setShowAnswer] = useState(false);
-  const [showPreview, setShowPreview] = useState(false);
-  const previewTimerRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Функция для получения полного контента
+  const getFullContent = () => {
+    if (item.type === 'interviews') {
+      const originalData = item.metadata.originalData;
+      return item.metadata.fullContent || (originalData && 'content' in originalData ? originalData.content as string : '') || '';
+    }
+    if (item.type === 'practice') {
+      return item.metadata.textContent || '';
+    }
+    return '';
+  };
+
+  // Показывать превью только для интервью и практики
+  const canShowPreview = (item.type === 'interviews' || item.type === 'practice') && getFullContent();
+
+  // Обработчики превью с задержкой
+  const handleMouseEnter = useCallback(() => {
+    if (!canShowPreview) return;
+    previewTimerRef.current = setTimeout(() => {
+      setShowPreview(true);
+    }, 500);
+  }, [canShowPreview]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (previewTimerRef.current) {
+      clearTimeout(previewTimerRef.current);
+      previewTimerRef.current = null;
+    }
+    setShowPreview(false);
+  }, []);
 
   // Обработчик клика на карточку
   const handleCardClick = useCallback(() => {
@@ -62,7 +91,6 @@ export const UniversalContentCard: React.FC<UniversalContentCardProps> = ({
       case 'questions':
         // Копируем вопрос в буфер обмена
         navigator.clipboard.writeText(item.title);
-        // TODO: Показать toast уведомление
         break;
       case 'practice':
         navigate(`/code-editor?blockId=${item.id}`);
@@ -144,12 +172,13 @@ export const UniversalContentCard: React.FC<UniversalContentCardProps> = ({
         );
       }
       
-      if (item.metadata?.technologies?.length > 0) {
+      const technologies = item.metadata.technologies;
+      if (technologies && technologies.length > 0) {
         metaItems.push(
           <span key="tech" className={styles.metaItem}>
             <Code size={14} />
-            {item.metadata.technologies.slice(0, 2).join(', ')}
-            {item.metadata.technologies.length > 2 ? '...' : ''}
+            {technologies.slice(0, 2).join(', ')}
+            {technologies.length > 2 ? '...' : ''}
           </span>
         );
       }
@@ -213,37 +242,6 @@ export const UniversalContentCard: React.FC<UniversalContentCardProps> = ({
     );
   }
 
-  // Функция для получения полного контента
-  const getFullContent = () => {
-    if (item.type === 'interviews') {
-      return item.metadata?.fullContent || item.metadata?.originalData?.content || '';
-    }
-    if (item.type === 'practice') {
-      return item.metadata?.textContent || '';
-    }
-    return '';
-  };
-
-  // Показывать превью только для интервью и практики
-  const canShowPreview = (item.type === 'interviews' || item.type === 'practice') && getFullContent();
-
-  // Обработчики превью с задержкой
-  const handleMouseEnter = useCallback(() => {
-    if (canShowPreview) {
-      previewTimerRef.current = setTimeout(() => {
-        setShowPreview(true);
-      }, 500); // Задержка 500ms перед показом
-    }
-  }, [canShowPreview]);
-
-  const handleMouseLeave = useCallback(() => {
-    if (previewTimerRef.current) {
-      clearTimeout(previewTimerRef.current);
-      previewTimerRef.current = null;
-    }
-    setShowPreview(false);
-  }, []);
-
   // Вид списком
   if (viewMode === 'list') {
     return (
@@ -276,25 +274,29 @@ export const UniversalContentCard: React.FC<UniversalContentCardProps> = ({
               {renderMetaInfo()}
             </div>
             {/* Интервью-теги для вопросов */}
-            {item.type === 'questions' && item.metadata?.interviewInfo && (
-              <div className={styles.interviewTag}>
-                <button
-                  className={styles.interviewBadge}
-                  onClick={(e) => handleInterviewTagClick(e, item.metadata.interviewInfo.id)}
-                  title={`Показать все вопросы из ${item.metadata.interviewInfo.formattedName}`}
-                >
-                  <FileText size={12} />
-                  <span>
-                    {item.metadata.interviewInfo.formattedName}
-                    {interviewCounts[item.metadata.interviewInfo.id] > 1 && (
-                      <span className={styles.interviewCount}>
-                        {' '}• {interviewCounts[item.metadata.interviewInfo.id]} вопр
-                      </span>
-                    )}
-                  </span>
-                </button>
-              </div>
-            )}
+            {item.type === 'questions' && item.metadata.interviewInfo ? (() => {
+              const interviewInfo = item.metadata.interviewInfo;
+              if (!interviewInfo || !interviewInfo.id || !interviewInfo.formattedName) return null;
+              return (
+                <div className={styles.interviewTag}>
+                  <button
+                    className={styles.interviewBadge}
+                    onClick={(e) => handleInterviewTagClick(e, interviewInfo.id)}
+                    title={`Показать все вопросы из ${interviewInfo.formattedName}`}
+                  >
+                    <FileText size={12} />
+                    <span>
+                      {interviewInfo.formattedName}
+                      {interviewCounts[interviewInfo.id] > 1 && (
+                        <span className={styles.interviewCount}>
+                          {' '}• {interviewCounts[interviewInfo.id]} вопр
+                        </span>
+                      )}
+                    </span>
+                  </button>
+                </div>
+              );
+            })() : null}
           </div>
         </div>
         <div className={styles.listActions}>
@@ -313,7 +315,7 @@ export const UniversalContentCard: React.FC<UniversalContentCardProps> = ({
                 {item.type === 'interviews' ? '📄 Полное интервью' : '💻 Полное описание задачи'}
               </div>
               <div className={styles.previewText}>
-                {getFullContent()}
+{String(getFullContent() || '')}
               </div>
             </div>
           </div>

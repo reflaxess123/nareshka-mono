@@ -1,7 +1,7 @@
 import { AppRoutes } from '@/app/providers/router';
 import { Link } from '@/shared/components/Link';
 import clsx from 'clsx';
-import { Bird, Code, Home, Map } from 'lucide-react';
+import { Code, Home, Map, GraduationCap } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import styles from './BottomNavBar.module.scss';
 
@@ -9,7 +9,7 @@ export const BottomNavBar = () => {
   const { pathname } = useLocation();
   const links = [
     { href: AppRoutes.HOME, icon: <Home />, text: 'Админка' },
-    { href: AppRoutes.TASKS, icon: <Bird />, text: 'Нарешка' },
+    { href: AppRoutes.LEARNING, icon: <GraduationCap />, text: 'Обучение' },
     { href: AppRoutes.CODE_EDITOR, icon: <Code />, text: 'Кодер' },
     { href: AppRoutes.MINDMAP, icon: <Map />, text: 'Карта' },
   ];

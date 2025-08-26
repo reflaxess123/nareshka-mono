@@ -136,10 +136,14 @@ const useUpdateProgress = () => {
       // Это избегает race condition между локальным обновлением и новым запросом
 
       // Обновляем infinite queries
-      queryClient.setQueriesData<{
+      interface TheoryInfiniteQueryData {
         pages: TheoryCardsResponse[];
-        pageParams: unknown[];
-      }>({ queryKey: ['theory-cards-infinite'] }, (oldData) => {
+        pageParams: (string | number)[];
+      }
+
+      queryClient.setQueriesData<TheoryInfiniteQueryData>(
+        { queryKey: ['theory-cards-infinite'] },
+        (oldData) => {
         if (!oldData) return oldData;
 
         // Для infinite queries обновляем в pages

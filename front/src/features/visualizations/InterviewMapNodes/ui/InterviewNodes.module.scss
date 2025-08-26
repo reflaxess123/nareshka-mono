@@ -1,0 +1,354 @@
+@use '@/app/styles/helpers' as *;
+
+// Стили для корневого узла (соответствует CenterNode)
+.rootNode {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: 3px solid #8b5cf6;
+  border-radius: 20px;
+  padding: 24px;
+  min-width: 300px;
+  max-width: 350px;
+  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3);
+  transition: all 0.3s ease;
+  font-family: var(--font-family-base), serif;
+  color: white;
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: 0 12px 40px rgba(139, 92, 246, 0.4);
+    transform: translateY(-2px);
+  }
+
+  &.selected {
+    border-color: #a855f7;
+    box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.2);
+  }
+
+  // Используем те же классы что и в CenterNode
+  .centerContent {
+    .centerHeader {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+
+      .centerIcon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .centerTitle {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 1.3;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+    }
+
+    .centerDescription {
+      margin: 0 0 20px 0;
+      font-size: 14px;
+      line-height: 1.5;
+      opacity: 0.9;
+    }
+
+    .centerProgress {
+      margin-bottom: 20px;
+
+      .progressText {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        text-align: center;
+      }
+    }
+
+    .centerBadge {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+  }
+}
+
+// Стили для узлов категорий (яркие цветные блоки)
+.topicNode {
+  // Фон устанавливается динамически через style
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  // box-shadow устанавливается динамически
+  transition: all 0.3s ease;
+  font-family: var(--font-family-base);
+  min-width: 220px;
+  max-width: 280px;
+  cursor: pointer;
+  color: white;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.4);
+    filter: brightness(1.1);
+  }
+
+  &.selected {
+    border-color: rgba(255, 255, 255, 0.6);
+    transform: scale(1.02);
+    filter: brightness(1.15);
+  }
+
+  .nodeContent {
+    padding: 16px;
+    border-left: 4px solid rgba(255, 255, 255, 0.6);
+
+    .nodeHeader {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+
+      .nodeIcon {
+        font-size: 24px;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        backdrop-filter: blur(10px);
+      }
+
+      .nodeTitle {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+        color: white;
+        line-height: 1.3;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      }
+    }
+
+    .nodeProgress {
+      .progressText {
+        font-size: 14px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.95);
+        margin-bottom: 6px;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      }
+
+      .progressMeta {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+.rootContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+}
+
+.rootHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .rootIcon {
+    font-size: 32px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  }
+
+  .rootTitle {
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    line-height: 1.2;
+  }
+}
+
+.rootStats {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex: 1;
+  align-items: center;
+
+  .statItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+
+    .statNumber {
+      font-size: 24px;
+      font-weight: 800;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      line-height: 1;
+    }
+
+    .statLabel {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.9);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+  }
+}
+
+.rootFooter {
+  .footerText {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    display: block;
+  }
+}
+
+// Стили для узлов категорий
+.categoryNode {
+  border-radius: 12px;
+  box-shadow: 
+    0 6px 20px rgba(0, 0, 0, 0.2),
+    0 3px 10px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  min-width: 200px;
+  min-height: 120px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+
+  &:hover {
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 
+      0 10px 30px rgba(0, 0, 0, 0.3),
+      0 5px 15px rgba(0, 0, 0, 0.2);
+    border-width: 3px;
+    z-index: 10;
+  }
+
+  &.selected {
+    transform: scale(1.1);
+    box-shadow: 
+      0 15px 40px rgba(0, 0, 0, 0.4),
+      0 8px 20px rgba(0, 0, 0, 0.25);
+    z-index: 20;
+  }
+  
+  &.highlighted {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    border-width: 3px;
+    border-color: rgba(255, 255, 255, 0.8);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.02);
+  }
+}
+
+.categoryContent {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+}
+
+.categoryHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .categoryIcon {
+    font-size: 20px;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+  }
+
+  .categoryName {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    line-height: 1.2;
+  }
+}
+
+.categoryStats {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+
+  .statItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .statNumber {
+      font-size: 14px;
+      font-weight: 800;
+      color: white;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      line-height: 1;
+      margin-bottom: 2px;
+    }
+
+    .statLabel {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.8);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      font-weight: 600;
+    }
+  }
+}
+
+.categoryPercentage {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  justify-content: center;
+
+  .percentageValue {
+    font-size: 13px;
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  .percentageLabel {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.8);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+}

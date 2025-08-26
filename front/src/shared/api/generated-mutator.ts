@@ -1,34 +1,11 @@
 import axios from 'axios';
 
-// Создаем отдельный экземпляр axios для generated API
-// Не используем базовый URL, так как пути в OpenAPI уже содержат /api/v2
 export const generatedApiInstance = axios.create({
   withCredentials: true,
   timeout: 20000,
   headers: {
     'Content-Type': 'application/json',
   },
-  // Настройка сериализации параметров для массивов
-  paramsSerializer: {
-    serialize: (params) => {
-      const searchParams = new URLSearchParams();
-      
-      Object.entries(params).forEach(([key, value]) => {
-        if (Array.isArray(value)) {
-          // Для массивов повторяем ключ для каждого значения
-          value.forEach(item => {
-            if (item !== null && item !== undefined) {
-              searchParams.append(key, String(item));
-            }
-          });
-        } else if (value !== null && value !== undefined) {
-          searchParams.append(key, String(value));
-        }
-      });
-      
-      return searchParams.toString();
-    }
-  }
 });
 
 generatedApiInstance.interceptors.response.use(

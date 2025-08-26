@@ -1,16 +1,20 @@
 // Адаптер для React Query v5
-// Этот файл временно исправляет проблемы совместимости между Orval и React Query v5
 
-import { useQuery as useQueryV5, useMutation as useMutationV5 } from '@tanstack/react-query';
+import { 
+  useQuery as useQueryV5, 
+  useMutation as useMutationV5,
+  type UseQueryOptions,
+  type UseMutationOptions 
+} from '@tanstack/react-query';
 
-// Переопределяем useQuery чтобы игнорировать queryClient параметр
-export function useQuery(options: any, queryClient?: any) {
-  // В v5 queryClient больше не передается как параметр
+export function useQuery<TQueryFnData = unknown, TError = unknown, TData = TQueryFnData, TQueryKey extends readonly unknown[] = readonly unknown[]>(
+  options: UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>
+) {
   return useQueryV5(options);
 }
 
-// Переопределяем useMutation чтобы игнорировать queryClient параметр  
-export function useMutation(options: any, queryClient?: any) {
-  // В v5 queryClient больше не передается как параметр
+export function useMutation<TData = unknown, TError = unknown, TVariables = void, TContext = unknown>(
+  options: UseMutationOptions<TData, TError, TVariables, TContext>
+) {
   return useMutationV5(options);
 }

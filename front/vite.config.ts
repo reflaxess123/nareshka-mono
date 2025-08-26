@@ -6,7 +6,7 @@ import { chromeMonitorPlugin } from './vite-plugin-chrome-monitor';
 export default defineConfig({
   plugins: [
     react(),
-    chromeMonitorPlugin(), // 🔍 Chrome MCP Monitor плагин
+    chromeMonitorPlugin(),
     checker({
       typescript: {
         tsconfigPath: './tsconfig.app.json',
@@ -40,14 +40,6 @@ export default defineConfig({
         target: 'http://localhost:4000',
         changeOrigin: true,
         secure: false,
-        configure: (proxy, options) => {
-          proxy.on('proxyRes', (proxyRes, req, res) => {
-            // Передаем все заголовки от backend, включая Set-Cookie
-            if (proxyRes.headers['set-cookie']) {
-              res.setHeader('set-cookie', proxyRes.headers['set-cookie']);
-            }
-          });
-        },
       },
     },
   },

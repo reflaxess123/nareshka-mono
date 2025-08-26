@@ -3,7 +3,7 @@ import { AppRoutes } from '@/app/providers/router';
 import { isAdmin } from '@/entities/User/model/types';
 import { Link } from '@/shared/components/Link';
 import { useAppDispatch, useAuth } from '@/shared/hooks';
-import { Bird, Code, Map, Shield, MessageSquare, Database, GraduationCap } from 'lucide-react';
+import { Code, Map, Shield, GraduationCap } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { toggleSidebar } from '../model/slice/sidebarSlice';
 import styles from './Sidebar.module.scss';
@@ -52,32 +52,6 @@ export const Sidebar = ({ children }: { children: React.ReactNode }) => {
             variant="sidebar"
           />
 
-          <Link
-            text="Собеседования"
-            className={styles.link}
-            icon={<MessageSquare size={24} />}
-            isParentHovered={isOpen}
-            to={AppRoutes.INTERVIEWS}
-            variant="sidebar"
-          />
-
-          <Link
-            text="База вопросов"
-            className={styles.link}
-            icon={<Database size={24} />}
-            isParentHovered={isOpen}
-            to={AppRoutes.QUESTIONS_DATABASE}
-            variant="sidebar"
-          />
-
-          <Link
-            text="Нарешка"
-            className={styles.link}
-            icon={<Bird size={24} />}
-            isParentHovered={isOpen}
-            to={AppRoutes.TASKS}
-            variant="sidebar"
-          />
 
           <Link
             text="Редактор кода"

@@ -7,7 +7,6 @@ import type {
 } from '@/entities/TheoryCard/model/types';
 import { apiInstance } from './base';
 
-// Тип для ответа сервера (с progress объектом)
 interface ServerTheoryCard {
   id: string;
   ankiGuid: string;
@@ -55,8 +54,7 @@ export const theoryCardsApi = {
       }
     );
 
-    // Преобразуем данные сервера в нужный формат
-    const transformedData: TheoryCardsResponse = {
+    return {
       cards: response.data.cards.map((card) => ({
         id: card.id,
         ankiGuid: card.ankiGuid,
@@ -74,8 +72,6 @@ export const theoryCardsApi = {
       })),
       pagination: response.data.pagination,
     };
-
-    return transformedData;
   },
 
   async getCategories(): Promise<CategoriesResponse> {

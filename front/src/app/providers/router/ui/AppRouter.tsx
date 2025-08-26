@@ -16,9 +16,6 @@ export const AppRouter = () => {
   const homeElement = routeConfig.find(
     (route) => route.path === AppRoutes.HOME
   )?.element;
-  const getStartedElement = routeConfig.find(
-    (route) => route.path === AppRoutes.GET_STARTED
-  )?.element;
 
   return (
     <BrowserRouter>
@@ -51,13 +48,6 @@ export const AppRouter = () => {
             key={AppRoutes.HOME}
             path={AppRoutes.HOME}
             element={homeElement}
-          />
-          <Route
-            key={AppRoutes.GET_STARTED}
-            path={AppRoutes.GET_STARTED}
-            element={
-              <Suspense fallback={<Loading />}>{getStartedElement}</Suspense>
-            }
           />
         </Routes>
       )}

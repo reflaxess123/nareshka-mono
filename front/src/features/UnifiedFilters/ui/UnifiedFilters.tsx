@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { X } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useGetCompaniesListApiV2InterviewsCompaniesListGet } from '@/shared/api/generated/api';
 import { FilterSection } from './FilterSection';
 import { CompanyFilter } from './CompanyFilter';
 import { AdditionalFilter } from './AdditionalFilter';
-import { ContentFilters } from '@/features/ContentFilters';
 import { useContentCategories, useCompanies } from '@/shared/hooks/useContentBlocks';
 import { translateMainCategory, translateSubCategory } from '@/shared/constants/categoryTranslations';
 import { useRole } from '@/shared/hooks/useRole';
@@ -43,7 +41,6 @@ export const UnifiedFilters: React.FC<UnifiedFiltersProps> = ({
   type,
   filters,
   onFiltersChange,
-  resultsCount,
   className,
 }) => {
   const [expandedSections, setExpandedSections] = useState({
@@ -94,15 +91,12 @@ export const UnifiedFilters: React.FC<UnifiedFiltersProps> = ({
   }, [isMobile]);
 
   // Загрузка данных компаний для интервью и вопросов с количеством вопросов
-  const { data: companiesData, isLoading: companiesLoading } = 
-    useGetCompaniesListApiV2InterviewsCompaniesListGet(
-      { limit: 400 }, // Загружаем все компании (380+)
-      {
-        query: {
-          enabled: type === 'interviews' || type === 'questions',
-        },
-      }
-    );
+  const { data: companiesData, isLoading: companiesLoading } =
+    useGetCompaniesListApiV2InterviewsCompaniesListGet({
+      query: {
+        enabled: type === 'interviews' || type === 'questions',
+      },
+    });
 
   // Загрузка категорий для вопросов
   const { data: categories } = useQuery<Category[]>({
@@ -124,7 +118,7 @@ export const UnifiedFilters: React.FC<UnifiedFiltersProps> = ({
         filters.categories.forEach(catId => params.append('category_id', catId));
       }
       params.append('limit', '200');
-      
+
       const response = await fetch(`/api/v2/interview-categories/clusters/all?${params}`);
       if (!response.ok) throw new Error('Failed to fetch clusters');
       return response.json();
@@ -175,7 +169,7 @@ export const UnifiedFilters: React.FC<UnifiedFiltersProps> = ({
   const handlePracticeMainCategoryToggle = useCallback((categoryName: string, checked: boolean) => {
     const currentCategories = filters.categories || [];
     let newCategories: string[];
-    
+
     if (checked) {
       newCategories = [...currentCategories, categoryName];
     } else {
@@ -192,7 +186,7 @@ export const UnifiedFilters: React.FC<UnifiedFiltersProps> = ({
   const handlePracticeSubCategoryToggle = useCallback((subCategoryName: string, checked: boolean) => {
     const currentSubCategories = filters.subCategories || [];
     let newSubCategories: string[];
-    
+
     if (checked) {
       newSubCategories = [...currentSubCategories, subCategoryName];
     } else {
@@ -213,7 +207,7 @@ export const UnifiedFilters: React.FC<UnifiedFiltersProps> = ({
 
     const currentCompanies = filters.companies || [];
     let newCompanies: string[];
-    
+
     if (checked) {
       newCompanies = [...currentCompanies, companyName];
     } else {
@@ -259,12 +253,11 @@ export const UnifiedFilters: React.FC<UnifiedFiltersProps> = ({
   };
 
   const activeFilters = hasActiveFilters(filters);
-  // Преобразуем список компаний из API в нужный формат
   const companiesList = React.useMemo(() => {
-    if (!companiesData?.companies) return [];
-    // ВРЕМЕННО: API возвращает массив строк, преобразуем в объекты
+    if (!companiesData?.companies || companiesData.companies.length === 0) return [];
+    // API может возвращать как массив строк, так и массив объектов
     if (typeof companiesData.companies[0] === 'string') {
-      return companiesData.companies.map((company: string) => ({ name: company, count: 0 }));
+      return (companiesData.companies as unknown as string[]).map((company: string) => ({ name: company, count: 0 }));
     }
     // API теперь возвращает массив объектов с name и count
     return companiesData.companies;
@@ -273,7 +266,6 @@ export const UnifiedFilters: React.FC<UnifiedFiltersProps> = ({
   return (
     <div className={`${styles.unifiedFilters} ${className || ''}`}>
 
-      {/* Фильтр по категориям - только для вопросов */}
       {type === 'questions' && (
         <FilterSection
           title="Категории"
@@ -304,7 +296,6 @@ export const UnifiedFilters: React.FC<UnifiedFiltersProps> = ({
         </FilterSection>
       )}
 
-      {/* Фильтр по кластерам - только для вопросов */}
       {type === 'questions' && (
         <FilterSection
           title="Кластеры"
@@ -510,7 +501,7 @@ export const UnifiedFilters: React.FC<UnifiedFiltersProps> = ({
 
       {/* Кнопка сброса фильтров */}
       {activeFilters && (
-        <button 
+        <button
           className={styles.resetButton}
           onClick={handleReset}
         >

@@ -8,6 +8,7 @@ import { useLearningStore } from '@/pages/Learning/model/learningStore';
 import { UniversalContentCard } from './UniversalContentCard';
 import { ContentSkeletonList } from './ContentSkeletonList';
 import type { ContentType, UniversalContentItem, LearningFilters } from '@/shared/types/learning';
+import type { InterviewResponse, QuestionResponse, ContentBlockResponse, TheoryCardResponse } from '@/shared/types/api-responses';
 import styles from './UniversalContentList.module.scss';
 
 interface UniversalContentListProps {
@@ -15,13 +16,15 @@ interface UniversalContentListProps {
   filters: LearningFilters;
   viewMode: 'cards' | 'list' | 'compact';
   className?: string;
+  onFiltersChange?: (filters: LearningFilters) => void;
 }
 
 export const UniversalContentList: React.FC<UniversalContentListProps> = ({
   contentType,
   filters,
   viewMode,
-  className
+  className,
+  onFiltersChange
 }) => {
   const {
     items,
@@ -49,29 +52,35 @@ export const UniversalContentList: React.FC<UniversalContentListProps> = ({
     setError(null);
 
     try {
-      let response: any;
+      let response: { interviews?: InterviewResponse[]; total?: number; has_next?: boolean; questions?: QuestionResponse[]; content_blocks?: ContentBlockResponse[]; theory_cards?: TheoryCardResponse[]; };
       let adaptedItems: UniversalContentItem[] = [];
       let totalCount = 0;
       let hasMore = false;
 
       switch (contentType) {
-        case 'interviews':
-          response = await getInterviewsApiV2InterviewsGet({
+        case 'interviews': {
+          const apiResponse = await getInterviewsApiV2InterviewsGet({
             page: pageNum,
             limit,
             companies: filters.companies,
             search: filters.search,
             has_audio: filters.has_audio
           });
+          response = {
+            interviews: (apiResponse as { interviews: InterviewResponse[] }).interviews,
+            total: (apiResponse as { total: number }).total,
+            has_next: (apiResponse as { has_next: boolean }).has_next
+          };
           
-          if (response && response.interviews) {
-            adaptedItems = ContentAdapter.adaptArray(response.interviews, 'interviews');
-            totalCount = response.total;
-            hasMore = response.has_next;
+          if (response && Array.isArray(response.interviews)) {
+            adaptedItems = ContentAdapter.adaptArray(response.interviews || [], 'interviews');
+            totalCount = response.total as number;
+            hasMore = response.has_next as boolean;
           }
           break;
+        }
 
-        case 'questions':
+        case 'questions': {
           // Используем fetch напрямую для questions API
           const queryParams = new URLSearchParams();
           queryParams.append('q', filters.search || '*');
@@ -93,8 +102,9 @@ export const UniversalContentList: React.FC<UniversalContentListProps> = ({
             hasMore = questionsData.has_next || false;
           }
           break;
+        }
 
-        case 'practice':
+        case 'practice': {
           // Используем правильный API endpoint как в /tasks
           const contentParams = new URLSearchParams({
             page: pageNum.toString(),
@@ -128,8 +138,9 @@ export const UniversalContentList: React.FC<UniversalContentListProps> = ({
             hasMore = practiceData.pagination?.page < practiceData.pagination?.totalPages;
           }
           break;
+        }
 
-        case 'theory':
+        case 'theory': {
           // Используем fetch для theory cards
           const theoryParams = new URLSearchParams({
             page: pageNum.toString(),
@@ -154,6 +165,7 @@ export const UniversalContentList: React.FC<UniversalContentListProps> = ({
             hasMore = theoryData.pagination?.hasNext || false;
           }
           break;
+        }
       }
 
       // Обновляем store
@@ -192,7 +204,7 @@ export const UniversalContentList: React.FC<UniversalContentListProps> = ({
   // Загрузка при изменении фильтров или типа контента
   useEffect(() => {
     fetchContent(1);
-  }, [contentType, filters, sortBy, sortOrder]);
+  }, [contentType, filters, sortBy, sortOrder, fetchContent]);
 
   // Обработчик подгрузки следующей страницы
   const handleLoadMore = useCallback(async () => {
@@ -215,7 +227,7 @@ export const UniversalContentList: React.FC<UniversalContentListProps> = ({
     if (contentType !== 'questions') return {};
     const counts: Record<string, number> = {};
     items.forEach(item => {
-      const interviewId = item.metadata?.interviewId;
+      const interviewId = item.metadata.interviewId;
       if (interviewId) {
         counts[interviewId] = (counts[interviewId] || 0) + 1;
       }
@@ -287,8 +299,9 @@ export const UniversalContentList: React.FC<UniversalContentListProps> = ({
           <button 
             className={styles.clearFiltersButton}
             onClick={() => {
-              // TODO: реализовать очистку фильтров
-              console.log('Clear filters');
+              if (onFiltersChange) {
+                onFiltersChange({});
+              }
             }}
           >
             Очистить фильтры

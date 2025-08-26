@@ -1,1 +1,0 @@
-export { InterviewsPage } from './ui/InterviewsPage';

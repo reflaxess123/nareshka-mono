@@ -1,23 +1,20 @@
 import {
-  setBlocks,
-  setCategories,
-  setCurrentBlock,
-  setError,
-  updateBlockProgress,
   type ContentBlock,
   type ContentBlocksFilters,
-  type ContentBlocksResponse,
   type ContentProgressUpdate,
+  setCategories,
+  setError,
+  updateBlockProgress,
 } from '@/entities/ContentBlock';
 import { contentApi } from '@/shared/api/content';
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useAppDispatch } from './redux';
+
+interface InfiniteQueryData {
+  pages: { data: ContentBlock[] }[];
+  pageParams: unknown[];
+}
 
 export const contentQueryKeys = {
   all: ['content'] as const,
@@ -27,170 +24,6 @@ export const contentQueryKeys = {
   companies: () => [...contentQueryKeys.all, 'companies'] as const,
   filteredBlocks: (filters: ContentBlocksFilters) =>
     [...contentQueryKeys.blocks(), 'filtered', filters] as const,
-};
-
-export const useContentBlocks = (filters: ContentBlocksFilters = {}) => {
-  const dispatch = useAppDispatch();
-
-  const query = useQuery({
-    queryKey: contentQueryKeys.filteredBlocks(filters),
-    queryFn: () => {
-      const params = new URLSearchParams();
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== '') {
-          if (Array.isArray(value)) {
-            let paramName = key;
-            if (key === 'mainCategories') {
-              paramName = 'mainCategories';
-            } else if (key === 'subCategories') {
-              paramName = 'subCategories';
-            } else if (key === 'companies') {
-              paramName = 'companiesList';
-            }
-
-            value.forEach((item) => {
-              if (item !== undefined && item !== null && item !== '') {
-                params.append(paramName, item.toString());
-              }
-            });
-          } else {
-            params.append(key, value.toString());
-          }
-        }
-      });
-
-      return fetch(`/api/v2/tasks/items?${params.toString()}`, {
-        credentials: 'include',
-      }).then((res) => res.json());
-    },
-    staleTime: 5 * 60 * 1000,
-  });
-
-  useEffect(() => {
-    if (query.data) {
-      dispatch(setBlocks(query.data));
-    }
-  }, [query.data, dispatch]);
-
-  useEffect(() => {
-    if (query.error) {
-      dispatch(
-        setError(
-          query.error instanceof Error
-            ? query.error.message
-            : 'Ошибка загрузки блоков'
-        )
-      );
-    }
-  }, [query.error, dispatch]);
-
-  return query;
-};
-
-export const useInfiniteContentBlocks = (
-  filters: ContentBlocksFilters = {}
-) => {
-  const dispatch = useAppDispatch();
-
-  const query = useInfiniteQuery({
-    queryKey: contentQueryKeys.filteredBlocks(filters),
-    queryFn: ({ pageParam = 1 }) => {
-      const params = new URLSearchParams();
-      Object.entries({ ...filters, page: pageParam }).forEach(
-        ([key, value]) => {
-          if (value !== undefined && value !== null && value !== '') {
-            if (Array.isArray(value)) {
-              let paramName = key;
-              if (key === 'mainCategories') {
-                paramName = 'mainCategories';
-              } else if (key === 'subCategories') {
-                paramName = 'subCategories';
-              } else if (key === 'companies') {
-                paramName = 'companiesList';
-              }
-
-              value.forEach((item) => {
-                if (item !== undefined && item !== null && item !== '') {
-                  params.append(paramName, item.toString());
-                }
-              });
-            } else {
-              params.append(key, value.toString());
-            }
-          }
-        }
-      );
-
-      return fetch(`/api/v2/tasks/items?${params.toString()}`, {
-        credentials: 'include',
-      }).then((res) => res.json());
-    },
-    getNextPageParam: (lastPage: ContentBlocksResponse) => {
-      const { page, totalPages } = lastPage.pagination;
-      return page < totalPages ? page + 1 : undefined;
-    },
-    staleTime: 5 * 60 * 1000,
-    initialPageParam: 1,
-  });
-
-  useEffect(() => {
-    if (query.data) {
-      const allBlocks = query.data.pages.flatMap((page) => page.data);
-      const lastPage = query.data.pages[query.data.pages.length - 1];
-
-      dispatch(
-        setBlocks({
-          data: allBlocks,
-          pagination: lastPage.pagination,
-        })
-      );
-    }
-  }, [query.data, dispatch]);
-
-  useEffect(() => {
-    if (query.error) {
-      dispatch(
-        setError(
-          query.error instanceof Error
-            ? query.error.message
-            : 'Ошибка загрузки блоков'
-        )
-      );
-    }
-  }, [query.error, dispatch]);
-
-  return query;
-};
-
-export const useContentBlock = (blockId: string) => {
-  const dispatch = useAppDispatch();
-
-  const query = useQuery({
-    queryKey: contentQueryKeys.block(blockId),
-    queryFn: () => contentApi.getBlock(blockId),
-    enabled: !!blockId,
-    staleTime: 10 * 60 * 1000,
-  });
-
-  useEffect(() => {
-    if (query.data) {
-      dispatch(setCurrentBlock(query.data));
-    }
-  }, [query.data, dispatch]);
-
-  useEffect(() => {
-    if (query.error) {
-      dispatch(
-        setError(
-          query.error instanceof Error
-            ? query.error.message
-            : 'Ошибка загрузки блока'
-        )
-      );
-    }
-  }, [query.error, dispatch]);
-
-  return query;
 };
 
 export const useContentCategories = () => {
@@ -276,13 +109,14 @@ export const useUpdateProgress = () => {
         })
       );
 
+
       queryClient.setQueriesData(
         { queryKey: ['content', 'blocks', 'filtered'] },
         (oldData: unknown) => {
           if (!oldData || typeof oldData !== 'object' || !('pages' in oldData))
             return oldData;
 
-          const data = oldData as { pages: { data: ContentBlock[] }[] };
+          const data = oldData as InfiniteQueryData;
           return {
             ...data,
             pages: data.pages.map((page) => ({
@@ -332,10 +166,10 @@ export const useUpdateProgress = () => {
           if (!oldData || typeof oldData !== 'object' || !('pages' in oldData))
             return oldData;
 
-          const dataObj = oldData as { pages: { data: ContentBlock[] }[] };
+          const dataObj = oldData as InfiniteQueryData;
           return {
             ...dataObj,
-            pages: dataObj.pages.map((page) => ({
+            pages: dataObj.pages.map((page: { data: ContentBlock[] }) => ({
               ...page,
               data: page.data.map((block: ContentBlock) =>
                 block.id === variables.blockId
@@ -385,103 +219,11 @@ export const useUpdateProgress = () => {
   });
 };
 
-export const useSearchContentBlocks = (
-  query: string,
-  filters: ContentBlocksFilters = {}
-) => {
-  const dispatch = useAppDispatch();
-
-  const queryResult = useQuery({
-    queryKey: [...contentQueryKeys.blocks(), 'search', query, filters],
-    queryFn: () => contentApi.searchBlocks(query, filters),
-    enabled: query.length >= 2,
-    staleTime: 2 * 60 * 1000,
-  });
-
-  useEffect(() => {
-    if (queryResult.data) {
-      dispatch(setBlocks(queryResult.data));
-    }
-  }, [queryResult.data, dispatch]);
-
-  useEffect(() => {
-    if (queryResult.error) {
-      dispatch(
-        setError(
-          queryResult.error instanceof Error
-            ? queryResult.error.message
-            : 'Ошибка поиска'
-        )
-      );
-    }
-  }, [queryResult.error, dispatch]);
-
-  return queryResult;
-};
-
-export const useContentBlocksByCategories = (
-  mainCategories?: string[],
-  subCategories?: string[],
-  additionalFilters: ContentBlocksFilters = {}
-) => {
-  const dispatch = useAppDispatch();
-
-  const query = useQuery({
-    queryKey: [
-      ...contentQueryKeys.blocks(),
-      'categories',
-      mainCategories,
-      subCategories,
-      additionalFilters,
-    ],
-    queryFn: () =>
-      contentApi.getBlocksByCategories(
-        mainCategories,
-        subCategories,
-        additionalFilters
-      ),
-    enabled: !!(mainCategories && mainCategories.length > 0),
-    staleTime: 5 * 60 * 1000,
-  });
-
-  useEffect(() => {
-    if (query.data) {
-      dispatch(setBlocks(query.data));
-    }
-  }, [query.data, dispatch]);
-
-  useEffect(() => {
-    if (query.error) {
-      dispatch(
-        setError(
-          query.error instanceof Error
-            ? query.error.message
-            : 'Ошибка загрузки блоков категорий'
-        )
-      );
-    }
-  }, [query.error, dispatch]);
-
-  return query;
-};
-
-export const usePrefetchContentBlock = () => {
-  const queryClient = useQueryClient();
-
-  return (blockId: string) => {
-    queryClient.prefetchQuery({
-      queryKey: contentQueryKeys.block(blockId),
-      queryFn: () => contentApi.getBlock(blockId),
-      staleTime: 10 * 60 * 1000,
-    });
-  };
-};
-
 export const useCompanies = (filters?: {
   mainCategories?: string[];
   subCategories?: string[];
 }) => {
-  const query = useQuery({
+  return useQuery({
     queryKey: [...contentQueryKeys.companies(), filters],
     queryFn: () => {
       const params = new URLSearchParams();
@@ -502,6 +244,4 @@ export const useCompanies = (filters?: {
     },
     staleTime: 30 * 60 * 1000,
   });
-
-  return query;
 };

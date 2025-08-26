@@ -33,7 +33,6 @@ apiInstance.interceptors.response.use(
   }
 );
 
-// Функция для Orval mutator
 export const apiClient = <T = unknown>(
   config: import('axios').AxiosRequestConfig
 ): Promise<T> => {
@@ -51,5 +50,4 @@ export const apiClient = <T = unknown>(
   return promise;
 };
 
-// Экспорт для Orval mutator (именованный)
 export default apiClient;

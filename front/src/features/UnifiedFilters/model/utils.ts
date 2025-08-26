@@ -122,7 +122,7 @@ export const adaptFromInterviewFilters = (filters: {
   has_audio: filters.has_audio,
 });
 
-export const debounce = <T extends (...args: unknown[]) => unknown>(
+export const debounce = <T extends (...args: never[]) => void>(
   func: T,
   wait: number
 ): ((...args: Parameters<T>) => void) => {

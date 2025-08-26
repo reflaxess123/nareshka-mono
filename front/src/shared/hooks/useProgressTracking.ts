@@ -174,7 +174,7 @@ export const useProgressTracking = (
     (blockId: string) => {
       getTestCasesMutation.mutate(blockId);
     },
-    [] // useMutation.mutate стабилен, зависимости не нужны
+    [getTestCasesMutation]
   );
 
   const showInfoMessage = useCallback(

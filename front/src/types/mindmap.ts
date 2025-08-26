@@ -113,9 +113,7 @@ export interface TopicNodeData extends TopicData, Record<string, unknown> {
   type: 'topic';
 }
 
-export interface DifficultyNodeData
-  extends DifficultyLevelData,
-    Record<string, unknown> {
+export interface DifficultyNodeData extends DifficultyLevelData, Record<string, unknown> {
   type: 'difficulty';
 }
 

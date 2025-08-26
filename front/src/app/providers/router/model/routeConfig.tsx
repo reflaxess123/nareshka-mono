@@ -3,21 +3,12 @@ import Home from '@/pages/Home/ui/Home';
 import { lazy } from 'react';
 import type { AppRoute } from './types';
 
-const GetStarted = lazy(() =>
-  import('@/pages/GetStarted').then((module) => ({
-    default: module.GetStarted,
-  }))
-);
 const Profile = lazy(() =>
   import('@/pages/Profile').then((module) => ({ default: module.Profile }))
 );
 const Settings = lazy(() =>
   import('@/pages/Settings').then((module) => ({ default: module.Settings }))
 );
-const Tasks = lazy(() =>
-  import('@/pages/Tasks').then((module) => ({ default: module.Tasks }))
-);
-
 const UserManagement = lazy(() =>
   import('@/pages/Admin/UserManagement').then((module) => ({
     default: module.UserManagement,
@@ -38,29 +29,9 @@ const MindMap = lazy(() =>
     default: module.default,
   }))
 );
-const Interviews = lazy(() =>
-  import('@/pages/Interviews').then((module) => ({
-    default: module.InterviewsPage,
-  }))
-);
 const InterviewDetail = lazy(() =>
   import('@/pages/InterviewDetail').then((module) => ({
     default: module.InterviewDetailPage,
-  }))
-);
-const Analytics = lazy(() =>
-  import('@/pages/Analytics').then((module) => ({
-    default: module.AnalyticsPage,
-  }))
-);
-const QuestionsDatabase = lazy(() =>
-  import('@/pages/QuestionsDatabase').then((module) => ({
-    default: module.QuestionsDatabasePage,
-  }))
-);
-const Visualization = lazy(() =>
-  import('@/pages/VisualizationPage/VisualizationPage').then((module) => ({
-    default: module.default,
   }))
 );
 const Learning = lazy(() =>
@@ -71,11 +42,7 @@ const Learning = lazy(() =>
 
 export enum AppRoutes {
   HOME = '/',
-  GET_STARTED = '/get-started',
   LEARNING = '/learning',
-  TASKS = '/tasks',
-  INTERVIEWS = '/interviews',
-  QUESTIONS_DATABASE = '/questions-database',
   INTERVIEW_DETAIL = '/interviews/:id',
   PROFILE = '/profile',
   SETTINGS = '/settings',
@@ -84,19 +51,12 @@ export enum AppRoutes {
   ADMIN_PANEL = '/admin-panel',
   ADMIN_USERS = '/admin/users',
   ADMIN_STATS = '/admin/stats',
-  ANALYTICS = '/analytics',
-  VISUALIZATION = '/visualization',
 }
 
 export const routeConfig: AppRoute[] = [
   { path: AppRoutes.HOME, element: <Home /> },
-  { path: AppRoutes.GET_STARTED, element: <GetStarted /> },
   { path: AppRoutes.LEARNING, element: <Learning /> },
-  { path: AppRoutes.TASKS, element: <Tasks /> },
-  { path: AppRoutes.INTERVIEWS, element: <Interviews /> },
-  { path: AppRoutes.QUESTIONS_DATABASE, element: <QuestionsDatabase /> },
   { path: AppRoutes.INTERVIEW_DETAIL, element: <InterviewDetail /> },
-
   { path: AppRoutes.PROFILE, element: <Profile /> },
   { path: AppRoutes.SETTINGS, element: <Settings /> },
   { path: AppRoutes.CODE_EDITOR, element: <CodeEditor /> },
@@ -104,6 +64,4 @@ export const routeConfig: AppRoute[] = [
   { path: AppRoutes.ADMIN_PANEL, element: <Adminka /> },
   { path: AppRoutes.ADMIN_USERS, element: <UserManagement /> },
   { path: AppRoutes.ADMIN_STATS, element: <DetailedStats /> },
-  { path: AppRoutes.ANALYTICS, element: <Analytics /> },
-  { path: AppRoutes.VISUALIZATION, element: <Visualization /> },
 ];

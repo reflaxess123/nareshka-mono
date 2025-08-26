@@ -1,4 +1,3 @@
-// Chrome MCP Monitor типы
 interface ChromeMonitorRequest {
   type: 'FETCH' | 'XHR';
   url: string;
@@ -51,17 +50,17 @@ interface ChromeMonitor {
   logs: ChromeMonitorLog[];
   errors: ChromeMonitorError[];
   startTime: number;
-  sendTimeout: any;
+  sendTimeout: NodeJS.Timeout | null;
   batchDelay: number;
   lastSentLogsCount: number;
   lastSentErrorsCount: number;
-  _addLog?: (type: string, message: string, extra?: any) => void;
-  _addError?: (errorData: any) => void;
+  _addLog?: (type: string, message: string, extra?: Record<string, unknown>) => void;
+  _addError?: (errorData: Record<string, unknown>) => void;
   init(): void;
   getStats(): ChromeMonitorData;
   clear(): void;
   export(): void;
-  sendToBackend(): Promise<{status: string, result?: any, error?: string, reason?: string}>;
+  sendToBackend(): Promise<{status: string, result?: Record<string, unknown>, error?: string, reason?: string}>;
   clearMonitor(): void;
   startAutoSend(): void;
   scheduleSend(): void;
@@ -74,6 +73,6 @@ declare global {
     getMonitorStats: () => ChromeMonitorData;
     clearMonitor: () => void;
     exportMonitor: () => void;
-    sendToBackend: () => Promise<{status: string, result?: any, error?: string, reason?: string}>;
+    sendToBackend: () => Promise<{status: string, result?: Record<string, unknown>, error?: string, reason?: string}>;
   }
 }

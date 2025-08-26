@@ -1,5 +1,5 @@
-@import '@/app/styles/variables.scss';
-@import '@/app/styles/helpers/mixins.scss';
+@use '@/app/styles/variables' as *;
+@use '@/app/styles/helpers/mixins' as *;
 
 .page {
   min-height: 100vh;

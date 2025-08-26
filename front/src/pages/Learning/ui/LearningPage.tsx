@@ -24,7 +24,6 @@ export const LearningPage: React.FC = () => {
     sortOrder,
     setActiveTab,
     updateFilters,
-    resetFilters,
     addToSearchHistory,
     setSorting
   } = useLearningStore();
