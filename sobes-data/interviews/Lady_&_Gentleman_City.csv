@@ -1,6 +1,0 @@
-"id","question_text","company","date","interview_id"
-"q1","В массиве ищем элемент по id, какая сложность алгоритма?","Lady & Gentleman City","2024-11-26","interview_Lady_&_Gentleman_City_000"
-"q2","Реализуйте функцию reverseWords, которая переворачивает порядок слов в строке, но не переворачивает буквы внутри слов","Lady & Gentleman City","2024-11-26","interview_Lady_&_Gentleman_City_000"
-"q3","Реализуйте функцию splitCamelCase, которая разделяет строку на слова по заглавным буквам, вставляя пробел перед каждой заглавной буквой","Lady & Gentleman City","2024-11-26","interview_Lady_&_Gentleman_City_000"
-"q4","Добавьте метод splitCamelCase в прототип String, чтобы можно было вызывать его на строках","Lady & Gentleman City","2024-11-26","interview_Lady_&_Gentleman_City_000"
-"q5","Правильно оттипизируйте React-компонент Select, чтобы он принимал обобщённые пропсы с типом T, где optionList — массив T, а onSelect — функция, принимающая T","Lady & Gentleman City","2024-11-26","interview_Lady_&_Gentleman_City_000"

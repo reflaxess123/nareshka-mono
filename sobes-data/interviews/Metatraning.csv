@@ -1,6 +1,0 @@
-"id","question_text","company","date","interview_id"
-"q1","Что такое замыкание","Metatraning","2025-03-09","interview_Metatraning_000"
-"q2","Напишите функцию, которая реализует счетчик с использованием замыкания, увеличивающего значение count при каждом вызове","Metatraning","2025-03-09","interview_Metatraning_000"
-"q3","Объясните разницу между let, var и const в JavaScript","Metatraning","2025-03-09","interview_Metatraning_000"
-"q4","Что такое event-loop в JavaScript","Metatraning","2025-03-09","interview_Metatraning_000"
-"q5","Напишите функцию promiseAll, которая принимает массив промисов и возвращает промис, который резолвится массивом результатов всех промисов или реджектится при первом ошибочном промисе","Metatraning","2025-03-09","interview_Metatraning_000"

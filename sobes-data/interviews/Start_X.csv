@@ -1,6 +1,0 @@
-"id","question_text","company","date","interview_id"
-"q1","Что такое intersection observer и mutation observer и как они работают?","Start X","2024-07-24","interview_Start_X_000"
-"q2","Объясните, что такое Proxy объект и приведите примеры его использования","Start X","2024-07-24","interview_Start_X_000"
-"q3","Что такое Service worker и как он используется в веб-приложениях?","Start X","2024-07-24","interview_Start_X_000"
-"q4","Что такое Web worker и как он помогает в производительности приложений?","Start X","2024-07-24","interview_Start_X_000"
-"q5","Какие методы и подходы можно использовать для улучшения производительности сайта по результатам аудита Lighthouse?","Start X","2024-07-24","interview_Start_X_000"

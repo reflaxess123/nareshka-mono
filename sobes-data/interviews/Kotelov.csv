@@ -1,3 +1,0 @@
-"id","question_text","company","date","interview_id"
-"q1","Напишите хук useQuery","Kotelov","2024-06-30","interview_Kotelov_000"
-"q1","Написать кастомный React-хук для получения данных с сервера и обработки их, с использованием TypeScript для типизации всех данных","Kotelov","2024-01-17","interview_Kotelov_001"

@@ -1,4 +1,0 @@
-"id","question_text","company","date","interview_id"
-"q1","Задача на консоль лог с промисами и setTimeout","Dinord","2024-01-24","interview_Dinord_000"
-"q2","Нужно получить объединённый массив объектов по id из двух массивов: const a = [{id:1, color: red}], const b = [{id:1, size: 32}], результат: const c = [{id:1, color: red, size: 32}]","Dinord","2024-01-24","interview_Dinord_000"
-"q3","event-loop","Dinord","2024-01-24","interview_Dinord_000"

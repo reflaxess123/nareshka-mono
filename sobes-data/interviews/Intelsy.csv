@@ -1,8 +1,0 @@
-"id","question_text","company","date","interview_id"
-"q1","Для чего нужен key?","Intelsy","2025-07-04","interview_Intelsy_000"
-"q2","Что такое virtual dom?","Intelsy","2025-07-04","interview_Intelsy_000"
-"q3","Что нужно использовать внутри key?","Intelsy","2025-07-04","interview_Intelsy_000"
-"q4","Что такое useLayoutEffect?","Intelsy","2025-07-04","interview_Intelsy_000"
-"q5","В чем разница между async и defer?","Intelsy","2025-07-04","interview_Intelsy_000"
-"q6","Какие существуют коды ошибок HTTP?","Intelsy","2025-07-04","interview_Intelsy_000"
-"q7","Что такое CORS?","Intelsy","2025-07-04","interview_Intelsy_000"

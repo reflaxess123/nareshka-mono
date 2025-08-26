@@ -1,6 +1,0 @@
-"id","question_text","company","date","interview_id"
-"q1","Реализовать товарный листинг интернет-магазина: получить список товаров, отобразить заголовок листинга, полученный по API, при клике на товар открывать его в новой вкладке","Melon Fashion Group","2024-08-14","interview_Melon_Fashion_Group_000"
-"q2","Отобразить список товаров по 4 карточки в ряд на экранах шире 768px","Melon Fashion Group","2024-08-14","interview_Melon_Fashion_Group_000"
-"q3","Для экранов ниже 768px выводить список товаров по 1 карточке в ряд","Melon Fashion Group","2024-08-14","interview_Melon_Fashion_Group_000"
-"q4","При наведении на изображение товара увеличивать его в рамках контейнера","Melon Fashion Group","2024-08-14","interview_Melon_Fashion_Group_000"
-"q5","При наведении на текст товара подчеркивать его, при клике менять цвет текста","Melon Fashion Group","2024-08-14","interview_Melon_Fashion_Group_000"

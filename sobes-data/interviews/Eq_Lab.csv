@@ -1,5 +1,0 @@
-"id","question_text","company","date","interview_id"
-"q1","Что выведет в консоль при выполнении кода: document.body.id = 1; console.log(document.body.id === 1)?","Eq Lab","2025-03-21","interview_Eq_Lab_000"
-"q2","Как сделать так, чтобы при изменении свойства id объекта instance с '1' на 2 typeof instance.id оставался string, используя дескрипторы?","Eq Lab","2025-03-21","interview_Eq_Lab_000"
-"q3","Опишите порядок вывода в консоль при выполнении следующего кода с использованием event loop и Promise: console.log('1'); const p1 = new Promise(resolve => { console.log('3'); setTimeout(() => console.log('4')); resolve(); }); p1.then(() => {console.log('5')}); Promise.resolve().then(() => { console.log('6') }); console.log('2')","Eq Lab","2025-03-21","interview_Eq_Lab_000"
-"q4","Допишите необходимый функционал для работы новостной ленты React-компонента Feed, используя предоставленные интерфейсы User и PostResponse, а также асинхронные функции getPosts, getUser и send, чтобы реализовать отображение постов с аватаром и именем пользователя, добавление новых постов и корректное отображение времени","Eq Lab","2025-03-21","interview_Eq_Lab_000"

@@ -1,8 +1,0 @@
-"id","question_text","company","date","interview_id"
-"q1","что такое http, какие методы у него есть, Rest API","Моеvideo","2025-01-30","interview_Моеvideo_000"
-"q2","CORS, preflight запросы, как обойти","Моеvideo","2025-01-30","interview_Моеvideo_000"
-"q3","коды ответов http, 403 ошибка, чем её можно заменить","Моеvideo","2025-01-30","interview_Моеvideo_000"
-"q4","Symbol, его особенности","Моеvideo","2025-01-30","interview_Моеvideo_000"
-"q5","как добавить в примитив метод без использования String.prototype","Моеvideo","2025-01-30","interview_Моеvideo_000"
-"q6","Особенности функционального программирования","Моеvideo","2025-01-30","interview_Моеvideo_000"
-"q7","сложность алгоритмов","Моеvideo","2025-01-30","interview_Моеvideo_000"

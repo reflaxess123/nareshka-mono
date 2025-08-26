@@ -1,8 +1,0 @@
-"id","question_text","company","date","interview_id"
-"q1","Что конкретно делал","Dataworks","2024-11-20","interview_Dataworks_000"
-"q2","Что такое SOLID","Dataworks","2024-11-20","interview_Dataworks_000"
-"q3","Паттерны проектирования","Dataworks","2024-11-20","interview_Dataworks_000"
-"q4","Что такое чистая функция","Dataworks","2024-11-20","interview_Dataworks_000"
-"q5","В чем отличие стрелочных функций от обычных функций","Dataworks","2024-11-20","interview_Dataworks_000"
-"q6","Объясните spread и rest операторы","Dataworks","2024-11-20","interview_Dataworks_000"
-"q7","Какие хуки знаете","Dataworks","2024-11-20","interview_Dataworks_000"

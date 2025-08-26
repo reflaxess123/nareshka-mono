@@ -1,3 +1,0 @@
-"id","question_text","company","date","interview_id"
-"q1","На первой странице вывести карточки юзеров с полями id, name, username, email","Kikimora.Tech","2025-01-30","interview_Kikimora.Tech_000"
-"q2","На второй странице вывести карточки юзеров с их постами, в карточке вывести юзера, title и body из поста","Kikimora.Tech","2025-01-30","interview_Kikimora.Tech_000"
